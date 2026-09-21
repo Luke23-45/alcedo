@@ -114,11 +114,7 @@ export function UpdatePlanScreen({
           </S.ReviewHeader>
           <S.CardsWrap>
             {sessionRows.length > 0 && (
-              <DiffReviewCard
-                tone="neutral"
-                label={t('plan.diff.review.session')}
-                countText={t('plan.diff.review.card_count', { count: sessionRows.length })}
-              >
+              <DiffReviewCard tone="neutral" label={t('plan.diff.review.session')}>
                 {sessionRows}
               </DiffReviewCard>
             )}
@@ -141,7 +137,15 @@ export function UpdatePlanScreen({
               </DiffReviewCard>
             )}
             {hasModified && (
-              <DiffReviewCard tone="modified" label={t('plan.diff.review.modified')}>
+              <DiffReviewCard
+                tone="modified"
+                label={t('plan.diff.review.modified')}
+                countText={t('plan.diff.review.card_count', {
+                  count:
+                    diff.modifiedExercises.reduce((total, group) => total + group.changes.length, 0) +
+                    diff.reorderedExercises.length,
+                })}
+              >
                 {modifiedGroups}
                 {reorderedGroups}
               </DiffReviewCard>

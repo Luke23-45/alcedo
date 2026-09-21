@@ -11,7 +11,7 @@ function CheckGlyph({ checked, dark }: { checked: boolean; dark: boolean }) {
     <Svg width={22} height={22} viewBox="0 0 22 22">
       {checked ? (
         <>
-          <Circle cx={11} cy={11} r={11} fill="#30D158" />
+          <Circle cx={11} cy={11} r={11} fill={dark ? '#30D158' : '#34C759'} />
           <Path
             d="M7 11.3l2.6 2.6L15 8.5"
             fill="none"
@@ -125,13 +125,13 @@ export function DiffChangeRow({ view, checked, onToggle }: DiffChangeRowProps) {
         {view.description ? <S.RowDescription>{view.description}</S.RowDescription> : null}
         {view.transition ? (
           <S.TransitionRow>
-            <S.OldValue numberOfLines={1}>{view.transition.oldText}</S.OldValue>
-            <S.TransitionChevron>›</S.TransitionChevron>
-            <S.NewValueChip $dark={dark}>
-              <S.NewValueText $dark={dark} numberOfLines={1}>
-                {view.transition.newText}
-              </S.NewValueText>
-            </S.NewValueChip>
+            <S.OldValue $dark={dark} numberOfLines={1}>
+              {view.transition.oldText}
+            </S.OldValue>
+            <S.TransitionArrow $dark={dark}>→</S.TransitionArrow>
+            <S.NewValueText $dark={dark} numberOfLines={1}>
+              {view.transition.newText}
+            </S.NewValueText>
           </S.TransitionRow>
         ) : null}
       </S.RowTexts>

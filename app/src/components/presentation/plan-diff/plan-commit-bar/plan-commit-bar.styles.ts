@@ -11,7 +11,7 @@ export const BarSurface = styled.View<{ $dark: boolean }>`
   background-color: ${({ $dark }) => ($dark ? 'rgba(28,28,30,0.72)' : 'rgba(249,249,249,0.72)')};
 `;
 
-/** 110×54 ghost discard. */
+/** 110×54 destructive ghost discard: red wash + hairline, red label. */
 export const DiscardButton = styled.Pressable<{ $dark: boolean }>`
   width: 110px;
   height: 54px;
@@ -19,7 +19,9 @@ export const DiscardButton = styled.Pressable<{ $dark: boolean }>`
   border-curve: continuous;
   align-items: center;
   justify-content: center;
-  background-color: ${({ $dark }) => ($dark ? 'rgba(255,255,255,0.10)' : 'rgba(120,120,128,0.12)')};
+  background-color: rgba(255, 59, 48, 0.1);
+  border-width: 1px;
+  border-color: rgba(255, 59, 48, 0.22);
 `;
 
 export const DiscardLabel = styled.Text<{ $dark: boolean }>`
@@ -27,7 +29,7 @@ export const DiscardLabel = styled.Text<{ $dark: boolean }>`
   line-height: 20px;
   font-weight: 600;
   letter-spacing: -0.2px;
-  color: ${({ $dark }) => ($dark ? '#FFFFFF' : '#111111')};
+  color: ${({ $dark }) => ($dark ? '#FF6B60' : '#D70015')};
 `;
 
 /** 54pt save: flex-fills beside discard, brand gradient, deep shadow. */

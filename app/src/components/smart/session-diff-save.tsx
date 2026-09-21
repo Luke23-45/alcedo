@@ -46,7 +46,7 @@ const ResetLabel = styled.Text<{ $dark: boolean }>`
   line-height: 20px;
   font-weight: 400;
   letter-spacing: -0.2px;
-  color: ${({ $dark }) => ($dark ? '#FF9F0A' : '#B25000')};
+  color: ${({ $dark }) => ($dark ? '#FF9F0A' : '#007AFF')};
 `;
 
 export function SessionDiffSaveEditor() {

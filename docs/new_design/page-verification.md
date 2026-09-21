@@ -175,8 +175,8 @@ tests green; eslint 0 errors in touched files; `oxfmt --check` clean; all
 confirmation on device — no device used.
 | 2 | Workout flow (session) | docs/new_design | done 2026-09-22 |
 | 3 | Workout editor | docs/new_design/workout-editor-redesign.md | done 2026-09-22 |
-| 4 | Exercise editor | docs/new_design (exercise editor) | pending |
-| 5 | Diff-save (Update Plan) | docs/new_design/diff-save-redesign.md | pending |
+| 4 | Exercise editor | docs/new_design/exercise-editor-redesign.md | done 2026-09-22 |
+| 5 | Diff-save (Update Plan) | docs/new_design/diff-save-redesign.md | done 2026-09-22 |
 | 6 | History | docs/new_design/history-dark.md | pending |
 | 7 | Trends | docs/new_design | pending |
 | 8 | Feed timeline | docs/new_design/social-dark.md | pending |
@@ -356,3 +356,76 @@ performance — no device used.
 
 **Not claimed:** pixel/animation feel, haptic feel, real-device performance —
 no device used.
+
+### 5. Diff-save / Update Plan (/diff-save)
+- Verified 2026-09-22 (route `app/src/app/diff-save.tsx`, container
+  `components/smart/session-diff-save.tsx`, screen
+  `components/presentation/plan-diff/update-plan-screen/`).
+- Sections inventoried (in render order): nav row (back chevron, Update Plan
+  title, Reset action 44×44), intro title + destination-aware subtitle, mode
+  segmented control (Update Push Day / Save as New, 361×44, radius 22) +
+  consequence line, REVIEW CHANGES header + "N SELECTED" chip, review cards
+  (neutral SESSION, green ADDED, red REMOVED, amber MODIFIED with exercise
+  group headers), per-row checkbox or lock glyph + ALWAYS tag, transition
+  typography (old → new + delta chip), sticky commit bar (destructive-ghost
+  Discard 110×54 + brand-gradient Save 54pt), no-changes empty state (quiet
+  check glyph + honest copy).
+- State matrix simulated: reference Push Day (session notes + added +
+  removed + modified sets/rest), all-checked default, per-row toggle,
+  all-deselected (Save disabled, plain "Save" label), mode switch
+  update→new→update (diff recomputed, selection reset, original references
+  preserved), Reset (reverts to all-checked), no-changes deep-link state
+  (empty state + disabled save + working Discard), offline (the entire flow
+  is local: Redux + SQLite + local sessionService; zero network calls).
+- Apply semantics traced exactly: update mode applies only the selected
+  changes to the workout matched by name (falls back to name search when
+  the plan moved it; silent no-op when the workout is gone — never invents
+  data); save-as-new appends a uniquely named workout; the logged history
+  session is never touched; programs persist via the existing transactional
+  SQLite effect. Added exercises land at their session position, not
+  appended.
+- Entry points: workout finish, post-workout summary, history edit — each
+  pushes `/diff-save` only when `getPlanDiff` finds a real diff.
+- 44×44 audit: Reset (44×44), rows (64px), segments (44px), Discard
+  (110×54), Save (54pt), checkboxes non-pressable visuals inside the row
+  target — all pass.
+
+**Bugs found and fixed:**
+1. `plan-commit-bar.styles.ts` — Discard rendered as a neutral ghost (white
+   / `#111111` text). The spec demands a destructive ghost: `#FF3B30` @ .10
+   fill + .22 hairline, `#FF6B60` text dark / `#D70015` light.
+2. `session-diff-save.tsx` — Reset label in light mode was `#B25000`; the
+   spec's deliberate light-mode deviation is `#007AFF`.
+3. `diff-review-card.tsx` — selected checkbox hard-coded `#30D158` in both
+   modes; spec says `#34C759` in light.
+4. `diff-review-card.styles.ts` / `.tsx` — transition rows had a
+   strikethrough old value, a green pill around the new value, and a `›`
+   chevron. The spec is plain `old → new` typography: old `#6C6C70` /
+   `#AEAEB2`, arrow `#48484A` / `#AEAEB2`, new white / `#111111` 600.
+5. `update-plan-screen.tsx` — SESSION card showed a count the reference
+   doesn't have (removed); MODIFIED card was missing the reference's "2"
+   count (now total modified change rows).
+
+**Light-mode deviations (the spec's two deliberate ones) verified and
+restored:** Discard text `#D70015` (not `#FF6B60`) and Reset `#007AFF` (not
+`#FF9F0A`) — both deepen failing-on-light colors to WCAG AA-passing ones;
+justified and unchanged in intent.
+
+**Tests (18 new, all green):**
+- `diff-save-simulation.spec.ts` (new, 18 tests): reference-scenario
+  grouping (session/added/removed/modified), "5 SELECTED" count, notes
+  line/char honesty, added/removed summaries computed from real blueprints
+  + ADD/REMOVE chips, sets 4→5 +1 chip, rest 90→120 s +30 S chip,
+  same-count rep transition without chip, locked-row never toggleable and
+  never counted, deselected rows excluded from the committed diff, save-as-
+  new naming, new→update recomputation from preserved refs, store-level
+  apply (selected-only, by-name matching after reorder, save-as-new
+  append, silent no-op on missing workout), `getPlanDiff`
+  undefined/diff/add entry points.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 110 files /
+1,622 tests green; oxlint 0 errors and oxfmt clean on touched files
+(214 repo-wide oxlint errors are pre-existing in untouched files).
+
+**Not claimed:** pixel/animation feel, real-device performance — no device
+used.

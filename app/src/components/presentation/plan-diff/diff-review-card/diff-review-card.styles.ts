@@ -136,30 +136,20 @@ export const TransitionRow = styled.View`
   margin-top: 3px;
 `;
 
-export const OldValue = styled.Text`
+export const OldValue = styled.Text<{ $dark: boolean }>`
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
-  color: #86868b;
-  text-decoration-line: line-through;
+  color: ${({ $dark }) => ($dark ? '#6C6C70' : '#AEAEB2')};
 `;
 
-export const TransitionChevron = styled.Text`
+export const TransitionArrow = styled.Text<{ $dark: boolean }>`
   font-size: 10px;
   line-height: 14px;
   font-weight: 500;
-  color: #86868b;
+  color: ${({ $dark }) => ($dark ? '#48484A' : '#AEAEB2')};
   margin-left: 4px;
   margin-right: 4px;
-`;
-
-export const NewValueChip = styled.View<{ $dark: boolean }>`
-  border-radius: 5px;
-  padding-left: 6px;
-  padding-right: 6px;
-  padding-top: 2px;
-  padding-bottom: 2px;
-  background-color: ${({ $dark }) => ($dark ? 'rgba(48,209,88,0.16)' : 'rgba(48,209,88,0.14)')};
 `;
 
 export const NewValueText = styled.Text<{ $dark: boolean }>`
@@ -167,7 +157,7 @@ export const NewValueText = styled.Text<{ $dark: boolean }>`
   line-height: 14px;
   font-weight: 600;
   letter-spacing: -0.2px;
-  color: ${({ $dark }) => ($dark ? '#4ADE80' : '#248A3D')};
+  color: ${({ $dark }) => ($dark ? '#FFFFFF' : '#111111')};
 `;
 
 // ============================================================================
