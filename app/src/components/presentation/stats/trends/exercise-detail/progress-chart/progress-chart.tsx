@@ -13,9 +13,10 @@ import Svg, {
 } from 'react-native-svg';
 import { useTranslate } from '@tolgee/react';
 import type { TranslationKey } from '@tolgee/web';
-import { DateTimeFormatter, LocalDate } from '@js-joda/core';
+import { LocalDate } from '@js-joda/core';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useFormatDate } from '@/hooks/useFormatDate';
 import { type as typeHelper } from '@/styles/theme';
 import { DetailSession, formatBare, formatDeltaPercent } from '../exercise-detail-model';
 import * as S from './progress-chart.styles';
@@ -62,9 +63,20 @@ function smoothLinePath(points: { x: number; y: number }[]): string {
   return `${d} L ${round1(last.x)} ${round1(last.y)}`;
 }
 
-const MONTH_DAY = DateTimeFormatter.ofPattern('MMM d');
+/**
+ * js-joda text patterns (MMM/MMMM/EEEE) throw without the locale plugin, which
+ * we don't ship — month names go through the cached Intl formatters instead.
+ */
+function monthDay(formatDate: (date: LocalDate, opts: Intl.DateTimeFormatOptions) => string, date: LocalDate): string {
+  return formatDate(date, { month: 'short', day: 'numeric' });
+}
 
-const MODES: { key: ChartMode; labelKey: TranslationKey; titleKey: TranslationKey; value: (s: DetailSession) => number }[] = [
+const MODES: {
+  key: ChartMode;
+  labelKey: TranslationKey;
+  titleKey: TranslationKey;
+  value: (s: DetailSession) => number;
+}[] = [
   {
     key: 'weight',
     labelKey: 'stats.exercise_detail.chart.weight',
@@ -105,6 +117,7 @@ export function ProgressChart({
 }) {
   const theme = useAppTheme();
   const { t } = useTranslate();
+  const formatDate = useFormatDate();
   const [mode, setMode] = useState<ChartMode>('weight');
   const { width: windowWidth } = useWindowDimensions();
 
@@ -129,8 +142,7 @@ export function ProgressChart({
   const contentWidth = Math.min(windowWidth, 393) - 32 - 40;
   const plotWidth = contentWidth - PAD_X * 2;
   const lastIndex = windowed.length - 1;
-  const x = (i: number) =>
-    windowed.length === 1 ? contentWidth / 2 : PAD_X + (plotWidth * i) / lastIndex;
+  const x = (i: number) => (windowed.length === 1 ? contentWidth / 2 : PAD_X + (plotWidth * i) / lastIndex);
   const y = (v: number) => PLOT_TOP_PAD + PLOT_H * (1 - (v - vLo) / (vHi - vLo));
 
   const coords = values.map((v, i) => ({ x: x(i), y: y(v) }));
@@ -153,8 +165,7 @@ export function ProgressChart({
 
   const delta = formatDeltaPercent(values[0]!, values[lastIndex]!);
   const deltaColor = delta?.startsWith('-') ? '#FF453A' : '#4ADE80';
-  const strengthRatio =
-    latestBodyweight && latestBodyweight > 0 ? (bestE1rm / latestBodyweight).toFixed(2) : null;
+  const strengthRatio = latestBodyweight && latestBodyweight > 0 ? (bestE1rm / latestBodyweight).toFixed(2) : null;
 
   const selectedIndex = MODES.findIndex((m) => m.key === mode);
   const segmentPitch = contentWidth / MODES.length;
@@ -180,7 +191,7 @@ export function ProgressChart({
 
         <S.ChartTitle>{t(modeSpec.titleKey)}</S.ChartTitle>
         <S.ChartSubtitle>
-          {first.date.format(MONTH_DAY)} – {last.date.format(MONTH_DAY)} · {windowed.length}{' '}
+          {monthDay(formatDate, first.date)} – {monthDay(formatDate, last.date)} · {windowed.length}{' '}
           {t('stats.exercise_detail.chart.sessions')}
           {delta ? (
             <>
@@ -192,98 +203,107 @@ export function ProgressChart({
 
         <S.SvgWrap>
           <Svg width={contentWidth} height={SVG_H}>
-          <Defs>
-            <SvgGradient id="edLine" x1="0" y1="0" x2="1" y2="0">
-              <Stop offset="0" stopColor={tokens.line.start} />
-              <Stop offset="1" stopColor={tokens.line.end} />
-            </SvgGradient>
-            <SvgGradient id="edArea" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0" stopColor="#FF6A3D" stopOpacity={tokens.line.areaOpacity} />
-              <Stop offset="1" stopColor="#FF6A3D" stopOpacity={0} />
-            </SvgGradient>
-            <RadialGradient id="edGlow" cx="50%" cy="50%" r="50%">
-              <Stop offset="0" stopColor={tokens.line.end} stopOpacity={0.55} />
-              <Stop offset="0.55" stopColor={tokens.line.end} stopOpacity={0.22} />
-              <Stop offset="1" stopColor={tokens.line.end} stopOpacity={0} />
-            </RadialGradient>
-            <SvgGradient id="edGold" x1="0.2" y1="0" x2="0.8" y2="1">
-              <Stop offset="0" stopColor="#FFF0BE" />
-              <Stop offset="1" stopColor="#D9A441" />
-            </SvgGradient>
-          </Defs>
-          {[0, PLOT_H / 2, PLOT_H].map((gy) => (
-            <Line
-              key={gy}
-              x1={0}
-              y1={PLOT_TOP_PAD + gy}
-              x2={contentWidth}
-              y2={PLOT_TOP_PAD + gy}
-              stroke={tokens.grid}
-              strokeWidth={1}
-            />
-          ))}
-          <Path d={areaPath} fill="url(#edArea)" />
-          <Path
-            d={linePath}
-            fill="none"
-            stroke="url(#edLine)"
-            strokeWidth={2.6}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {coords.map((c, i) =>
-            i === weightPrIndex || i === lastIndex ? null : (
-              <Circle key={i} cx={c.x} cy={c.y} r={3.4} fill={halo} stroke="#FF6A3D" strokeWidth={2} />
-            ),
-          )}
-          {prCoord && (
-            <>
-              <Circle cx={prCoord.x} cy={prCoord.y} r={6.4} fill="url(#edGold)" stroke={halo} strokeWidth={2.4} />
-              <Path
-                d="M0 -9 L2.23 -3.07 L8.56 -2.78 L3.61 1.17 L5.29 7.28 L0 3.8 L-5.29 7.28 L-3.61 1.17 L-8.56 -2.78 L-2.23 -3.07 Z"
-                transform={`translate(${prCoord.x},${prCoord.y}) scale(0.34)`}
-                fill="#5C4300"
+            <Defs>
+              <SvgGradient id="edLine" x1="0" y1="0" x2="1" y2="0">
+                <Stop offset="0" stopColor={tokens.line.start} />
+                <Stop offset="1" stopColor={tokens.line.end} />
+              </SvgGradient>
+              <SvgGradient id="edArea" x1="0" y1="0" x2="0" y2="1">
+                <Stop offset="0" stopColor="#FF6A3D" stopOpacity={tokens.line.areaOpacity} />
+                <Stop offset="1" stopColor="#FF6A3D" stopOpacity={0} />
+              </SvgGradient>
+              <RadialGradient id="edGlow" cx="50%" cy="50%" r="50%">
+                <Stop offset="0" stopColor={tokens.line.end} stopOpacity={0.55} />
+                <Stop offset="0.55" stopColor={tokens.line.end} stopOpacity={0.22} />
+                <Stop offset="1" stopColor={tokens.line.end} stopOpacity={0} />
+              </RadialGradient>
+              <SvgGradient id="edGold" x1="0.2" y1="0" x2="0.8" y2="1">
+                <Stop offset="0" stopColor="#FFF0BE" />
+                <Stop offset="1" stopColor="#D9A441" />
+              </SvgGradient>
+            </Defs>
+            {[0, PLOT_H / 2, PLOT_H].map((gy) => (
+              <Line
+                key={gy}
+                x1={0}
+                y1={PLOT_TOP_PAD + gy}
+                x2={contentWidth}
+                y2={PLOT_TOP_PAD + gy}
+                stroke={tokens.grid}
+                strokeWidth={1}
               />
-              <SvgText
-                x={prLabelX}
-                y={prCoord.y - 11}
-                textAnchor="middle"
-                fontFamily={fontFamily}
-                fontSize={9.5}
-                fontWeight="700"
-                letterSpacing={-0.1}
-                fill="#FFD84D"
-              >
-                {formatBare(values[weightPrIndex]!)} PR
-              </SvgText>
-            </>
-          )}
-          {lastCoord && !prIsLast && (
-            <>
-              <Circle cx={lastCoord.x} cy={lastCoord.y} r={11} fill="url(#edGlow)" />
-              <Circle cx={lastCoord.x} cy={lastCoord.y} r={5.4} fill={tokens.line.end} stroke={halo} strokeWidth={2.2} />
-              <SvgText
-                x={contentWidth - PAD_X}
-                y={lastCoord.y + 19}
-                textAnchor="end"
-                fontFamily={fontFamily}
-                fontSize={9.5}
-                fontWeight="700"
-                letterSpacing={-0.1}
-                fill={theme.isDark ? '#FF6A88' : tokens.line.end}
-              >
-                {formatBare(values[lastIndex]!)}
-              </SvgText>
-            </>
-          )}
-        </Svg>
+            ))}
+            <Path d={areaPath} fill="url(#edArea)" />
+            <Path
+              d={linePath}
+              fill="none"
+              stroke="url(#edLine)"
+              strokeWidth={2.6}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {coords.map((c, i) =>
+              i === weightPrIndex || i === lastIndex ? null : (
+                <Circle key={i} cx={c.x} cy={c.y} r={3.4} fill={halo} stroke="#FF6A3D" strokeWidth={2} />
+              ),
+            )}
+            {prCoord && (
+              <>
+                <Circle cx={prCoord.x} cy={prCoord.y} r={6.4} fill="url(#edGold)" stroke={halo} strokeWidth={2.4} />
+                <Path
+                  d="M0 -9 L2.23 -3.07 L8.56 -2.78 L3.61 1.17 L5.29 7.28 L0 3.8 L-5.29 7.28 L-3.61 1.17 L-8.56 -2.78 L-2.23 -3.07 Z"
+                  transform={`translate(${prCoord.x},${prCoord.y}) scale(0.34)`}
+                  fill="#5C4300"
+                />
+                <SvgText
+                  x={prLabelX}
+                  y={prCoord.y - 11}
+                  textAnchor="middle"
+                  fontFamily={fontFamily}
+                  fontSize={9.5}
+                  fontWeight="700"
+                  letterSpacing={-0.1}
+                  fill="#FFD84D"
+                >
+                  {formatBare(values[weightPrIndex]!)} PR
+                </SvgText>
+              </>
+            )}
+            {lastCoord && !prIsLast && (
+              <>
+                <Circle cx={lastCoord.x} cy={lastCoord.y} r={11} fill="url(#edGlow)" />
+                <Circle
+                  cx={lastCoord.x}
+                  cy={lastCoord.y}
+                  r={5.4}
+                  fill={tokens.line.end}
+                  stroke={halo}
+                  strokeWidth={2.2}
+                />
+                <SvgText
+                  x={contentWidth - PAD_X}
+                  y={lastCoord.y + 19}
+                  textAnchor="end"
+                  fontFamily={fontFamily}
+                  fontSize={9.5}
+                  fontWeight="700"
+                  letterSpacing={-0.1}
+                  fill={theme.isDark ? '#FF6A88' : tokens.line.end}
+                >
+                  {formatBare(values[lastIndex]!)}
+                </SvgText>
+              </>
+            )}
+          </Svg>
         </S.SvgWrap>
 
         <S.XLabels>
-          <S.XLabelStart>{first.date.format(MONTH_DAY)}</S.XLabelStart>
-          <S.XLabelMid>{windowed[Math.ceil(lastIndex / 2)]!.date.format(MONTH_DAY)}</S.XLabelMid>
+          <S.XLabelStart>{monthDay(formatDate, first.date)}</S.XLabelStart>
+          <S.XLabelMid>{monthDay(formatDate, windowed[Math.ceil(lastIndex / 2)]!.date)}</S.XLabelMid>
           <S.XLabelEnd $current>
-            {last.date.equals(LocalDate.now()) ? t('stats.exercise_detail.chart.today') : last.date.format(MONTH_DAY)}
+            {last.date.equals(LocalDate.now())
+              ? t('stats.exercise_detail.chart.today')
+              : monthDay(formatDate, last.date)}
           </S.XLabelEnd>
         </S.XLabels>
 

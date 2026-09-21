@@ -4,6 +4,7 @@ import { deriveComposerSessionData } from '@/components/presentation/feed/compos
 import type { ComposerStatKey } from '@/components/presentation/feed/composer/composer-types';
 import { buildPosterProps } from '@/components/presentation/feed/composer/poster-props';
 import { useAppSelector } from '@/store';
+import { useFormatDate } from '@/hooks/useFormatDate';
 import { selectComposerPosts, type ComposerPost } from '@/store/feed/composer-posts';
 import { selectHistoryPersonalRecords, selectSessions } from '@/store/stored-sessions';
 
@@ -31,6 +32,7 @@ export function FeedComposerPosts() {
   const posts = useAppSelector(selectComposerPosts);
   const sessions = useAppSelector(selectSessions);
   const recordsBySession = useAppSelector(selectHistoryPersonalRecords);
+  const formatDate = useFormatDate();
 
   if (posts.length === 0) {
     return null;
@@ -41,7 +43,7 @@ export function FeedComposerPosts() {
     <View style={{ gap: 12, marginBottom: 12 }}>
       {posts.map((post) => {
         const session = sessions.find((s) => s.id === post.sessionId);
-        const data = session ? deriveComposerSessionData(session, sessions, recordsBySession) : null;
+        const data = session ? deriveComposerSessionData(session, sessions, recordsBySession, formatDate) : null;
         const poster = data ? buildPosterProps(data, post.theme, visibleRecord(post.visibleStats)) : null;
         return <ComposerPostCard key={post.id} post={post} data={data} poster={poster} now={now} />;
       })}

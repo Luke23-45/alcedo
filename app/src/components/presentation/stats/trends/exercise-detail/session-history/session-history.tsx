@@ -1,14 +1,11 @@
 import { Pressable } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { DateTimeFormatter } from '@js-joda/core';
 import { useTranslate } from '@tolgee/react';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useFormatDate } from '@/hooks/useFormatDate';
 import { DetailSession, formatBare } from '../exercise-detail-model';
 import * as S from './session-history.styles';
-
-const MONTH = DateTimeFormatter.ofPattern('MMM');
-const DAY = DateTimeFormatter.ofPattern('dd');
 
 /** The reference previews the six most recent sessions; the header's total opens the full list. */
 const PREVIEW_ROWS = 6;
@@ -64,6 +61,7 @@ export function SessionHistory({
 }) {
   const { t } = useTranslate();
   const theme = useAppTheme();
+  const formatDate = useFormatDate();
   const preview = sessions.slice(0, PREVIEW_ROWS);
   return (
     <S.Section>
@@ -86,12 +84,14 @@ export function SessionHistory({
           <Pressable onPress={() => onSessionPress(s.sessionId)} accessibilityRole="button">
             <S.RowInner>
               <S.DateTile $pr={s.holdsWeightPr}>
-                <S.DateMonth $pr={s.holdsWeightPr}>{s.date.format(MONTH).toUpperCase()}</S.DateMonth>
-                <S.DateDay $pr={s.holdsWeightPr}>{s.date.format(DAY)}</S.DateDay>
+                {/* js-joda text patterns (MMM) throw without the locale plugin, which
+                    we don't ship — month names go through the cached Intl formatters. */}
+                <S.DateMonth $pr={s.holdsWeightPr}>{formatDate(s.date, { month: 'short' }).toUpperCase()}</S.DateMonth>
+                <S.DateDay $pr={s.holdsWeightPr}>{formatDate(s.date, { day: '2-digit' })}</S.DateDay>
               </S.DateTile>
               <S.TextBlock>
                 <S.MainLine numberOfLines={1} ellipsizeMode="tail">
-                  {s.repList.join(' · ')}  @ {formatBare(s.topSet)} {unitLabel}
+                  {s.repList.join(' · ')} @ {formatBare(s.topSet)} {unitLabel}
                 </S.MainLine>
                 <S.SubLine numberOfLines={1} ellipsizeMode="tail">
                   {t('stats.exercise_detail.history.row_subtitle', {

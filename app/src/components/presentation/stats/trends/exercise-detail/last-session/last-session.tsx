@@ -1,7 +1,7 @@
-import { DateTimeFormatter } from '@js-joda/core';
 import { useTranslate } from '@tolgee/react';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { SampleBadge } from '@/components/presentation/home/shared/sample-badge';
+import { useFormatDate } from '@/hooks/useFormatDate';
 import { DetailSession, formatBare } from '../exercise-detail-model';
 import * as S from './last-session.styles';
 
@@ -16,14 +16,13 @@ import * as S from './last-session.styles';
  */
 const SAMPLED_RPES = [7.0, 7.0, 8.0, 8.0];
 
-const MONTH_DAY = DateTimeFormatter.ofPattern('MMM d');
-
 function sampledRpe(index: number): number | null {
   return index < SAMPLED_RPES.length ? SAMPLED_RPES[index]! : null;
 }
 
 export function LastSessionDetail({ session, unitLabel }: { session: DetailSession; unitLabel: string }) {
   const { t } = useTranslate();
+  const formatDate = useFormatDate();
   const sets = session.sets;
   const totalReps = sets.reduce((sum, s) => sum + s.reps, 0);
   const setsLabel =
@@ -39,7 +38,9 @@ export function LastSessionDetail({ session, unitLabel }: { session: DetailSessi
         <S.TitleRow>
           <S.Title>
             {t('stats.exercise_detail.last_session.title', {
-              date: session.date.format(MONTH_DAY),
+              // js-joda text patterns (MMM) throw without the locale plugin, which
+              // we don't ship — month names go through the cached Intl formatters.
+              date: formatDate(session.date, { month: 'short', day: 'numeric' }),
             })}
           </S.Title>
           <SampleBadge />

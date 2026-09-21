@@ -4,15 +4,11 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'expo-router';
 import { Instant } from '@js-joda/core';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useFormatDate } from '@/hooks/useFormatDate';
 import { useScroll } from '@/hooks/useScrollListener';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { shareString } from '@/store/app';
-import {
-  fetchFeedItems,
-  fetchInboxItems,
-  selectReceivedReactionsByEvent,
-  upsertReceivedReactions,
-} from '@/store/feed';
+import { fetchFeedItems, fetchInboxItems, selectReceivedReactionsByEvent, upsertReceivedReactions } from '@/store/feed';
 import { ReceivedReaction } from '@/models/feed-models';
 import {
   alexPostSeed,
@@ -174,7 +170,8 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
   const sessions = useAppSelector(selectSessions);
   const recordsBySession = useAppSelector(selectHistoryPersonalRecords);
   const latest = latestSession(sessions);
-  const composerData = latest ? deriveComposerSessionData(latest, sessions, recordsBySession) : undefined;
+  const formatDate = useFormatDate();
+  const composerData = latest ? deriveComposerSessionData(latest, sessions, recordsBySession, formatDate) : undefined;
   const draftCaption = useComposerDraftCaption(keyValueStore);
   const hidden = useHiddenPosts(keyValueStore);
   const bookmarks = useBookmarks(keyValueStore);
@@ -282,9 +279,7 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
             <TimelinePostRow
               post={post}
               kudosOverride={isAlexPost ? alexKudos : undefined}
-              onToggleKudosOverride={
-                isAlexPost ? () => dispatch(togglePostKudos('alex')) : undefined
-              }
+              onToggleKudosOverride={isAlexPost ? () => dispatch(togglePostKudos('alex')) : undefined}
               caption={caption}
               bookmarked={bookmarks.has(post.id)}
               shareText={shareText}

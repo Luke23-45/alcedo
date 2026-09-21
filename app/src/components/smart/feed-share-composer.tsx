@@ -10,6 +10,7 @@ import {
   type ComposerTheme,
 } from '@/components/presentation/feed/composer/composer-types';
 import { useAppSelector } from '@/store';
+import { useFormatDate } from '@/hooks/useFormatDate';
 import { publishComposerPost } from '@/store/feed/composer-posts';
 import { selectSessions, selectHistoryPersonalRecords } from '@/store/stored-sessions';
 
@@ -54,7 +55,8 @@ export function FeedShareComposer() {
   const [tagSheetVisible, setTagSheetVisible] = useState(false);
 
   const attached = !detached && latest !== undefined;
-  const data = attached && latest ? deriveComposerSessionData(latest, sessions, recordsBySession) : null;
+  const formatDate = useFormatDate();
+  const data = attached && latest ? deriveComposerSessionData(latest, sessions, recordsBySession, formatDate) : null;
 
   const toggleStat = (key: ComposerStatKey) => setVisible((prev) => ({ ...prev, [key]: !prev[key] }));
 

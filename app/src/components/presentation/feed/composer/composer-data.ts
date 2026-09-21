@@ -4,7 +4,7 @@ import { Weight } from '@/models/weight';
 import { completedSetCount, formatSessionClock } from '@/components/presentation/summary/post-workout-format';
 import { getSessionReferenceTime } from '@/store/stored-sessions';
 import type { PersonalRecord } from '@/store/stats/personal-records';
-import { DateTimeFormatter, LocalDate } from '@js-joda/core';
+import { LocalDate } from '@js-joda/core';
 
 /**
  * Real-data derivation for the Share Composer and for composer posts rendered
@@ -101,10 +101,18 @@ function trainingStreakDays(sessions: readonly Session[]): number {
   return streak;
 }
 
+/**
+ * A cached `Intl.DateTimeFormat`-backed formatter (see `useFormatDate`), passed
+ * in by components: js-joda text patterns (EEEE/MMMM) throw without the locale
+ * plugin, which we don't ship, so the kicker date must go through Intl.
+ */
+export type ComposerFormatDate = (date: LocalDate, opts: Intl.DateTimeFormatOptions) => string;
+
 export function deriveComposerSessionData(
   session: Session,
   sessions: readonly Session[],
   recordsBySession: Map<string, PersonalRecord[]>,
+  formatDate: ComposerFormatDate,
 ): ComposerSessionData {
   const volumeKg = sessionVolumeKg(session);
   const volumeLabel = Math.round(volumeKg).toLocaleString('en-US');
@@ -128,10 +136,11 @@ export function deriveComposerSessionData(
     prPills.push(`${streak}-DAY STREAK`);
   }
 
-  const kickerDate = getSessionReferenceTime(session)
-    .toLocalDate()
-    .format(DateTimeFormatter.ofPattern('EEEE, MMMM d'))
-    .toUpperCase();
+  const kickerDate = formatDate(getSessionReferenceTime(session).toLocalDate(), {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  }).toUpperCase();
 
   return {
     sessionId: session.id,
