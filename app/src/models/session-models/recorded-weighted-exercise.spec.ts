@@ -371,8 +371,20 @@ describe('RecordedWeightedExercise.withAddedSet', () => {
     expect(added.weight.equals(last.weight)).toBe(true);
   });
 
-  it('returns the same exercise when there are no sets', () => {
+  it('returns the same exercise when there are no sets and no unit is given', () => {
     const exercise = new RecordedWeightedExercise(makeWeightedBlueprint(), [], undefined);
     expect(exercise.withAddedSet()).toBe(exercise);
+  });
+
+  it('reseeds from the blueprint when a unit is given and there are no sets', () => {
+    const exercise = new RecordedWeightedExercise(makeWeightedBlueprint(), [], undefined);
+    const result = exercise.withAddedSet('kilograms');
+    expect(result).not.toBe(exercise);
+    expect(result.potentialSets.length).toBe(1);
+    const added = result.potentialSets[0]!;
+    expect(added.set).toBeUndefined();
+    expect(added.weight.value.toNumber()).toBe(0);
+    expect(added.weight.unit).toBe('kilograms');
+    expect(added.target).toEqual(exercise.blueprint.repsTargetForSet(0));
   });
 });

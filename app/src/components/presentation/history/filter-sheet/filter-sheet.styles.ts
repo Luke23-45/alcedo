@@ -64,8 +64,8 @@ export const SearchInput = styled.TextInput`
 `;
 
 export const ClearQuery = styled.Pressable`
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   align-items: center;
   justify-content: center;
 `;

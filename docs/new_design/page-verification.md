@@ -33,6 +33,8 @@ timing, real-device performance. Device checklist comes later with a dev build.
 | 2 | Workout flow (session) | docs/new_design | done 2026-09-22 |
 | 3 | Workout editor | docs/new_design/workout-editor-redesign.md | done 2026-09-22 |
 | 4 | Exercise editor | docs/new_design/exercise-editor-redesign.md | done 2026-09-22 |
+| 5 | Diff-save / Update Plan | docs/new_design/diff-save-redesign.md | done 2026-09-22 |
+| 6 | History | docs/new_design/history-dark.md | done 2026-09-22 |
 
 ## Per-page log
 ### 1. Home
@@ -177,7 +179,7 @@ confirmation on device — no device used.
 | 3 | Workout editor | docs/new_design/workout-editor-redesign.md | done 2026-09-22 |
 | 4 | Exercise editor | docs/new_design/exercise-editor-redesign.md | done 2026-09-22 |
 | 5 | Diff-save (Update Plan) | docs/new_design/diff-save-redesign.md | done 2026-09-22 |
-| 6 | History | docs/new_design/history-dark.md | pending |
+| 6 | History | docs/new_design/history-dark.md | done 2026-09-22 |
 | 7 | Trends | docs/new_design | pending |
 | 8 | Feed timeline | docs/new_design/social-dark.md | pending |
 | 9 | Feed post detail | docs/new_design/social-dark.md | pending |
@@ -426,6 +428,113 @@ justified and unchanged in intent.
 **Verification:** `npm run typecheck` 0 errors; full vitest 110 files /
 1,622 tests green; oxlint 0 errors and oxfmt clean on touched files
 (214 repo-wide oxlint errors are pre-existing in untouched files).
+
+**Not claimed:** pixel/animation feel, real-device performance — no device
+used.
+
+### 6. History (`/history`, `/history/post-workout`, `/history/edit`)
+- Verified 2026-09-22 (routes `app/src/app/(tabs)/history/index.tsx`,
+  `app/src/app/(tabs)/history/post-workout.tsx`,
+  `app/src/app/(tabs)/history/edit.tsx`; screens
+  `components/presentation/history/*`).
+- Sections inventoried (in render order):
+  - Screen 1 (activity calendar + sessions): header (activity title, month
+    pager chevrons, filter button with active-filter badge), month calendar
+    (Monday-first six-week grid, computed load rings, ring geometry from
+    `history-design.ts`, chevrons 44×44), month summary strip (workouts /
+    volume / hours, month-aware copy, hidden when the month is empty), day
+    summary + selected-session cards (coral edge, PR chips), week list
+    (weekday rows + session rows), empty states (empty selected day →
+    "Add workout" creates a freeform session at that date and opens the
+    edit screen; empty month → "Start workout"; no filter results →
+    "Clear filters").
+  - Screen 2 (session detail): nav row (back chevron, "Session Detail"
+    title, overflow menu), hero (date, volume, duration), stat tiles
+    (volume / sets / exercises + sub notes), detail strip (avg BPM sample
+    under SampleBadge, started-exercise count standing in for AVG RPE —
+    documented, rest time), PR card (gold ring; set chips e1RM-matched
+    against store records via `pr-match.ts`), HR curve (sample, SampleBadge),
+    exercise breakdown (per-exercise volume, gold PR chips), previous-session
+    comparison (`selectPreviousComparableSession`), notes card, kudos,
+    actions (share / repeat with replace-current confirm / edit / delete
+    with destructive confirm).
+  - Screen 3 (edit session): nav (Cancel / Save, overflow with Resume +
+    Delete), live totals strip (volume / sets / reps / duration recomputed
+    from the draft + pulsing sync dot, 361×68), WHEN card (Start / End rows
+    open date-then-time pickers that shift every recorded set timestamp via
+    `applySessionDateTime`; Duration row recomputes with AUTO chip), EXERCISES
+    section (drag-to-reorder keeping blueprint + recorded arrays aligned,
+    set chips with 44pt hitSlop, inline set editor with weight/reps
+    steppers + delete-set, add-exercise via `useAddExercise`), notes editor
+    (500-char draft committed on blur/unmount), Delete Session (destructive
+    confirm).
+- Data path traced: real stored sessions through focused Redux selectors
+  backed by SQLite persistence; write-through `updateStoredSession` on every
+  edit; leaving the edit screen dispatches `sessionFinished` once (re-queues
+  feed sharing, marks stats dirty, re-exports to health) unless resuming.
+  Detail route redirects to `/history` for missing/invalid session ids.
+  Calories are the documented approximation
+  `round(3.5 × minutes + 0.028 × volumeKg)` and always labelled "KCAL EST".
+  Avg/max BPM and the HR curve are sample data (no HR source in the app) and
+  carry SampleBadge.
+- State matrix simulated: populated month, empty month, empty selected day,
+  filters active with and without matches (filter logic in
+  `history-screen1.spec.ts`), empty session (honest zeros, "—" duration),
+  planned-but-unlogged session (ignored by aggregates), weighted session,
+  cardio-only session (zero volume, sets counted, kcal from duration),
+  mixed session, active/rest split from real timestamps (undefined without
+  timing data), month grouping, edit write-through, delete (detail can no
+  longer find it), previous comparable found / missing, delete-all-sets then
+  re-add, notes write-through. Calendar grid + ring geometry and filters
+  were already covered by `history-screen1.spec.ts`; PR matching by
+  `pr-match.spec.ts`; time shifts by `session-time-utils.spec.ts`.
+
+**Bugs found and fixed:**
+1. `app/(tabs)/history/edit.tsx` — the delete-session confirmation did not
+   pass `destructive`, unlike the detail screen's; the spec demands red
+   destructive text. Fixed.
+2. `app/(tabs)/history/edit.tsx` — `save()` dispatched `sessionFinished`
+   through `finishWorkout()`, then the unmount handler dispatched it a
+   second time (duplicate stats/exports work). Now guarded with a
+   `finished` ref; cancel/resume paths unchanged.
+3. `models/session-models/recorded-weighted-exercise.ts` —
+   `withAddedSet()` no-op'd when an exercise's sets were all deleted, leaving
+   the add-set chip a dead control. It now reseeds from the blueprint (zero
+   weight in the user's unit, first planned target) when a unit is given;
+   the edit screen passes the settings unit. The no-unit no-op contract is
+   unchanged.
+4. `when-card.styles.ts` — body was 130px with 43.33px rows while the spec
+   (and the file's own comment) say 361×132 with three 44pt rows; dividers
+   at 48/92 floated mid-row. Now 132px body, 44px rows — also fixes the
+   sub-44pt touch target.
+5. `live-totals-strip.styles.ts` — body 66px vs the spec's 361×68. Now 68px.
+6. `filter-sheet.styles.ts` — search clear button was 32×32, under the
+   44×44 minimum. Now 44×44 (fits the 44px search box).
+
+**Deliberate deviations / deferred (recorded, not patched):**
+- RPE: the spec's strip shows AVG RPE and screen 3 has an Effort slider, but
+  the Session model has no RPE field (SessionJSON v7) and no workout flow
+  collects one. The strip shows the started-exercise count instead
+  (documented in code); the edit screen omits the slider rather than
+  inventing data. Adding RPE needs a SessionJSON v8 + model field — a
+  feature, not a safe patch; deferred for a product decision.
+- The spec's "Mark as personal record" toggle is mock chrome: PRs are
+  store-computed from logged sets, and a manual toggle would invent
+  records. Omitted deliberately.
+- Home continuity patches from the spec (22 min Zone 3+, 12m / 8m / 9m / 9m
+  / 4m bars, static TODAY chip) were verified already applied in
+  `home/hr-zones/hr-zones.tsx`.
+
+**Tests (14 new, all green):**
+- `history-simulation.spec.ts` (new, 13 tests): empty / planned-only /
+  weighted / cardio-only / mixed aggregates, kcal estimates, active/rest
+  split, month grouping, edit write-through, delete, previous comparable,
+  delete-all-sets reseed, notes write-through.
+- `recorded-weighted-exercise.spec.ts` (+1 test): `withAddedSet` reseeds
+  from the blueprint with a unit; the existing no-unit no-op test kept.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 111 files /
+1,636 tests green; oxlint 0 errors and oxfmt clean on touched files.
 
 **Not claimed:** pixel/animation feel, real-device performance — no device
 used.

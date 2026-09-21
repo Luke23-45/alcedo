@@ -8,13 +8,7 @@ import { useTranslate } from '@tolgee/react';
 import { OffsetDateTime } from '@js-joda/core';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import {
-  runOnJS,
-  SharedValue,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import { runOnJS, SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useAppReducedMotion } from '@/hooks/useMotionSettings';
 import Svg, { Circle, G, Line, Rect } from 'react-native-svg';
 import * as S from './exercises-section.styles';
@@ -409,6 +403,7 @@ export function ExercisesSection({
   const { t } = useTranslate();
   const [selection, setSelection] = useState<Selection | null>(null);
   const prRecords = useAppSelector(selectHistoryPersonalRecords);
+  const useImperialUnits = useAppSelector((x) => x.settings.useImperialUnits);
 
   const dragActive = useSharedValue(-1);
   const dragTarget = useSharedValue(0);
@@ -485,7 +480,10 @@ export function ExercisesSection({
   const handleAddSet = (exerciseIndex: number) => {
     const recorded = session.recordedExercises[exerciseIndex];
     const nextIndex = recorded instanceof RecordedWeightedExercise ? recorded.potentialSets.length : 0;
-    withWeighted(exerciseIndex, (re) => re.withAddedSet());
+    // Pass the unit so an exercise whose sets were all deleted reseeds from the
+    // blueprint instead of leaving the add control dead (withAddedSet no-ops
+    // on empty without one).
+    withWeighted(exerciseIndex, (re) => re.withAddedSet(useImperialUnits ? 'pounds' : 'kilograms'));
     setSelection({ exerciseIndex, setIndex: nextIndex });
   };
 

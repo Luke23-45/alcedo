@@ -30,11 +30,11 @@ export const WhenOuter = styled(HomeGradient).attrs({ variant: 'cardEdge' })<{
 export const WhenBody = styled(HomeGradient).attrs({ variant: 'cardBody' })`
   border-radius: 27px;
   overflow: hidden;
-  height: 130px;
+  height: 132px;
 `;
 
 export const WhenRow = styled.Pressable`
-  height: 43.33px;
+  height: 44px;
   flex-direction: row;
   align-items: center;
   padding-horizontal: 20px;

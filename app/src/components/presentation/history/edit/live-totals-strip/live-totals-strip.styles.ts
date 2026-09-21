@@ -36,7 +36,7 @@ export const StripBody = styled(HomeGradient).attrs({
 })`
   border-radius: 23px;
   overflow: hidden;
-  height: 66px;
+  height: 68px;
   flex-direction: row;
   align-items: stretch;
 `;

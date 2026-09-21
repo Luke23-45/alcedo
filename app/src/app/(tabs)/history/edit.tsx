@@ -25,8 +25,11 @@ export default function HistoryEditPage() {
   // Resuming hands the session back to the workout in progress, so leaving this screen must not also
   // finish it - that would immediately clear it as the active workout again.
   const resumed = useRef(false);
+  // save()/confirmDelete() already dispatch sessionFinished through finishWorkout; the unmount
+  // below must not dispatch it a second time (duplicate stats/exports work).
+  const finished = useRef(false);
   useOnDismiss(() => {
-    if (!resumed.current) {
+    if (!resumed.current && !finished.current) {
       dispatch(sessionFinished(sessionId));
     }
   });
@@ -39,6 +42,7 @@ export default function HistoryEditPage() {
 
   const save = () => {
     const hasDiff = finishWorkout();
+    finished.current = true;
     dismissTo('/history');
     if (hasDiff) {
       push('/diff-save');
@@ -50,6 +54,7 @@ export default function HistoryEditPage() {
     dispatch(deleteStoredSession(sessionId));
     dispatch(addUnpublishedSessionId(sessionId));
     dispatch(removeReactionsForEvents([sessionId]));
+    finished.current = true;
     setDeleteConfirmOpen(false);
     dismissTo('/history');
   };
@@ -94,6 +99,7 @@ export default function HistoryEditPage() {
         )}
         cancelText={t('generic.cancel.button', 'Cancel')}
         okText={t('history.edit.delete_session.confirm.button', 'Delete')}
+        destructive
         onCancel={() => setDeleteConfirmOpen(false)}
         onOk={confirmDelete}
       />

@@ -139,11 +139,21 @@ export class RecordedWeightedExercise {
     });
   }
 
-  /** Appends an empty set seeded from the last set's weight and target. */
-  withAddedSet(): RecordedWeightedExercise {
+  /**
+   * Appends an empty set seeded from the last set's weight and target. When every
+   * set was deleted there is no last set to copy: with a unit the set reseeds
+   * from the blueprint (zero weight, first planned target) so the exercise can
+   * gain sets again; without one it stays a no-op rather than inventing a unit.
+   */
+  withAddedSet(unit?: WeightUnit): RecordedWeightedExercise {
     const last = this.potentialSets.at(-1);
     if (!last) {
-      return this;
+      if (!unit) {
+        return this;
+      }
+      return this.with({
+        potentialSets: [PotentialSet.of({ weight: new Weight(0, unit), target: this.blueprint.repsTargetForSet(0) })],
+      });
     }
     return this.with({
       potentialSets: [...this.potentialSets, PotentialSet.of({ weight: last.weight, target: last.target })],
