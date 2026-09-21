@@ -18,6 +18,23 @@ export function shouldCommitDraftOnDismiss(intent: DraftDismissIntent): boolean 
 }
 
 /**
+ * Resolves the committed name from the draft. A blank draft name falls back to
+ * the stored name — a plan can never be saved nameless. An untouched name
+ * resolves to undefined so the stored value survives the commit.
+ */
+export function resolveDraftName(
+  rawName: string,
+  nameDirty: boolean,
+  storedName: string | undefined,
+): string | undefined {
+  if (!nameDirty) {
+    return undefined;
+  }
+  const trimmed = rawName.trim();
+  return trimmed.length > 0 ? trimmed : storedName;
+}
+
+/**
  * Builds the store update that commits the draft. A field left `undefined`
  * was never touched and keeps its stored value.
  */

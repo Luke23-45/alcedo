@@ -376,7 +376,7 @@ Draft model: commits on **Save** and on **swipe-back**; only **Cancel** discards
 |---|---|---|
 | Exercises count | 6 exercises listed | **6** ✓ meta card |
 | Sets sum | 4+3+3+3+3+3 | **19** ✓ meta card |
-| Est. Volume | (100×5×4) + (34×8×3) + (60×10×3) + (25×12×3) + (20×15×3) + (33×12×3) | 2000 + 816 + 1800 + 900 + 900 + 1188 = **7,604** … but we use total-DB convention: 34 per DB × 2 = 68 × 8 × 3 = 1,632. So 2000+1632+1800+900+900+1188 = **8,420 kg** ✓ (matches session total exactly) |
+| Est. Volume | Σ(heaviest-recorded-weight × planned reps) on the reference Push Day, as logged | (100×5×4) + (34×8×3) + (60×10×3) + (25×12×3) + (20×15×3) + (33×12×3) = 2000 + 816 + 1800 + 900 + 900 + 1188 = **7,604 kg** ✓ |
 | Min est | (4+3+3+3+3+3)×45s work + (4×90 + 5×60) rests + 5×60s transitions | 855 + 660 + 300 = **1,815s ≈ 30 min** — hmm, recalculating with the audit formula: per-set rests are counted after each set except last of each exercise. Bench: 4×45 + 3×90 = 180+270 = 450. Incline: 3×45 + 2×60 = 135+120 = 255. Shoulder: 3×45 + 2×90 = 135+180 = 315. Crossover: 3×45 + 2×60 = 255. Triceps: 255. Pec Deck: 255. Transitions: 5×60 = 300. Total = 450+255+315+255+255+255+300 = **2,085s ≈ 35 min**. Let me show **35** — more honest. I will patch the canvas to read **35**. |
 | Row summary format | "sets × reps · weight · rest" | applied uniformly ✓ |
 | Weight source | last-recorded lift | Bench 100 (Jun 9), Incline 34, Shoulder 60, Cable 25, Triceps 20, Pec Deck 33 ✓ |
@@ -389,3 +389,13 @@ Draft model: commits on **Save** and on **swipe-back**; only **Cancel** discards
 | Long-press → per-exercise confirm | designed ✓ |
 | ⋯ → Remove-all confirm | designed ✓ |
 | Reorder = handle-only drag |
+
+## Correction — reference volume (page-3 simulation, 2026-09-22)
+
+The earlier draft of this log claimed **8,420 kg** for the reference Push Day,
+via a "two-dumbbell convention" (34 kg per DB × 2 = 68). That convention was
+removed: no exercise, blueprint, or recorded set carries dumbbell-count
+metadata, so doubling the logged weight would be invented data. The logged
+weight is the source of truth — the same 34 kg the row summary shows — and the
+honest reference value is **7,604 kg**, which is what the implementation
+computes and the test suite asserts (`plan-estimates.spec.ts`).

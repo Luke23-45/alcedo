@@ -1061,6 +1061,7 @@
   "workout.editor.plan_name.placeholder": "Untitled workout",
   "workout.editor.remove_all_exercises.button": "Remove All Exercises",
   "workout.editor.remove_all_exercises.confirm.body": "All {count} exercises will be removed. This cannot be undone. Past sessions are not affected.",
+  "workout.editor.remove_all_exercises.confirm.ok": "Remove all",
   "workout.editor.remove_all_exercises.confirm.title": "Remove all exercises?",
   "workout.editor.remove_exercise.confirm.body": "{name} will be removed from this plan. Recorded history for past sessions is not affected.",
   "workout.editor.reorder_caption": "Reorder commits index changes to the store on drop. Blueprint and recorded exercises stay aligned 1-for-1.",

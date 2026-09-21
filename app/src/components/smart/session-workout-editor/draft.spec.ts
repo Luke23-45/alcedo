@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { makeSession, makeWeightedBlueprint } from '@/models/session-models/__test__/helpers';
 import { storedSessionsReducer, putStoredSession, updateStoredSession } from '@/store/stored-sessions';
-import { buildDraftCommitUpdate, shouldCommitDraftOnDismiss } from './draft';
+import { buildDraftCommitUpdate, resolveDraftName, shouldCommitDraftOnDismiss } from './draft';
 
 vi.mock('expo-localization', () => ({ getLocales: () => [{ decimalSeparator: '.' }] }));
 
@@ -23,6 +23,42 @@ describe('shouldCommitDraftOnDismiss', () => {
 
   it('discards only on Cancel', () => {
     expect(shouldCommitDraftOnDismiss('cancel')).toBe(false);
+  });
+});
+
+describe('resolveDraftName', () => {
+  it('trims a dirty name', () => {
+    expect(resolveDraftName('  Leg Day  ', true, 'Push Day')).toBe('Leg Day');
+  });
+
+  it('keeps the stored name when the draft is blank — a plan can never be saved nameless', () => {
+    expect(resolveDraftName('   ', true, 'Push Day')).toBe('Push Day');
+  });
+
+  it('resolves to undefined when the name was never touched', () => {
+    expect(resolveDraftName('Push Day', false, 'Push Day')).toBeUndefined();
+  });
+
+  it('commits the blank-name fallback through the real store', () => {
+    const { state, sessionId } = stateWithSession();
+    const storedName = state.sessions[sessionId]!.blueprint.name;
+    const next = storedSessionsReducer(
+      state,
+      updateStoredSession({
+        sessionId,
+        update: buildDraftCommitUpdate(resolveDraftName('   ', true, storedName), undefined),
+      }),
+    );
+    expect(next.sessions[sessionId]!.blueprint.name).toBe(storedName);
+  });
+
+  it('clearing the notes persists the empty string', () => {
+    const { state, sessionId } = stateWithSession();
+    const next = storedSessionsReducer(
+      state,
+      updateStoredSession({ sessionId, update: buildDraftCommitUpdate(undefined, '') }),
+    );
+    expect(next.sessions[sessionId]!.blueprint.notes).toBe('');
   });
 });
 

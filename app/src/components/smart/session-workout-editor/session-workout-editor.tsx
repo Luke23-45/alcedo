@@ -21,8 +21,9 @@ import { runOnJS, SharedValue, useAnimatedStyle, useSharedValue, withTiming } fr
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Ellipse, G, Line, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useDispatch } from 'react-redux';
-import { buildDraftCommitUpdate, shouldCommitDraftOnDismiss, type DraftDismissIntent } from './draft';
+import { buildDraftCommitUpdate, resolveDraftName, shouldCommitDraftOnDismiss, type DraftDismissIntent } from './draft';
 import { countPlanSets, estimatePlanMinutes, estimatePlanVolumeKg, formatRowSummary } from './plan-estimates';
+import { reorderExercises } from './reorder';
 import * as S from './session-workout-editor.styles';
 
 export function getSessionWorkoutEditorHref(sessionId: string, opts?: { focusNotes?: boolean }): Href {
@@ -142,23 +143,6 @@ function ScreenAura() {
       </Svg>
     </S.AuraWrap>
   );
-}
-
-/** Reorder that keeps blueprint.exercises and recordedExercises aligned. */
-function reorderExercises(session: Session, from: number, to: number): Session {
-  if (from === to) {
-    return session;
-  }
-  const move = <T,>(items: T[]): T[] => {
-    const next = [...items];
-    const [item] = next.splice(from, 1);
-    next.splice(to, 0, item!);
-    return next;
-  };
-  return session.with({
-    blueprint: session.blueprint.with({ exercises: move(session.blueprint.exercises) }),
-    recordedExercises: move(session.recordedExercises),
-  });
 }
 
 /* ------------------------------------------------------------------ *
@@ -373,8 +357,7 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
   };
 
   const commitDraft = () => {
-    const trimmedName = nameRef.current.trim();
-    const nextName = nameDirty.current ? (trimmedName.length > 0 ? trimmedName : workout?.blueprint.name) : undefined;
+    const nextName = resolveDraftName(nameRef.current, nameDirty.current, workout?.blueprint.name);
     dispatch(
       updateStoredSession({
         sessionId,
@@ -612,7 +595,7 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
                       <S.MetaValue style={{ fontVariant: ['tabular-nums'] }}>
                         {minutes === undefined ? '–' : minutes}
                       </S.MetaValue>
-                      <S.MetaLabel>{t('workout.editor.meta.est_time', 'EST. TIME')}</S.MetaLabel>
+                      <S.MetaLabel>{t('workout.editor.meta.est_time', 'MIN · EST. TIME')}</S.MetaLabel>
                     </S.MetaCol>
                   </S.MetaRow>
                   <S.MetaFootnote>
@@ -790,7 +773,8 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
           defaultValue: 'All {count} exercises will be removed. This cannot be undone. Past sessions are not affected.',
           count: exercises.length,
         })}
-        okText={t('generic.delete.button', 'Delete')}
+        okText={t('workout.editor.remove_all_exercises.confirm.ok', 'Remove all')}
+        destructive
         onCancel={() => setConfirmingClear(false)}
         onOk={() => {
           setConfirmingClear(false);
@@ -809,6 +793,7 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
               : '',
         })}
         okText={t('generic.remove.button', 'Remove')}
+        destructive
         onCancel={() => setRemovingIndex(null)}
         onOk={() => {
           const index = removingIndex;

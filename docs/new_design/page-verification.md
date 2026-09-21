@@ -172,7 +172,7 @@ tests green; eslint 0 errors in touched files; `oxfmt --check` clean; all
 **Not claimed:** pixel/animation feel, real-device performance, haptic
 confirmation on device — no device used.
 | 2 | Workout flow (session) | docs/new_design | done 2026-09-22 |
-| 3 | Workout editor | docs/new_design/workout-editor-redesign.md | pending |
+| 3 | Workout editor | docs/new_design/workout-editor-redesign.md | done 2026-09-22 |
 | 4 | Exercise editor | docs/new_design (exercise editor) | pending |
 | 5 | Diff-save (Update Plan) | docs/new_design/diff-save-redesign.md | pending |
 | 6 | History | docs/new_design/history-dark.md | pending |
@@ -190,3 +190,73 @@ confirmation on device — no device used.
 | 18 | Backup hub + remote/export/import | docs/new_design/backup-redesign.md | pending |
 | 19 | What's New | (settings spec) | pending |
 | 20 | Backends [id] | — | deferred (no design yet) |
+
+### 3. Workout editor (/workout-editor)
+- Verified 2026-09-22 (route `app/src/app/workout-editor.tsx`, container
+  `components/smart/session-workout-editor/session-workout-editor.tsx`).
+- Sections inventoried (in render order): nav row (back chevron, Edit Plan
+  title, ⋯ overflow), amber draft strip, plan-name input (focused underline),
+  meta card (exercises / sets / est. volume / est. time + "Computed from logged
+  history"), notes section (autofocus on `?focus=notes`), exercises list
+  (grip + number tile, name, row summary, chevron, dividers), empty state
+  (dumbbell, 0/0/–/–, Add Exercise, ADD BEHAVIOR card), formula footnote,
+  sticky footer (Add Exercise + Save Plan + "Changes apply to this session
+  only" / amber Cancel when empty), remove-all confirm, per-exercise remove
+  confirm (long-press).
+- State matrix simulated: populated (6-exercise reference), empty, reorder
+  dragging (scroll locked, lifted row, drop indicator), confirmation open
+  (both), draft dirty/clean, notes focus entry, imperial units, unlogged
+  exercise (weight segment vanishes), bodyweight moves, cardio rows.
+- Estimate math verified against the reference Push Day: 19 sets, 35 min
+  (2,085s → round), volume **7,604 kg** — see the spec correction below.
+- Draft semantics traced exactly: name/notes are local drafts committed on
+  Save, back chevron, and swipe-back (unmount); only Cancel / Discard Changes
+  discards. Add/remove/reorder mutate the store immediately and are never
+  lost by a Cancel. Blank name falls back to the stored name; cleared notes
+  persist as empty.
+- 44×44 audit: nav buttons, menu trigger, Add/Save (52px), empty-state CTA,
+  Cancel, grab zone (handle + number tile, ≈56×64) pass.
+
+**Bugs found and fixed:**
+1. `session-workout-editor.tsx` — both destructive confirmations rendered
+   their confirm action in the default button color. They now pass
+   `destructive`, so Remove / Remove all render in destructive red per the
+   spec.
+2. `session-workout-editor.tsx` — the remove-all confirm's button read the
+   generic "Delete". The spec shows "Remove all". Now uses the dedicated key
+   `workout.editor.remove_all_exercises.confirm.ok` ("Remove all", added to
+   `en.json`).
+3. `session-workout-editor.tsx` — the est-time label's `t()` default was
+   "EST. TIME" while `en.json` (and the spec) say "MIN · EST. TIME". Default
+   aligned to the spec.
+4. Spec correction (`docs/new_design/workout-editor-redesign.md`): the
+   verification log claimed 8,420 kg for the reference Push Day via a
+   "two-dumbbell convention" (34 kg per DB × 2). No exercise, blueprint, or
+   recorded set carries dumbbell-count metadata, so doubling the logged
+   weight would be invented data. The honest reference value is **7,604 kg**,
+   which is what the implementation computes and the suite asserts.
+
+**Refactors (behavior unchanged):**
+- `reorderExercises` moved verbatim from the component file to new
+  `reorder.ts` (named export) so the simulation suite can drive it.
+- Draft-name resolution extracted from the component's `commitDraft` into
+  `resolveDraftName` in `draft.ts` (named export).
+
+**Tests (13 new, all green):**
+- `reorder.spec.ts` (new, 8 tests): from===to identity, first→last and
+  last→first moves, adjacent swap, no mutation of the original, store-level
+  reorder keeping blueprint/recorded 1-for-1, store-level remove-all clearing
+  both arrays while keeping name/notes, single-exercise removal keeping
+  alignment.
+- `draft.spec.ts` (+5 tests): name trimming, blank-name fallback through the
+  real store, untouched name untouched, cleared notes persist as empty.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 109 files /
+1,597 tests green; oxlint 0 errors and oxfmt clean on touched files; all
+`t('…')` keys resolve in `en.json`. (One environment note: a full-suite run
+failed mid-way with `ENOSPC` — `/tmp` was full of 511 leftover
+`liftlog-test-*.db` files from earlier backup-test runs; after cleaning,
+the suite went fully green.)
+
+**Not claimed:** pixel/animation feel, drag-gesture feel, real-device
+performance — no device used.
