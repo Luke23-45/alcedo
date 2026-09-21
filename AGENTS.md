@@ -21,7 +21,9 @@ pre-delivery checklist. Treat it as law.
 
 The vast majority of work is in **`app/`** — an **Expo ~57 / React Native 0.86 / React 19** app.
 Stack: expo-router (file-based routes in `app/src/app/`), Redux Toolkit, React Native Paper (Material 3),
-Drizzle ORM + expo-sqlite, Tolgee i18n, React Compiler, TypeScript ~6, styled-components (removed — see theming).
+Drizzle ORM + expo-sqlite, Tolgee i18n, React Compiler, TypeScript ~6, **styled-components 6**
+(`styled-components/native`) for all new UI — see
+[Styling with styled-components](#styling-with-styled-components).
 
 `backend/` is a **.NET / C# Web API** (end-to-end-encrypted feeds + AI planner). It **usually does not
 need changing** to add app features — only touch it when the task is explicitly backend work.
@@ -33,7 +35,9 @@ need changing** to add app features — only touch it when the task is explicitl
   - `presentation/foundation/` — our very core, reusable UI primitives: buttons, cards, forms,
     dialogs, list items, `editors/`. Single-file primitives live flat; multi-file
     ones (platform-split `.android.tsx` + shared `-props`) get a folder with an `index.tsx` barrel
-    (e.g. `menu/`, `page-actions/`, `switch/`). Reach for these before building a new control.
+    (e.g. `menu/`, `page-actions/`, `switch/`). Reach for these before building a new control. A
+    styled section keeps its styles in a sibling `<name>.styles.ts` — see
+    [Styling with styled-components](#styling-with-styled-components).
   - `presentation/<feature>/` — presentational components for one feature area: `feed/`, `calendar/`,
     `stats/`, `workout/`, `workout-editor/`, `ai-planner/`, `summary/`. Dumb-ish; take props.
   - `smart/` — container components that wire presentation up to state/services (providers, dialogs,
@@ -104,6 +108,68 @@ theme.elevation.sm               // shadow
   `tabular: true`. Cast with `as any` when spreading into style props to avoid the readonly tuple issue.
 - React Native Paper's `PaperProvider` is still used for Paper components — it receives a Paper theme
   built from the Alcedo palette in `useAppTheme.tsx`.
+
+## Styling with styled-components
+
+All new UI is styled with **`styled-components/native`** (v6): `styled.View` / `styled.Text` /
+`styled.Pressable`. Not `StyleSheet.create`, not inline style objects, not Paper's `style` prop for
+layout. `app/src/styles/styled.d.ts` augments styled-components' `DefaultTheme` with `AppTheme`, so
+`props.theme` is typed in every template — no generics at the call site.
+
+```tsx
+// statistic-bar-chart.styles.ts
+import styled, { css } from 'styled-components/native';
+
+export const ChartSurface = styled.View<{ $compact?: boolean }>`
+  padding: ${({ theme }) => theme.space.base}px;
+  background-color: ${({ theme }) => theme.color.background.elevated};
+  ${({ theme, $compact }) =>
+    $compact
+      ? css`
+          gap: ${theme.space.xs}px;
+        `
+      : css`
+          gap: ${theme.space.md}px;
+        `}
+`;
+```
+
+- Values come from `props.theme` only — `theme.color.*`, `theme.space.*`, `theme.radius.*`,
+  `theme.elevation.*`, `theme.components.*`, and `type(theme, 'body')` for text. No raw hex or px.
+- Variants ride on **transient props** (`$compact`, `$status`), so they never reach the native view;
+  conditional styles go through the `css` helper.
+- RN-only style props a `css` block can't express (`borderCurve: 'continuous'`, `fontVariant`) ride as
+  a `style` prop on the styled component — see `styles/theme.usage.tsx` for the pattern.
+- Reach for existing `components/presentation/foundation/` primitives before writing a new styled
+  view. Migrate a file to styled-components when you're already editing it — never in bulk.
+
+> **If `props.theme` is `undefined`, the styled `ThemeProvider` is missing.** It belongs in
+> `hooks/useAppTheme.tsx` — the one place app-wide theme context is built — wrapping `PaperProvider`
+> and fed the same memoized `createTheme(...)` value that `useAppTheme()` serves.
+
+### File organization
+
+One folder per section; folder name == file stem, kebab-case:
+
+```
+components/presentation/stats/statistic-bar-chart/
+  statistic-bar-chart.tsx          # the component — named export, no styles inside
+  statistic-bar-chart.styles.ts    # its styled.* primitives (and style-only helpers)
+  statistic-bar-chart.android.tsx  # optional platform variant — Metro picks it over .tsx
+  statistic-bar-chart-props.tsx    # optional props shared by the platform variants
+  index.tsx                        # optional barrel — multi-file folders, cf. foundation/switch/
+```
+
+- **`<name>.tsx` + `<name>.styles.ts` are the two files every styled section has.** Styles never live
+  in the component file: no `StyleSheet.create` beside the JSX, no loose style objects in the folder.
+- Consumers import the folder path — `@/components/presentation/stats/statistic-bar-chart` — which
+  resolves through `index.tsx` when there is one, or to the file itself when there isn't.
+- Split by **section**, not by primitive: one `.styles.ts` holds every styled piece its component owns
+  (`Row`, `Label`, …). Don't grow a shared styles file per feature area.
+- Non-visual modules stay flat: pure containers (`components/smart/feed-item.tsx`), hooks, and utils
+  don't get a folder just to carry a `.styles.ts` they never write.
+
+## Commands (run from `app/`)
 
 ## Commands (run from `app/`)
 
