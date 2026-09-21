@@ -1,0 +1,65 @@
+import { ActivityWeekCell } from '@/components/presentation/calendar/activity-week-cell';
+import { cellEntrance } from '@/components/presentation/calendar/activity-entrance';
+import { SurfaceText } from '@/components/presentation/foundation/surface-text';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { useFormatDate } from '@/hooks/useFormatDate';
+import { useMountEffect } from '@/hooks/useMountEffect';
+import { ActivityCell } from '@/store/activity';
+import { useMemo, useRef } from 'react';
+import { Animated, Easing, I18nManager, View } from 'react-native';
+
+const ENTRANCE_DURATION_MS = 450;
+
+interface WeekActivityStripProps {
+  cells: ActivityCell[];
+}
+
+/**
+ * The seven-day row `ActivityCalendar` draws in `week` density, minus the name and trailing columns it aligns
+ * every row against. Here the row belongs to a single person already named above it, so those columns would
+ * only eat the width the cells need.
+ */
+export function WeekActivityStrip({ cells }: WeekActivityStripProps) {
+  const formatDate = useFormatDate();
+  const theme = useAppTheme();
+
+  const progress = useRef(new Animated.Value(0)).current;
+  useMountEffect(() => {
+    Animated.timing(progress, {
+      toValue: 1,
+      duration: ENTRANCE_DURATION_MS,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  });
+
+  const entrances = useMemo(
+    () => Array.from({ length: cells.length }, (_, index) => cellEntrance(progress, index, cells.length)),
+    [progress, cells.length],
+  );
+
+  const direction = I18nManager.isRTL ? 'row-reverse' : 'row';
+
+  return (
+    <View style={{ gap: theme.space.xs }}>
+      <View style={{ flexDirection: direction, gap: theme.space.xs }}>
+        {cells.map((cell, index) => (
+          <SurfaceText
+            key={index}
+            font="text-2xs"
+            color="onSurfaceVariant"
+            style={{ flex: 1, textAlign: 'center', letterSpacing: 0.6 }}
+          >
+            {formatDate(cell.date, { weekday: 'narrow' }).toUpperCase()}
+          </SurfaceText>
+        ))}
+      </View>
+
+      <View style={{ flexDirection: direction, gap: theme.space.xs }}>
+        {cells.map((cell, index) => (
+          <ActivityWeekCell key={index} cell={cell} entrance={entrances[index]!} />
+        ))}
+      </View>
+    </View>
+  );
+}

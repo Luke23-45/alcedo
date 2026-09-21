@@ -1,0 +1,179 @@
+import CardList from '@/components/presentation/foundation/card-list';
+import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
+import SessionSummary from '@/components/presentation/summary/session-summary';
+import SessionSummaryTitle from '@/components/presentation/summary/session-summary-title';
+import SplitCardControl from '@/components/presentation/foundation/split-card-control';
+import { SurfaceText } from '@/components/presentation/foundation/surface-text';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { SharedItem, SharedProgramBlueprint, SharedSession } from '@/models/feed-models';
+import { addProgramSession, savePlan } from '@/store/program';
+import { showSnackbar } from '@/store/app';
+import { T } from '@tolgee/react';
+import { Animated, View } from 'react-native';
+import { Card, Text } from 'react-native-paper';
+import Button from '@/components/presentation/foundation/button';
+import { useDispatch } from 'react-redux';
+import { uuid } from '@/utils/uuid';
+import { useRouter } from 'expo-router';
+import { Session } from '@/models/session-models';
+import { usePreferredWeightUnit } from '@/hooks/usePreferredWeightUnit';
+import SessionComponent from '@/components/smart/session-component';
+import { useAppSelector } from '@/store';
+import { useScrollHeaderColor } from '@/hooks/useScrollListener';
+import { useStartWorkoutWithConfirmation } from '@/hooks/useStartWorkoutWithConfirmation';
+
+interface SharedItemProps {
+  sharedItem: SharedItem;
+}
+
+function SharedProgramBlueprintContent({ sharedItem }: { sharedItem: SharedProgramBlueprint }) {
+  const theme = useAppTheme();
+  const program = sharedItem.programBlueprint;
+  const dispatch = useDispatch();
+  const preferredWeightUnit = usePreferredWeightUnit();
+  const { push } = useRouter();
+
+  // Convert session blueprints to sessions for display
+  const sessions = program.sessions.map((sessionBlueprint) =>
+    Session.getEmptySession(sessionBlueprint, preferredWeightUnit),
+  );
+
+  const handleSave = () => {
+    const programId = uuid();
+    dispatch(
+      savePlan({
+        programId,
+        programBlueprint: program,
+      }),
+    );
+    push(`/settings/program-list?focusprogramId=${programId}`, {
+      withAnchor: true,
+    });
+    dispatch(
+      showSnackbar({
+        text: `"${program.name}" saved to your plans`,
+      }),
+    );
+  };
+
+  return (
+    <FullHeightScrollView
+      contentContainerStyle={{
+        padding: theme.layout.screenPadding,
+        gap: theme.space.sm,
+      }}
+    >
+      {/* Header section */}
+      <View style={{ gap: theme.space.sm }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            <Text variant="titleLarge">{program.name}</Text>
+            <Text variant="bodyMedium" style={{ opacity: 0.7 }}>
+              {program.sessions.length} {program.sessions.length === 1 ? 'workout' : 'workouts'}
+            </Text>
+          </View>
+          <Button mode="contained" icon="save" style={{ alignSelf: 'center' }} onPress={handleSave}>
+            <T keyName="generic.save.button" />
+          </Button>
+        </View>
+      </View>
+
+      <View style={{ flex: 1, gap: theme.space.sm }}>
+        <Text variant="titleMedium">
+          <T keyName="workout.all.title" />
+        </Text>
+        <CardList
+          cardType="contained"
+          items={sessions}
+          renderItemContent={(session) => (
+            <Card.Content>
+              <SplitCardControl
+                titleContent={<SessionSummaryTitle session={session} />}
+                mainContent={<SessionSummary session={session} />}
+              />
+            </Card.Content>
+          )}
+          keySelector={(session) => session.id}
+          emptyTemplate={
+            <SurfaceText>
+              <T keyName="workout.no_workouts_in_plan.message" />
+            </SurfaceText>
+          }
+        />
+      </View>
+    </FullHeightScrollView>
+  );
+}
+
+function SharedSessionContent({ sharedItem }: { sharedItem: SharedSession }) {
+  const theme = useAppTheme();
+  const session = sharedItem.session;
+  const dispatch = useDispatch();
+  const showBodyweight = useAppSelector((x) => x.settings.showBodyweight);
+  const headerColor = useScrollHeaderColor();
+  const activeProgramId = useAppSelector((x) => x.program.activePlanId);
+  const { push } = useRouter();
+  const { start, confirmationDialog } = useStartWorkoutWithConfirmation();
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Animated.View
+        style={{
+          flexDirection: 'row',
+          gap: theme.space.sm,
+          padding: theme.layout.screenPadding,
+          backgroundColor: headerColor,
+        }}
+      >
+        <Button
+          icon={'assignment'}
+          onPress={() => {
+            dispatch(
+              addProgramSession({
+                programId: activeProgramId,
+                sessionBlueprint: session.blueprint,
+              }),
+            );
+            push(`/settings/manage-workouts/${activeProgramId}`);
+          }}
+          mode="outlined"
+          style={{ flex: 1 }}
+        >
+          <T keyName="feed.shared_session.save_to_plan.button" />
+        </Button>
+        <Button
+          icon={'playCircle'}
+          onPress={() => start(session.with({ id: uuid() }))}
+          mode="contained"
+          style={{ flex: 1 }}
+        >
+          <T keyName="feed.shared_session.start_workout.button" />
+        </Button>
+      </Animated.View>
+      {confirmationDialog}
+      <SessionComponent session={session} showBodyweight={showBodyweight} />
+    </View>
+  );
+}
+
+export default function SharedItemComponent({ sharedItem }: SharedItemProps) {
+  const theme = useAppTheme();
+  if (sharedItem instanceof SharedProgramBlueprint) {
+    return <SharedProgramBlueprintContent sharedItem={sharedItem} />;
+  }
+  if (sharedItem instanceof SharedSession) {
+    return <SharedSessionContent sharedItem={sharedItem} />;
+  }
+  // Fallback for future shared item types
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <SurfaceText>Unsupported shared item type</SurfaceText>
+    </View>
+  );
+}

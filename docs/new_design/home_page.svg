@@ -1,0 +1,433 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="393" height="852" viewBox="0 0 393 852"
+     role="img" aria-labelledby="ttl dsc"
+     font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+     text-rendering="optimizeLegibility" shape-rendering="geometricPrecision">
+
+  <title id="ttl">Kinetic — Gym App Home Screen (iOS)</title>
+  <desc id="dsc">Dark-mode iOS home screen: status bar with Dynamic Island, greeting header with avatar and notification badge, Activity Rings hero card with Move/Exercise/Stand progress, three metric tiles, Today's Session card with primary play action, Weekly Volume bar chart, Programs section, and a four-item tab bar with home indicator.</desc>
+
+  <defs>
+    <!-- ══════════════ CLIPS ══════════════ -->
+    <clipPath id="screenClip"><rect x="0" y="0" width="393" height="852" rx="54.5" ry="54.5"/></clipPath>
+    <clipPath id="scrollClip"><rect x="0" y="0" width="393" height="769"/></clipPath>
+    <clipPath id="avatarClip"><circle cx="355" cy="90" r="22"/></clipPath>
+    <clipPath id="personClip"><circle cx="0" cy="0" r="10.2"/></clipPath>
+    <clipPath id="bar4Clip"><rect x="186" y="622" width="20" height="60" rx="8"/></clipPath>
+
+    <!-- ══════════════ ENVIRONMENT ══════════════ -->
+    <linearGradient id="gBg" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0"   stop-color="#0B0B0E"/>
+      <stop offset="0.5" stop-color="#050507"/>
+      <stop offset="1"   stop-color="#08080B"/>
+    </linearGradient>
+    <radialGradient id="gAuraA" gradientUnits="userSpaceOnUse" cx="70" cy="150" r="290">
+      <stop offset="0" stop-color="#FF2D55" stop-opacity="0.20"/>
+      <stop offset="0.55" stop-color="#FF2D55" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#FF2D55" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gAuraB" gradientUnits="userSpaceOnUse" cx="360" cy="520" r="280">
+      <stop offset="0" stop-color="#0A84FF" stop-opacity="0.13"/>
+      <stop offset="1" stop-color="#0A84FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gAuraC" gradientUnits="userSpaceOnUse" cx="40" cy="700" r="230">
+      <stop offset="0" stop-color="#A6FF00" stop-opacity="0.07"/>
+      <stop offset="1" stop-color="#A6FF00" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- ══════════════ CARD MATERIAL ══════════════ -->
+    <linearGradient id="gCard" x1="0" y1="0" x2="0.45" y2="1">
+      <stop offset="0"   stop-color="#1F1F23"/>
+      <stop offset="0.55" stop-color="#17171A"/>
+      <stop offset="1"   stop-color="#131316"/>
+    </linearGradient>
+    <linearGradient id="gCardEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#FFFFFF" stop-opacity="0.17"/>
+      <stop offset="0.35" stop-color="#FFFFFF" stop-opacity="0.06"/>
+      <stop offset="1"   stop-color="#FFFFFF" stop-opacity="0.025"/>
+    </linearGradient>
+    <linearGradient id="gTab" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#1D1D21" stop-opacity="0.90"/>
+      <stop offset="1"   stop-color="#0E0E11" stop-opacity="0.985"/>
+    </linearGradient>
+    <linearGradient id="gFade" gradientUnits="userSpaceOnUse" x1="0" y1="730" x2="0" y2="769">
+      <stop offset="0" stop-color="#050507" stop-opacity="0"/>
+      <stop offset="1" stop-color="#050507" stop-opacity="0.88"/>
+    </linearGradient>
+
+    <!-- ══════════════ RING GRADIENTS (Apple Fitness hues) ══════════════ -->
+    <linearGradient id="gMove" gradientUnits="userSpaceOnUse" x1="56" y1="200" x2="150" y2="300">
+      <stop offset="0" stop-color="#FF0A47"/><stop offset="1" stop-color="#FF7A96"/>
+    </linearGradient>
+    <linearGradient id="gEx" gradientUnits="userSpaceOnUse" x1="56" y1="200" x2="150" y2="300">
+      <stop offset="0" stop-color="#8BE000"/><stop offset="1" stop-color="#D6FF52"/>
+    </linearGradient>
+    <linearGradient id="gStand" gradientUnits="userSpaceOnUse" x1="56" y1="200" x2="150" y2="300">
+      <stop offset="0" stop-color="#009DFF"/><stop offset="1" stop-color="#2CE9F7"/>
+    </linearGradient>
+
+    <!-- ══════════════ BAR GRADIENTS ══════════════ -->
+    <linearGradient id="gBarMove" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FF1F52"/><stop offset="1" stop-color="#FF7A96"/></linearGradient>
+    <linearGradient id="gBarEx" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#92E82A"/><stop offset="1" stop-color="#D6FF52"/></linearGradient>
+    <linearGradient id="gBarStand" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#17A9FF"/><stop offset="1" stop-color="#2CE9F7"/></linearGradient>
+
+    <linearGradient id="gBrand" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#FFB03A"/><stop offset="0.45" stop-color="#FF6A3D"/>
+      <stop offset="1" stop-color="#FF2D55"/></linearGradient>
+    <linearGradient id="gToday" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#FF2D55"/><stop offset="0.6" stop-color="#FF7A3D"/>
+      <stop offset="1" stop-color="#FFC24A"/></linearGradient>
+    <linearGradient id="gGloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.30"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.0"/>
+    </linearGradient>
+    <linearGradient id="gAvatar" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5E5CE6"/><stop offset="1" stop-color="#BF5AF2"/></linearGradient>
+    <linearGradient id="gProgA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B3BE8"/><stop offset="1" stop-color="#1B1440"/></linearGradient>
+    <linearGradient id="gProgB" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E7C86"/><stop offset="1" stop-color="#0A2530"/></linearGradient>
+
+    <!-- ══════════════ SHADOWS & GLOWS ══════════════ -->
+    <filter id="fCard" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.50"/>
+    </filter>
+    <filter id="fTile" x="-40%" y="-40%" width="180%" height="200%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.42"/>
+    </filter>
+    <filter id="fBrand" x="-80%" y="-80%" width="260%" height="260%">
+      <feDropShadow dx="0" dy="7" stdDeviation="11" flood-color="#FF2D55" flood-opacity="0.50"/>
+    </filter>
+    <filter id="fGlowMove" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#FF0A47" flood-opacity="0.55"/></filter>
+    <filter id="fGlowEx" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#A6FF00" flood-opacity="0.45"/></filter>
+    <filter id="fGlowStand" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#00D9E9" flood-opacity="0.50"/></filter>
+    <filter id="fGlowToday" x="-90%" y="-40%" width="280%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#FF6A3D" flood-opacity="0.60"/></filter>
+    <filter id="fSoft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.45"/></filter>
+
+    <!-- ══════════════ ICON LIBRARY (SF Symbols geometry) ══════════════ -->
+    <path id="ic-heart" d="M0 5.9 C-6.7 1.5 -8.0 -2.5 -5.9 -4.9 C-4.2 -6.7 -1.5 -6.4 0 -4.3 C1.5 -6.4 4.2 -6.7 5.9 -4.9 C8.0 -2.5 6.7 1.5 0 5.9 Z"/>
+    <g id="ic-flame">
+      <path d="M0 -8.2 C2.9 -4.6 5.9 -1.7 5.9 1.9 C5.9 5.4 3.3 7.9 0 7.9 C-3.3 7.9 -5.9 5.4 -5.9 1.9 C-5.9 -0.2 -4.6 -1.9 -3.3 -3.4 C-3.2 -1.7 -2.4 -0.9 -1.3 -0.7 C-1.7 -3.5 -1.1 -5.9 0 -8.2 Z"/>
+      <path d="M0.1 1.2 C1.4 2.4 2.1 3.4 2.1 4.6 C2.1 6.0 1.2 7.0 0 7.0 C-1.2 7.0 -2.1 6.0 -2.1 4.7 C-2.1 3.5 -1.0 2.4 0.1 1.2 Z" fill="#FFFFFF" opacity="0.45"/>
+    </g>
+    <path id="ic-foot" d="M0 -7.4 C3.0 -7.4 4.9 -5.1 4.9 -2.1 C4.9 0.6 3.8 1.9 3.8 3.7 C3.8 5.7 2.3 7.2 0 7.2 C-2.3 7.2 -3.8 5.7 -3.8 3.7 C-3.8 1.9 -4.9 0.6 -4.9 -2.1 C-4.9 -5.1 -3.0 -7.4 0 -7.4 Z"/>
+    <g id="ic-dumbbell">
+      <rect x="-13" y="-5.6" width="4.4" height="11.2" rx="1.8"/>
+      <rect x="-7.6" y="-8.0" width="3.8" height="16.0" rx="1.7"/>
+      <rect x="-7.6" y="-1.9" width="15.2" height="3.8" rx="0.6"/>
+      <rect x="3.8"  y="-8.0" width="3.8" height="16.0" rx="1.7"/>
+      <rect x="8.6"  y="-5.6" width="4.4" height="11.2" rx="1.8"/>
+    </g>
+    <path id="ic-house-fill" d="M0 -10.8 L10.6 -1.95 L10.6 10.4 L3.5 10.4 L3.5 2.7 L-3.5 2.7 L-3.5 10.4 L-10.6 10.4 L-10.6 -1.95 Z"/>
+    <g id="ic-house-line" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M0 -10.8 L10.6 -1.95 L10.6 10.4 L3.5 10.4 L3.5 2.7 L-3.5 2.7 L-3.5 10.4 L-10.6 10.4 L-10.6 -1.95 Z"/>
+    </g>
+    <g id="ic-trend" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-10.2 -10.6 L-10.2 10.2 L10.4 10.2"/>
+      <path d="M-6.6 4.8 L-1.6 -1.4 L2.2 1.6 L8.2 -6.4"/>
+    </g>
+    <g id="ic-person">
+      <circle cx="0" cy="0" r="11.1" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      <circle cx="0" cy="-3.4" r="3.4" fill="currentColor"/>
+      <g clip-path="url(#personClip)"><path d="M-9.4 12.6 Q-9.4 3.0 0 3.0 Q9.4 3.0 9.4 12.6 Z" fill="currentColor"/></g>
+    </g>
+    <path id="ic-spark" d="M0 -5.2 L1.35 -1.35 L5.2 0 L1.35 1.35 L0 5.2 L-1.35 1.35 L-5.2 0 L-1.35 -1.35 Z"/>
+  </defs>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <g clip-path="url(#screenClip)">
+
+    <!-- ░░ AMBIENT BACKGROUND ░░ -->
+    <rect width="393" height="852" fill="url(#gBg)"/>
+    <rect width="393" height="852" fill="url(#gAuraA)"/>
+    <rect width="393" height="852" fill="url(#gAuraB)"/>
+    <rect width="393" height="852" fill="url(#gAuraC)"/>
+
+    <!-- ░░ SCROLLABLE CONTENT ░░ -->
+    <g clip-path="url(#scrollClip)">
+
+      <!-- ─── HEADER ─── -->
+      <text x="24" y="78" font-size="10.5" font-weight="700" letter-spacing="1.45" fill="#86868B">MONDAY, JUNE 9</text>
+      <text x="24" y="108" font-size="25" font-weight="700" letter-spacing="-0.55" fill="#FFFFFF">Good morning, Alex</text>
+
+      <g filter="url(#fSoft)">
+        <circle cx="355" cy="90" r="22" fill="url(#gAvatar)"/>
+      </g>
+      <g clip-path="url(#avatarClip)" opacity="0.35">
+        <circle cx="345" cy="78" r="16" fill="#FFFFFF" opacity="0.25"/>
+        <path d="M333 112 Q355 96 377 112 L377 118 L333 118 Z" fill="#FFFFFF" opacity="0.18"/>
+      </g>
+      <text x="355" y="96.5" font-size="17" font-weight="600" letter-spacing="-0.3" fill="#FFFFFF" text-anchor="middle" opacity="0.95">A</text>
+      <circle cx="355" cy="90" r="22" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1"/>
+      <circle cx="370" cy="75" r="7" fill="#FF3B30" stroke="#0B0B0E" stroke-width="2.2"/>
+      <text x="370" y="78.2" font-size="8.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+
+      <!-- ═══════════ HERO · ACTIVITY RINGS ═══════════ -->
+      <g filter="url(#fCard)">
+        <rect x="16" y="124" width="361" height="212" rx="30" fill="url(#gCard)"/>
+      </g>
+      <rect x="16.5" y="124.5" width="360" height="211" rx="29.5" fill="none" stroke="url(#gCardEdge)" stroke-width="1"/>
+
+      <text x="36" y="157" font-size="10" font-weight="700" letter-spacing="1.35" fill="#86868B">TODAY’S ACTIVITY</text>
+
+      <!-- streak pill -->
+      <rect x="311" y="142" width="46" height="22" rx="11" fill="#FF9F0A" fill-opacity="0.15" stroke="#FF9F0A" stroke-opacity="0.28" stroke-width="0.8"/>
+      <use xlink:href="#ic-flame" href="#ic-flame" transform="translate(325,153) scale(0.52)" fill="#FF9F0A"/>
+      <text x="334.5" y="157.5" font-size="11" font-weight="700" letter-spacing="-0.1" fill="#FFB84D">12</text>
+
+      <!-- ── THE RINGS ──  r=46/35.5/25 · sw=10 · C=289.03/223.05/157.08 -->
+      <g transform="translate(102,250)">
+        <!-- tracks -->
+        <circle r="46"   fill="none" stroke="#FF0A47" stroke-opacity="0.17" stroke-width="10"/>
+        <circle r="35.5" fill="none" stroke="#A6FF00" stroke-opacity="0.15" stroke-width="10"/>
+        <circle r="25"   fill="none" stroke="#00D9E9" stroke-opacity="0.16" stroke-width="10"/>
+        <!-- MOVE 80% -->
+        <circle r="46" fill="none" stroke="url(#gMove)" stroke-width="10" stroke-linecap="round"
+                stroke-dasharray="231.22 289.03" transform="rotate(-90)" filter="url(#fGlowMove)">
+          <animate attributeName="stroke-dasharray" from="0 289.03" to="231.22 289.03" dur="1.3s"
+                   begin="0.1s" fill="freeze" calcMode="spline" keySplines="0.16 0.84 0.24 1" keyTimes="0;1"/>
+        </circle>
+        <!-- EXERCISE 70% -->
+        <circle r="35.5" fill="none" stroke="url(#gEx)" stroke-width="10" stroke-linecap="round"
+                stroke-dasharray="156.14 223.06" transform="rotate(-90)" filter="url(#fGlowEx)">
+          <animate attributeName="stroke-dasharray" from="0 223.06" to="156.14 223.06" dur="1.3s"
+                   begin="0.22s" fill="freeze" calcMode="spline" keySplines="0.16 0.84 0.24 1" keyTimes="0;1"/>
+        </circle>
+        <!-- STAND 92% -->
+        <circle r="25" fill="none" stroke="url(#gStand)" stroke-width="10" stroke-linecap="round"
+                stroke-dasharray="144.51 157.08" transform="rotate(-90)" filter="url(#fGlowStand)">
+          <animate attributeName="stroke-dasharray" from="0 157.08" to="144.51 157.08" dur="1.3s"
+                   begin="0.34s" fill="freeze" calcMode="spline" keySplines="0.16 0.84 0.24 1" keyTimes="0;1"/>
+        </circle>
+      </g>
+
+      <!-- ── RING BREAKDOWN ROWS ── -->
+      <g>
+        <!-- Move -->
+        <text x="176" y="208" font-size="12" font-weight="600" letter-spacing="-0.1" fill="#F5F5F7">Move</text>
+        <text x="357" y="208" font-size="12" font-weight="700" fill="#FF6A88" text-anchor="end">520<tspan font-weight="500" fill="#6C6C70">/650 kcal</tspan></text>
+        <rect x="176" y="216" width="181" height="6" rx="3" fill="#FFFFFF" fill-opacity="0.09"/>
+        <rect x="176" y="216" width="144.8" height="6" rx="3" fill="url(#gBarMove)"/>
+        <!-- Exercise -->
+        <text x="176" y="246" font-size="12" font-weight="600" letter-spacing="-0.1" fill="#F5F5F7">Exercise</text>
+        <text x="357" y="246" font-size="12" font-weight="700" fill="#C3F53C" text-anchor="end">42<tspan font-weight="500" fill="#6C6C70">/60 min</tspan></text>
+        <rect x="176" y="254" width="181" height="6" rx="3" fill="#FFFFFF" fill-opacity="0.09"/>
+        <rect x="176" y="254" width="126.7" height="6" rx="3" fill="url(#gBarEx)"/>
+        <!-- Stand -->
+        <text x="176" y="284" font-size="12" font-weight="600" letter-spacing="-0.1" fill="#F5F5F7">Stand</text>
+        <text x="357" y="284" font-size="12" font-weight="700" fill="#5EDCF0" text-anchor="end">11<tspan font-weight="500" fill="#6C6C70">/12 hr</tspan></text>
+        <rect x="176" y="292" width="181" height="6" rx="3" fill="#FFFFFF" fill-opacity="0.09"/>
+        <rect x="176" y="292" width="166" height="6" rx="3" fill="url(#gBarStand)"/>
+      </g>
+
+      <!-- insight line -->
+      <use xlink:href="#ic-spark" href="#ic-spark" transform="translate(40.5,316) scale(0.8)" fill="#FF9F0A" opacity="0.9"/>
+      <text x="51" y="320" font-size="10.5" font-weight="500" letter-spacing="-0.05" fill="#86868B">On pace to close all three rings by 6:40 PM</text>
+
+      <!-- ═══════════ METRIC TILES ═══════════ -->
+      <!-- Tile 1 · Heart Rate -->
+      <g filter="url(#fTile)"><rect x="16" y="348" width="112" height="82" rx="24" fill="url(#gCard)"/></g>
+      <rect x="16.5" y="348.5" width="111" height="81" rx="23.5" fill="none" stroke="url(#gCardEdge)" stroke-width="1"/>
+      <rect x="30" y="357" width="20" height="20" rx="6.5" fill="#FF2D55" fill-opacity="0.16"/>
+      <g transform="translate(40,367) scale(0.56)" fill="#FF5A78">
+        <use xlink:href="#ic-heart" href="#ic-heart">
+          <animateTransform attributeName="transform" type="scale" values="1;1.16;1;1;1" keyTimes="0;0.12;0.26;0.6;1" dur="1.6s" repeatCount="indefinite" additive="sum"/>
+        </use>
+      </g>
+      <path d="M76 369 L81 369 L84 361 L88 375 L91 365 L95 369 L101 369 L104 360 L108 373 L111 367 L114 367"
+            fill="none" stroke="#FF2D55" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+      <text x="30" y="392" font-size="9" font-weight="700" letter-spacing="0.95" fill="#86868B">HEART RATE</text>
+      <text x="30" y="414" font-size="20" font-weight="700" letter-spacing="-0.6" fill="#FFFFFF">62</text>
+      <text x="55" y="414" font-size="10.5" font-weight="600" fill="#6C6C70">bpm</text>
+
+      <!-- Tile 2 · Calories -->
+      <g filter="url(#fTile)"><rect x="140" y="348" width="112" height="82" rx="24" fill="url(#gCard)"/></g>
+      <rect x="140.5" y="348.5" width="111" height="81" rx="23.5" fill="none" stroke="url(#gCardEdge)" stroke-width="1"/>
+      <rect x="154" y="357" width="20" height="20" rx="6.5" fill="#FF9F0A" fill-opacity="0.16"/>
+      <use xlink:href="#ic-flame" href="#ic-flame" transform="translate(164,367) scale(0.62)" fill="#FFB84D"/>
+      <rect x="305" y="357" width="42" height="17" rx="8.5" fill="#30D158" fill-opacity="0.14"/>
+      <text x="326" y="369" font-size="9.5" font-weight="700" letter-spacing="0.1" fill="#30D158" text-anchor="middle">+8%</text>
+      <text x="154" y="392" font-size="9" font-weight="700" letter-spacing="0.95" fill="#86868B">CALORIES</text>
+      <text x="154" y="414" font-size="20" font-weight="700" letter-spacing="-0.6" fill="#FFFFFF">520</text>
+      <text x="191" y="414" font-size="10.5" font-weight="600" fill="#6C6C70">kcal</text>
+
+      <!-- Tile 3 · Steps -->
+      <g filter="url(#fTile)"><rect x="264" y="348" width="113" height="82" rx="24" fill="url(#gCard)"/></g>
+      <rect x="264.5" y="348.5" width="112" height="81" rx="23.5" fill="none" stroke="url(#gCardEdge)" stroke-width="1"/>
+      <rect x="278" y="357" width="20" height="20" rx="6.5" fill="#30D158" fill-opacity="0.16"/>
+      <g fill="#4ADE80">
+        <use xlink:href="#ic-foot" href="#ic-foot" transform="translate(285,364.6) rotate(-12) scale(0.44)"/>
+        <use xlink:href="#ic-foot" href="#ic-foot" transform="translate(291.4,370) rotate(10) scale(0.44)"/>
+      </g>
+      <g>
+        <rect x="329" y="368" width="4" height="7"  rx="2" fill="#30D158" fill-opacity="0.30"/>
+        <rect x="336.5" y="364" width="4" height="11" rx="2" fill="#30D158" fill-opacity="0.38"/>
+        <rect x="344" y="366" width="4" height="9"  rx="2" fill="#30D158" fill-opacity="0.30"/>
+        <rect x="351.5" y="361" width="4" height="14" rx="2" fill="#30D158" fill-opacity="0.55"/>
+        <rect x="359" y="363" width="4" height="12" rx="2" fill="#30D158"/>
+      </g>
+      <text x="278" y="392" font-size="9" font-weight="700" letter-spacing="0.95" fill="#86868B">STEPS</text>
+      <text x="278" y="414" font-size="20" font-weight="700" letter-spacing="-0.6" fill="#FFFFFF">8,412</text>
+
+      <!-- ═══════════ TODAY'S SESSION ═══════════ -->
+      <g filter="url(#fCard)"><rect x="16" y="442" width="361" height="104" rx="30" fill="url(#gCard)"/></g>
+      <rect x="16.5" y="442.5" width="360" height="103" rx="29.5" fill="none" stroke="url(#gCardEdge)" stroke-width="1"/>
+
+      <g filter="url(#fBrand)">
+        <rect x="36" y="464" width="60" height="60" rx="20" fill="url(#gBrand)"/>
+      </g>
+      <rect x="36" y="464" width="60" height="30" rx="20" fill="url(#gGloss)" opacity="0.55"/>
+      <use xlink:href="#ic-dumbbell" href="#ic-dumbbell" transform="translate(66,494) scale(1.25)" fill="#FFFFFF"/>
+
+      <text x="112" y="466" font-size="9" font-weight="700" letter-spacing="1.25" fill="#86868B">TODAY’S SESSION</text>
+      <text x="112" y="488" font-size="17" font-weight="600" letter-spacing="-0.35" fill="#FFFFFF">Push Day · Strength</text>
+      <text x="112" y="507" font-size="11.5" font-weight="500" letter-spacing="-0.05" fill="#98989F">45 min  ·  12 exercises  ·  380 kcal</text>
+      <rect x="112" y="515" width="86" height="19" rx="9.5" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.07" stroke-width="0.7"/>
+      <text x="155" y="528" font-size="9.5" font-weight="700" letter-spacing="0.55" fill="#C7C7CC" text-anchor="middle">INTERMEDIATE</text>
+
+      <g filter="url(#fBrand)">
+        <circle cx="341" cy="494" r="21" fill="url(#gBrand)"/>
+      </g>
+      <circle cx="341" cy="494" r="21" fill="none" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="0.9"/>
+      <path d="M-4.4 -6.6 L7.4 0 L-4.4 6.6 Z" transform="translate(342.4,494)"
+            fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2.6" stroke-linejoin="round"/>
+
+      <!-- ═══════════ WEEKLY VOLUME ═══════════ -->
+      <g filter="url(#fCard)"><rect x="16" y="558" width="361" height="162" rx="30" fill="url(#gCard)"/></g>
+      <rect x="16.5" y="558.5" width="360" height="161" rx="29.5" fill="none" stroke="url(#gCardEdge)" stroke-width="1"/>
+
+      <text x="36" y="588" font-size="15.5" font-weight="600" letter-spacing="-0.3" fill="#FFFFFF">Weekly Volume</text>
+      <text x="36" y="606" font-size="11" font-weight="500" fill="#86868B">24,380 kg lifted · 4 sessions</text>
+      <rect x="305" y="574" width="52" height="21" rx="10.5" fill="#30D158" fill-opacity="0.15"/>
+      <path d="M315 587.5 L318.6 582.8 L322.2 587.5" fill="none" stroke="#30D158" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="326" y="588.6" font-size="10.5" font-weight="700" letter-spacing="-0.1" fill="#30D158">18%</text>
+
+      <!-- average guide -->
+      <line x1="44" y1="648" x2="349" y2="648" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1" stroke-dasharray="2 5" stroke-linecap="round"/>
+      <text x="357" y="645" font-size="8" font-weight="700" letter-spacing="0.7" fill="#6C6C70" text-anchor="end">AVG</text>
+
+      <!-- tracks -->
+      <g fill="#FFFFFF" fill-opacity="0.055">
+        <rect x="49"  y="618" width="20" height="60" rx="8"/>
+        <rect x="95"  y="618" width="20" height="60" rx="8"/>
+        <rect x="141" y="618" width="20" height="60" rx="8"/>
+        <rect x="186" y="618" width="20" height="60" rx="8"/>
+        <rect x="232" y="618" width="20" height="60" rx="8"/>
+        <rect x="278" y="618" width="20" height="60" rx="8"/>
+        <rect x="324" y="618" width="20" height="60" rx="8"/>
+      </g>
+      <!-- values -->
+      <g fill="#4A4A50">
+        <rect x="49"  y="642"   width="20" height="36"   rx="8"/>
+        <rect x="95"  y="626.4" width="20" height="51.6" rx="8"/>
+        <rect x="141" y="651.6" width="20" height="26.4" rx="8"/>
+        <rect x="232" y="634.8" width="20" height="43.2" rx="8"/>
+        <rect x="278" y="661.2" width="20" height="16.8" rx="7"/>
+      </g>
+      <rect x="324" y="674" width="20" height="4" rx="2" fill="#FFFFFF" fill-opacity="0.10"/>
+      <!-- today -->
+      <g filter="url(#fGlowToday)">
+        <rect x="186" y="618" width="20" height="60" rx="8" fill="url(#gToday)"/>
+      </g>
+      <g clip-path="url(#bar4Clip)"><rect x="186" y="618" width="20" height="26" fill="url(#gGloss)"/></g>
+      <circle cx="196" cy="611" r="2.6" fill="#FFC24A">
+        <animate attributeName="opacity" values="1;0.35;1" dur="2.2s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- day labels -->
+      <g font-size="10" font-weight="600" letter-spacing="0.2" fill="#6C6C70" text-anchor="middle">
+        <text x="59"  y="698">M</text>
+        <text x="105" y="698">T</text>
+        <text x="151" y="698">W</text>
+        <text x="196" y="698" fill="#FFFFFF" font-weight="700">T</text>
+        <text x="242" y="698">F</text>
+        <text x="288" y="698">S</text>
+        <text x="334" y="698">S</text>
+      </g>
+
+      <!-- ═══════════ PROGRAMS (scroll continuation) ═══════════ -->
+      <text x="24" y="748" font-size="10" font-weight="700" letter-spacing="1.35" fill="#86868B">PROGRAMS</text>
+      <text x="367" y="748" font-size="11.5" font-weight="600" letter-spacing="-0.1" fill="#FF9F0A" text-anchor="end">See All</text>
+      <path d="M370 744 L373.6 747.6 L370 751.2" fill="none" stroke="#FF9F0A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <g filter="url(#fTile)">
+        <rect x="16"  y="758" width="164" height="96" rx="24" fill="url(#gProgA)"/>
+        <rect x="192" y="758" width="164" height="96" rx="24" fill="url(#gProgB)"/>
+      </g>
+
+      <!-- scroll fade -->
+      <rect x="0" y="730" width="393" height="39" fill="url(#gFade)"/>
+    </g>
+
+    <!-- ░░ STATUS BAR ░░ -->
+    <g>
+      <text x="66" y="36" font-size="16" font-weight="600" letter-spacing="-0.35" fill="#FFFFFF" text-anchor="middle">9:41</text>
+
+      <!-- cellular -->
+      <g fill="#FFFFFF">
+        <rect x="281" y="27"   width="3" height="4.5" rx="1.5"/>
+        <rect x="286" y="25"   width="3" height="6.5" rx="1.5"/>
+        <rect x="291" y="23"   width="3" height="8.5" rx="1.5"/>
+        <rect x="296" y="20.5" width="3" height="11"  rx="1.5"/>
+      </g>
+      <!-- wi-fi -->
+      <g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round">
+        <path d="M306.28 23.78 A9.5 9.5 0 0 1 319.72 23.78"/>
+        <path d="M308.55 26.05 A6.3 6.3 0 0 1 317.45 26.05"/>
+        <path d="M310.81 28.31 A3.1 3.1 0 0 1 315.19 28.31"/>
+      </g>
+      <circle cx="313" cy="30.8" r="1.3" fill="#FFFFFF"/>
+      <!-- battery -->
+      <rect x="328" y="23" width="24" height="11" rx="3.2" fill="none" stroke="#FFFFFF" stroke-opacity="0.38" stroke-width="1"/>
+      <rect x="329.8" y="24.8" width="15" height="7.4" rx="2" fill="#FFFFFF"/>
+      <path d="M353.6 26.4 C354.9 26.8 354.9 30.2 353.6 30.6 Z" fill="#FFFFFF" fill-opacity="0.42"/>
+    </g>
+
+    <!-- ░░ DYNAMIC ISLAND ░░ -->
+    <rect x="133.5" y="11" width="126" height="37" rx="18.5" fill="#000000"/>
+    <circle cx="245.5" cy="29.5" r="6.2" fill="#0A0C10"/>
+    <circle cx="245.5" cy="29.5" r="3.1" fill="#121A24"/>
+    <circle cx="244.2" cy="28.2" r="1.05" fill="#3E6E9E" opacity="0.75"/>
+
+    <!-- ░░ TAB BAR ░░ -->
+    <rect x="0" y="769" width="393" height="83" fill="url(#gTab)"/>
+    <line x1="0" y1="769.5" x2="393" y2="769.5" stroke="#FFFFFF" stroke-opacity="0.11" stroke-width="1"/>
+
+    <!-- Home · active -->
+    <g transform="translate(49.1,797)" filter="url(#fSoft)">
+      <use xlink:href="#ic-house-fill" href="#ic-house-fill" fill="#FF375F"/>
+    </g>
+    <text x="49.1" y="826" font-size="10" font-weight="600" letter-spacing="-0.1" fill="#FF375F" text-anchor="middle">Home</text>
+
+    <!-- Workouts -->
+    <g transform="translate(147.4,797)">
+      <use xlink:href="#ic-dumbbell" href="#ic-dumbbell" transform="scale(0.92)" fill="#8E8E93"/>
+    </g>
+    <text x="147.4" y="826" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Workouts</text>
+
+    <!-- Trends -->
+    <g transform="translate(245.6,797)" color="#8E8E93">
+      <use xlink:href="#ic-trend" href="#ic-trend"/>
+    </g>
+    <text x="245.6" y="826" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Trends</text>
+
+    <!-- Profile -->
+    <g transform="translate(343.9,797)" color="#8E8E93">
+      <use xlink:href="#ic-person" href="#ic-person"/>
+    </g>
+    <text x="343.9" y="826" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Profile</text>
+
+    <!-- home indicator -->
+    <rect x="140.5" y="838" width="112" height="5" rx="2.5" fill="#FFFFFF" fill-opacity="0.88"/>
+  </g>
+
+  <!-- ░░ DEVICE EDGE ░░ -->
+  <rect x="0.75" y="0.75" width="391.5" height="850.5" rx="54" fill="none" stroke="#FFFFFF" stroke-opacity="0.13" stroke-width="1.5"/>
+</svg>

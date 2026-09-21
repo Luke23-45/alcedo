@@ -1,0 +1,78 @@
+import { AiChatServiceV2 } from '@/services/ai-chat-service-v2';
+import { EncryptionService } from '@/services/encryption-service';
+import { FeedApiService } from '@/services/feed-api';
+import { FeedFollowService } from '@/services/feed-follow-service';
+import { FeedIdentityService } from '@/services/feed-identity-service';
+import { FeedInboxDecryptionService } from '@/services/feed-inbox-decryption-service';
+import { FileExportService } from '@/services/file-export-service';
+import { FilePickerService } from '@/services/file-picker-service';
+import { HubConnectionFactory } from '@/services/hub-connection-factory';
+import { KeyValueStore } from '@/services/key-value-store';
+import { Logger } from '@/services/logger';
+import { NotificationService } from '@/services/notification-service';
+import { PreferenceService } from '@/services/preference-service';
+import { ProgressRepository } from '@/services/progress-repository';
+import { SessionService } from '@/services/session-service';
+import { StringSharer } from '@/services/string-sharer';
+import { getTolgee } from '@/services/tolgee';
+import { WorkoutWorker } from '@/services/workout-worker';
+import { RootState } from '@/store';
+import { Store } from '@reduxjs/toolkit';
+import { HealthExportService } from './health-export-service';
+import { HealthExportService as HES } from './health-export-service-shared';
+import { DatabaseMigrationService } from './database-migration-service';
+import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
+import { SQLiteDatabase } from 'expo-sqlite';
+import { DatabaseImportService } from '@/services/database-import-service';
+
+export type Services = ReturnType<typeof createServices>;
+
+export function createServices(store: Store<RootState>, db: ExpoSQLiteDatabase, expoDb: SQLiteDatabase) {
+  const logger = new Logger();
+  const keyValueStore = new KeyValueStore();
+  const progressRepository = new ProgressRepository(store.getState);
+  const sessionService = new SessionService(progressRepository, store.getState);
+  const notificationService = new NotificationService(store.getState, store.dispatch);
+  const encryptionService = new EncryptionService();
+  const feedApiService = new FeedApiService(store.getState);
+  const feedIdentityService = new FeedIdentityService(feedApiService, encryptionService);
+  const feedInboxDecryptionService = new FeedInboxDecryptionService(encryptionService, feedApiService);
+  const feedFollowService = new FeedFollowService(feedApiService, encryptionService);
+  const stringSharer = new StringSharer();
+  const fileExportService = new FileExportService();
+  const filePickerService = new FilePickerService();
+  const preferenceService = new PreferenceService(keyValueStore);
+  const aiChatService = new AiChatServiceV2(new HubConnectionFactory(), store.getState);
+  const tolgee = getTolgee(preferenceService);
+  const workoutWorkerService = new WorkoutWorker(store.dispatch, store.getState, tolgee);
+  const healthExportService: HES = new HealthExportService();
+  const databaseMigrationService = new DatabaseMigrationService(
+    db,
+    logger,
+    new DatabaseImportService(db, keyValueStore, preferenceService),
+  );
+
+  return {
+    logger,
+    keyValueStore,
+    progressRepository,
+    sessionService,
+    notificationService,
+    encryptionService,
+    feedFollowService,
+    feedInboxDecryptionService,
+    feedApiService,
+    feedIdentityService,
+    healthExportService,
+    stringSharer,
+    fileExportService,
+    filePickerService,
+    preferenceService,
+    aiChatService,
+    workoutWorkerService,
+    tolgee,
+    db,
+    expoDb,
+    databaseMigrationService,
+  };
+}
