@@ -2,10 +2,18 @@ import { MovementKey } from '@/models/blueprint-models';
 import { Session } from '@/models/session-models';
 import { Weight } from '@/models/weight';
 import { calculateOneRepMax } from '@/store/stats/calculate-stats';
+import { LocalDate } from '@js-joda/core';
 
 export interface PersonalRecord {
   exerciseName: string;
   oneRepMax: Weight;
+  /**
+   * The standing best at the moment this record was set, so callers can show
+   * the improvement ("+5.0 kg") without re-walking history.
+   */
+  previousBest?: Weight;
+  /** The session date this record was achieved on. */
+  achievedAt?: LocalDate;
 }
 
 function bestOneRepMax(session: Session): Map<MovementKey, PersonalRecord> {
@@ -51,7 +59,7 @@ export function findPersonalRecords(sessionsOldestFirst: Session[]): Map<string,
       const previous = runningBest.get(key);
 
       if (previous && candidate.oneRepMax.isGreaterThan(previous)) {
-        records.push(candidate);
+        records.push({ ...candidate, previousBest: previous, achievedAt: session.date });
       }
 
       if (!previous || candidate.oneRepMax.isGreaterThan(previous)) {

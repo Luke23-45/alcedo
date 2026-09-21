@@ -7,9 +7,11 @@ import { Avatar, HeaderRow, TextColumn, TrailingGroup } from './greeting-header.
 
 /**
  * Reference avatar: r22 circle on gAvatar (#5E5CE6→#BF5AF2) with top gloss,
- * white@0.18 ring, and a red notification badge.
+ * white@0.18 ring, and the red notification dot from the reference
+ * (offset +15/−15 from center, r7, stroked with the screen background).
  */
 function AvatarBadge() {
+  const theme = useAppTheme();
   return (
     <Svg width={52} height={52} viewBox="0 0 52 52">
       <Defs>
@@ -21,6 +23,7 @@ function AvatarBadge() {
       <Circle cx={26} cy={26} r={22} fill="url(#greetAvatar)" />
       <Circle cx={21} cy={18} r={12} fill="#FFFFFF" opacity={0.18} />
       <Circle cx={26} cy={26} r={22} fill="none" stroke="#FFFFFF" strokeOpacity={0.18} />
+      <Circle cx={41} cy={11} r={7} fill="#FF3B30" stroke={theme.color.background.base} strokeWidth={2.2} />
     </Svg>
   );
 }

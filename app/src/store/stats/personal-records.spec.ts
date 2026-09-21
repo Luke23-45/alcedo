@@ -123,6 +123,30 @@ describe('findPersonalRecords', () => {
     expect(records.has('s2')).toBe(false);
     expect(records.has('s3')).toBe(true);
   });
+
+  it('carries the previous best and the achievement date on each record', () => {
+    const records = findPersonalRecords([
+      session('s1', day(1), [exercise('Squat', kg(100), 5)]),
+      session('s2', day(8), [exercise('Squat', kg(110), 5)]),
+    ]);
+
+    const record = records.get('s2')?.[0];
+    expect(record?.previousBest?.value.toNumber()).toBeCloseTo(116.67, 1);
+    expect(record?.achievedAt?.equals(day(8))).toBe(true);
+  });
+
+  it('chains the previous best across three sessions', () => {
+    const records = findPersonalRecords([
+      session('s1', day(1), [exercise('Squat', kg(100), 5)]),
+      session('s2', day(8), [exercise('Squat', kg(110), 5)]),
+      session('s3', day(15), [exercise('Squat', kg(120), 5)]),
+    ]);
+
+    const record = records.get('s3')?.[0];
+    // Previous best is s2's estimated 1RM (110kg x 5), not s1's.
+    expect(record?.previousBest?.value.toNumber()).toBeCloseTo(128.33, 1);
+    expect(record?.achievedAt?.equals(day(15))).toBe(true);
+  });
 });
 
 describe('findPersonalRecords for exercises that track no load', () => {

@@ -47,3 +47,8 @@ export const EmptyBox = styled.View`
   padding-horizontal: ${({ theme }) => theme.space.base}px;
   padding-vertical: ${({ theme }) => theme.space.md}px;
 `;
+
+/** The whole 68pt row is the tap target; the chevron promises navigation. */
+export const RowPressable = styled.Pressable`
+  border-radius: 22px;
+`;

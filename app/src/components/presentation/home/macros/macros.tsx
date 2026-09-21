@@ -9,13 +9,13 @@ import { SampleBadge } from '../shared/sample-badge';
 import * as S from './macros.styles';
 
 /**
- * Sample macro state, kept self-consistent:
- * 124g protein + 186g carbs + 52g fat = 124*4 + 186*4 + 52*9 = 1,708 kcal,
+ * Sample macro state, kept self-consistent and matching the reference:
+ * 125g protein + 200g carbs + 60g fat = 125*4 + 200*4 + 60*9 = 1,840 kcal,
  * which drives the footer bar against the 2,400 kcal goal.
  */
-const PROTEIN_G = 124;
-const CARBS_G = 186;
-const FAT_G = 52;
+const PROTEIN_G = 125;
+const CARBS_G = 200;
+const FAT_G = 60;
 const KCAL_GOAL = 2400;
 const RING_R = 19;
 

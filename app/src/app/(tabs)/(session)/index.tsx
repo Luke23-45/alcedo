@@ -149,7 +149,13 @@ function HomeScreen({ upcoming, onStart }: { upcoming: readonly Session[]; onSta
       <HrZones />
       <ProgramsSection programs={data.programs} onSeeAll={() => push('/settings/program-list')} />
       <CoachCard />
-      <RecentActivitySection items={data.recentActivity} onSeeAll={() => push('/(tabs)/history')} />
+      <RecentActivitySection
+        items={data.recentActivity}
+        onSeeAll={() => push('/(tabs)/history')}
+        onSessionPress={(sessionId) =>
+          push(`/history/post-workout?sessionId=${encodeURIComponent(sessionId)}&source=history`)
+        }
+      />
       <AchievementsSection />
       <HomeDuoRow>
         <HomeDuoCell>

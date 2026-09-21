@@ -1,7 +1,6 @@
 import styled from 'styled-components/native';
 import { alpha } from '@/styles/theme';
 import { HomeGradient } from '../shared/home-gradient';
-import { HomeCard } from '../shared/home-card';
 
 /** 74pt = 104pt card − 2pt edge − 28pt padding. */
 export const CardBody = styled.View`
@@ -116,20 +115,4 @@ export const StartGloss = styled(HomeGradient).attrs({ variant: 'gloss' as const
   right: 0;
   height: 38px;
   opacity: 0.45;
-`;
-
-export const TilePressable = styled.Pressable`
-  flex: 1;
-  height: 76px;
-`;
-
-export const TilePlain = styled.View`
-  flex: 1;
-  height: 76px;
-`;
-
-export const TileBody = styled(HomeCard)`
-  height: 76px;
-  align-items: center;
-  justify-content: center;
 `;

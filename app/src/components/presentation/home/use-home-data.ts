@@ -1,10 +1,12 @@
 import { useAppSelector } from '@/store';
 import { selectHistoryPersonalRecords, selectSessions } from '@/store/stored-sessions';
+import type { PersonalRecord } from '@/store/stats/personal-records';
 import { Session } from '@/models/session-models';
 import { RecordedWeightedExercise } from '@/models/session-models/recorded-weighted-exercise';
 import { Weight } from '@/models/weight';
 import { formatSessionClock } from '@/components/presentation/summary/post-workout-format';
-import { DateTimeFormatter, LocalDate } from '@js-joda/core';
+import { useFormatDate } from '@/hooks/useFormatDate';
+import { LocalDate } from '@js-joda/core';
 import { useTranslate } from '@tolgee/react';
 
 export interface VolumeDay {
@@ -104,6 +106,7 @@ function activityKind(session: Session): RecentActivityItem['kind'] {
  */
 export function useHomeData(upcoming: readonly Session[] | undefined): HomeData {
   const { t } = useTranslate();
+  const formatDate = useFormatDate();
   const sessions = useAppSelector(selectSessions);
   const historyRecords = useAppSelector(selectHistoryPersonalRecords);
   const savedPrograms = useAppSelector((s) => s.program.savedPrograms);
@@ -117,7 +120,9 @@ export function useHomeData(upcoming: readonly Session[] | undefined): HomeData 
       : hour < 18
         ? t('home.greeting.afternoon') // en: "Good afternoon"
         : t('home.greeting.evening'); // en: "Good evening"
-  const dateLabel = today.format(DateTimeFormatter.ofPattern('EEEE, MMMM d')).toUpperCase();
+  // js-joda text patterns (EEEE/MMMM) throw without the locale plugin, which we
+  // don't ship — weekday/month names go through the cached Intl formatters instead.
+  const dateLabel = formatDate(today, { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
 
   const todaySession = upcoming?.[0];
   const todayExerciseCount = todaySession?.recordedExercises.length ?? 0;
@@ -157,7 +162,7 @@ export function useHomeData(upcoming: readonly Session[] | undefined): HomeData 
       const volumeKg = sessionVolumeKg(session);
       const datePart = session.date.equals(today)
         ? t('feed.home.recent.today') // en: "Today"
-        : session.date.format(DateTimeFormatter.ofPattern('EEEE'));
+        : formatDate(session.date, { weekday: 'long' });
       // Law III: Session has no kcal/energy field (verified across models/),
       // so the subtitle can only ever show duration — never invented kcal.
       const subtitle = session.duration
@@ -174,14 +179,32 @@ export function useHomeData(upcoming: readonly Session[] | undefined): HomeData 
     });
 
   // --- Personal records: prefer the big three lifts, else the first three -----
-  const allRecords = [...historyRecords.values()].flat();
+  // The store only emits sessions where a record was actually set, oldest
+  // first, so the last entry per exercise is the standing best — Home must
+  // show that, not the first time the lift ever PR'd.
+  const latestByExercise = new Map<string, PersonalRecord>();
+  for (const records of historyRecords.values()) {
+    for (const record of records) latestByExercise.set(record.exerciseName, record);
+  }
+  const latestRecords = [...latestByExercise.values()];
   const liftOrder = [/bench/i, /squat/i, /deadlift/i];
   const personalRecords: PersonalRecordItem[] = liftOrder
-    .map((pattern) => allRecords.find((r) => pattern.test(r.exerciseName)))
+    .map((pattern) => latestRecords.find((r) => pattern.test(r.exerciseName)))
     .filter((r) => r !== undefined)
-    .concat(allRecords.filter((r) => !liftOrder.some((pattern) => pattern.test(r.exerciseName))))
+    .concat(latestRecords.filter((r) => !liftOrder.some((pattern) => pattern.test(r.exerciseName))))
     .slice(0, 3)
-    .map((r) => ({ name: r.exerciseName, value: r.oneRepMax.shortLocaleFormat(0) ?? '' }));
+    .map((r) => {
+      const improvement = r.previousBest ? r.oneRepMax.minus(r.previousBest) : undefined;
+      const achieved = r.achievedAt;
+      return {
+        name: r.exerciseName,
+        value: r.oneRepMax.shortLocaleFormat(0) ?? '',
+        // A record only exists when it beat a previous best, so the delta is
+        // always positive here; the "+" makes the improvement explicit.
+        delta: improvement ? `+${improvement.shortLocaleFormat(1)}` : undefined,
+        isNew: achieved ? achieved.year() === today.year() && achieved.month() === today.month() : undefined,
+      };
+    });
 
   // --- Programs: active plan first --------------------------------------------
   const programs: ProgramItem[] = Object.entries(savedPrograms)

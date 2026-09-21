@@ -64,7 +64,16 @@ function ChevronGlyph() {
   );
 }
 
-export function RecentActivitySection({ items, onSeeAll }: { items: RecentActivityItem[]; onSeeAll: () => void }) {
+export function RecentActivitySection({
+  items,
+  onSeeAll,
+  onSessionPress,
+}: {
+  items: RecentActivityItem[];
+  onSeeAll: () => void;
+  /** Opens the session detail; every row carries a chevron, so every row must go somewhere. */
+  onSessionPress: (sessionId: string) => void;
+}) {
   const { t } = useTranslate();
   const theme = useAppTheme();
   const dark = theme.isDark;
@@ -88,49 +97,56 @@ export function RecentActivitySection({ items, onSeeAll }: { items: RecentActivi
       ) : (
         <S.List>
           {items.map((item) => (
-            <HomeCard key={item.id} radius={22} pad={14} style={{ height: 68 }}>
-              <S.RowInner>
-                <S.Tile $kind={item.kind}>
-                  <KindGlyph kind={item.kind} />
-                </S.Tile>
-                <S.Middle>
-                  <HomeText
-                    weight={fontWeight.semibold}
-                    tracking={-0.2}
-                    numberOfLines={1}
-                    style={{ fontSize: 14, lineHeight: 18, color: titleColor }}
-                  >
-                    {item.title}
-                  </HomeText>
-                  <HomeText
-                    weight={fontWeight.medium}
-                    numberOfLines={1}
-                    style={{ fontSize: 11, lineHeight: 14, color: subtitleColor, marginTop: 2 }}
-                  >
-                    {item.subtitle}
-                  </HomeText>
-                </S.Middle>
-                <S.ValueBlock>
-                  <HomeText
-                    weight={fontWeight.bold}
-                    tabular
-                    tracking={-0.3}
-                    numberOfLines={1}
-                    style={{ fontSize: 14, lineHeight: 18, color: titleColor }}
-                  >
-                    {item.value}
-                  </HomeText>
-                  <HomeText
-                    weight={fontWeight.medium}
-                    numberOfLines={1}
-                    style={{ fontSize: 10, lineHeight: 13, color: unitColor, marginTop: 1 }}
-                  >
-                    {item.unit}
-                  </HomeText>
-                </S.ValueBlock>
-                <ChevronGlyph />
-              </S.RowInner>
-            </HomeCard>
+            <S.RowPressable
+              key={item.id}
+              onPress={() => onSessionPress(item.id)}
+              accessibilityRole="button"
+              accessibilityLabel={item.title}
+            >
+              <HomeCard radius={22} pad={14} style={{ height: 68 }}>
+                <S.RowInner>
+                  <S.Tile $kind={item.kind}>
+                    <KindGlyph kind={item.kind} />
+                  </S.Tile>
+                  <S.Middle>
+                    <HomeText
+                      weight={fontWeight.semibold}
+                      tracking={-0.2}
+                      numberOfLines={1}
+                      style={{ fontSize: 14, lineHeight: 18, color: titleColor }}
+                    >
+                      {item.title}
+                    </HomeText>
+                    <HomeText
+                      weight={fontWeight.medium}
+                      numberOfLines={1}
+                      style={{ fontSize: 11, lineHeight: 14, color: subtitleColor, marginTop: 2 }}
+                    >
+                      {item.subtitle}
+                    </HomeText>
+                  </S.Middle>
+                  <S.ValueBlock>
+                    <HomeText
+                      weight={fontWeight.bold}
+                      tabular
+                      tracking={-0.3}
+                      numberOfLines={1}
+                      style={{ fontSize: 14, lineHeight: 18, color: titleColor }}
+                    >
+                      {item.value}
+                    </HomeText>
+                    <HomeText
+                      weight={fontWeight.medium}
+                      numberOfLines={1}
+                      style={{ fontSize: 10, lineHeight: 13, color: unitColor, marginTop: 1 }}
+                    >
+                      {item.unit}
+                    </HomeText>
+                  </S.ValueBlock>
+                  <ChevronGlyph />
+                </S.RowInner>
+              </HomeCard>
+            </S.RowPressable>
           ))}
         </S.List>
       )}

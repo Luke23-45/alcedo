@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { G, Path, Rect, Svg } from 'react-native-svg';
 import { useTranslate } from '@tolgee/react';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -14,8 +13,6 @@ export interface TodaySessionProps {
   /** Optional difficulty pill (e.g. "INTERMEDIATE"); hidden when the session has no difficulty. */
   difficultyLabel?: string;
   onStart: () => void;
-  onNutrition?: () => void;
-  onTimer?: () => void;
 }
 
 /** Reference ic-dumbbell: five rounded rects, drawn at 1.25× in the badge. */
@@ -48,71 +45,7 @@ function PlayGlyph({ size = 14, stroke = 2.6 }: { size?: number; stroke?: number
   );
 }
 
-/** Reference ic-meal: fork (strokes) + spoon (filled), tinted per action. */
-function MealGlyph({ color }: { color: string }) {
-  return (
-    <Svg width={20} height={20} viewBox="-10 -10 20 20">
-      <G fill="none" stroke={color} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-        <Path d="M-7.4 -8.6 V-3.8" />
-        <Path d="M-4.8 -8.6 V-3.8" />
-        <Path d="M-2.2 -8.6 V-3.8" />
-        <Path d="M-7.4 -3.8 C-7.4 -1.2 -6.2 0.2 -4.8 0.2 C-3.4 0.2 -2.2 -1.2 -2.2 -3.8" />
-        <Path d="M-4.8 0.2 V8.6" />
-      </G>
-      <Path d="M2.6 -8.6 C5.8 -5.4 7.0 -1.6 6.4 1.4 L4.4 2.6 V8.6 H2.6 Z" fill={color} />
-    </Svg>
-  );
-}
-
-/** Reference ic-stopwatch, tinted per action. */
-function StopwatchGlyph({ color }: { color: string }) {
-  return (
-    <Svg width={20} height={20} viewBox="-10 -10 20 20">
-      <G fill="none" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-        <Path d="M0 1.8 m-7.4 0 a7.4 7.4 0 1 0 14.8 0 a7.4 7.4 0 1 0 -14.8 0" />
-        <Path d="M0 1.8 V-2.4" />
-        <Path d="M-2.4 -9.4 H2.4" />
-        <Path d="M0 -9.4 V-5.6" />
-        <Path d="M6.4 -4.6 L8.2 -6.4" />
-      </G>
-    </Svg>
-  );
-}
-
-/** A secondary quick-action tile: pressable when a handler exists, plain view otherwise. */
-function SecondaryTile({ label, glyph, onPress }: { label: string; glyph: ReactNode; onPress?: () => void }) {
-  const theme = useAppTheme();
-  const body = (
-    <S.TileBody>
-      {glyph}
-      <HomeText
-        weight={fontWeight.semibold}
-        tracking={-0.1}
-        style={{ fontSize: 11.5, lineHeight: 14, color: theme.isDark ? '#F5F5F7' : '#1C1C1E', marginTop: 8 }}
-      >
-        {label}
-      </HomeText>
-    </S.TileBody>
-  );
-  if (onPress) {
-    return (
-      <S.TilePressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
-        {body}
-      </S.TilePressable>
-    );
-  }
-  return <S.TilePlain>{body}</S.TilePlain>;
-}
-
-export function TodaySession({
-  title,
-  subtitle,
-  startLabel,
-  difficultyLabel,
-  onStart,
-  onNutrition,
-  onTimer,
-}: TodaySessionProps) {
+export function TodaySession({ title, subtitle, startLabel, difficultyLabel, onStart }: TodaySessionProps) {
   const { t } = useTranslate();
   const theme = useAppTheme();
   const labelColor = theme.isDark ? '#86868B' : '#8E8E93';
@@ -178,6 +111,12 @@ export function TodaySession({
         </S.CardBody>
       </HomeCard>
 
+      {/*
+        Quick actions row: Start is the only real action. Nutrition and Timer
+        tiles were here per the reference, but the app has no nutrition logging
+        or standalone timer — dead tiles are worse than missing ones. They
+        return when those features ship.
+      */}
       <S.ActionsRow>
         <S.StartTilePressable
           onPress={onStart}
@@ -197,16 +136,6 @@ export function TodaySession({
             </HomeText>
           </S.StartTileGradient>
         </S.StartTilePressable>
-        <SecondaryTile
-          label={t('home.today_session.nutrition') /* en: "Nutrition" */}
-          glyph={<MealGlyph color="#FFB84D" />}
-          onPress={onNutrition}
-        />
-        <SecondaryTile
-          label={t('home.today_session.timer') /* en: "Timer" */}
-          glyph={<StopwatchGlyph color="#5EDCF0" />}
-          onPress={onTimer}
-        />
       </S.ActionsRow>
     </>
   );
