@@ -3,6 +3,7 @@ import { HomeScreenBackground } from '@/components/presentation/home/shared/home
 import { ExerciseEditorScreen } from '@/components/presentation/exercise-editor/exercise-editor-screen/exercise-editor-screen';
 import { blueprintsEqual, kindOf } from '@/components/presentation/exercise-editor/exercise-editor-logic';
 import { ExerciseBlueprint } from '@/models/blueprint-models';
+import { exerciseEditorDismissUpdate } from './dismiss-update';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { selectExercises, selectSession, updateStoredSession } from '@/store/stored-sessions';
 import { Href, Stack, useRouter } from 'expo-router';
@@ -65,28 +66,15 @@ export function SessionExerciseEditor(props: { sessionId: string; index: number;
   };
 
   useOnDismiss(() => {
-    const updated = draftRef.current;
-    if (isNew && (!updated || updated.name.trim() === '')) {
-      // Backed out of Add mode without choosing an exercise: drop the placeholder.
+    const update = exerciseEditorDismissUpdate(exerciseIndex, draftRef.current, useImperialUnits);
+    if (update) {
       dispatch(
         updateStoredSession({
           sessionId: props.sessionId,
-          update: (s) => (s.recordedExercises[exerciseIndex] ? s.withRemovedExercise(exerciseIndex) : s),
+          update,
         }),
       );
-      return;
     }
-    if (!updated) {
-      return;
-    }
-    dispatch(
-      updateStoredSession({
-        sessionId: props.sessionId,
-        // The exercise can have been removed while the editor was open, in which case the edit is moot.
-        update: (s) =>
-          s.recordedExercises[exerciseIndex] ? s.withEditedExercise(exerciseIndex, updated, useImperialUnits) : s,
-      }),
-    );
   });
 
   const hasExercise = !!exercise;

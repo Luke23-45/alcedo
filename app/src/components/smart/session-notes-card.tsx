@@ -7,7 +7,8 @@ import { useRouter } from 'expo-router';
 /**
  * The post-workout notes card, wired to the store. Notes are the session's
  * blueprint notes (the only notes field the store has); Edit opens the
- * existing workout editor, which persists them via updateStoredSession.
+ * workout editor with the notes field focused, which persists them via
+ * updateStoredSession.
  */
 export function SmartSessionNotesCard({ sessionId }: { sessionId: string }) {
   const session = useAppSelectorWithArg(selectSession, sessionId);
@@ -18,6 +19,9 @@ export function SmartSessionNotesCard({ sessionId }: { sessionId: string }) {
   }
 
   return (
-    <SessionNotesCard notes={session.blueprint.notes} onEdit={() => push(getSessionWorkoutEditorHref(sessionId))} />
+    <SessionNotesCard
+      notes={session.blueprint.notes}
+      onEdit={() => push(getSessionWorkoutEditorHref(sessionId, { focusNotes: true }))}
+    />
   );
 }

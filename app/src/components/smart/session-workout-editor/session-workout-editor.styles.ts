@@ -1,15 +1,16 @@
 import styled, { css } from 'styled-components/native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Animated from 'react-native-reanimated';
-import { alpha, fontWeight } from '@/styles/theme';
-import { HomeCard } from '@/components/presentation/home/shared/home-card';
+import { ScrollView as GestureScrollView } from 'react-native-gesture-handler';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
+import type { AppTheme } from '@/styles/theme';
 
 /* ------------------------------------------------------------------ *
- * Kinetic reference, spec screen 4 (Workout Editor), 393×852.
- * Dark values below; light mode adapts per the home-page token mapping
+ * Workout editor, three-canvas redesign (393×852 reference).
+ * Dark values below; light mode derives from the home-page token mapping
  * (white cards, black edge strokes, #1C1C1E / #8E8E93 / #AEAEB2 text).
  * ------------------------------------------------------------------ */
+
+/* --- Screen ---------------------------------------------------------------- */
 
 export const Screen = styled.View`
   flex: 1;
@@ -17,439 +18,582 @@ export const Screen = styled.View`
 
 export const AuraWrap = styled.View`
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: -150px;
+  left: -90px;
+  width: 570px;
+  height: 430px;
 `;
+
+export const Scroll = styled(GestureScrollView).attrs({
+  contentContainerStyle: { paddingBottom: 24 },
+  keyboardShouldPersistTaps: 'handled',
+})``;
 
 export const Content = styled.View`
-  flex: 1;
-  padding-horizontal: 16px;
+  padding-left: ${({ theme }) => theme.layout.screenPadding}px;
+  padding-right: ${({ theme }) => theme.layout.screenPadding}px;
 `;
 
-/* Nav · Cancel 16/400/-0.3 #8E8E93, title 15/600/-0.3, dots r2 #8E8E93. */
+/* --- Nav ------------------------------------------------------------------- */
+
 export const NavRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  height: 56px;
-  padding-horizontal: 16px;
-`;
-
-export const CancelButton = styled.Pressable`
-  padding-vertical: 12px;
   padding-left: 8px;
-  padding-right: 12px;
+  padding-right: 8px;
+  padding-top: 4px;
+  min-height: 52px;
 `;
 
-export const CancelText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 16px;
-  font-weight: ${fontWeight.regular};
-  letter-spacing: -0.3px;
-  color: #8e8e93;
+export const NavSideButton = styled.Pressable`
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
 `;
 
-export const NavTitleWrap = styled.View`
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
+export const MenuTrigger = styled.Pressable.attrs({ hitSlop: 8 })`
+  width: 44px;
+  height: 44px;
   align-items: center;
   justify-content: center;
 `;
 
 export const NavTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 15px;
-  font-weight: ${fontWeight.semibold};
-  letter-spacing: -0.3px;
-  color: ${({ theme }) => (theme.isDark ? '#FFFFFF' : '#1C1C1E')};
-`;
-
-export const NavMenuWrap = styled.View`
-  margin-right: -12px;
-`;
-
-/* Plan name card · 361×70 rx22. Focused: 2pt brand ring + coral glow. */
-export const PlanFieldOuter = styled(HomeGradient).attrs({ variant: 'brand' as const })<{
-  $focused: boolean;
-}>`
-  height: 70px;
-  border-radius: 22px;
-  padding: 2px;
-  ${({ $focused }) =>
-    $focused
-      ? css`
-          shadow-color: #ff6a3d;
-          shadow-offset: 0px 0px;
-          shadow-opacity: 0.45;
-          shadow-radius: 5px;
-          elevation: 4;
-        `
-      : ''}
-`;
-
-/**
- * 1pt edge stroke as a gradient layer with 1pt of padding, so the body reads
- * as inset by the stroke (the same construction as HomeCard, kept local so
- * the focused state can drop the edge without remounting the input).
- * Focused, the brand ring replaces the edge: padding collapses to 0 and the
- * opaque body covers the layer, so no white hairline shows inside the ring —
- * exactly the spec's focused state. The card shadow lives here (never on the
- * overflow-hidden body, which would clip it on iOS).
- */
-export const PlanFieldEdge = styled(HomeGradient).attrs({ variant: 'cardEdge' as const })<{
-  $focused: boolean;
-}>`
-  flex: 1;
-  border-radius: 20px;
-  padding: ${({ $focused }) => ($focused ? '0px' : '1px')};
-  ${({ theme }) =>
-    theme.isDark
-      ? css`
-          shadow-color: #000000;
-          shadow-offset: 0px 10px;
-          shadow-opacity: 0.5;
-          shadow-radius: 14px;
-          elevation: 8;
-        `
-      : css`
-          shadow-color: #14142b;
-          shadow-offset: 0px 8px;
-          shadow-opacity: 0.075;
-          shadow-radius: 16px;
-          elevation: 4;
-        `}
-`;
-
-/** Card body. Clips content to its radius; the edge layer carries the shadow. */
-export const PlanFieldBody = styled(HomeGradient).attrs({ variant: 'cardBody' as const })<{
-  $focused: boolean;
-}>`
-  flex: 1;
-  border-radius: ${({ $focused }) => ($focused ? 20 : 19)}px;
-  overflow: hidden;
-`;
-
-export const PlanFieldContent = styled.View`
-  flex: 1;
-  justify-content: center;
-  padding-horizontal: 16px;
-`;
-
-export const PlanLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 9px;
-  font-weight: ${fontWeight.bold};
-  letter-spacing: 1.25px;
-  text-transform: uppercase;
-  color: #86868b;
-`;
-
-export const PlanInput = styled.TextInput`
-  margin-top: 5px;
-  padding: 0px;
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 19px;
-  font-weight: ${fontWeight.semibold};
-  letter-spacing: -0.45px;
-  color: ${({ theme }) => (theme.isDark ? '#FFFFFF' : '#1C1C1E')};
-`;
-
-/* Meta strip · 361×72 rx22, four columns, hairline dividers. */
-export const MetaCard = styled(HomeCard).attrs({ radius: 22, pad: 0 })`
-  height: 72px;
-  margin-top: 12px;
-`;
-
-export const MetaInner = styled.View`
-  flex: 1;
-  flex-direction: row;
-  align-items: stretch;
-`;
-
-export const MetaColumn = styled.View`
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-`;
-
-export const MetaValue = styled.Text`
+  position: absolute;
+  left: 64px;
+  right: 64px;
+  text-align: center;
   font-family: ${({ theme }) => theme.font.text};
   font-size: 15px;
   line-height: 20px;
-  font-weight: ${fontWeight.bold};
-  letter-spacing: -0.4px;
-  color: ${({ theme }) => (theme.isDark ? '#FFFFFF' : '#1C1C1E')};
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: ${({ theme }) => theme.color.content.primary};
 `;
 
-export const MetaLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 8px;
-  line-height: 10px;
-  font-weight: ${fontWeight.bold};
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  margin-top: 8px;
-  color: #86868b;
-`;
+/* --- Draft strip ------------------------------------------------------------ */
 
-export const MetaDivider = styled.View`
-  width: 1px;
-  align-self: center;
-  height: 44px;
-  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.08) : alpha('#000000', 0.08))};
-`;
-
-/* Segmented control · 361×36 rx18, thumb 116.4×32 rx16. */
-export const SegmentTrack = styled.View`
-  height: 36px;
-  border-radius: 18px;
-  margin-top: 12px;
-  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.06) : alpha('#000000', 0.06))};
-`;
-
-export const SegmentThumbSlot = styled(Animated.View)`
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 116.4px;
-  height: 32px;
-`;
-
-export const SegmentThumb = styled.View`
-  flex: 1;
-  border-radius: 16px;
-  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.13) : '#FFFFFF')};
-  border-width: 0.8px;
-  border-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.12) : alpha('#000000', 0.06))};
-  ${({ theme }) =>
-    theme.isDark
-      ? css`
-          shadow-color: #000000;
-          shadow-offset: 0px 2px;
-          shadow-opacity: 0.5;
-          shadow-radius: 3px;
-          elevation: 2;
-        `
-      : css`
-          shadow-color: #000000;
-          shadow-offset: 0px 1px;
-          shadow-opacity: 0.18;
-          shadow-radius: 3px;
-          elevation: 2;
-        `}
-`;
-
-export const SegmentLabels = styled.View`
-  flex: 1;
+export const DraftStrip = styled.View`
   flex-direction: row;
-`;
-
-export const SegmentOption = styled.Pressable`
-  flex: 1;
   align-items: center;
-  justify-content: center;
+  padding-left: ${({ theme }) => theme.layout.screenPadding}px;
+  padding-right: ${({ theme }) => theme.layout.screenPadding}px;
+  margin-top: 2px;
 `;
 
-export const SegmentOptionText = styled.Text<{ $selected: boolean }>`
+export const DraftDot = styled.View`
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: ${({ theme }) => theme.home.seeAll};
+  margin-right: 6px;
+`;
+
+export const DraftText = styled.Text`
   font-family: ${({ theme }) => theme.font.text};
-  font-size: 12px;
-  font-weight: ${fontWeight.semibold};
-  letter-spacing: -0.15px;
-  color: ${({ theme, $selected }) =>
-    $selected ? (theme.isDark ? '#FFFFFF' : '#1C1C1E') : theme.isDark ? '#98989F' : '#8E8E93'};
+  font-size: 10.5px;
+  line-height: 14px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.color.content.tertiary};
+  flex-shrink: 1;
 `;
 
-/* Section header · 10/700/1.35 label + 10/600 drag hint. */
+/* --- Sections --------------------------------------------------------------- */
+
+export const Section = styled.View`
+  margin-top: ${({ theme }) => theme.space.xl}px;
+`;
+
 export const SectionHeaderRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding-horizontal: 8px;
-  margin-top: 18px;
-  margin-bottom: 12px;
-`;
-
-export const SectionLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 10px;
-  font-weight: ${fontWeight.bold};
-  letter-spacing: 1.35px;
-  text-transform: uppercase;
-  color: #86868b;
-`;
-
-export const DragHint = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 10px;
-  font-weight: ${fontWeight.semibold};
-  letter-spacing: 0.2px;
-  color: #6c6c70;
-`;
-
-/* Exercise row · 361×64 rx20. Pitch 74 (64 + 10 gap). */
-export const RowSlot = styled(Animated.View)`
-  height: 64px;
   margin-bottom: 10px;
 `;
 
-export const RowCard = styled(HomeCard).attrs({ radius: 20, pad: 0, elev: 'tile' as const })`
+export const MicroLabel = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 9px;
+  line-height: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.color.content.tertiary};
+`;
+
+export const HeaderHint = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 10.5px;
+  line-height: 14px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.color.content.tertiary};
+`;
+
+/* --- Plan name ---------------------------------------------------------------- */
+
+export const PlanNameWrap = styled.View`
+  margin-top: 18px;
+`;
+
+export const PlanNameInput = styled.TextInput.attrs<{ theme: AppTheme }>((props) => ({
+  placeholderTextColor: props.theme.isDark ? '#6C6C70' : '#AEAEB2',
+  selectionColor: props.theme.home.seeAll,
+}))`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  color: ${({ theme }) => theme.color.content.primary};
+  padding: 0;
+  margin: 0;
+`;
+
+export const PlanNameUnderline = styled.View<{ $focused: boolean }>`
+  height: 2px;
+  margin-top: 2px;
+  border-radius: 1px;
+  background-color: ${({ theme, $focused }) => ($focused ? theme.home.seeAll : theme.color.border.hairline)};
+`;
+
+/* --- Meta card ------------------------------------------------------------------ */
+
+export const MetaBody = styled.View`
+  padding: 14px 4px 10px 4px;
+`;
+
+export const MetaRow = styled.View`
+  flex-direction: row;
+  align-items: stretch;
+`;
+
+export const MetaCol = styled.View`
   flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;
+  padding-bottom: 2px;
+`;
+
+export const MetaValue = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: ${({ theme }) => theme.color.content.primary};
+`;
+
+export const MetaLabel = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 7.5px;
+  line-height: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.color.content.tertiary};
+  margin-top: 4px;
+  text-align: center;
+`;
+
+export const MetaDivider = styled.View`
+  width: 1px;
+  background-color: ${({ theme }) => theme.color.border.hairline};
+  margin-top: 4px;
+  margin-bottom: 4px;
+`;
+
+export const MetaFootnote = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 8.5px;
+  line-height: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: ${({ theme }) => (theme.isDark ? '#6C6C70' : '#AEAEB2')};
+  text-align: right;
+  margin-top: 8px;
+  padding-right: 12px;
+`;
+
+/* --- Notes ---------------------------------------------------------------------- */
+
+export const NotesHint = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 9.5px;
+  line-height: 12px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.color.content.tertiary};
+`;
+
+export const NotesInput = styled.TextInput.attrs<{ theme: AppTheme }>((props) => ({
+  placeholderTextColor: props.theme.isDark ? '#6C6C70' : '#AEAEB2',
+  selectionColor: props.theme.home.seeAll,
+  textAlignVertical: 'top',
+}))`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 13.5px;
+  line-height: 19px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.color.content.primary};
+  padding: 0;
+  margin: 0;
+  min-height: 88px;
+`;
+
+/* --- Exercise rows -------------------------------------------------------------- */
+
+export const RowsClip = styled.View`
+  position: relative;
+`;
+
+export const RowSlot = styled(Animated.View)<{ $last: boolean }>`
+  height: ${({ $last }) => ($last ? 64 : 74)}px;
 `;
 
 export const RowPress = styled.Pressable`
-  flex: 1;
+  height: 64px;
   flex-direction: row;
   align-items: center;
-  padding-left: 12px;
-  padding-right: 14px;
 `;
 
-export const HandleBox = styled.View`
-  width: 44px;
-  height: 44px;
-  justify-content: center;
-  align-items: flex-start;
-  padding-left: 2px;
-  margin-right: -20px;
-  z-index: 2;
+export const ActiveBorder = styled(Animated.View)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  border-radius: 20px;
+  border-width: 1.8px;
+  border-color: ${({ theme }) => theme.home.seeAll};
 `;
 
-export const NumberTile = styled.View`
+export const Grip = styled.View`
   width: 22px;
-  height: 22px;
-  border-radius: 7px;
   align-items: center;
   justify-content: center;
-  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.07) : alpha('#000000', 0.05))};
+  margin-right: 2px;
+`;
+
+/**
+ * The drag-grab zone: the visual handle plus the (non-interactive) number
+ * tile, so the reorder target meets 44×44 while the glyph keeps its drawn
+ * position. Dragging stays handle-only; the rest of the row still taps.
+ */
+export const GrabZone = styled.View`
+  flex-direction: row;
+  align-items: center;
+  align-self: stretch;
+`;
+
+export const NumberTile = styled(HomeGradient).attrs({ variant: 'breast' as const })`
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 `;
 
 export const NumberText = styled.Text`
   font-family: ${({ theme }) => theme.font.text};
-  font-size: 10px;
-  font-weight: ${fontWeight.bold};
-  color: #8e8e93;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 700;
+  color: #ffffff;
 `;
 
 export const RowTexts = styled.View`
   flex: 1;
-  justify-content: center;
-  margin-left: 10px;
+  margin-left: 12px;
   margin-right: 8px;
+  justify-content: center;
 `;
 
 export const RowName = styled.Text`
   font-family: ${({ theme }) => theme.font.text};
   font-size: 14px;
-  font-weight: ${fontWeight.semibold};
-  letter-spacing: -0.2px;
-  color: ${({ theme }) => (theme.isDark ? '#FFFFFF' : '#1C1C1E')};
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  color: ${({ theme }) => theme.color.content.primary};
+`;
+
+export const RowNameEmpty = styled(RowName)`
+  color: ${({ theme }) => (theme.isDark ? '#6C6C70' : '#AEAEB2')};
+  font-style: italic;
 `;
 
 export const RowSummary = styled.Text`
   font-family: ${({ theme }) => theme.font.text};
   font-size: 11px;
-  font-weight: ${fontWeight.medium};
-  margin-top: 4px;
-  color: #86868b;
+  line-height: 15px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.color.content.tertiary};
+  margin-top: 2px;
 `;
 
-export const EmptyRows = styled.View`
-  padding-vertical: 28px;
+export const RowDivider = styled.View`
+  height: 1px;
+  background-color: ${({ theme }) => theme.color.border.hairline};
+  margin-left: 24px;
+  margin-right: 4px;
+`;
+
+/** The dashed drop-target line shown while a row is being reordered. */
+export const DropIndicator = styled(Animated.View)`
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 0;
+  height: 2px;
+  flex-direction: row;
   align-items: center;
 `;
 
-export const EmptyRowsText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 13px;
-  font-weight: ${fontWeight.regular};
-  letter-spacing: -0.2px;
-  text-align: center;
-  color: #86868b;
+export const DropDot = styled.View`
+  width: 5px;
+  height: 5px;
+  border-radius: 2.5px;
+  background-color: ${({ theme }) => theme.home.seeAll};
 `;
 
-/* Sticky footer · material bar + 44pt fade, Add 361×48, Save 361×54. */
-export const FooterFloat = styled.View`
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-`;
-
-export const FooterFade = styled(LinearGradient)`
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -44px;
-  height: 44px;
-`;
-
-export const FooterBar = styled(LinearGradient)`
-  border-top-width: 1px;
-  border-top-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.11) : alpha('#000000', 0.11))};
-  padding-horizontal: 16px;
-  padding-top: 14px;
-`;
-
-export const AddRow = styled.Pressable`
-  height: 48px;
-  border-radius: 24px;
-  border-width: 1px;
+export const DropDash = styled.View`
+  flex: 1;
+  height: 2px;
+  margin-left: 4px;
+  margin-right: 4px;
+  border-top-width: 2px;
+  border-top-color: ${({ theme }) => theme.home.seeAll};
   border-style: dashed;
-  border-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.14) : alpha('#000000', 0.2))};
-  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.07) : alpha('#000000', 0.03))};
+  opacity: 0.85;
+`;
+
+export const ReorderCaption = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 9.5px;
+  line-height: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => (theme.isDark ? '#48484A' : '#8E8E93')};
+  text-align: center;
+  margin-top: 12px;
+  padding-left: 24px;
+  padding-right: 24px;
+`;
+
+/* --- Empty state ------------------------------------------------------------------ */
+
+export const EmptyBody = styled.View`
+  align-items: center;
+  padding: 36px 28px 32px 28px;
+`;
+
+export const EmptyIconRing = styled.View`
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.color.fill.secondary};
+  margin-bottom: 18px;
+`;
+
+export const EmptyTitle = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: ${({ theme }) => theme.color.content.primary};
+  text-align: center;
+`;
+
+export const EmptyBodyText = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 12px;
+  line-height: 17px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.color.content.tertiary};
+  text-align: center;
+  margin-top: 8px;
+`;
+
+/** Ghost secondary button per the spec: white 8% fill, amber label and glyph. */
+export const EmptyAddButton = styled.View`
+  border-radius: 22px;
+  overflow: hidden;
+  margin-top: 20px;
+  background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)')};
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.color.border.hairline};
+`;
+
+export const EmptyAddPress = styled.Pressable`
+  min-width: 176px;
+  min-height: 44px;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  gap: 8px;
 `;
 
-export const AddLabel = styled.Text`
+export const EmptyAddLabel = styled.Text`
   font-family: ${({ theme }) => theme.font.text};
-  font-size: 14.5px;
-  font-weight: ${fontWeight.semibold};
-  letter-spacing: -0.25px;
-  margin-left: 12px;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: ${({ theme }) => theme.home.seeAll};
+`;
+
+/* --- Add-behavior annotation ---------------------------------------------------------- */
+
+export const BehaviorCard = styled.View`
+  border-radius: 20px;
+  border-width: 1px;
+  border-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 159, 10, 0.35)' : 'rgba(201, 52, 0, 0.3)')};
+  background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 159, 10, 0.06)' : 'rgba(201, 52, 0, 0.05)')};
+`;
+
+export const BehaviorBody = styled.View`
+  padding: 14px 16px;
+`;
+
+export const BehaviorKicker = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 9px;
+  line-height: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
   color: ${({ theme }) => theme.home.amber};
+  margin-bottom: 6px;
 `;
 
-export const SaveOuter = styled(HomeGradient).attrs({ variant: 'brand' as const })`
-  height: 54px;
-  border-radius: 27px;
-  margin-top: 12px;
-  shadow-color: #ff2d55;
-  shadow-offset: 0px 7px;
-  shadow-opacity: 0.5;
-  shadow-radius: 12px;
-  elevation: 6;
+export const BehaviorText = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 11.5px;
+  line-height: 16px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.color.content.secondary};
 `;
 
-export const SavePress = styled.Pressable`
+/* --- Footnote ------------------------------------------------------------------------- */
+
+export const Footnote = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 9.5px;
+  line-height: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => (theme.isDark ? '#48484A' : '#8E8E93')};
+  text-align: center;
+  margin-top: 16px;
+  padding-left: 20px;
+  padding-right: 20px;
+`;
+
+/* --- Footer ----------------------------------------------------------------------------- */
+
+export const FooterBar = styled.View`
+  border-top-width: 0.5px;
+  border-top-color: ${({ theme }) => theme.color.border.hairline};
+  background-color: ${({ theme }) => (theme.isDark ? 'rgba(11, 11, 14, 0.92)' : 'rgba(248, 248, 252, 0.92)')};
+  padding: 12px ${({ theme }) => theme.layout.screenPadding}px 10px ${({ theme }) => theme.layout.screenPadding}px;
+`;
+
+export const FooterRow = styled.View`
+  flex-direction: row;
+  gap: 12px;
+`;
+
+export const AddButton = styled.Pressable`
   flex: 1;
-  border-radius: 27px;
+  min-height: 52px;
+  border-radius: 16px;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.07)' : theme.color.fill.secondary)};
   border-width: 1px;
-  border-color: ${alpha('#FFFFFF', 0.22)};
+  border-color: ${({ theme }) => theme.color.border.hairline};
+`;
+
+export const AddButtonLabel = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.home.seeAll};
+`;
+
+export const SaveButtonShell = styled(HomeGradient).attrs({ variant: 'breast' as const })`
+  flex: 1;
+  border-radius: 16px;
   overflow: hidden;
+  ${({ theme }) =>
+    theme.isDark
+      ? css`
+          shadow-color: #ff6a3d;
+          shadow-offset: 0px 6px;
+          shadow-opacity: 0.38;
+          shadow-radius: 14px;
+          elevation: 6;
+        `
+      : css`
+          shadow-color: #ff6a3d;
+          shadow-offset: 0px 6px;
+          shadow-opacity: 0.28;
+          shadow-radius: 14px;
+          elevation: 6;
+        `}
+`;
+
+export const SaveButton = styled.Pressable`
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const SaveButtonLabel = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 16px;
+  line-height: 21px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: #ffffff;
 `;
 
 export const SaveGloss = styled(HomeGradient).attrs({ variant: 'gloss' as const })`
   position: absolute;
-  left: 0;
-  right: 0;
   top: 0;
-  height: 27px;
-  opacity: 0.35;
+  right: 0;
+  left: 0;
+  height: 26px;
+  opacity: 0.5;
 `;
 
-export const SaveLabel = styled.Text`
+export const SaveSubcaption = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 10.5px;
+  line-height: 14px;
+  font-weight: 500;
+  color: ${({ theme }) => (theme.isDark ? '#6C6C70' : '#AEAEB2')};
+  text-align: center;
+  margin-top: 8px;
+`;
+
+export const CancelButton = styled.Pressable`
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const CancelLabel = styled.Text`
   font-family: ${({ theme }) => theme.font.text};
   font-size: 16px;
-  font-weight: ${fontWeight.semibold};
-  letter-spacing: -0.3px;
-  color: #ffffff;
+  line-height: 21px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.home.seeAll};
 `;
