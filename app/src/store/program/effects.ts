@@ -17,6 +17,7 @@ import { AsyncStream } from 'data-async-iterators';
 import { Logger } from '@/services/logger';
 import { selectLatestExercises } from '../stored-sessions';
 import { programsSchema } from '@/db/schema';
+import { mapRowsSkippingCorrupt } from '@/db/helpers';
 import { toLocalDateJSON } from '@/models/storage/versions/latest';
 import { programBlueprintMigrations } from '@/models/storage/versions/migrations';
 import { LocalDate } from '@js-joda/core';
@@ -37,18 +38,28 @@ export function applyProgramEffects(addEffect: AddEffectFn) {
 
       let activePlanId: string | undefined;
       const dbPrograms = await db.select().from(programsSchema);
-      const programs = (dbPrograms.length ? dbPrograms : [getEmptyInitialProgram()]).reduce(
+      // One corrupt payload must not fail the whole hydration and brick the app.
+      const parsedPrograms = mapRowsSkippingCorrupt(
+        dbPrograms.length ? dbPrograms : [getEmptyInitialProgram()],
+        (row) => ({
+          id: row.id,
+          active: row.active,
+          program: ProgramBlueprint.fromJSON(programBlueprintMigrations.migrate(row.payload)),
+        }),
+        (row, error) => logger.error(`Skipping unreadable program row ${row.id} during hydration`, error),
+      );
+      const programs = parsedPrograms.reduce(
         toRecord(
           (x) => x.id,
-          (row) => {
-            if (row.active) {
-              activePlanId = row.id;
-            }
-            return ProgramBlueprint.fromJSON(programBlueprintMigrations.migrate(row.payload));
-          },
+          (x) => x.program,
         ),
         {},
       );
+      // The partial unique index guarantees at most one active row.
+      const activeRow = parsedPrograms.find((x) => x.active);
+      if (activeRow) {
+        activePlanId = activeRow.id;
+      }
       dispatch(setSavedPlans(programs));
 
       if (!(await keyValueStore.getItem(builtInProgramsStorageKey))) {

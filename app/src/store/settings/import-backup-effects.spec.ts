@@ -25,6 +25,21 @@ function snackbarText(payload: SnackbarDescriptor): string | undefined {
   return 'text' in payload ? payload.text : undefined;
 }
 
+/** Chainable drizzle-insert mock. `onConflictDoUpdate` records each completed write. */
+function mockDbWithInsert(writes: string[], gate?: Promise<void>) {
+  const chain = {
+    values: () => chain,
+    onConflictDoUpdate: () => {
+      writes.push('insert');
+      return gate ?? Promise.resolve();
+    },
+  };
+  return {
+    delete: () => ({ where: () => Promise.resolve() }),
+    insert: () => chain,
+  } as never;
+}
+
 describe('import-backup-effects', () => {
   it('dispatches a valid import when the sqlite db is there', async () => {
     const realBytes = await readFile(resolve(__dirname, '../../utils/__test__/export.liftlogbackup.sqlite.gz'));
@@ -74,11 +89,35 @@ describe('import-backup-effects', () => {
     expect(Object.values(dispatchedImport.payload.programs)).toHaveLength(0);
     expect(dispatchedImport.payload.successMessage).toBe('Restore complete!');
   });
+  it('skips a corrupt session in a proto backup instead of aborting the restore', async () => {
+    const realBytes = await readFile(resolve(__dirname, '../../utils/__test__/export.liftlogbackup.protobuf.gz'));
+    const testBed = createAddEffectTestBed({
+      services: {
+        filePickerService: {
+          pickFile: vi.fn().mockResolvedValue({ bytes: realBytes }),
+        },
+        tolgee: { t: (s: string) => s },
+      },
+    });
+
+    addImportBackupEffects(testBed.addEffect);
+    await testBed.dispatchHandled(importData());
+    const protoAction = testBed.getDispatchedAction(importDataProto);
+    // Corrupt one session in the parsed backup.
+    (protoAction.payload.dao.sessions as unknown[])[0] = null;
+
+    await testBed.dispatchHandled(protoAction);
+
+    // 85 sessions in the fixture, minus the corrupt one — the restore proceeds.
+    const dispatchedImport = testBed.getDispatchedAction(importBackupData);
+    expect(dispatchedImport.payload.workouts).toHaveLength(84);
+  });
   it('dispatches the appropriate actions when importing', async () => {
+    const writes: string[] = [];
     const testBed = createAddEffectTestBed({
       services: {
         tolgee: { t: (s: string) => s },
-        db: { delete: () => ({ where: () => Promise.resolve() }) } as never,
+        db: mockDbWithInsert(writes),
         databaseMigrationService: { migrate: vi.fn() } as never,
       },
     });
@@ -121,13 +160,47 @@ describe('import-backup-effects', () => {
     expect(testBed.getDispatchedAction(upsertExercises).payload).toBe(mockExercises);
     expect(snackbarText(testBed.getDispatchedAction(showSnackbar).payload)).toBe('Restore complete!');
     expect(testBed.getDispatchedAction(beginFeedImport).payload).toBe(mockFeed);
+    // sessions + exercises written directly; programs skipped when empty.
+    expect(writes).toEqual(['insert', 'insert']);
   });
 
-  it('records last-import metadata after the upserts commit, for external imports', async () => {
+  it('does not announce success until the imported rows are durable', async () => {
+    let releaseWrites!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      releaseWrites = resolve;
+    });
+    const writes: string[] = [];
     const testBed = createAddEffectTestBed({
       services: {
         tolgee: { t: (s: string) => s },
-        db: { delete: () => ({ where: () => Promise.resolve() }) } as never,
+        db: mockDbWithInsert(writes, gate),
+        databaseMigrationService: { migrate: vi.fn() } as never,
+      },
+    });
+    addImportBackupEffects(testBed.addEffect);
+
+    const pending = testBed.dispatchHandled(
+      importBackupData({
+        workouts: [EmptySession],
+        programs: {},
+        successMessage: 'Restore complete!',
+      }),
+    );
+    // Let the effect reach the gated write.
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    testBed.expectNotDispatched(showSnackbar);
+    releaseWrites();
+    await pending;
+    expect(snackbarText(testBed.getDispatchedAction(showSnackbar).payload)).toBe('Restore complete!');
+    expect(writes).toEqual(['insert']);
+  });
+
+  it('records last-import metadata after the upserts commit, for external imports', async () => {
+    const writes: string[] = [];
+    const testBed = createAddEffectTestBed({
+      services: {
+        tolgee: { t: (s: string) => s },
+        db: mockDbWithInsert(writes),
         databaseMigrationService: { migrate: vi.fn() } as never,
       },
     });

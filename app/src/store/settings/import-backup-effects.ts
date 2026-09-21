@@ -27,7 +27,7 @@ import {
 } from '@/models/feed-models';
 import { deserializeDatabaseAsync } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { DatabaseMigrationService } from '@/services/database-migration-service';
 import { FeedBackupData } from '@/models/backup';
 import {
@@ -56,7 +56,8 @@ import {
   pendingFeedUserMigrations,
 } from '@/models/storage/versions/migrations';
 import { FeedUserJSON } from '@/models/storage/versions/latest';
-import { fromExerciseDescriptorJSON } from '@/models/exercise-models';
+import { fromExerciseDescriptorJSON, toExerciseDescriptorJSON } from '@/models/exercise-models';
+import { mapRowsSkippingCorrupt, upsert } from '@/db/helpers';
 
 export function addImportBackupEffects(addEffect: AddEffectFn) {
   addEffect(importData, async (_, { dispatch, extra: { filePickerService, logger, tolgee } }) => {
@@ -93,6 +94,45 @@ export function addImportBackupEffects(addEffect: AddEffectFn) {
 
   addEffect(importBackupData, async ({ payload }, { dispatch, extra: { db, databaseMigrationService } }) => {
     const { workouts, programs, exercises, feed, successMessage, externalImport } = payload;
+    // Durable first: write the imported rows to SQLite and await them, so the
+    // success announcement below is never a lie. The store actions dispatched
+    // next update Redux state; their persistence effects re-upsert identical
+    // data (payload-only conflict path, idempotent), so a later effect run
+    // changes nothing.
+    await upsert(
+      db,
+      sessionsSchema,
+      workouts.map((x) => ({ id: x.id, payload: x.toJSON() })),
+    );
+    // programs.active is NOT NULL without a default, so it must be carried
+    // explicitly. Restored programs are never the active plan — an import must
+    // not switch the user's current plan; the state persist effect rewrites
+    // the correct active flags from Redux afterwards. The conflict path
+    // preserves the existing active flag, exactly like the upsert helper.
+    if (Object.keys(programs).length) {
+      await db
+        .insert(programsSchema)
+        .values(
+          Object.entries(programs).map(([id, program]) => ({
+            id,
+            active: false,
+            payload: program.toJSON(),
+          })),
+        )
+        .onConflictDoUpdate({
+          target: programsSchema.id,
+          set: {
+            payload: sql.raw(`excluded.${programsSchema.payload.name}`),
+          },
+        });
+    }
+    if (exercises) {
+      await upsert(
+        db,
+        exercisesSchema,
+        Object.entries(exercises).map(([id, exercise]) => ({ id, payload: toExerciseDescriptorJSON(exercise) })),
+      );
+    }
     dispatch(upsertStoredSessions(workouts));
     dispatch(upsertSavedPlans(programs));
     if (exercises) {
@@ -134,20 +174,32 @@ export function addImportBackupEffects(addEffect: AddEffectFn) {
       });
 
       await migrator.migrate();
-      const workouts = (await drizzleBackupDb.select().from(sessionsSchema)).map((x) =>
-        Session.fromJSON(sessionMigrations.migrate(x.payload)),
+      // One unreadable row in the backup file must not abort the whole restore;
+      // corrupt payloads are logged and skipped, the rest still imports.
+      const workouts = mapRowsSkippingCorrupt(
+        await drizzleBackupDb.select().from(sessionsSchema),
+        (x) => Session.fromJSON(sessionMigrations.migrate(x.payload)),
+        (row, error) => logger.warn('Skipping unreadable session in backup file', { id: row.id, error }),
       );
-      const programs = (await drizzleBackupDb.select().from(programsSchema)).reduce(
+      const programs = mapRowsSkippingCorrupt(
+        await drizzleBackupDb.select().from(programsSchema),
+        (x) => ({ id: x.id, program: ProgramBlueprint.fromJSON(programBlueprintMigrations.migrate(x.payload)) }),
+        (row, error) => logger.warn('Skipping unreadable program in backup file', { id: row.id, error }),
+      ).reduce(
         toRecord(
           (x) => x.id,
-          (x) => ProgramBlueprint.fromJSON(programBlueprintMigrations.migrate(x.payload)),
+          (x) => x.program,
         ),
         {},
       );
-      const exercises = (await drizzleBackupDb.select().from(exercisesSchema)).reduce(
+      const exercises = mapRowsSkippingCorrupt(
+        await drizzleBackupDb.select().from(exercisesSchema),
+        (x) => ({ id: x.id, exercise: fromExerciseDescriptorJSON(exerciseDescriptorMigrations.migrate(x.payload)) }),
+        (row, error) => logger.warn('Skipping unreadable exercise in backup file', { id: row.id, error }),
+      ).reduce(
         toRecord(
           (x) => x.id,
-          (x) => fromExerciseDescriptorJSON(exerciseDescriptorMigrations.migrate(x.payload)),
+          (x) => x.exercise,
         ),
         {},
       );
@@ -157,21 +209,29 @@ export function addImportBackupEffects(addEffect: AddEffectFn) {
       if (feedIdentityDb) {
         feed = {
           identity: FeedIdentity.fromJSON(feedIdentityDb.payload),
-          feedItems: (await drizzleBackupDb.select().from(feedItemsSchema)).map((x) =>
-            SessionUserEvent.fromJSON(sessionUserEventMigrations.migrate(x.payload)),
+          feedItems: mapRowsSkippingCorrupt(
+            await drizzleBackupDb.select().from(feedItemsSchema),
+            (x) => SessionUserEvent.fromJSON(sessionUserEventMigrations.migrate(x.payload)),
+            (row, error) => logger.warn('Skipping unreadable feed item in backup file', { id: row.id, error }),
           ),
-          followRequests: (await drizzleBackupDb.select().from(feedFollowRequestsSchema)).map((x) =>
-            FollowRequestInboxMessage.fromJSON(x.payload),
+          followRequests: mapRowsSkippingCorrupt(
+            await drizzleBackupDb.select().from(feedFollowRequestsSchema),
+            (x) => FollowRequestInboxMessage.fromJSON(x.payload),
+            (row, error) => logger.warn('Skipping unreadable follow request in backup file', { id: row.id, error }),
           ),
-          followed: (
-            (await drizzleBackupDb.select().from(feedFollowedUsersSchema)) as {
-              payload: FeedUserJSON;
-            }[]
-          )
-            .concat(await drizzleBackupDb.select().from(feedPendingUsersSchema))
-            .map((x) => fromFeedUserJSON(x.payload)),
-          followers: (await drizzleBackupDb.select().from(feedFollowerUsersSchema)).map((x) =>
-            FollowerFeedUser.fromJSON(x.payload),
+          followed: mapRowsSkippingCorrupt(
+            (
+              (await drizzleBackupDb.select().from(feedFollowedUsersSchema)) as {
+                payload: FeedUserJSON;
+              }[]
+            ).concat(await drizzleBackupDb.select().from(feedPendingUsersSchema)),
+            (x) => fromFeedUserJSON(x.payload),
+            (_, error) => logger.warn('Skipping unreadable followed user in backup file', error),
+          ),
+          followers: mapRowsSkippingCorrupt(
+            await drizzleBackupDb.select().from(feedFollowerUsersSchema),
+            (x) => FollowerFeedUser.fromJSON(x.payload),
+            (row, error) => logger.warn('Skipping unreadable follower in backup file', { id: row.id, error }),
           ),
         };
       }
@@ -190,12 +250,17 @@ export function addImportBackupEffects(addEffect: AddEffectFn) {
     }
   });
 
-  addEffect(importDataProto, async ({ payload: { dao } }, { dispatch, extra: { tolgee } }) => {
-    const workouts = dao.sessions.map((s) =>
-      Session.fromJSON(sessionMigrations.migrate(ProtobufToJsonV1Migrator.migrateSession(s))),
+  addEffect(importDataProto, async ({ payload: { dao } }, { dispatch, extra: { logger, tolgee } }) => {
+    // One unreadable entry in the backup file must not abort the whole restore;
+    // corrupt entries are logged and skipped, the rest still imports.
+    const workouts = mapRowsSkippingCorrupt(
+      dao.sessions,
+      (s) => Session.fromJSON(sessionMigrations.migrate(ProtobufToJsonV1Migrator.migrateSession(s))),
+      (_, error) => logger.warn('Skipping unreadable session in backup file', error),
     );
     const programs = Object.fromEntries(
-      Object.entries(dao.savedPrograms).map(
+      mapRowsSkippingCorrupt(
+        Object.entries(dao.savedPrograms),
         ([id, program]) =>
           [
             id,
@@ -203,6 +268,7 @@ export function addImportBackupEffects(addEffect: AddEffectFn) {
               programBlueprintMigrations.migrate(ProtobufToJsonV1Migrator.migrateProgramBlueprint(program)),
             ),
           ] as const,
+        ([id], error) => logger.warn('Skipping unreadable program in backup file', { id, error }),
       ),
     );
     let feed: FeedBackupData | undefined;
@@ -211,28 +277,41 @@ export function addImportBackupEffects(addEffect: AddEffectFn) {
         identity: FeedIdentity.fromJSON(
           feedIdentityMigrations.migrate(ProtobufToJsonV1Migrator.migrateFeedIdentity(dao.feedState.identity)),
         ),
-        feedItems: (dao.feedState.feedItems ?? []).map((x) =>
-          SessionUserEvent.fromJSON(
-            sessionUserEventMigrations.migrate(ProtobufToJsonV1Migrator.migrateSessionUserEvent(x)),
-          ),
+        feedItems: mapRowsSkippingCorrupt(
+          dao.feedState.feedItems ?? [],
+          (x) =>
+            SessionUserEvent.fromJSON(
+              sessionUserEventMigrations.migrate(ProtobufToJsonV1Migrator.migrateSessionUserEvent(x)),
+            ),
+          (_, error) => logger.warn('Skipping unreadable feed item in backup file', error),
         ),
-        followed: (dao.feedState.followedUsers ?? []).map((x) => {
-          const json = ProtobufToJsonV1Migrator.migrateFollowedUser(x);
-          return fromFeedUserJSON(
-            json.type === 'FollowedFeedUser'
-              ? followedFeedUserMigrations.migrate(json)
-              : pendingFeedUserMigrations.migrate(json),
-          );
-        }),
-        followers: (dao.feedState.followers ?? []).map((x) =>
-          FollowerFeedUser.fromJSON(
-            followerFeedUserMigrations.migrate(ProtobufToJsonV1Migrator.migrateFollowerUser(x)),
-          ),
+        followed: mapRowsSkippingCorrupt(
+          dao.feedState.followedUsers ?? [],
+          (x) => {
+            const json = ProtobufToJsonV1Migrator.migrateFollowedUser(x);
+            return fromFeedUserJSON(
+              json.type === 'FollowedFeedUser'
+                ? followedFeedUserMigrations.migrate(json)
+                : pendingFeedUserMigrations.migrate(json),
+            );
+          },
+          (_, error) => logger.warn('Skipping unreadable followed user in backup file', error),
         ),
-        followRequests: (dao.feedState.followRequests ?? []).map((x) =>
-          FollowRequestInboxMessage.fromJSON(
-            followRequestInboxMessageMigrations.migrate(ProtobufToJsonV1Migrator.migrateFollowRequest(x)),
-          ),
+        followers: mapRowsSkippingCorrupt(
+          dao.feedState.followers ?? [],
+          (x) =>
+            FollowerFeedUser.fromJSON(
+              followerFeedUserMigrations.migrate(ProtobufToJsonV1Migrator.migrateFollowerUser(x)),
+            ),
+          (_, error) => logger.warn('Skipping unreadable follower in backup file', error),
+        ),
+        followRequests: mapRowsSkippingCorrupt(
+          dao.feedState.followRequests ?? [],
+          (x) =>
+            FollowRequestInboxMessage.fromJSON(
+              followRequestInboxMessageMigrations.migrate(ProtobufToJsonV1Migrator.migrateFollowRequest(x)),
+            ),
+          (_, error) => logger.warn('Skipping unreadable follow request in backup file', error),
         ),
       };
     }

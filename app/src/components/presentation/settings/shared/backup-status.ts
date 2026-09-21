@@ -5,6 +5,8 @@ import { LocalDate, ZoneId } from '@js-joda/core';
 export interface DayLabels {
   today: string;
   yesterday: string;
+  /** Shown when a backup succeeded but its timestamp was never recorded. */
+  unknownTime: string;
 }
 
 /** Clock honoring Preferences → "24-Hour Time" (off: every clock shows AM/PM). */
@@ -23,7 +25,8 @@ function formatDate(millis: number, locale: string | undefined): string {
 /**
  * Human "Last backup" label from the real `lastBackup` RemoteData:
  * "Today, 6:12 AM", "Yesterday, 6:12 AM", or "Jun 8, 6:12 AM".
- * Returns null when no backup has ever succeeded.
+ * Returns the honest "time unknown" label when a backup succeeded but its
+ * timestamp was never recorded, and null when no backup has ever succeeded.
  */
 export function lastBackupLabel(
   lastBackup: RemoteData<LastBackup, string>,
@@ -33,6 +36,9 @@ export function lastBackupLabel(
 ): string | null {
   return lastBackup.match({
     success: (data) => {
+      if (!data.lastBackupTime) {
+        return labels.unknownTime;
+      }
       const zoned = data.lastBackupTime.atZone(ZoneId.systemDefault());
       const today = LocalDate.now(ZoneId.systemDefault());
       const date = zoned.toLocalDate();

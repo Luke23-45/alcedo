@@ -25,6 +25,7 @@ import { setPreferredLanguage } from '@/store/settings';
 import { Session } from '@/models/session-models';
 import { sessionMigrations } from '@/models/storage/versions/migrations';
 import { exercisesSchema, sessionsSchema } from '@/db/schema';
+import { mapRowsSkippingCorrupt } from '@/db/helpers';
 import { eq, sql } from 'drizzle-orm';
 import { toRecord } from '@/utils/reduce';
 import { fromExerciseDescriptorJSON, toExerciseDescriptorJSON } from '@/models/exercise-models';
@@ -43,11 +44,22 @@ export function applyStoredSessionsEffects(addEffect: AddEffectFn) {
         throw new Error('Settings must be hydrated before stored sessions');
       }
       await logger.time('initializeStoredSessions', async () => {
-        const rows = await db.select().from(sessionsSchema);
-        const storedSessions = rows.reduce(
+        // The two table reads are independent, so they run concurrently
+        // instead of two sequential round-trips.
+        const [rows, exerciseRows] = await Promise.all([
+          db.select().from(sessionsSchema),
+          db.select().from(exercisesSchema),
+        ]);
+        // One corrupt payload (e.g. a backup restored from a newer app version)
+        // must not fail the whole hydration and brick the app.
+        const storedSessions = mapRowsSkippingCorrupt(
+          rows,
+          (row) => ({ id: row.id, session: Session.fromJSON(sessionMigrations.migrate(row.payload)) }),
+          (row, error) => logger.error(`Skipping unreadable session row ${row.id} during hydration`, error),
+        ).reduce(
           toRecord(
             (x) => x.id,
-            (row) => Session.fromJSON(sessionMigrations.migrate(row.payload)),
+            (x) => x.session,
           ),
           {},
         );
@@ -58,18 +70,21 @@ export function applyStoredSessionsEffects(addEffect: AddEffectFn) {
         if (activeRowId) {
           dispatch(setActiveSessionId(activeRowId));
         }
+        const savedExercises = mapRowsSkippingCorrupt(
+          exerciseRows,
+          (x) => ({ id: x.id, exercise: fromExerciseDescriptorJSON(x.payload) }),
+          (row, error) => logger.error(`Skipping unreadable exercise row ${row.id} during hydration`, error),
+        ).reduce(
+          toRecord(
+            (x) => x.id,
+            (x) => x.exercise,
+          ),
+          {},
+        );
+        dispatch(setExercises(savedExercises));
       });
 
       await migrateLegacyCurrentSession(dispatch, getState, keyValueStore, logger);
-
-      const savedExercises = (await db.select().from(exercisesSchema)).reduce(
-        toRecord(
-          (x) => x.id,
-          (x) => fromExerciseDescriptorJSON(x.payload),
-        ),
-        {},
-      );
-      dispatch(setExercises(savedExercises));
 
       const builtInExercises = await loadBuiltInExercises(getState().settings.preferredLanguage);
       dispatch(setBuiltInExercises(builtInExercises));

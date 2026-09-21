@@ -10,7 +10,13 @@ import {
   resetRemoteBackupTestCache,
 } from '@/store/settings/remote-backup-effects';
 import { getBackupBytes } from '@/store/settings/util';
-import { executeRemoteBackup, retryRemoteBackup, setLastRemoteBackupTest, setTestInFlight } from '@/store/settings';
+import {
+  BackupMode,
+  executeRemoteBackup,
+  retryRemoteBackup,
+  setLastRemoteBackupTest,
+  setTestInFlight,
+} from '@/store/settings';
 import { showSnackbar } from '@/store/app';
 import { Backend } from '@/models/backend';
 import { RemoteData } from '@/models/remote';
@@ -60,12 +66,13 @@ const testBackend: Backend = {
   headers: [],
 };
 
-function makeBed(expoDb: SQLiteDatabase, withBackendAssignment = false) {
+function makeBed(expoDb: SQLiteDatabase, withBackendAssignment = false, backupMode: BackupMode = 'manual') {
   const fetchMock = vi.fn();
   vi.stubGlobal('fetch', fetchMock);
   const testBed = createAddEffectTestBed({
     initialState: {
       settings: {
+        backupMode,
         backupIncludeFeedAccount: false,
         lastBackup: RemoteData.notAsked(),
       },
@@ -146,7 +153,7 @@ describe('addRemoteBackupEffects', () => {
     const { testBed, fetchMock } = makeBed(expoDb);
     fetchMock.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
 
-    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true }));
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true, reason: 'test' }));
 
     const lastTest = testBed.getDispatchedAction(setLastRemoteBackupTest).payload!;
     expect(lastTest.status).toBe('success');
@@ -174,7 +181,7 @@ describe('addRemoteBackupEffects', () => {
     const { testBed, fetchMock } = makeBed(expoDb, true);
     fetchMock.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
 
-    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true }));
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true, reason: 'test' }));
     const firstBody = (fetchMock.mock.calls[0] as [string, { body: Uint8Array }])[1].body;
     expect(getBackupBytesMock).toHaveBeenCalledTimes(1);
 
@@ -209,7 +216,7 @@ describe('addRemoteBackupEffects', () => {
   it('Retry uses the cached target directly, even with no backend assigned', async () => {
     const first = makeBed(expoDb);
     first.fetchMock.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
-    await first.testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true }));
+    await first.testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true, reason: 'test' }));
     const firstBody = (first.fetchMock.mock.calls[0] as [string, { body: Uint8Array }])[1].body;
     expect(getBackupBytesMock).toHaveBeenCalledTimes(1);
 
@@ -227,11 +234,11 @@ describe('addRemoteBackupEffects', () => {
   });
 
   it('automatic backup never writes last-tested and stays silent', async () => {
-    const { testBed, fetchMock } = makeBed(expoDb);
+    const { testBed, fetchMock } = makeBed(expoDb, false, 'automatic');
     fetchMock.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
 
     // force: false — the silent auto-backup path.
-    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend }));
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, reason: 'automatic' }));
 
     expect(fetchMock).toHaveBeenCalledOnce();
     // No last-tested write, no snackbar: auto-backup is silent.
@@ -243,7 +250,7 @@ describe('addRemoteBackupEffects', () => {
     const { testBed, fetchMock } = makeBed(expoDb);
     fetchMock.mockResolvedValue({ ok: false, status: 401, statusText: 'Unauthorized' });
 
-    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true }));
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true, reason: 'test' }));
 
     const lastTest = testBed.getDispatchedAction(setLastRemoteBackupTest).payload!;
     expect(lastTest.status).toBe('error');
@@ -255,10 +262,10 @@ describe('addRemoteBackupEffects', () => {
   });
 
   it('silent auto-backup (non-force) never touches last-tested and shows no snackbar', async () => {
-    const { testBed, fetchMock } = makeBed(expoDb);
+    const { testBed, fetchMock } = makeBed(expoDb, false, 'automatic');
     fetchMock.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
 
-    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend }));
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, reason: 'automatic' }));
 
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(() => testBed.getDispatchedAction(setLastRemoteBackupTest)).toThrow();
@@ -266,12 +273,67 @@ describe('addRemoteBackupEffects', () => {
   });
 
   it('silent auto-backup failure shows no snackbar and records no last-tested entry', async () => {
-    const { testBed, fetchMock } = makeBed(expoDb);
+    const { testBed, fetchMock } = makeBed(expoDb, false, 'automatic');
     fetchMock.mockResolvedValue({ ok: false, status: 500, statusText: 'Error' });
 
-    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend }));
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, reason: 'automatic' }));
 
     expect(() => testBed.getDispatchedAction(setLastRemoteBackupTest)).toThrow();
     expect(() => testBed.getDispatchedAction(showSnackbar)).toThrow();
+  });
+});
+
+describe('backup mode gating (privacy-first, off by default)', () => {
+  let expoDb: SQLiteDatabase;
+
+  beforeEach(async () => {
+    expoDb = await createSeededDb();
+    getBackupBytesMock.mockClear();
+    resetRemoteBackupTestCache();
+    vi.unstubAllGlobals();
+  });
+
+  it('off: nothing uploads, whatever the invocation reason', async () => {
+    for (const reason of [undefined, 'automatic', 'manual', 'test'] as const) {
+      const { testBed, fetchMock } = makeBed(expoDb, true, 'off');
+      fetchMock.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
+
+      await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true, reason }));
+
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(getBackupBytesMock).not.toHaveBeenCalled();
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('off: retry of a cached test payload does not upload', async () => {
+    const { testBed, fetchMock } = makeBed(expoDb, true, 'off');
+    fetchMock.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
+
+    await testBed.dispatchHandled(retryRemoteBackup());
+
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('automatic: automatic invocations upload, explicit actions upload too', async () => {
+    const { testBed, fetchMock } = makeBed(expoDb, true, 'automatic');
+    fetchMock.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
+
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, reason: 'automatic' }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true, reason: 'manual' }));
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('manual: explicit actions upload, automatic invocations do not', async () => {
+    const { testBed, fetchMock } = makeBed(expoDb, true, 'manual');
+    fetchMock.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
+
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, force: true, reason: 'manual' }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await testBed.dispatchHandled(executeRemoteBackup({ backend: testBackend, reason: 'automatic' }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

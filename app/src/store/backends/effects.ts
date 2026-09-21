@@ -25,12 +25,21 @@ export function applyBackendsEffects(addEffect: AddEffectFn) {
         db.select().from(backendAssignmentsSchema),
       ]);
 
+      // Group headers once instead of filtering the full header list per
+      // backend (O(backends × headers)).
+      const headersByBackend = new Map<string, { name: string; value: string }[]>();
+      for (const header of headerRows) {
+        const list = headersByBackend.get(header.backendId) ?? [];
+        list.push({ name: header.name, value: header.value });
+        headersByBackend.set(header.backendId, list);
+      }
+
       const backends: Backend[] = backendRows.map((row) => ({
         id: row.id,
         name: row.name,
         url: row.url,
         kind: row.kind,
-        headers: headerRows.filter((header) => header.backendId === row.id).map(({ name, value }) => ({ name, value })),
+        headers: headersByBackend.get(row.id) ?? [],
       }));
 
       dispatch(setBackends(backends));

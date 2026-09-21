@@ -306,19 +306,19 @@ describe('PreferenceService - last backup bookkeeping', () => {
   it('lastBackupTime reads a stored ISO instant verbatim', async () => {
     const iso = '2024-01-02T03:04:05Z';
     const { service } = makeService({ lastBackupTime: iso });
-    expect((await service.getLastBackupTime()).equals(Instant.parse(iso))).toBe(true);
+    expect((await service.getLastBackupTime())?.equals(Instant.parse(iso))).toBe(true);
   });
 
-  it('lastBackupTime persists a fresh now when unset', async () => {
+  it('lastBackupTime stays unset when no timestamp was recorded (never invents one)', async () => {
     const { service, store } = makeService();
-    const result = await service.getLastBackupTime();
-    expect(store.setItem).toHaveBeenCalledWith('lastBackupTime', result.toString());
+    expect(await service.getLastBackupTime()).toBeUndefined();
+    expect(store.setItem).not.toHaveBeenCalled();
   });
 
-  it('lastBackupTime persists a fresh now when the stored value is unparseable', async () => {
+  it('lastBackupTime stays unset when the stored value is unparseable', async () => {
     const { service, store } = makeService({ lastBackupTime: 'not-an-instant' });
-    const result = await service.getLastBackupTime();
-    expect(store.setItem).toHaveBeenCalledWith('lastBackupTime', result.toString());
+    expect(await service.getLastBackupTime()).toBeUndefined();
+    expect(store.setItem).not.toHaveBeenCalled();
   });
 
   it('writes an instant via toString', async () => {
@@ -326,5 +326,11 @@ describe('PreferenceService - last backup bookkeeping', () => {
     const instant = Instant.parse('2024-05-06T07:08:09Z');
     await service.setLastBackupTime(instant);
     expect(store.setItem).toHaveBeenCalledWith('lastBackupTime', instant.toString());
+  });
+
+  it('setLastBackupTime with undefined writes nothing', async () => {
+    const { service, store } = makeService();
+    await service.setLastBackupTime(undefined);
+    expect(store.setItem).not.toHaveBeenCalled();
   });
 });

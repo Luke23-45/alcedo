@@ -174,11 +174,13 @@ export function applySettingsEffects(addEffect: AddEffectFn) {
 
   addEffect(setLastBackup, async (action, { stateAfterReduce, extra: { preferenceService } }) => {
     if (stateAfterReduce.settings.isHydrated && action.payload.isSuccess()) {
-      await preferenceService.setLastBackupTime(action.payload.data.lastBackupTime);
-      await preferenceService.setLastSuccessfulRemoteBackupHash(
-        action.payload.data.lastSuccessfulRemoteBackupHash,
-      );
-      await preferenceService.setLastBackupBackendId(action.payload.data.backendId);
+      // The three keys are independent files; write them concurrently instead of
+      // three sequential round-trips.
+      await Promise.all([
+        preferenceService.setLastBackupTime(action.payload.data.lastBackupTime),
+        preferenceService.setLastSuccessfulRemoteBackupHash(action.payload.data.lastSuccessfulRemoteBackupHash),
+        preferenceService.setLastBackupBackendId(action.payload.data.backendId),
+      ]);
     }
   });
 

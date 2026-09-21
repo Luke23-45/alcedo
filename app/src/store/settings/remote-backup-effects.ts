@@ -86,12 +86,27 @@ export function classifyRemoteBackupError(error: unknown): {
 }
 
 export function addRemoteBackupEffects(addEffect: AddEffectFn) {
-  addEffect(executeRemoteBackup, async ({ payload: { backend, force } }, api) => {
+  addEffect(executeRemoteBackup, async ({ payload: { backend, force, reason } }, api) => {
     api.cancelActiveListeners();
+    // Privacy-first gating (defense in depth — the callers also check): the
+    // automatic home-focus backup runs only in Automatic mode; explicit user
+    // actions (Back Up Now, destination Test) run in Automatic or Manual
+    // mode; Off never uploads.
+    const mode = api.getState().settings.backupMode;
+    const invocation = reason ?? 'automatic';
+    const allowed = invocation === 'automatic' ? mode === 'automatic' : mode !== 'off';
+    if (!allowed) {
+      return;
+    }
     await runRemoteBackup(api, { backend, force: !!force, reuseCache: false });
   });
   addEffect(retryRemoteBackup, async (_, api) => {
     api.cancelActiveListeners();
+    // Retry re-sends the last manual Test payload: an explicit user action,
+    // so it is allowed in Automatic and Manual mode, never in Off.
+    if (api.getState().settings.backupMode === 'off') {
+      return;
+    }
     await runRemoteBackup(api, { backend: undefined, force: true, reuseCache: true });
   });
 }

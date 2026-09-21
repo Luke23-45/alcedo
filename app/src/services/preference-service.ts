@@ -103,18 +103,20 @@ export class PreferenceService {
     return (await this.keyValueStore.getItem('lastBackupBackendId')) ?? undefined;
   }
 
-  setLastBackupTime(time: Instant): Promise<void> {
+  setLastBackupTime(time: Instant | undefined): Promise<void> {
+    if (!time) {
+      return Promise.resolve();
+    }
     return this.keyValueStore.setItem('lastBackupTime', instantCodec.serialize(time)!);
   }
 
-  async getLastBackupTime(): Promise<Instant> {
+  /**
+   * The stored last-backup timestamp, or undefined when none was recorded.
+   * A legacy hash without a timestamp stays "time unknown" — this never
+   * invents a fresh timestamp, which would make an old backup look new.
+   */
+  async getLastBackupTime(): Promise<Instant | undefined> {
     const value = await this.keyValueStore.getItem('lastBackupTime');
-    const parsed = instantCodec.deserialize(value);
-    if (parsed) {
-      return parsed;
-    }
-    const now = Instant.now();
-    await this.setLastBackupTime(now);
-    return now;
+    return instantCodec.deserialize(value) ?? undefined;
   }
 }

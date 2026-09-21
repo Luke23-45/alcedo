@@ -52,7 +52,7 @@ import {
   feedUnpublishedSessionsSchema,
 } from '@/db/schema';
 import { eq, inArray, sql } from 'drizzle-orm';
-import { upsert } from '@/db/helpers';
+import { mapRowsSkippingCorrupt, upsert } from '@/db/helpers';
 import {
   FeedIdentity,
   FollowerFeedUser,
@@ -77,58 +77,94 @@ export function applyFeedEffects(addEffect: AddEffectFn) {
       cancelActiveListeners();
       const sw = performance.now();
       try {
-        const identity = (await db.select().from(feedIdentitySchema)).at(0);
+        // The nine table reads are independent of each other, so they run
+        // concurrently instead of nine sequential round-trips.
+        const [
+          identityRows,
+          feedItemRows,
+          followRequestRows,
+          followedRows,
+          pendingRows,
+          revokedSecretRows,
+          followerRows,
+          receivedReactionRows,
+          sentReactionRows,
+        ] = await Promise.all([
+          db.select().from(feedIdentitySchema),
+          db.select().from(feedItemsSchema),
+          db.select().from(feedFollowRequestsSchema),
+          db.select().from(feedFollowedUsersSchema),
+          db.select().from(feedPendingUsersSchema),
+          db.select().from(feedRevokedFollowSecretsSchema),
+          db.select().from(feedFollowerUsersSchema),
+          db.select().from(feedReactionsSchema),
+          db.select().from(feedSentReactionsSchema),
+        ]);
+        const identity = identityRows.at(0);
         dispatch(
           patchFeedState({
             identity: identity ? RemoteData.success(FeedIdentity.fromJSON(identity.payload)) : RemoteData.notAsked(),
-            feed: (await db.select().from(feedItemsSchema)).map((x) =>
-              SessionUserEvent.fromJSON(sessionUserEventMigrations.migrate(x.payload)),
+            // One corrupt payload must not fail the whole hydration and brick
+            // the app; unreadable rows are logged and skipped.
+            feed: mapRowsSkippingCorrupt(
+              feedItemRows,
+              (x) => SessionUserEvent.fromJSON(sessionUserEventMigrations.migrate(x.payload)),
+              (_, error) => logger.error('Skipping unreadable feed item during hydration', error),
             ),
-            followRequests: (await db.select().from(feedFollowRequestsSchema)).map((x) =>
-              FollowRequestInboxMessage.fromJSON(x.payload),
+            followRequests: mapRowsSkippingCorrupt(
+              followRequestRows,
+              (x) => FollowRequestInboxMessage.fromJSON(x.payload),
+              (_, error) => logger.error('Skipping unreadable follow request during hydration', error),
             ),
-            followedUsers: (
-              (await db.select().from(feedFollowedUsersSchema)) as {
-                payload: FeedUserJSON;
-              }[]
-            )
-              .concat(await db.select().from(feedPendingUsersSchema))
-              .map((x) => fromFeedUserJSON(x.payload))
-              .reduce(
-                toRecord(
-                  (x) => x.id,
-                  (x) => x,
-                ),
-                {},
+            followedUsers: mapRowsSkippingCorrupt(
+              (
+                followedRows as {
+                  payload: FeedUserJSON;
+                }[]
+              ).concat(pendingRows),
+              (x) => fromFeedUserJSON(x.payload),
+              (_, error) => logger.error('Skipping unreadable followed user during hydration', error),
+            ).reduce(
+              toRecord(
+                (x) => x.id,
+                (x) => x,
               ),
-            revokedFollowSecrets: (await db.select().from(feedRevokedFollowSecretsSchema)).map((x) => x.secret),
-            followers: (await db.select().from(feedFollowerUsersSchema))
-              .map((x) => FollowerFeedUser.fromJSON(x.payload))
-              .reduce(
-                toRecord(
-                  (x) => x.id,
-                  (x) => x,
-                ),
-                {},
+              {},
+            ),
+            revokedFollowSecrets: revokedSecretRows.map((x) => x.secret),
+            followers: mapRowsSkippingCorrupt(
+              followerRows,
+              (x) => FollowerFeedUser.fromJSON(x.payload),
+              (_, error) => logger.error('Skipping unreadable follower during hydration', error),
+            ).reduce(
+              toRecord(
+                (x) => x.id,
+                (x) => x,
               ),
-            receivedReactions: (await db.select().from(feedReactionsSchema))
-              .map((x) => ReceivedReaction.fromJSON(x.payload))
-              .reduce(
-                toRecord(
-                  (x) => x.id,
-                  (x) => x,
-                ),
-                {},
+              {},
+            ),
+            receivedReactions: mapRowsSkippingCorrupt(
+              receivedReactionRows,
+              (x) => ReceivedReaction.fromJSON(x.payload),
+              (_, error) => logger.error('Skipping unreadable reaction during hydration', error),
+            ).reduce(
+              toRecord(
+                (x) => x.id,
+                (x) => x,
               ),
-            sentReactions: (await db.select().from(feedSentReactionsSchema))
-              .map((x) => SentReaction.fromJSON(x.payload))
-              .reduce(
-                toRecord(
-                  (x) => x.id,
-                  (x) => x,
-                ),
-                {},
+              {},
+            ),
+            sentReactions: mapRowsSkippingCorrupt(
+              sentReactionRows,
+              (x) => SentReaction.fromJSON(x.payload),
+              (_, error) => logger.error('Skipping unreadable sent reaction during hydration', error),
+            ).reduce(
+              toRecord(
+                (x) => x.id,
+                (x) => x,
               ),
+              {},
+            ),
           }),
         );
         if (!identity) {
@@ -171,8 +207,13 @@ export function applyFeedEffects(addEffect: AddEffectFn) {
   });
 
   addEffect(removeFollowedUser, async (action, { extra: { db } }) => {
-    await db.delete(feedFollowedUsersSchema).where(eq(feedFollowedUsersSchema.id, action.payload));
-    await db.delete(feedPendingUsersSchema).where(eq(feedPendingUsersSchema.id, action.payload));
+    // Atomic: the Redux reducer drops the user from both lists at once, so the
+    // database must too — a crash between two separate deletes would leave the
+    // tables disagreeing with the store.
+    await db.transaction(async (tx) => {
+      await tx.delete(feedFollowedUsersSchema).where(eq(feedFollowedUsersSchema.id, action.payload));
+      await tx.delete(feedPendingUsersSchema).where(eq(feedPendingUsersSchema.id, action.payload));
+    });
   });
 
   addEffect(setFollowRequests, async (action, { extra: { db } }) => {
@@ -253,16 +294,20 @@ export function applyFeedEffects(addEffect: AddEffectFn) {
     await db.delete(feedSentReactionsSchema).where(eq(feedSentReactionsSchema.id, action.payload));
   });
   // Rows are keyed by reactionId, so deleting a session's cheers has to match on the payload's eventId.
+  // The two deletes run in one transaction: a crash between them must not leave
+  // received cheers removed while their sent counterparts survive (or vice versa).
   addEffect(removeReactionsForEvents, async (action, { extra: { db } }) => {
     if (!action.payload.length) {
       return;
     }
-    await db
-      .delete(feedReactionsSchema)
-      .where(inArray(sql`json_extract(${feedReactionsSchema.payload}, '$.eventId')`, action.payload));
-    await db
-      .delete(feedSentReactionsSchema)
-      .where(inArray(sql`json_extract(${feedSentReactionsSchema.payload}, '$.eventId')`, action.payload));
+    await db.transaction(async (tx) => {
+      await tx
+        .delete(feedReactionsSchema)
+        .where(inArray(sql`json_extract(${feedReactionsSchema.payload}, '$.eventId')`, action.payload));
+      await tx
+        .delete(feedSentReactionsSchema)
+        .where(inArray(sql`json_extract(${feedSentReactionsSchema.payload}, '$.eventId')`, action.payload));
+    });
   });
   addEffect(addRevokableFollowSecret, async (action, { extra: { db } }) => {
     await db

@@ -41,7 +41,8 @@ export interface RemoteBackupSettings {
 
 export interface LastBackup {
   lastSuccessfulRemoteBackupHash: string;
-  lastBackupTime: Instant;
+  /** Undefined for legacy backups recorded before the timestamp was stored. */
+  lastBackupTime: Instant | undefined;
   /** Which backend received it, so repointing backup uploads again instead of matching the hash. */
   backendId: BackendId;
 }
@@ -63,6 +64,16 @@ const REMOTE_BACKUP_ERROR_KINDS: readonly RemoteBackupErrorKind[] = [
   'httpOther',
   'unknown',
 ];
+
+/**
+ * Remote backup consent mode (privacy-first, opt-in).
+ * - 'off' (default): never uploads anything.
+ * - 'automatic': backs up when data changes.
+ * - 'manual': uploads only from an explicit Back Up Now action.
+ */
+export type BackupMode = 'off' | 'automatic' | 'manual';
+
+const BACKUP_MODES: readonly BackupMode[] = ['off', 'automatic', 'manual'];
 
 /**
  * One manual Test-run record for the remote backup screen. Persisted between
@@ -273,6 +284,14 @@ export const preferenceRegistry = {
   }),
 
   backupIncludeFeedAccount: pref({ default: false, codec: boolCodec }),
+
+  /**
+   * Backup consent mode (privacy-first, opt-in; default 'off').
+   * 'automatic' keeps the previous auto-backup-on-change behavior;
+   * 'manual' uploads only from an explicit Back Up Now action.
+   * Generic hydrate + persist.
+   */
+  backupMode: pref<BackupMode>({ default: 'off', codec: stringUnionCodec(BACKUP_MODES) }),
 
   // --- AI Planner configuration (Phase 6, Screen 4). Generic hydrate + persist
   // --- via the effects below; defaults mirror the planner design contract.

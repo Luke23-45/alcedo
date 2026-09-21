@@ -47,7 +47,9 @@ export default function Index() {
   useFocusEffect(() => {
     dispatch(fetchUpcomingSessions());
     dispatch(publishUnpublishedSessions());
-    dispatch(executeRemoteBackup({}));
+    // Automatic invocation: the effect runs it only when the backup mode is
+    // Automatic (Off and Manual never auto-upload).
+    dispatch(executeRemoteBackup({ reason: 'automatic' }));
   });
 
   return (

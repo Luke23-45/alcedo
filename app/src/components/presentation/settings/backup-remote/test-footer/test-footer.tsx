@@ -14,8 +14,9 @@ const BRAND_GRADIENT = ['#FFB03A', '#FF6A3D', '#FF2D55'] as const;
  * Floating footer (backup-redesign.md S1 + S3): the Test primary button
  * fires a forced full upload; while the test is in flight it shows a spinner
  * plus "Sending…" and stays disabled. With no server assigned Test is
- * disabled — tapping it would have nowhere to send. Manage backends opens
- * the backend list.
+ * disabled — tapping it would have nowhere to send. While the backup mode
+ * is Off, Test is disabled too: Off never uploads, so the caption says so
+ * honestly. Manage backends opens the backend list.
  */
 export function TestFooter() {
   const { t } = useTranslate();
@@ -23,8 +24,10 @@ export function TestFooter() {
   const { push } = useRouter();
   const testInFlight = useAppSelector((s) => s.settings.testInFlight);
   const assignedBackendId = useAppSelector((s) => selectAssignedBackendId(s, 'backup'));
+  const backupMode = useAppSelector((s) => s.settings.backupMode);
 
-  const disabled = !assignedBackendId || testInFlight;
+  const backupsOff = backupMode === 'off';
+  const disabled = !assignedBackendId || testInFlight || backupsOff;
 
   return (
     <S.FooterBar>
@@ -33,7 +36,7 @@ export function TestFooter() {
         accessibilityLabel={testInFlight ? t('backup.remote.test.sending') : t('backup.remote.test.button')}
         accessibilityState={{ disabled }}
         disabled={disabled}
-        onPress={() => dispatch(executeRemoteBackup({ force: true }))}
+        onPress={() => dispatch(executeRemoteBackup({ force: true, reason: 'test' }))}
       >
         {disabled && !testInFlight ? (
           <S.TestButtonDisabled>
@@ -54,7 +57,9 @@ export function TestFooter() {
         )}
       </S.TestPressable>
       {disabled && !testInFlight ? (
-        <S.DisabledCaption>{t('backup.remote.test.disabled_caption')}</S.DisabledCaption>
+        <S.DisabledCaption>
+          {t(backupsOff ? 'backup.remote.test.disabled_off_caption' : 'backup.remote.test.disabled_caption')}
+        </S.DisabledCaption>
       ) : undefined}
       <S.ManageButton
         accessibilityRole="button"

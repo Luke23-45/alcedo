@@ -3,7 +3,8 @@ import { combineReducers } from '@reduxjs/toolkit';
 import { Instant, LocalDate } from '@js-joda/core';
 import { addFeedItemEffects, publishSessionAsync } from '@/store/feed/feed-items-effects';
 import { createAddEffectTestBed } from '@/utils/__test__/add-effect-testbed';
-import feedReducer, { fetchFeedItems } from '@/store/feed';
+import feedReducer, { fetchFeedItems, publishUnpublishedSessions, removeUnpublishedSessionId } from '@/store/feed';
+import { RemoteData } from '@/models/remote';
 import { storedSessionsReducer } from '@/store/stored-sessions';
 import { FeedIdentity, FEED_EVENT_RETENTION_SECONDS, FollowedFeedUser, SessionUserEvent } from '@/models/feed-models';
 import { Session } from '@/models/session-models';
@@ -223,5 +224,42 @@ describe('fetchFeedItems ingestion', () => {
     await testBed.dispatchHandled(fetchFeedItems({ fromUserAction: false }));
 
     expect(ingestedEventIds(testBed).sort()).toEqual(['good-1', 'good-2']);
+  });
+});
+
+describe('publishUnpublishedSessions', () => {
+  it('keeps publishing the rest of the queue when one session throws', async () => {
+    const session1 = sessionWithBodyweight(undefined).with({ id: 'session-1' });
+    const session2 = sessionWithBodyweight(undefined).with({ id: 'session-2' });
+    const { encryptionService, feedApiService } = capturingServices();
+    feedApiService.putUserEventAsync
+      .mockRejectedValueOnce(new Error('network down'))
+      .mockResolvedValue(ApiResult.success());
+
+    const testBed = createAddEffectTestBed({
+      initialState: {
+        feed: { identity: RemoteData.success(identityWith(true)) },
+        storedSessions: { sessions: { 'session-1': session1, 'session-2': session2 } },
+      },
+      services: {
+        db: {
+          select: () => ({
+            from: () => Promise.resolve([{ sessionId: 'session-1' }, { sessionId: 'session-2' }]),
+          }),
+        } as never,
+        encryptionService,
+        feedApiService,
+      },
+    });
+    addFeedItemEffects(testBed.addEffect);
+
+    await testBed.dispatchHandled(publishUnpublishedSessions());
+
+    expect(feedApiService.putUserEventAsync).toHaveBeenCalledTimes(2);
+    const removed = testBed.dispatchedActions
+      .filter((a) => a.type === removeUnpublishedSessionId.type)
+      .map((a) => (a as ReturnType<typeof removeUnpublishedSessionId>).payload);
+    // The failed session stays queued for the next run; the rest still publish.
+    expect(removed).toEqual(['session-2']);
   });
 });

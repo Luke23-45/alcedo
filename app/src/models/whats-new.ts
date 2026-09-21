@@ -52,6 +52,18 @@ export const whatsNewEntries: WhatsNewEntry[] = [
     },
     condition: (state) => state.backends.backends.length === 0,
   },
+  {
+    id: 4,
+    icon: 'backup',
+    titleKey: 'whats_new.backup_choice.title',
+    bodyKey: 'whats_new.backup_choice.body',
+    cta: {
+      labelKey: 'whats_new.backup_choice.cta',
+      route: '/settings/backup-and-restore',
+    },
+    // The mode is a real choice now: hide once the user picks Automatic or Manual.
+    condition: (state) => state.settings.backupMode === 'off',
+  },
 ];
 
 export const latestWhatsNewId = whatsNewEntries.reduce((max, entry) => Math.max(max, entry.id), 0);

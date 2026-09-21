@@ -42,8 +42,25 @@ export const BackupSeparator = styled.View`
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(60,60,67,0.12)')};
 `;
 
-// Auto-backup row: 52pt, title x36 13.5/600, value 12.5/500 #98989F, chevron.
-export const AutoRow = styled.Pressable`
+// Backup mode segmented control: full-bleed with 20pt margins (x36→x357),
+// matching the CTA and separators.
+export const ModeSegmentWrap = styled.View`
+  margin-top: 2px;
+  margin-horizontal: 20px;
+`;
+
+export const ModeHintText = styled.Text`
+  font-family: ${({ theme }) => theme.font.text};
+  font-size: 11px;
+  font-weight: ${({ theme }) => theme.weight.medium};
+  color: #86868b;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  margin-horizontal: 20px;
+`;
+
+// Destination row: 52pt, title x36 13.5/600, value 12.5/500 #98989F, chevron.
+export const DestinationRow = styled.Pressable`
   min-height: 52px;
   flex-direction: row;
   align-items: center;
@@ -51,7 +68,7 @@ export const AutoRow = styled.Pressable`
   padding-right: 14px;
 `;
 
-export const AutoRowTitle = styled.Text`
+export const DestinationRowTitle = styled.Text`
   flex: 1;
   font-family: ${({ theme }) => theme.font.text};
   font-size: 13.5px;
@@ -60,7 +77,7 @@ export const AutoRowTitle = styled.Text`
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
-export const AutoRowValue = styled.Text`
+export const DestinationRowValue = styled.Text`
   font-family: ${({ theme }) => theme.font.text};
   font-size: 12.5px;
   font-weight: ${({ theme }) => theme.weight.medium};

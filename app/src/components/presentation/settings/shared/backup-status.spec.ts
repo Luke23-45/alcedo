@@ -4,7 +4,7 @@ import { RemoteData } from '@/models/remote';
 import { LastBackup } from '@/store/settings/registry';
 import { didLastBackupSucceed, lastBackupLabel } from './backup-status';
 
-const labels = { today: 'Today', yesterday: 'Yesterday' };
+const labels = { today: 'Today', yesterday: 'Yesterday', unknownTime: 'Time unknown' };
 
 function backupAt(instant: Instant): RemoteData<LastBackup, string> {
   return RemoteData.success({
@@ -38,6 +38,20 @@ describe('lastBackupLabel', () => {
     expect(lastBackupLabel(RemoteData.notAsked(), labels, 'en-US', false)).toBeNull();
     expect(lastBackupLabel(RemoteData.loading(), labels, 'en-US', false)).toBeNull();
     expect(lastBackupLabel(RemoteData.error('boom'), labels, 'en-US', false)).toBeNull();
+  });
+
+  it('is honest about a legacy backup with no recorded timestamp', () => {
+    const label = lastBackupLabel(
+      RemoteData.success({
+        lastBackupTime: undefined,
+        lastSuccessfulRemoteBackupHash: 'abc',
+        backendId: 'built-in',
+      }),
+      labels,
+      'en-US',
+      false,
+    );
+    expect(label).toBe('Time unknown');
   });
 
   it('honors the 24-hour clock preference', () => {

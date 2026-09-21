@@ -18,13 +18,14 @@ import {
   PrefKey,
   PrefValue,
   RemoteBackupErrorKind,
+  BackupMode,
   RemoteBackupSettings,
 } from "./registry";
 
 import type { ExportPreviewCounts } from "@/services/plaintext-export-preview";
 
 export type { ColorSchemeSeed, ThemeMode } from "./codecs";
-export type { RemoteBackupSettings, LastBackup, LastRemoteBackupTest, LastExternalImport, RemoteBackupErrorKind };
+export type { RemoteBackupSettings, LastBackup, LastRemoteBackupTest, LastExternalImport, RemoteBackupErrorKind, BackupMode };
 export type { ExternalImportFormat };
 export type { ExportPreviewCounts } from "@/services/plaintext-export-preview";
 
@@ -110,6 +111,14 @@ export const executeRemoteBackup = createAction<{
   /** Overrides the assigned backup backend, so the settings screen can test one before saving it. */
   backend?: Backend;
   force?: boolean;
+  /**
+   * Why this backup was requested. 'automatic' invocations (home focus)
+   * run only when the user chose the Automatic mode; 'manual' (Back Up Now)
+   * and 'test' (destination Test) are explicit user actions and run in
+   * Automatic or Manual mode. Absent means 'automatic'. Nothing uploads
+   * while the backup mode is Off.
+   */
+  reason?: 'automatic' | 'manual' | 'test';
 }>("executeRemoteBackup");
 
 export const remoteBackupSucceeded = createAction("remoteBackupSucceeded");
@@ -137,6 +146,7 @@ export const {
   setCrashReportsEnabled,
   setWelcomeWizardCompleted,
   setBackupIncludeFeedAccount,
+  setBackupMode,
   setLastBackup,
   setLastRemoteBackupTest,
   setLastExternalImport,

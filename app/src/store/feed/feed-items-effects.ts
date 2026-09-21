@@ -185,7 +185,7 @@ export function addFeedItemEffects(addEffect: AddEffectFn) {
 
   addEffect(
     publishUnpublishedSessions,
-    async (_, { dispatch, getState, extra: { db, feedApiService, encryptionService } }) => {
+    async (_, { dispatch, getState, extra: { db, feedApiService, encryptionService, logger } }) => {
       const state = getState();
       const identityRemote = state.feed.identity;
 
@@ -201,17 +201,24 @@ export function addFeedItemEffects(addEffect: AddEffectFn) {
       const unpublishedSessionIds = await db.select().from(feedUnpublishedSessionsSchema);
 
       for (const { sessionId } of unpublishedSessionIds) {
-        const session = selectSession(getState(), sessionId);
+        // One session's failure (network throw, crypto error) must not strand
+        // the rest of the queue until the next app focus.
+        try {
+          const session = selectSession(getState(), sessionId);
 
-        let result;
-        if (session) {
-          result = await publishSessionAsync(identity, session, encryptionService, feedApiService);
-        } else {
-          result = await removePublishedSessionAsync(identity, sessionId, encryptionService, feedApiService);
-        }
+          let result;
+          if (session) {
+            result = await publishSessionAsync(identity, session, encryptionService, feedApiService);
+          } else {
+            result = await removePublishedSessionAsync(identity, sessionId, encryptionService, feedApiService);
+          }
 
-        if (result?.isSuccess()) {
-          dispatch(removeUnpublishedSessionId(sessionId));
+          if (result?.isSuccess()) {
+            dispatch(removeUnpublishedSessionId(sessionId));
+          }
+        } catch (error) {
+          // Stays queued; the next publishUnpublishedSessions run retries it.
+          logger.warn(`Failed to publish session ${sessionId}, will retry`, error);
         }
       }
     },

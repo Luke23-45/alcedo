@@ -39,6 +39,7 @@ export function DataSyncGroup() {
     {
       today: t(settingsKey('settings.backup.day.today')),
       yesterday: t(settingsKey('settings.backup.day.yesterday')),
+      unknownTime: t(settingsKey('settings.backup.day.unknown_time')),
     },
     preferredLanguage ?? undefined,
     use24HourTime,
