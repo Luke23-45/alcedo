@@ -1,0 +1,582 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="393" height="2300" viewBox="0 0 393 2300" role="img" aria-labelledby="ttl dsc"
+     font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+     text-rendering="optimizeLegibility" shape-rendering="geometricPrecision">
+
+<title id="ttl">Kinetic — Full Home Page, Light Mode</title>
+<desc id="dsc">Light-mode iOS home page: header, activity rings, metric tiles, today's session, quick actions, weekly volume, heart-rate zones, programs carousel, AI coach, recent activity, achievements, hydration and macros, personal records, weekly challenge leaderboard, persistent tab bar.</desc>
+
+<defs>
+  <!-- ══════ CLIPS ══════ -->
+  <clipPath id="frame"><rect x="0" y="0" width="393" height="2300"/></clipPath>
+  <clipPath id="avatarClip"><circle cx="355" cy="90" r="22"/></clipPath>
+  <clipPath id="personClip"><circle cx="0" cy="0" r="10.2"/></clipPath>
+  <clipPath id="badgeClip"><circle cx="0" cy="0" r="23"/></clipPath>
+  <clipPath id="bar4Clip"><rect x="186" y="706" width="20" height="60" rx="8"/></clipPath>
+  <clipPath id="pc1"><rect x="16" y="1018" width="160" height="190" rx="26"/></clipPath>
+  <clipPath id="pc2"><rect x="188" y="1018" width="160" height="190" rx="26"/></clipPath>
+  <clipPath id="pc3"><rect x="360" y="1018" width="160" height="190" rx="26"/></clipPath>
+  <clipPath id="coachClip"><rect x="16" y="1220" width="361" height="156" rx="30"/></clipPath>
+
+  <!-- ══════ ENVIRONMENT (light) ══════ -->
+  <linearGradient id="gBg" x1="0" y1="0" x2="0.25" y2="1">
+    <stop offset="0" stop-color="#F8F8FC"/><stop offset="0.5" stop-color="#F1F1F6"/><stop offset="1" stop-color="#F3F3F8"/>
+  </linearGradient>
+  <radialGradient id="gAuraA" gradientUnits="userSpaceOnUse" cx="60" cy="180" r="300">
+    <stop offset="0" stop-color="#FF2D55" stop-opacity="0.09"/><stop offset="1" stop-color="#FF2D55" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gAuraB" gradientUnits="userSpaceOnUse" cx="370" cy="900" r="330">
+    <stop offset="0" stop-color="#007AFF" stop-opacity="0.075"/><stop offset="1" stop-color="#007AFF" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gAuraC" gradientUnits="userSpaceOnUse" cx="30" cy="1500" r="300">
+    <stop offset="0" stop-color="#34C759" stop-opacity="0.06"/><stop offset="1" stop-color="#34C759" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gAuraD" gradientUnits="userSpaceOnUse" cx="380" cy="1980" r="300">
+    <stop offset="0" stop-color="#AF52DE" stop-opacity="0.075"/><stop offset="1" stop-color="#AF52DE" stop-opacity="0"/></radialGradient>
+
+  <!-- ══════ MATERIAL (light) ══════ -->
+  <linearGradient id="gCard" x1="0" y1="0" x2="0.45" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="0.55" stop-color="#FDFDFF"/><stop offset="1" stop-color="#FAFAFC"/></linearGradient>
+  <linearGradient id="gCardEdge" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#000000" stop-opacity="0.045"/><stop offset="0.4" stop-color="#000000" stop-opacity="0.06"/><stop offset="1" stop-color="#000000" stop-opacity="0.115"/></linearGradient>
+  <linearGradient id="gTile" x1="0" y1="0" x2="0.5" y2="1">
+    <stop offset="0" stop-color="#787880" stop-opacity="0.125"/><stop offset="1" stop-color="#787880" stop-opacity="0.06"/></linearGradient>
+  <linearGradient id="gTab" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FBFBFD" stop-opacity="0.93"/><stop offset="1" stop-color="#F2F2F6" stop-opacity="0.99"/></linearGradient>
+  <linearGradient id="gScrim" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#000000" stop-opacity="0"/><stop offset="0.42" stop-color="#000000" stop-opacity="0.05"/>
+    <stop offset="0.70" stop-color="#000000" stop-opacity="0.55"/><stop offset="1" stop-color="#000000" stop-opacity="0.88"/></linearGradient>
+  <linearGradient id="gGloss" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.40"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+
+  <!-- ══════ RINGS (deepened for white) ══════ -->
+  <linearGradient id="gMove" gradientUnits="userSpaceOnUse" x1="56" y1="200" x2="150" y2="300">
+    <stop offset="0" stop-color="#E00040"/><stop offset="1" stop-color="#FF5C7A"/></linearGradient>
+  <linearGradient id="gEx" gradientUnits="userSpaceOnUse" x1="56" y1="200" x2="150" y2="300">
+    <stop offset="0" stop-color="#63C400"/><stop offset="1" stop-color="#A9F026"/></linearGradient>
+  <linearGradient id="gStand" gradientUnits="userSpaceOnUse" x1="56" y1="200" x2="150" y2="300">
+    <stop offset="0" stop-color="#0089CE"/><stop offset="1" stop-color="#17C8E8"/></linearGradient>
+  <linearGradient id="gBarMove" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#E00040"/><stop offset="1" stop-color="#FF5C7A"/></linearGradient>
+  <linearGradient id="gBarEx" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#63C400"/><stop offset="1" stop-color="#A9F026"/></linearGradient>
+  <linearGradient id="gBarStand" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0089CE"/><stop offset="1" stop-color="#17C8E8"/></linearGradient>
+
+  <!-- ══════ BRAND & ACCENTS ══════ -->
+  <linearGradient id="gBrand" x1="0" y1="0" x2="0.6" y2="1">
+    <stop offset="0" stop-color="#FFA312"/><stop offset="0.45" stop-color="#FF5A3C"/><stop offset="1" stop-color="#E8003F"/></linearGradient>
+  <linearGradient id="gToday" x1="0" y1="1" x2="0" y2="0">
+    <stop offset="0" stop-color="#E8003F"/><stop offset="0.6" stop-color="#FF6A2D"/><stop offset="1" stop-color="#FFB03A"/></linearGradient>
+  <linearGradient id="gAvatar" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5856D6"/><stop offset="1" stop-color="#AF52DE"/></linearGradient>
+  <linearGradient id="gCoach" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7B61FF"/><stop offset="1" stop-color="#FF4FB8"/></linearGradient>
+  <linearGradient id="gCoachBorder" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#8944AB" stop-opacity="0.45"/><stop offset="0.5" stop-color="#00A6C9" stop-opacity="0.22"/><stop offset="1" stop-color="#FF2D55" stop-opacity="0.10"/></linearGradient>
+  <linearGradient id="gCoachRing" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#7B61FF"/><stop offset="1" stop-color="#00A6C9"/></linearGradient>
+  <linearGradient id="gWater" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#007AFF"/><stop offset="1" stop-color="#32ADE6"/></linearGradient>
+
+  <linearGradient id="gProgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6A4BF0"/><stop offset="1" stop-color="#2A1B63"/></linearGradient>
+  <linearGradient id="gProgB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0E94A2"/><stop offset="1" stop-color="#06323A"/></linearGradient>
+  <linearGradient id="gProgC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F2662B"/><stop offset="1" stop-color="#4A1520"/></linearGradient>
+  <radialGradient id="gProgGlow" cx="0.8" cy="0.1" r="0.9"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.24"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+
+  <linearGradient id="gZ1" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#8E8E93"/><stop offset="1" stop-color="#C7C7CC"/></linearGradient>
+  <linearGradient id="gZ2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#248A3D"/><stop offset="1" stop-color="#5FD97A"/></linearGradient>
+  <linearGradient id="gZ3" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#C99700"/><stop offset="1" stop-color="#FFD84D"/></linearGradient>
+  <linearGradient id="gZ4" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#C93400"/><stop offset="1" stop-color="#FF9F40"/></linearGradient>
+  <linearGradient id="gZ5" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#D70015"/><stop offset="1" stop-color="#FF5A6E"/></linearGradient>
+
+  <linearGradient id="gBadgeA" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#FFB03A"/><stop offset="1" stop-color="#F2662B"/></linearGradient>
+  <linearGradient id="gBadgeB" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#FF5C7A"/><stop offset="1" stop-color="#D70015"/></linearGradient>
+  <linearGradient id="gBadgeC" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#FFF0BE"/><stop offset="1" stop-color="#D9A441"/></linearGradient>
+  <linearGradient id="gBadgeD" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#5AC8FA"/><stop offset="1" stop-color="#0071C9"/></linearGradient>
+  <linearGradient id="gBadgeE" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#4CD964"/><stop offset="1" stop-color="#248A3D"/></linearGradient>
+
+  <linearGradient id="gMacroP" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#D70015"/><stop offset="1" stop-color="#FF6A88"/></linearGradient>
+  <linearGradient id="gMacroC" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#E8A400"/><stop offset="1" stop-color="#FFCC00"/></linearGradient>
+  <linearGradient id="gMacroF" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#8944AB"/><stop offset="1" stop-color="#C77DFF"/></linearGradient>
+
+  <radialGradient id="gMeshV" gradientUnits="userSpaceOnUse" cx="320" cy="1245" r="150">
+    <stop offset="0" stop-color="#8944AB" stop-opacity="0.16"/><stop offset="1" stop-color="#8944AB" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gMeshC" gradientUnits="userSpaceOnUse" cx="50" cy="1370" r="130">
+    <stop offset="0" stop-color="#00A6C9" stop-opacity="0.11"/><stop offset="1" stop-color="#00A6C9" stop-opacity="0"/></radialGradient>
+
+  <!-- ══════ FILTERS · two-layer light shadows ══════ -->
+  <filter id="fCard" x="-30%" y="-30%" width="160%" height="180%">
+    <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#14142B" flood-opacity="0.07"/>
+    <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#14142B" flood-opacity="0.075"/></filter>
+  <filter id="fTile" x="-40%" y="-40%" width="180%" height="200%">
+    <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#14142B" flood-opacity="0.055"/>
+    <feDropShadow dx="0" dy="5" stdDeviation="10" flood-color="#14142B" flood-opacity="0.06"/></filter>
+  <filter id="fBrand" x="-80%" y="-80%" width="260%" height="260%"><feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#FF2D55" flood-opacity="0.30"/></filter>
+  <filter id="fCoach" x="-80%" y="-80%" width="260%" height="260%"><feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#8944AB" flood-opacity="0.28"/></filter>
+  <filter id="fBadge" x="-70%" y="-70%" width="240%" height="240%"><feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#14142B" flood-opacity="0.20"/></filter>
+  <filter id="fSoft" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#14142B" flood-opacity="0.14"/></filter>
+  <filter id="fGlowMove" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#E00040" flood-opacity="0.28"/></filter>
+  <filter id="fGlowEx" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#63C400" flood-opacity="0.24"/></filter>
+  <filter id="fGlowStand" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#00A6C9" flood-opacity="0.26"/></filter>
+  <filter id="fGlowToday" x="-90%" y="-40%" width="280%" height="180%"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#FF6A2D" flood-opacity="0.32"/></filter>
+  <filter id="fGlowProg" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="8" stdDeviation="14" flood-color="#14142B" flood-opacity="0.22"/></filter>
+
+  <!-- ══════ ICONS (theme-agnostic) ══════ -->
+  <path id="ic-heart" d="M0 5.9 C-6.7 1.5 -8.0 -2.5 -5.9 -4.9 C-4.2 -6.7 -1.5 -6.4 0 -4.3 C1.5 -6.4 4.2 -6.7 5.9 -4.9 C8.0 -2.5 6.7 1.5 0 5.9 Z"/>
+  <path id="ic-flame" d="M0 -8.2 C2.9 -4.6 5.9 -1.7 5.9 1.9 C5.9 5.4 3.3 7.9 0 7.9 C-3.3 7.9 -5.9 5.4 -5.9 1.9 C-5.9 -0.2 -4.6 -1.9 -3.3 -3.4 C-3.2 -1.7 -2.4 -0.9 -1.3 -0.7 C-1.7 -3.5 -1.1 -5.9 0 -8.2 Z"/>
+  <path id="ic-foot" d="M0 -7.4 C3.0 -7.4 4.9 -5.1 4.9 -2.1 C4.9 0.6 3.8 1.9 3.8 3.7 C3.8 5.7 2.3 7.2 0 7.2 C-2.3 7.2 -3.8 5.7 -3.8 3.7 C-3.8 1.9 -4.9 0.6 -4.9 -2.1 C-4.9 -5.1 -3.0 -7.4 0 -7.4 Z"/>
+  <path id="ic-bolt" d="M1.8 -10 L-6.4 1.6 L-0.9 1.6 L-1.8 10 L6.4 -1.6 L0.9 -1.6 Z"/>
+  <path id="ic-star" d="M0 -9 L2.23 -3.07 L8.56 -2.78 L3.61 1.17 L5.29 7.28 L0 3.8 L-5.29 7.28 L-3.61 1.17 L-8.56 -2.78 L-2.23 -3.07 Z"/>
+  <path id="ic-play" d="M-4.4 -6.6 L7.4 0 L-4.4 6.6 Z"/>
+  <path id="ic-spark" d="M0 -5.2 L1.35 -1.35 L5.2 0 L1.35 1.35 L0 5.2 L-1.35 1.35 L-5.2 0 L-1.35 -1.35 Z"/>
+  <g id="ic-dumbbell">
+    <rect x="-13" y="-5.6" width="4.4" height="11.2" rx="1.8"/><rect x="-7.6" y="-8" width="3.8" height="16" rx="1.7"/>
+    <rect x="-7.6" y="-1.9" width="15.2" height="3.8" rx="0.6"/><rect x="3.8" y="-8" width="3.8" height="16" rx="1.7"/>
+    <rect x="8.6" y="-5.6" width="4.4" height="11.2" rx="1.8"/></g>
+  <g id="ic-lock">
+    <path d="M-3.9 -1.6 V-4.4 A3.9 3.9 0 0 1 3.9 -4.4 V-1.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    <rect x="-6.6" y="-1.6" width="13.2" height="9.8" rx="2.8" fill="currentColor"/></g>
+  <g id="ic-meal">
+    <g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-7.4 -8.6 V-3.8"/><path d="M-4.8 -8.6 V-3.8"/><path d="M-2.2 -8.6 V-3.8"/>
+      <path d="M-7.4 -3.8 C-7.4 -1.2 -6.2 0.2 -4.8 0.2 C-3.4 0.2 -2.2 -1.2 -2.2 -3.8"/><path d="M-4.8 0.2 V8.6"/></g>
+    <path d="M2.6 -8.6 C5.8 -5.4 7.0 -1.6 6.4 1.4 L4.4 2.6 V8.6 H2.6 Z" fill="currentColor"/></g>
+  <g id="ic-stopwatch" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="0" cy="1.8" r="7.4"/><path d="M0 1.8 V-2.4"/><path d="M-2.4 -9.4 H2.4"/><path d="M0 -9.4 V-5.6"/><path d="M6.4 -4.6 L8.2 -6.4"/></g>
+  <g id="ic-route">
+    <path d="M-5.6 6.2 C-5.6 1.4 -1.6 2.6 -1.6 -1.8 C-1.6 -5.6 2.2 -6.4 5.4 -6.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    <circle cx="-5.6" cy="6.2" r="2.3" fill="currentColor"/><circle cx="5.4" cy="-6.4" r="2.3" fill="currentColor"/></g>
+  <g id="badgeShine">
+    <g clip-path="url(#badgeClip)"><ellipse cx="0" cy="-13" rx="17" ry="9" fill="#FFFFFF" opacity="0.30"/></g>
+    <circle r="23" fill="none" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="1"/>
+    <circle r="23.6" fill="none" stroke="#000000" stroke-opacity="0.08" stroke-width="1"/></g>
+  <path id="ic-house-fill" d="M0 -10.8 L10.6 -1.95 L10.6 10.4 L3.5 10.4 L3.5 2.7 L-3.5 2.7 L-3.5 10.4 L-10.6 10.4 L-10.6 -1.95 Z"/>
+  <g id="ic-trend" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-10.2 -10.6 L-10.2 10.2 L10.4 10.2"/><path d="M-6.6 4.8 L-1.6 -1.4 L2.2 1.6 L8.2 -6.4"/></g>
+  <g id="ic-person">
+    <circle cx="0" cy="0" r="11.1" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="0" cy="-3.4" r="3.4" fill="currentColor"/>
+    <g clip-path="url(#personClip)"><path d="M-9.4 12.6 Q-9.4 3.0 0 3.0 Q9.4 3.0 9.4 12.6 Z" fill="currentColor"/></g></g>
+</defs>
+
+<g clip-path="url(#frame)">
+
+<!-- ░░ BACKGROUND ░░ -->
+<rect width="393" height="2300" fill="url(#gBg)"/>
+<rect width="393" height="2300" fill="url(#gAuraA)"/>
+<rect width="393" height="2300" fill="url(#gAuraB)"/>
+<rect width="393" height="2300" fill="url(#gAuraC)"/>
+<rect width="393" height="2300" fill="url(#gAuraD)"/>
+
+<!-- ═══════════ 01 · STATUS BAR (dark glyphs on light) ═══════════ -->
+<text x="66" y="36" font-size="16" font-weight="600" letter-spacing="-0.35" fill="#1C1C1E" text-anchor="middle">9:41</text>
+<g fill="#1C1C1E">
+  <rect x="281" y="27" width="3" height="4.5" rx="1.5"/><rect x="286" y="25" width="3" height="6.5" rx="1.5"/>
+  <rect x="291" y="23" width="3" height="8.5" rx="1.5"/><rect x="296" y="20.5" width="3" height="11" rx="1.5"/></g>
+<g fill="none" stroke="#1C1C1E" stroke-width="1.6" stroke-linecap="round">
+  <path d="M306.28 23.78 A9.5 9.5 0 0 1 319.72 23.78"/><path d="M308.55 26.05 A6.3 6.3 0 0 1 317.45 26.05"/>
+  <path d="M310.81 28.31 A3.1 3.1 0 0 1 315.19 28.31"/></g>
+<circle cx="313" cy="30.8" r="1.3" fill="#1C1C1E"/>
+<rect x="328" y="23" width="24" height="11" rx="3.2" fill="none" stroke="#1C1C1E" stroke-opacity="0.35"/>
+<rect x="329.8" y="24.8" width="15" height="7.4" rx="2" fill="#1C1C1E"/>
+<path d="M353.6 26.4 C354.9 26.8 354.9 30.2 353.6 30.6 Z" fill="#1C1C1E" fill-opacity="0.40"/>
+<!-- Dynamic Island stays PHYSICALLY BLACK in both themes -->
+<rect x="133.5" y="11" width="126" height="37" rx="18.5" fill="#000000"/>
+<circle cx="245.5" cy="29.5" r="6.2" fill="#0A0C10"/><circle cx="245.5" cy="29.5" r="3.1" fill="#121A24"/>
+<circle cx="244.2" cy="28.2" r="1.05" fill="#3E6E9E" opacity="0.75"/>
+
+<!-- ═══════════ 02 · HEADER ═══════════ -->
+<text x="24" y="78" font-size="10.5" font-weight="700" letter-spacing="1.45" fill="#8E8E93">MONDAY, JUNE 9</text>
+<text x="24" y="108" font-size="25" font-weight="700" letter-spacing="-0.55" fill="#1C1C1E">Good morning, Alex</text>
+<g filter="url(#fSoft)"><circle cx="355" cy="90" r="22" fill="url(#gAvatar)"/></g>
+<g clip-path="url(#avatarClip)" opacity="0.30">
+  <circle cx="345" cy="78" r="16" fill="#FFFFFF" opacity="0.30"/>
+  <path d="M333 112 Q355 96 377 112 L377 118 L333 118 Z" fill="#FFFFFF" opacity="0.22"/></g>
+<text x="355" y="96.5" font-size="17" font-weight="600" letter-spacing="-0.3" fill="#FFFFFF" text-anchor="middle">A</text>
+<circle cx="355" cy="90" r="22" fill="none" stroke="#000000" stroke-opacity="0.10"/>
+<circle cx="370" cy="75" r="7" fill="#FF3B30" stroke="#F2F2F7" stroke-width="2.2"/>
+<text x="370" y="78.2" font-size="8.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+
+<!-- ═══════════ 03 · ACTIVITY RINGS ═══════════ -->
+<g filter="url(#fCard)"><rect x="16" y="124" width="361" height="212" rx="30" fill="url(#gCard)"/></g>
+<rect x="16.5" y="124.5" width="360" height="211" rx="29.5" fill="none" stroke="url(#gCardEdge)"/>
+<text x="36" y="157" font-size="10" font-weight="700" letter-spacing="1.35" fill="#8E8E93">TODAY’S ACTIVITY</text>
+<rect x="311" y="142" width="46" height="22" rx="11" fill="#FF9500" fill-opacity="0.14" stroke="#FF9500" stroke-opacity="0.30" stroke-width="0.8"/>
+<use xlink:href="#ic-flame" href="#ic-flame" transform="translate(325,153) scale(0.52)" fill="#E07800"/>
+<text x="334.5" y="157.5" font-size="11" font-weight="700" fill="#B25000">12</text>
+
+<g transform="translate(102,250)">
+  <circle r="46" fill="none" stroke="#E00040" stroke-opacity="0.14" stroke-width="10"/>
+  <circle r="35.5" fill="none" stroke="#63C400" stroke-opacity="0.16" stroke-width="10"/>
+  <circle r="25" fill="none" stroke="#00A6C9" stroke-opacity="0.15" stroke-width="10"/>
+  <circle r="46" fill="none" stroke="url(#gMove)" stroke-width="10" stroke-linecap="round" stroke-dasharray="231.22 289.03" transform="rotate(-90)" filter="url(#fGlowMove)">
+    <animate attributeName="stroke-dasharray" from="0 289.03" to="231.22 289.03" dur="1.3s" begin="0.1s" fill="freeze" calcMode="spline" keySplines="0.16 0.84 0.24 1" keyTimes="0;1"/></circle>
+  <circle r="35.5" fill="none" stroke="url(#gEx)" stroke-width="10" stroke-linecap="round" stroke-dasharray="156.14 223.06" transform="rotate(-90)" filter="url(#fGlowEx)">
+    <animate attributeName="stroke-dasharray" from="0 223.06" to="156.14 223.06" dur="1.3s" begin="0.22s" fill="freeze" calcMode="spline" keySplines="0.16 0.84 0.24 1" keyTimes="0;1"/></circle>
+  <circle r="25" fill="none" stroke="url(#gStand)" stroke-width="10" stroke-linecap="round" stroke-dasharray="144.51 157.08" transform="rotate(-90)" filter="url(#fGlowStand)">
+    <animate attributeName="stroke-dasharray" from="0 157.08" to="144.51 157.08" dur="1.3s" begin="0.34s" fill="freeze" calcMode="spline" keySplines="0.16 0.84 0.24 1" keyTimes="0;1"/></circle>
+</g>
+<text x="176" y="208" font-size="12" font-weight="600" letter-spacing="-0.1" fill="#1C1C1E">Move</text>
+<text x="357" y="208" font-size="12" font-weight="700" fill="#D70015" text-anchor="end">520<tspan font-weight="500" fill="#AEAEB2">/650 kcal</tspan></text>
+<rect x="176" y="216" width="181" height="6" rx="3" fill="#787880" fill-opacity="0.16"/>
+<rect x="176" y="216" width="144.8" height="6" rx="3" fill="url(#gBarMove)"/>
+<text x="176" y="246" font-size="12" font-weight="600" letter-spacing="-0.1" fill="#1C1C1E">Exercise</text>
+<text x="357" y="246" font-size="12" font-weight="700" fill="#4A9E00" text-anchor="end">42<tspan font-weight="500" fill="#AEAEB2">/60 min</tspan></text>
+<rect x="176" y="254" width="181" height="6" rx="3" fill="#787880" fill-opacity="0.16"/>
+<rect x="176" y="254" width="126.7" height="6" rx="3" fill="url(#gBarEx)"/>
+<text x="176" y="284" font-size="12" font-weight="600" letter-spacing="-0.1" fill="#1C1C1E">Stand</text>
+<text x="357" y="284" font-size="12" font-weight="700" fill="#0071A8" text-anchor="end">11<tspan font-weight="500" fill="#AEAEB2">/12 hr</tspan></text>
+<rect x="176" y="292" width="181" height="6" rx="3" fill="#787880" fill-opacity="0.16"/>
+<rect x="176" y="292" width="166" height="6" rx="3" fill="url(#gBarStand)"/>
+<use xlink:href="#ic-spark" href="#ic-spark" transform="translate(40.5,316) scale(0.8)" fill="#FF9500"/>
+<text x="51" y="320" font-size="10.5" font-weight="500" fill="#6E6E73">On pace to close all three rings by 6:40 PM</text>
+
+<!-- ═══════════ 04 · METRIC TILES ═══════════ -->
+<g filter="url(#fTile)"><rect x="16" y="348" width="112" height="82" rx="24" fill="url(#gCard)"/></g>
+<rect x="16.5" y="348.5" width="111" height="81" rx="23.5" fill="none" stroke="url(#gCardEdge)"/>
+<rect x="30" y="357" width="20" height="20" rx="6.5" fill="#FF2D55" fill-opacity="0.13"/>
+<g transform="translate(40,367) scale(0.56)" fill="#E8003F"><use xlink:href="#ic-heart" href="#ic-heart">
+  <animateTransform attributeName="transform" type="scale" values="1;1.16;1;1;1" keyTimes="0;0.12;0.26;0.6;1" dur="1.6s" repeatCount="indefinite" additive="sum"/></use></g>
+<path d="M76 369 L81 369 L84 361 L88 375 L91 365 L95 369 L101 369 L104 360 L108 373 L111 367 L114 367" fill="none" stroke="#FF2D55" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<text x="30" y="392" font-size="9" font-weight="700" letter-spacing="0.95" fill="#8E8E93">HEART RATE</text>
+<text x="30" y="414" font-size="20" font-weight="700" letter-spacing="-0.6" fill="#1C1C1E">62</text>
+<text x="55" y="414" font-size="10.5" font-weight="600" fill="#AEAEB2">bpm</text>
+
+<g filter="url(#fTile)"><rect x="140" y="348" width="112" height="82" rx="24" fill="url(#gCard)"/></g>
+<rect x="140.5" y="348.5" width="111" height="81" rx="23.5" fill="none" stroke="url(#gCardEdge)"/>
+<rect x="154" y="357" width="20" height="20" rx="6.5" fill="#FF9500" fill-opacity="0.15"/>
+<use xlink:href="#ic-flame" href="#ic-flame" transform="translate(164,367) scale(0.62)" fill="#E07800"/>
+<rect x="305" y="357" width="42" height="17" rx="8.5" fill="#34C759" fill-opacity="0.16"/>
+<text x="326" y="369" font-size="9.5" font-weight="700" fill="#248A3D" text-anchor="middle">+8%</text>
+<text x="154" y="392" font-size="9" font-weight="700" letter-spacing="0.95" fill="#8E8E93">CALORIES</text>
+<text x="154" y="414" font-size="20" font-weight="700" letter-spacing="-0.6" fill="#1C1C1E">520</text>
+<text x="191" y="414" font-size="10.5" font-weight="600" fill="#AEAEB2">kcal</text>
+
+<g filter="url(#fTile)"><rect x="264" y="348" width="113" height="82" rx="24" fill="url(#gCard)"/></g>
+<rect x="264.5" y="348.5" width="112" height="81" rx="23.5" fill="none" stroke="url(#gCardEdge)"/>
+<rect x="278" y="357" width="20" height="20" rx="6.5" fill="#34C759" fill-opacity="0.15"/>
+<g fill="#248A3D">
+  <use xlink:href="#ic-foot" href="#ic-foot" transform="translate(285,364.6) rotate(-12) scale(0.44)"/>
+  <use xlink:href="#ic-foot" href="#ic-foot" transform="translate(291.4,370) rotate(10) scale(0.44)"/></g>
+<g fill="#34C759">
+  <rect x="329" y="368" width="4" height="7" rx="2" opacity="0.32"/>
+  <rect x="336.5" y="364" width="4" height="11" rx="2" opacity="0.45"/>
+  <rect x="344" y="366" width="4" height="9" rx="2" opacity="0.32"/>
+  <rect x="351.5" y="361" width="4" height="14" rx="2" opacity="0.65"/>
+  <rect x="359" y="363" width="4" height="12" rx="2"/></g>
+<text x="278" y="392" font-size="9" font-weight="700" letter-spacing="0.95" fill="#8E8E93">STEPS</text>
+<text x="278" y="414" font-size="20" font-weight="700" letter-spacing="-0.6" fill="#1C1C1E">8,412</text>
+
+<!-- ═══════════ 05 · TODAY'S SESSION ═══════════ -->
+<g filter="url(#fCard)"><rect x="16" y="442" width="361" height="104" rx="30" fill="url(#gCard)"/></g>
+<rect x="16.5" y="442.5" width="360" height="103" rx="29.5" fill="none" stroke="url(#gCardEdge)"/>
+<g filter="url(#fBrand)"><rect x="36" y="464" width="60" height="60" rx="20" fill="url(#gBrand)"/></g>
+<rect x="36" y="464" width="60" height="30" rx="20" fill="url(#gGloss)" opacity="0.5"/>
+<use xlink:href="#ic-dumbbell" href="#ic-dumbbell" transform="translate(66,494) scale(1.25)" fill="#FFFFFF"/>
+<text x="112" y="466" font-size="9" font-weight="700" letter-spacing="1.25" fill="#8E8E93">TODAY’S SESSION</text>
+<text x="112" y="488" font-size="17" font-weight="600" letter-spacing="-0.35" fill="#1C1C1E">Push Day · Strength</text>
+<text x="112" y="507" font-size="11.5" font-weight="500" fill="#6E6E73">45 min  ·  12 exercises  ·  380 kcal</text>
+<rect x="112" y="515" width="86" height="19" rx="9.5" fill="#787880" fill-opacity="0.13" stroke="#000000" stroke-opacity="0.05" stroke-width="0.7"/>
+<text x="155" y="528" font-size="9.5" font-weight="700" letter-spacing="0.55" fill="#48484A" text-anchor="middle">INTERMEDIATE</text>
+<g filter="url(#fBrand)"><circle cx="341" cy="494" r="21" fill="url(#gBrand)"/></g>
+<circle cx="341" cy="494" r="21" fill="none" stroke="#FFFFFF" stroke-opacity="0.30" stroke-width="0.9"/>
+<use xlink:href="#ic-play" href="#ic-play" transform="translate(342.4,494)" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2.6" stroke-linejoin="round"/>
+
+<!-- ═══════════ 06 · QUICK ACTIONS ═══════════ -->
+<g filter="url(#fBrand)"><rect x="16" y="558" width="112" height="76" rx="24" fill="url(#gBrand)"/></g>
+<rect x="16" y="558" width="112" height="38" rx="24" fill="url(#gGloss)" opacity="0.40"/>
+<rect x="16.5" y="558.5" width="111" height="75" rx="23.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.28"/>
+<use xlink:href="#ic-play" href="#ic-play" transform="translate(73.4,587)" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2.4" stroke-linejoin="round"/>
+<text x="72" y="617" font-size="11.5" font-weight="650" letter-spacing="-0.1" fill="#FFFFFF" text-anchor="middle">Start</text>
+
+<g filter="url(#fTile)"><rect x="140" y="558" width="112" height="76" rx="24" fill="url(#gCard)"/></g>
+<rect x="140.5" y="558.5" width="111" height="75" rx="23.5" fill="none" stroke="url(#gCardEdge)"/>
+<use xlink:href="#ic-meal" href="#ic-meal" transform="translate(196,587) scale(0.92)" color="#E07800"/>
+<text x="196" y="617" font-size="11.5" font-weight="600" letter-spacing="-0.1" fill="#1C1C1E" text-anchor="middle">Nutrition</text>
+
+<g filter="url(#fTile)"><rect x="264" y="558" width="113" height="76" rx="24" fill="url(#gCard)"/></g>
+<rect x="264.5" y="558.5" width="112" height="75" rx="23.5" fill="none" stroke="url(#gCardEdge)"/>
+<use xlink:href="#ic-stopwatch" href="#ic-stopwatch" transform="translate(320.5,587) scale(0.95)" color="#0071A8"/>
+<text x="320.5" y="617" font-size="11.5" font-weight="600" letter-spacing="-0.1" fill="#1C1C1E" text-anchor="middle">Timer</text>
+
+<!-- ═══════════ 07 · WEEKLY VOLUME ═══════════ -->
+<g filter="url(#fCard)"><rect x="16" y="646" width="361" height="162" rx="30" fill="url(#gCard)"/></g>
+<rect x="16.5" y="646.5" width="360" height="161" rx="29.5" fill="none" stroke="url(#gCardEdge)"/>
+<text x="36" y="676" font-size="15.5" font-weight="600" letter-spacing="-0.3" fill="#1C1C1E">Weekly Volume</text>
+<text x="36" y="694" font-size="11" font-weight="500" fill="#6E6E73">24,380 kg lifted · 4 sessions</text>
+<rect x="305" y="662" width="52" height="21" rx="10.5" fill="#34C759" fill-opacity="0.16"/>
+<path d="M315 675.5 L318.6 670.8 L322.2 675.5" fill="none" stroke="#248A3D" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="326" y="676.6" font-size="10.5" font-weight="700" letter-spacing="-0.1" fill="#248A3D">18%</text>
+<line x1="44" y1="736" x2="349" y2="736" stroke="#3C3C43" stroke-opacity="0.22" stroke-dasharray="2 5" stroke-linecap="round"/>
+<text x="357" y="733" font-size="8" font-weight="700" letter-spacing="0.7" fill="#AEAEB2" text-anchor="end">AVG</text>
+<g fill="#787880" fill-opacity="0.13">
+  <rect x="49" y="706" width="20" height="60" rx="8"/><rect x="95" y="706" width="20" height="60" rx="8"/>
+  <rect x="141" y="706" width="20" height="60" rx="8"/><rect x="186" y="706" width="20" height="60" rx="8"/>
+  <rect x="232" y="706" width="20" height="60" rx="8"/><rect x="278" y="706" width="20" height="60" rx="8"/>
+  <rect x="324" y="706" width="20" height="60" rx="8"/></g>
+<g fill="#C7C7CC">
+  <rect x="49" y="730" width="20" height="36" rx="8"/><rect x="95" y="714.4" width="20" height="51.6" rx="8"/>
+  <rect x="141" y="739.6" width="20" height="26.4" rx="8"/><rect x="232" y="722.8" width="20" height="43.2" rx="8"/>
+  <rect x="278" y="749.2" width="20" height="16.8" rx="7"/></g>
+<rect x="324" y="762" width="20" height="4" rx="2" fill="#787880" fill-opacity="0.20"/>
+<g filter="url(#fGlowToday)"><rect x="186" y="706" width="20" height="60" rx="8" fill="url(#gToday)"/></g>
+<g clip-path="url(#bar4Clip)"><rect x="186" y="706" width="20" height="26" fill="url(#gGloss)"/></g>
+<circle cx="196" cy="699" r="2.6" fill="#FF9500"><animate attributeName="opacity" values="1;0.35;1" dur="2.2s" repeatCount="indefinite"/></circle>
+<g font-size="10" font-weight="600" letter-spacing="0.2" fill="#AEAEB2" text-anchor="middle">
+  <text x="59" y="786">M</text><text x="105" y="786">T</text><text x="151" y="786">W</text>
+  <text x="196" y="786" fill="#1C1C1E" font-weight="700">T</text>
+  <text x="242" y="786">F</text><text x="288" y="786">S</text><text x="334" y="786">S</text></g>
+
+<!-- ═══════════ 08 · HEART RATE ZONES ═══════════ -->
+<g filter="url(#fCard)"><rect x="16" y="820" width="361" height="156" rx="30" fill="url(#gCard)"/></g>
+<rect x="16.5" y="820.5" width="360" height="155" rx="29.5" fill="none" stroke="url(#gCardEdge)"/>
+<text x="36" y="850" font-size="15.5" font-weight="600" letter-spacing="-0.3" fill="#1C1C1E">Heart Rate Zones</text>
+<text x="36" y="868" font-size="11" font-weight="500" fill="#6E6E73">42 min in Zone 3 and above</text>
+<rect x="309" y="836" width="48" height="21" rx="10.5" fill="#FF3B30" fill-opacity="0.13"/>
+<circle cx="321" cy="846.5" r="3" fill="#FF3B30"><animate attributeName="opacity" values="1;0.25;1" dur="1.6s" repeatCount="indefinite"/></circle>
+<text x="330" y="850" font-size="9" font-weight="700" letter-spacing="0.7" fill="#D70015">LIVE</text>
+<g fill="#787880" fill-opacity="0.13">
+  <rect x="46" y="886" width="44" height="58" rx="10"/><rect x="110" y="886" width="44" height="58" rx="10"/>
+  <rect x="175" y="886" width="44" height="58" rx="10"/><rect x="239" y="886" width="44" height="58" rx="10"/>
+  <rect x="303" y="886" width="44" height="58" rx="10"/></g>
+<rect x="46" y="920.8" width="44" height="23.2" rx="10" fill="url(#gZ1)"/>
+<rect x="110" y="901.5" width="44" height="42.5" rx="10" fill="url(#gZ2)"/>
+<g filter="url(#fSoft)"><rect x="175" y="886" width="44" height="58" rx="10" fill="url(#gZ3)"/></g>
+<rect x="239" y="897.6" width="44" height="46.4" rx="10" fill="url(#gZ4)"/>
+<rect x="303" y="920.8" width="44" height="23.2" rx="10" fill="url(#gZ5)"/>
+<g font-size="9.5" font-weight="700" text-anchor="middle">
+  <text x="68" y="914" fill="#8E8E93">6m</text><text x="132" y="895" fill="#248A3D">11m</text>
+  <text x="197" y="879" fill="#A05A00">15m</text><text x="261" y="891" fill="#C93400">12m</text>
+  <text x="325" y="914" fill="#D70015">6m</text></g>
+<g font-size="10" font-weight="600" letter-spacing="0.2" fill="#AEAEB2" text-anchor="middle">
+  <text x="68" y="962">Z1</text><text x="132" y="962">Z2</text>
+  <text x="197" y="962" fill="#1C1C1E" font-weight="700">Z3</text>
+  <text x="261" y="962">Z4</text><text x="325" y="962">Z5</text></g>
+
+<!-- ═══════════ 09 · PROGRAMS ═══════════ -->
+<text x="24" y="1006" font-size="10" font-weight="700" letter-spacing="1.35" fill="#8E8E93">PROGRAMS</text>
+<text x="367" y="1006" font-size="11.5" font-weight="600" letter-spacing="-0.1" fill="#C93400" text-anchor="end">See All</text>
+<path d="M370 1002 L373.6 1005.6 L370 1009.2" fill="none" stroke="#C93400" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+
+<g filter="url(#fGlowProg)"><rect x="16" y="1018" width="160" height="190" rx="26" fill="url(#gProgA)"/></g>
+<g clip-path="url(#pc1)">
+  <rect x="16" y="1018" width="160" height="190" fill="url(#gProgGlow)"/>
+  <use xlink:href="#ic-dumbbell" href="#ic-dumbbell" transform="translate(124,1082) rotate(-18) scale(3.4)" fill="#FFFFFF" opacity="0.09"/>
+  <rect x="16" y="1018" width="160" height="190" fill="url(#gScrim)"/></g>
+<rect x="16.5" y="1018.5" width="159" height="189" rx="25.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.22"/>
+<rect x="28" y="1030" width="67" height="20" rx="10" fill="#FFFFFF" fill-opacity="0.22" stroke="#FFFFFF" stroke-opacity="0.30" stroke-width="0.7"/>
+<text x="61.5" y="1043.5" font-size="9" font-weight="700" letter-spacing="0.5" fill="#FFFFFF" text-anchor="middle">STRENGTH</text>
+<circle cx="150" cy="1044" r="13" fill="#000000" fill-opacity="0.25"/>
+<circle cx="150" cy="1044" r="13" fill="none" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="3.5"/>
+<circle cx="150" cy="1044" r="13" fill="none" stroke="#D6CCFF" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="55.54 81.68" transform="rotate(-90 150 1044)"/>
+<text x="150" y="1047.4" font-size="7.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">68%</text>
+<text x="32" y="1168" font-size="15" font-weight="650" letter-spacing="-0.25" fill="#FFFFFF">Hypertrophy</text>
+<text x="32" y="1186" font-size="10.5" font-weight="500" fill="#FFFFFF" fill-opacity="0.70">6 weeks · 4 days/wk</text>
+<rect x="32" y="1196" width="128" height="3.5" rx="1.75" fill="#FFFFFF" fill-opacity="0.26"/>
+<rect x="32" y="1196" width="87" height="3.5" rx="1.75" fill="#D6CCFF"/>
+
+<g filter="url(#fGlowProg)"><rect x="188" y="1018" width="160" height="190" rx="26" fill="url(#gProgB)"/></g>
+<g clip-path="url(#pc2)">
+  <rect x="188" y="1018" width="160" height="190" fill="url(#gProgGlow)"/>
+  <use xlink:href="#ic-bolt" href="#ic-bolt" transform="translate(296,1084) rotate(12) scale(3.6)" fill="#FFFFFF" opacity="0.09"/>
+  <rect x="188" y="1018" width="160" height="190" fill="url(#gScrim)"/></g>
+<rect x="188.5" y="1018.5" width="159" height="189" rx="25.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.22"/>
+<rect x="200" y="1030" width="92" height="20" rx="10" fill="#FFFFFF" fill-opacity="0.22" stroke="#FFFFFF" stroke-opacity="0.30" stroke-width="0.7"/>
+<text x="246" y="1043.5" font-size="9" font-weight="700" letter-spacing="0.5" fill="#FFFFFF" text-anchor="middle">CONDITIONING</text>
+<circle cx="322" cy="1044" r="13" fill="#000000" fill-opacity="0.25"/>
+<circle cx="322" cy="1044" r="13" fill="none" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="3.5"/>
+<circle cx="322" cy="1044" r="13" fill="none" stroke="#7EE7F7" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="34.31 81.68" transform="rotate(-90 322 1044)"/>
+<text x="322" y="1047.4" font-size="7.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">42%</text>
+<text x="204" y="1168" font-size="15" font-weight="650" letter-spacing="-0.25" fill="#FFFFFF">Metcon Engine</text>
+<text x="204" y="1186" font-size="10.5" font-weight="500" fill="#FFFFFF" fill-opacity="0.70">8 weeks · 5 days/wk</text>
+<rect x="204" y="1196" width="128" height="3.5" rx="1.75" fill="#FFFFFF" fill-opacity="0.26"/>
+<rect x="204" y="1196" width="53.8" height="3.5" rx="1.75" fill="#7EE7F7"/>
+
+<g filter="url(#fGlowProg)"><rect x="360" y="1018" width="160" height="190" rx="26" fill="url(#gProgC)"/></g>
+<g clip-path="url(#pc3)">
+  <rect x="360" y="1018" width="160" height="190" fill="url(#gProgGlow)"/>
+  <use xlink:href="#ic-spark" href="#ic-spark" transform="translate(470,1086) scale(4.2)" fill="#FFFFFF" opacity="0.08"/>
+  <rect x="360" y="1018" width="160" height="190" fill="url(#gScrim)"/></g>
+<rect x="360.5" y="1018.5" width="159" height="189" rx="25.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.22"/>
+<rect x="372" y="1030" width="76" height="20" rx="10" fill="#FFFFFF" fill-opacity="0.22" stroke="#FFFFFF" stroke-opacity="0.30" stroke-width="0.7"/>
+<text x="410" y="1043.5" font-size="9" font-weight="700" letter-spacing="0.5" fill="#FFFFFF" text-anchor="middle">MOBILITY</text>
+
+<!-- ═══════════ 10 · AI COACH ═══════════ -->
+<g filter="url(#fCard)"><rect x="16" y="1220" width="361" height="156" rx="30" fill="url(#gCard)"/></g>
+<g clip-path="url(#coachClip)">
+  <rect x="16" y="1220" width="361" height="156" fill="url(#gMeshV)"/>
+  <rect x="16" y="1220" width="361" height="156" fill="url(#gMeshC)"/></g>
+<rect x="16.6" y="1220.6" width="359.8" height="154.8" rx="29.5" fill="none" stroke="url(#gCoachBorder)" stroke-width="1.2"/>
+<g filter="url(#fCoach)"><rect x="36" y="1231" width="34" height="34" rx="12" fill="url(#gCoach)"/></g>
+<rect x="36" y="1231" width="34" height="17" rx="12" fill="url(#gGloss)" opacity="0.45"/>
+<use xlink:href="#ic-spark" href="#ic-spark" transform="translate(53,1248) scale(0.95)" fill="#FFFFFF"/>
+<text x="80" y="1252" font-size="9" font-weight="700" letter-spacing="1.3" fill="#8944AB">KINETIC COACH</text>
+<rect x="315" y="1238" width="42" height="20" rx="10" fill="#787880" fill-opacity="0.13" stroke="#000000" stroke-opacity="0.05" stroke-width="0.7"/>
+<text x="336" y="1251.5" font-size="8.5" font-weight="700" letter-spacing="0.8" fill="#6E6E73" text-anchor="middle">BETA</text>
+<text x="36" y="1282" font-size="17" font-weight="650" letter-spacing="-0.3" fill="#1C1C1E">You’re 86% recovered</text>
+<text x="36" y="1302" font-size="12" font-weight="500" fill="#6E6E73">Swap today’s push for a lighter pull</text>
+<text x="36" y="1318" font-size="12" font-weight="500" fill="#6E6E73">session to protect shoulder volume.</text>
+<circle cx="337" cy="1296" r="22" fill="none" stroke="#787880" stroke-opacity="0.18" stroke-width="5"/>
+<circle cx="337" cy="1296" r="22" fill="none" stroke="url(#gCoachRing)" stroke-width="5" stroke-linecap="round" stroke-dasharray="118.88 138.23" transform="rotate(-90 337 1296)"/>
+<text x="337" y="1299" font-size="12.5" font-weight="700" letter-spacing="-0.3" fill="#1C1C1E" text-anchor="middle">86%</text>
+<text x="337" y="1310" font-size="6.5" font-weight="700" letter-spacing="0.6" fill="#8E8E93" text-anchor="middle">REC</text>
+<g filter="url(#fBrand)"><rect x="36" y="1332" width="116" height="32" rx="16" fill="url(#gBrand)"/></g>
+<rect x="36.5" y="1332.5" width="115" height="16" rx="15.5" fill="url(#gGloss)" opacity="0.30"/>
+<text x="94" y="1352.5" font-size="12.5" font-weight="650" letter-spacing="-0.15" fill="#FFFFFF" text-anchor="middle">Adjust Plan</text>
+<rect x="160" y="1332" width="88" height="32" rx="16" fill="#787880" fill-opacity="0.13" stroke="#000000" stroke-opacity="0.07" stroke-width="0.9"/>
+<text x="204" y="1352.5" font-size="12.5" font-weight="600" letter-spacing="-0.15" fill="#3C3C43" text-anchor="middle">Not now</text>
+
+<!-- ═══════════ 11 · RECENT ACTIVITY ═══════════ -->
+<text x="24" y="1406" font-size="10" font-weight="700" letter-spacing="1.35" fill="#8E8E93">RECENT ACTIVITY</text>
+<text x="367" y="1406" font-size="11.5" font-weight="600" letter-spacing="-0.1" fill="#C93400" text-anchor="end">See All</text>
+<path d="M370 1402 L373.6 1405.6 L370 1409.2" fill="none" stroke="#C93400" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+
+<g filter="url(#fTile)"><rect x="16" y="1418" width="361" height="68" rx="22" fill="url(#gCard)"/></g>
+<rect x="16.5" y="1418.5" width="360" height="67" rx="21.5" fill="none" stroke="url(#gCardEdge)"/>
+<rect x="32" y="1432" width="40" height="40" rx="14" fill="#FF2D55" fill-opacity="0.13"/>
+<use xlink:href="#ic-dumbbell" href="#ic-dumbbell" transform="translate(52,1452) scale(0.85)" fill="#E8003F"/>
+<text x="84" y="1448" font-size="14" font-weight="600" letter-spacing="-0.2" fill="#1C1C1E">Push Day · Strength</text>
+<text x="84" y="1466" font-size="11" font-weight="500" fill="#8E8E93">Today · 45 min · 380 kcal</text>
+<text x="345" y="1448" font-size="14" font-weight="700" letter-spacing="-0.3" fill="#1C1C1E" text-anchor="end">8,420</text>
+<text x="345" y="1465" font-size="10" font-weight="500" fill="#AEAEB2" text-anchor="end">kg lifted</text>
+<path d="M357 1448 L361 1452 L357 1456" fill="none" stroke="#C7C7CC" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+
+<g filter="url(#fTile)"><rect x="16" y="1496" width="361" height="68" rx="22" fill="url(#gCard)"/></g>
+<rect x="16.5" y="1496.5" width="360" height="67" rx="21.5" fill="none" stroke="url(#gCardEdge)"/>
+<rect x="32" y="1510" width="40" height="40" rx="14" fill="#34C759" fill-opacity="0.15"/>
+<use xlink:href="#ic-bolt" href="#ic-bolt" transform="translate(52,1530) scale(0.85)" fill="#248A3D"/>
+<text x="84" y="1526" font-size="14" font-weight="600" letter-spacing="-0.2" fill="#1C1C1E">HIIT Intervals</text>
+<text x="84" y="1544" font-size="11" font-weight="500" fill="#8E8E93">Yesterday · 28 min · 310 kcal</text>
+<text x="345" y="1526" font-size="14" font-weight="700" letter-spacing="-0.3" fill="#1C1C1E" text-anchor="end">162</text>
+<text x="345" y="1543" font-size="10" font-weight="500" fill="#AEAEB2" text-anchor="end">avg bpm</text>
+<path d="M357 1526 L361 1530 L357 1534" fill="none" stroke="#C7C7CC" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+
+<g filter="url(#fTile)"><rect x="16" y="1574" width="361" height="68" rx="22" fill="url(#gCard)"/></g>
+<rect x="16.5" y="1574.5" width="360" height="67" rx="21.5" fill="none" stroke="url(#gCardEdge)"/>
+<rect x="32" y="1588" width="40" height="40" rx="14" fill="#007AFF" fill-opacity="0.13"/>
+<use xlink:href="#ic-route" href="#ic-route" transform="translate(52,1608) scale(0.88)" color="#0062CC"/>
+<text x="84" y="1604" font-size="14" font-weight="600" letter-spacing="-0.2" fill="#1C1C1E">Zone 2 Run</text>
+<text x="84" y="1622" font-size="11" font-weight="500" fill="#8E8E93">Monday · 52 min · Easy pace</text>
+<text x="345" y="1604" font-size="14" font-weight="700" letter-spacing="-0.3" fill="#1C1C1E" text-anchor="end">6.8</text>
+<text x="345" y="1621" font-size="10" font-weight="500" fill="#AEAEB2" text-anchor="end">km</text>
+<path d="M357 1604 L361 1608 L357 1612" fill="none" stroke="#C7C7CC" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+
+<!-- ═══════════ 12 · ACHIEVEMENTS ═══════════ -->
+<text x="24" y="1672" font-size="10" font-weight="700" letter-spacing="1.35" fill="#8E8E93">ACHIEVEMENTS</text>
+<text x="367" y="1672" font-size="11.5" font-weight="600" letter-spacing="-0.1" fill="#C93400" text-anchor="end">See All</text>
+<path d="M370 1668 L373.6 1671.6 L370 1675.2" fill="none" stroke="#C93400" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<g filter="url(#fBadge)">
+  <circle cx="39" cy="1704" r="23" fill="url(#gBadgeA)"/><circle cx="107" cy="1704" r="23" fill="url(#gBadgeB)"/>
+  <circle cx="175" cy="1704" r="23" fill="url(#gBadgeC)"/><circle cx="243" cy="1704" r="23" fill="url(#gBadgeD)"/>
+  <circle cx="311" cy="1704" r="23" fill="url(#gBadgeE)"/></g>
+<circle cx="379" cy="1704" r="23" fill="#E4E4E9" stroke="#000000" stroke-opacity="0.08"/>
+<g><use xlink:href="#badgeShine" href="#badgeShine" transform="translate(39,1704)"/>
+   <use xlink:href="#badgeShine" href="#badgeShine" transform="translate(107,1704)"/>
+   <use xlink:href="#badgeShine" href="#badgeShine" transform="translate(175,1704)"/>
+   <use xlink:href="#badgeShine" href="#badgeShine" transform="translate(243,1704)"/>
+   <use xlink:href="#badgeShine" href="#badgeShine" transform="translate(311,1704)"/></g>
+<use xlink:href="#ic-flame" href="#ic-flame" transform="translate(39,1704) scale(0.82)" fill="#FFFFFF"/>
+<use xlink:href="#ic-dumbbell" href="#ic-dumbbell" transform="translate(107,1704) scale(0.78)" fill="#FFFFFF"/>
+<use xlink:href="#ic-star" href="#ic-star" transform="translate(175,1704) scale(0.85)" fill="#FFFFFF"/>
+<use xlink:href="#ic-bolt" href="#ic-bolt" transform="translate(243,1704) scale(0.82)" fill="#FFFFFF"/>
+<use xlink:href="#ic-heart" href="#ic-heart" transform="translate(311,1704) scale(0.85)" fill="#FFFFFF"/>
+<use xlink:href="#ic-lock" href="#ic-lock" transform="translate(379,1704) scale(0.85)" color="#AEAEB2"/>
+
+<!-- ═══════════ 13 · HYDRATION + MACROS ═══════════ -->
+<g filter="url(#fCard)"><rect x="16" y="1750" width="174" height="150" rx="28" fill="url(#gCard)"/></g>
+<rect x="16.5" y="1750.5" width="173" height="149" rx="27.5" fill="none" stroke="url(#gCardEdge)"/>
+<text x="32" y="1778" font-size="9" font-weight="700" letter-spacing="1.1" fill="#8E8E93">HYDRATION</text>
+<text x="32" y="1806" font-size="24" font-weight="700" letter-spacing="-0.7" fill="#1C1C1E">1.25</text>
+<text x="89" y="1806" font-size="12" font-weight="600" fill="#6E6E73">L</text>
+<text x="104" y="1806" font-size="10.5" font-weight="500" fill="#AEAEB2">/ 2.0 L</text>
+<g>
+  <rect x="32" y="1820" width="13" height="26" rx="6.5" fill="url(#gWater)"/>
+  <rect x="50.4" y="1820" width="13" height="26" rx="6.5" fill="url(#gWater)"/>
+  <rect x="68.8" y="1820" width="13" height="26" rx="6.5" fill="url(#gWater)"/>
+  <rect x="87.2" y="1820" width="13" height="26" rx="6.5" fill="url(#gWater)"/>
+  <rect x="105.6" y="1820" width="13" height="26" rx="6.5" fill="url(#gWater)"/>
+  <rect x="124" y="1820" width="13" height="26" rx="6.5" fill="#787880" fill-opacity="0.16"/>
+  <rect x="142.4" y="1820" width="13" height="26" rx="6.5" fill="#787880" fill-opacity="0.16"/>
+  <rect x="160.8" y="1820" width="13" height="26" rx="6.5" fill="#787880" fill-opacity="0.16"/></g>
+<rect x="32" y="1860" width="104" height="28" rx="14" fill="#32ADE6" fill-opacity="0.15" stroke="#007AFF" stroke-opacity="0.26" stroke-width="0.8"/>
+<text x="84" y="1878" font-size="10.5" font-weight="650" letter-spacing="-0.05" fill="#0040DD" text-anchor="middle">+  Add 250 ml</text>
+
+<g filter="url(#fCard)"><rect x="203" y="1750" width="174" height="150" rx="28" fill="url(#gCard)"/></g>
+<rect x="203.5" y="1750.5" width="173" height="149" rx="27.5" fill="none" stroke="url(#gCardEdge)"/>
+<text x="219" y="1778" font-size="9" font-weight="700" letter-spacing="1.1" fill="#8E8E93">MACROS</text>
+<g>
+  <circle cx="242.7" cy="1820" r="19" fill="none" stroke="#D70015" stroke-opacity="0.15" stroke-width="5.5"/>
+  <circle cx="242.7" cy="1820" r="19" fill="none" stroke="url(#gMacroP)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="97.89 119.38" transform="rotate(-90 242.7 1820)"/>
+  <circle cx="290" cy="1820" r="19" fill="none" stroke="#E8A400" stroke-opacity="0.18" stroke-width="5.5"/>
+  <circle cx="290" cy="1820" r="19" fill="none" stroke="url(#gMacroC)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="76.40 119.38" transform="rotate(-90 290 1820)"/>
+  <circle cx="337.3" cy="1820" r="19" fill="none" stroke="#8944AB" stroke-opacity="0.15" stroke-width="5.5"/>
+  <circle cx="337.3" cy="1820" r="19" fill="none" stroke="url(#gMacroF)" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="53.72 119.38" transform="rotate(-90 337.3 1820)"/></g>
+<g font-size="9.5" font-weight="700" letter-spacing="-0.2" fill="#1C1C1E" text-anchor="middle">
+  <text x="242.7" y="1823.5">124</text><text x="290" y="1823.5">186</text><text x="337.3" y="1823.5">52</text></g>
+<g font-size="9.5" font-weight="700" letter-spacing="0.5" fill="#8E8E93" text-anchor="middle">
+  <text x="242.7" y="1852">P</text><text x="290" y="1852">C</text><text x="337.3" y="1852">F</text></g>
+<rect x="219" y="1864" width="142" height="5" rx="2.5" fill="#787880" fill-opacity="0.16"/>
+<rect x="219" y="1864" width="108.9" height="5" rx="2.5" fill="url(#gBrand)"/>
+<text x="219" y="1886" font-size="10" font-weight="500" fill="#AEAEB2">1,840 / 2,400 kcal</text>
+
+<!-- ═══════════ 14 · PERSONAL RECORDS ═══════════ -->
+<g filter="url(#fCard)"><rect x="16" y="1912" width="361" height="140" rx="30" fill="url(#gCard)"/></g>
+<rect x="16.5" y="1912.5" width="360" height="139" rx="29.5" fill="none" stroke="url(#gCardEdge)"/>
+<text x="36" y="1942" font-size="15.5" font-weight="600" letter-spacing="-0.3" fill="#1C1C1E">Personal Records</text>
+<rect x="281" y="1928" width="76" height="21" rx="10.5" fill="#787880" fill-opacity="0.13"/>
+<text x="319" y="1942" font-size="8.5" font-weight="700" letter-spacing="0.8" fill="#48484A" text-anchor="middle">THIS MONTH</text>
+<g>
+  <rect x="36" y="1958" width="99" height="76" rx="20" fill="url(#gTile)" stroke="#000000" stroke-opacity="0.045" stroke-width="0.8"/>
+  <text x="48" y="1980" font-size="8.5" font-weight="700" letter-spacing="0.8" fill="#8E8E93">BENCH</text>
+  <text x="48" y="2006" font-size="15" font-weight="700" letter-spacing="-0.4" fill="#1C1C1E">102.5 kg</text>
+  <text x="48" y="2024" font-size="9.5" font-weight="700" fill="#248A3D">+5.0 kg</text></g>
+<g>
+  <rect x="147" y="1958" width="99" height="76" rx="20" fill="url(#gTile)" stroke="#000000" stroke-opacity="0.045" stroke-width="0.8"/>
+  <text x="159" y="1980" font-size="8.5" font-weight="700" letter-spacing="0.8" fill="#8E8E93">SQUAT</text>
+  <text x="159" y="2006" font-size="15" font-weight="700" letter-spacing="-0.4" fill="#1C1C1E">145 kg</text>
+  <text x="159" y="2024" font-size="9.5" font-weight="700" fill="#248A3D">+10 kg</text></g>
+<g>
+  <rect x="258" y="1958" width="99" height="76" rx="20" fill="url(#gTile)" stroke="#FF9500" stroke-opacity="0.40" stroke-width="1"/>
+  <text x="270" y="1980" font-size="8.5" font-weight="700" letter-spacing="0.8" fill="#8E8E93">DEADLIFT</text>
+  <text x="270" y="2006" font-size="15" font-weight="700" letter-spacing="-0.4" fill="#1C1C1E">180 kg</text>
+  <rect x="270" y="2013" width="38" height="15" rx="7.5" fill="#FF9500" fill-opacity="0.18"/>
+  <text x="289" y="2024" font-size="8" font-weight="700" letter-spacing="0.6" fill="#C93400" text-anchor="middle">NEW</text></g>
+
+<!-- ═══════════ 15 · WEEKLY CHALLENGE ═══════════ -->
+<g filter="url(#fCard)"><rect x="16" y="2064" width="361" height="140" rx="30" fill="url(#gCard)"/></g>
+<rect x="16.5" y="2064.5" width="360" height="139" rx="29.5" fill="none" stroke="url(#gCardEdge)"/>
+<text x="36" y="2094" font-size="15.5" font-weight="600" letter-spacing="-0.3" fill="#1C1C1E">Weekly Challenge</text>
+<rect x="281" y="2080" width="76" height="21" rx="10.5" fill="#FF9500" fill-opacity="0.16"/>
+<text x="319" y="2094" font-size="8.5" font-weight="700" letter-spacing="0.7" fill="#C93400" text-anchor="middle">3 DAYS LEFT</text>
+
+<text x="40" y="2124" font-size="12" font-weight="700" fill="#AEAEB2" text-anchor="middle">1</text>
+<circle cx="68" cy="2120" r="14.8" fill="none" stroke="#E8B100" stroke-width="1.6"/>
+<circle cx="68" cy="2120" r="13" fill="#FF4FB8"/>
+<text x="68" y="2124.5" font-size="10.5" font-weight="600" fill="#FFFFFF" text-anchor="middle">M</text>
+<text x="90" y="2124" font-size="12.5" font-weight="600" letter-spacing="-0.15" fill="#1C1C1E">Mia Chen</text>
+<text x="357" y="2124" font-size="12.5" font-weight="700" letter-spacing="-0.2" fill="#A05A00" text-anchor="end">12,480</text>
+<line x1="36" y1="2134" x2="357" y2="2134" stroke="#3C3C43" stroke-opacity="0.12"/>
+
+<text x="40" y="2152" font-size="12" font-weight="700" fill="#AEAEB2" text-anchor="middle">2</text>
+<circle cx="68" cy="2148" r="14.8" fill="none" stroke="#B0B0B8" stroke-width="1.6"/>
+<circle cx="68" cy="2148" r="13" fill="#007AFF"/>
+<text x="68" y="2152.5" font-size="10.5" font-weight="600" fill="#FFFFFF" text-anchor="middle">J</text>
+<text x="90" y="2152" font-size="12.5" font-weight="600" letter-spacing="-0.15" fill="#1C1C1E">Jon Reyes</text>
+<text x="357" y="2152" font-size="12.5" font-weight="700" letter-spacing="-0.2" fill="#6E6E73" text-anchor="end">11,920</text>
+<line x1="36" y1="2162" x2="357" y2="2162" stroke="#3C3C43" stroke-opacity="0.12"/>
+
+<rect x="28" y="2163" width="337" height="26" rx="13" fill="#FF2D55" fill-opacity="0.09"/>
+<text x="40" y="2180" font-size="12" font-weight="700" fill="#D30F45" text-anchor="middle">3</text>
+<circle cx="68" cy="2176" r="13" fill="url(#gBrand)"/>
+<circle cx="68" cy="2176" r="14.8" fill="none" stroke="#FF2D55" stroke-width="1.6" stroke-opacity="0.65"/>
+<text x="68" y="2180.5" font-size="10.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">A</text>
+<text x="90" y="2180" font-size="12.5" font-weight="700" letter-spacing="-0.15" fill="#1C1C1E">You</text>
+<text x="357" y="2180" font-size="12.5" font-weight="700" letter-spacing="-0.2" fill="#D30F45" text-anchor="end">10,340</text>
+
+<!-- ═══════════ 16 · TAB BAR ═══════════ -->
+<rect x="0" y="2216" width="393" height="84" fill="url(#gTab)"/>
+<line x1="0" y1="2216.5" x2="393" y2="2216.5" stroke="#3C3C43" stroke-opacity="0.16"/>
+<g transform="translate(49.1,2246)" filter="url(#fSoft)"><use xlink:href="#ic-house-fill" href="#ic-house-fill" fill="#FF2D55"/></g>
+<text x="49.1" y="2274" font-size="10" font-weight="600" letter-spacing="-0.1" fill="#FF2D55" text-anchor="middle">Home</text>
+<g transform="translate(147.4,2246)"><use xlink:href="#ic-dumbbell" href="#ic-dumbbell" transform="scale(0.92)" fill="#8E8E93"/></g>
+<text x="147.4" y="2274" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Workouts</text>
+<g transform="translate(245.6,2246)" color="#8E8E93"><use xlink:href="#ic-trend" href="#ic-trend"/></g>
+<text x="245.6" y="2274" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Trends</text>
+<g transform="translate(343.9,2246)" color="#8E8E93"><use xlink:href="#ic-person" href="#ic-person"/></g>
+<text x="343.9" y="2274" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Profile</text>
+<rect x="140.5" y="2286" width="112" height="5" rx="2.5" fill="#1C1C1E" fill-opacity="0.85"/>
+
+</g>
+<rect x="0.5" y="0.5" width="392" height="2299" fill="none" stroke="#000000" stroke-opacity="0.10"/>
+</svg>
