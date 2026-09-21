@@ -96,12 +96,7 @@ export function TimerPane({ time, status, accent, segments, controls, jiggling, 
   );
 }
 
-export function formatTimeSpan(ms: number): string {
-  const totalSeconds = Math.ceil(Math.max(ms, 0) / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-}
+export { formatTimeSpan } from './timer-format';
 
 function resolveSegmentColor(theme: AppTheme, color: string): string {
   if (color === 'green' || color === 'success') return theme.color.status.success.base;

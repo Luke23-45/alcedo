@@ -30,6 +30,7 @@ timing, real-device performance. Device checklist comes later with a dev build.
 | # | Page | Spec | Status |
 |---|------|------|--------|
 | 1 | Home | docs/new_design (home dark/light) | done 2026-09-21 |
+| 2 | Workout flow (session) | docs/new_design | done 2026-09-22 |
 
 ## Per-page log
 ### 1. Home
@@ -89,7 +90,88 @@ pre-existing in untouched files); oxfmt clean.
 `feed/composer/composer-data.ts:133` (`'EEEE, MMMM d'`),
 `stats/trends/exercise-detail/{progress-chart,last-session,session-history}`
 (`'MMM d'`, `'MMM'`). Flag for pages 7–10.
-| 2 | Workout flow (session) | docs/new_design | pending |
+Update 2026-09-22: fixed as commit `a4abc1b` (cached Intl formatters), so the
+deferral is resolved; the session-adjacent screens it touched are safe.
+
+### 2. Workout flow (session)
+- Verified 2026-09-22 (route `app/src/app/(tabs)/(session)/session/index.tsx`,
+  container `components/smart/session-component.tsx`).
+- Sections inventoried (in render order): SessionNav (back chevron, blueprint
+  title, `⋯` ActiveSessionMenu), ElapsedCard (MM:SS → H:MM:SS, LIVE pill,
+  anchored to the first logged set), StatStrip (Sets n/m, Volume kg, Reps, Avg
+  bpm), ExercisesHeader ("EXERCISES · n of m"), EmptySession (dumbbell
+  illustration, Add Exercise CTA), weighted exercise cards (index tile, name,
+  status chip, 32px set rows with number/weight/reps/check, prev-line, Add Set
+  row, notes, history/notes/`⋯` menus), cardio exercise cards (per-set duration
+  and distance, live CardioTimer), sticky SessionFooter (idle Rest card or live
+  timer slot, Finish Workout + "Log at least one set to finish" hint when
+  disabled), live RestTimer (two-segment ring, pause, ±15s, skip with undo,
+  complete-state Log Set), ActiveSessionMenu (Add exercise, Edit workout),
+  finish confirmation dialog (incomplete session), post-workout summary route.
+- State matrix simulated: empty (zeroed stats, disabled Finish, CTA), populated
+  weighted (sets/volume/reps math), unstarted-with-exercises (Finish stays
+  disabled), cardio (filled/empty), mixed weighted+cardio, rest timer
+  resting/ready/over/paused/failed/fixed/nudged (incl. the spec's 00:42 of 60
+  ring math), cardio timer count-up/countdown/`elapsedAt` banking/stop banking,
+  elapsed clock formats, kill → relaunch (active session restored exactly, no
+  invented active session, finished workout not resurrected, mid-set writes
+  never steal the active flag), offline focus (all session interactions are
+  local Redux + SQLite; nothing in this flow requires network).
+- Finish flow traced: empty session cannot finish; incomplete session shows the
+  confirmation dialog; complete finishes to `/session/post-workout` when the
+  summary toggle is on, otherwise clears the active session, dismisses homeward,
+  and opens `/diff-save` when plan differences exist. Back navigation never
+  destroys the stored active session.
+- 44×44 audit: nav buttons, Finish (54px), empty-state CTA (48px), set-row check
+  toggle (44 via hitSlop) pass. The weight/reps text edits inside the dense 32px
+  set rows are 30px effective — a deliberate density trade-off matching the
+  reference's row pitch; the primary mid-workout action (log set) meets the
+  target. Recorded as a considered decision, not a bug.
+
+**Bugs found and fixed:**
+1. `stat-strip.tsx` — the code comment claimed AVG BPM carries a `SampleBadge`,
+   but none rendered: the hard-coded sample `'128'` read as recorded health
+   data. The badge now renders (home convention), and the empty state shows
+   `'—'` for Avg bpm, matching the reference (`0 / 0 / —`).
+2. `useAddExercise.ts` — the new-exercise placeholder name was hard-coded
+   English (`'New Exercise'`). Now uses `t('exercise.new.default_name')` (key
+   added to `en.json`; other locales fall back to English via
+   `fallbackLanguage: 'en'`).
+3. `rest-timer.tsx` — the countdown state machine was locked inside the
+   component, untestable. Extracted to pure `rest-timer-state.ts`
+   (`getRestTimerState`); the pause-freeze now lives in the state machine
+   itself, component behavior unchanged.
+4. `timer-pane.tsx` — `formatTimeSpan` lived in a component module that cannot
+   load without native deps. Extracted to pure `timer-format.ts`; `timer-pane`
+   re-exports it, export shape unchanged.
+5. `session-component.tsx` — `computeSessionStats`, `sessionHasLoggedSet`, and
+   `sessionStartedExerciseCount` moved verbatim to new `session/session-stats.ts`
+   (named exports) so the simulation suite can drive them; the component
+   imports them, behavior unchanged.
+
+**Tests (40 new, all green):**
+- `session/session-simulation.spec.ts` (new, 24 tests): elapsed clock formats
+  (incl. the spec's 45:12 and 00:00 empty state), empty-session zeroing + Finish
+  gate, populated weighted sets/volume/reps math, unstarted exercises not
+  gating Finish, cardio filled/empty counting, mixed aggregation, heart-rate
+  sample honesty, cardio timer readouts (`formatTimeSpan`, `elapsedAt` banking,
+  stop banking), single-set start enabling Finish, completion timestamping.
+- `rest-timer-state.spec.ts` (new, 11 tests): resting countdown with exact
+  remaining time, the 00:42-of-60 ring fraction (114.35 of 163.36), failed-set
+  longer window, nudge clamping (never below zero, +15 exact), ready/over
+  phases, fixed-rest straight to over, paused freeze, medium/long presets.
+- `store/stored-sessions/session-restore.spec.ts` (new, 5 tests): kill →
+  relaunch restores the exact active session through the real reducers, effects,
+  and SQLite; payload restored not just the id; no invented active session;
+  finished workout not resurrected; mid-set writes never steal/drop the flag.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 108 files / 1,584
+tests green; eslint 0 errors in touched files; `oxfmt --check` clean; all
+`t('…')` keys in the workout flow resolve in `en.json`.
+
+**Not claimed:** pixel/animation feel, real-device performance, haptic
+confirmation on device — no device used.
+| 2 | Workout flow (session) | docs/new_design | done 2026-09-22 |
 | 3 | Workout editor | docs/new_design/workout-editor-redesign.md | pending |
 | 4 | Exercise editor | docs/new_design (exercise editor) | pending |
 | 5 | Diff-save (Update Plan) | docs/new_design/diff-save-redesign.md | pending |

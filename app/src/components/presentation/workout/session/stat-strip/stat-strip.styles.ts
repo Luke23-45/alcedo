@@ -54,6 +54,7 @@ export const ValueSuffix = styled.Text<{ $dimmed: boolean }>`
 export const LabelRow = styled.View`
   flex-direction: row;
   align-items: center;
+  gap: 4px;
   margin-top: 5px;
 `;
 

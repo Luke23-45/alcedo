@@ -1,15 +1,11 @@
 import { useTranslate } from '@tolgee/react';
 import { Fragment } from 'react';
 import { HomeCard } from '../../../home/shared/home-card';
+import { SampleBadge } from '../../../home/shared/sample-badge';
+import type { SessionStats } from '../session-stats';
 import { Column, DividerLine, Label, LabelRow, StripRow, StripWrap, Value, ValueSuffix } from './stat-strip.styles';
 
-export interface SessionStats {
-  setsCompleted: number;
-  setsTotal: number;
-  volume: string;
-  reps: string;
-  avgBpm: string | undefined;
-}
+export type { SessionStats };
 
 /**
  * Four-column session stat strip: Sets, Volume kg, Reps, Avg bpm.
@@ -20,7 +16,7 @@ export function StatStrip({ stats, dimmed }: { stats: SessionStats; dimmed?: boo
   const { t } = useTranslate();
   const dim = dimmed ?? false;
 
-  const columns: { value: React.ReactNode; label: string }[] = [
+  const columns: { value: React.ReactNode; label: string; sample?: boolean }[] = [
     {
       value: (
         <Value $dimmed={dim}>
@@ -30,11 +26,18 @@ export function StatStrip({ stats, dimmed }: { stats: SessionStats; dimmed?: boo
       ),
       label: t('workout.session.sets.label'),
     },
-    { value: <Value $dimmed={dim}>{stats.volume}</Value>, label: t('workout.session.volume_kg.label') },
-    { value: <Value $dimmed={dim}>{stats.reps}</Value>, label: t('workout.session.reps.label') },
     {
-      value: <Value $dimmed={dim}>{stats.avgBpm ?? '—'}</Value>,
+      value: <Value $dimmed={dim}>{stats.volume}</Value>,
+      label: t('workout.session.volume_kg.label'),
+    },
+    {
+      value: <Value $dimmed={dim}>{stats.reps}</Value>,
+      label: t('workout.session.reps.label'),
+    },
+    {
+      value: <Value $dimmed={dim}>{dim ? '—' : (stats.avgBpm ?? '—')}</Value>,
       label: t('workout.session.avg_bpm.label'),
+      sample: !dim,
     },
   ];
 
@@ -49,6 +52,7 @@ export function StatStrip({ stats, dimmed }: { stats: SessionStats; dimmed?: boo
                 {col.value}
                 <LabelRow>
                   <Label $dimmed={dim}>{col.label}</Label>
+                  {col.sample && <SampleBadge compact />}
                 </LabelRow>
               </Column>
             </Fragment>

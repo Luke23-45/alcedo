@@ -134,6 +134,7 @@
   "exercise.manage.subtitle": "Manage your exercise list",
   "exercise.manage.title": "Manage Exercises",
   "exercise.name.label": "Exercise name",
+  "exercise.new.default_name": "New Exercise",
   "exercise.description.cardio_set.body": "Set <em>{setNumber}</em> - {targetType}: <em>{targetValue}</em>",
   "exercise.never_done_before.message": "You have never done this exercise before",
   "exercise.no_exercises_added.message": "No exercises added yet",

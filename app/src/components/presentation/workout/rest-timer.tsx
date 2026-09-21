@@ -10,6 +10,7 @@ import { Jiggler } from '@/components/presentation/foundation/jiggler';
 import { useTranslate } from '@tolgee/react';
 import { RestTimerControls } from './rest-timer-controls';
 import * as S from './rest-timer.styles';
+import { getRestTimerState } from './rest-timer-state';
 
 interface RestTimerProps {
   rest: Rest;
@@ -155,43 +156,18 @@ export function RestTimer({
     setAdjustMs(0);
   }, [startTime]);
 
-  const getTimerState = useCallback(() => {
-    const now = pausedAt ?? OffsetDateTime.now();
-    const elapsed = Math.max(0, Duration.between(startTime, now).toMillis() + adjustMs);
-    // A failed set earns a single, longer rest, and a fixed rest has min === max. Both are a
-    // target rather than a window, so they have no second segment to fill.
-    const windowStart = (failed ? rest.failureRest : rest.minRest).toMillis();
-    const windowEnd = failed || rest.minRest.equals(rest.maxRest) ? undefined : rest.maxRest.toMillis();
-
-    if (elapsed < windowStart) {
-      return {
-        phase: 'resting' as const,
-        windowStart,
-        windowEnd,
-        elapsedMs: elapsed,
-        remainingMs: windowStart - elapsed,
-        restProgress: elapsed / windowStart,
-      };
-    }
-    if (windowEnd !== undefined && elapsed < windowEnd) {
-      return {
-        phase: 'ready' as const,
-        windowStart,
-        windowEnd,
-        elapsedMs: elapsed,
-        remainingMs: 0,
-        restProgress: 1,
-      };
-    }
-    return {
-      phase: 'over' as const,
-      windowStart,
-      windowEnd,
-      elapsedMs: elapsed,
-      remainingMs: 0,
-      restProgress: 1,
-    };
-  }, [startTime, pausedAt, rest, failed, adjustMs]);
+  const getTimerState = useCallback(
+    () =>
+      getRestTimerState({
+        rest,
+        startTime,
+        pausedAt,
+        failed,
+        adjustMs,
+        now: OffsetDateTime.now(),
+      }),
+    [startTime, pausedAt, rest, failed, adjustMs],
+  );
 
   const [timerState, setTimerState] = useState(getTimerState());
   const [jiggling, setJiggling] = useState(false);

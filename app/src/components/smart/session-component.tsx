@@ -44,7 +44,12 @@ import SessionMoreMenuComponent from '@/components/smart/session-more-menu-compo
 import { HomeScreenBackground } from '@/components/presentation/home/shared/home-auras';
 import { SessionNav } from '@/components/presentation/workout/session/session-nav/session-nav';
 import { ElapsedCard } from '@/components/presentation/workout/session/elapsed-card/elapsed-card';
-import { SessionStats, StatStrip } from '@/components/presentation/workout/session/stat-strip/stat-strip';
+import { StatStrip } from '@/components/presentation/workout/session/stat-strip/stat-strip';
+import {
+  computeSessionStats,
+  sessionHasLoggedSet,
+  sessionStartedExerciseCount,
+} from '@/components/presentation/workout/session/session-stats';
 import { ExercisesHeader } from '@/components/presentation/workout/session/exercises-header/exercises-header';
 import { EmptySession } from '@/components/presentation/workout/session/empty-session/empty-session';
 import { SessionFooter } from '@/components/presentation/workout/session/session-footer/session-footer';
@@ -52,59 +57,9 @@ import { SessionAuras } from '@/components/presentation/workout/session/session-
 import { useElapsedSeconds } from '@/components/presentation/workout/session/use-elapsed-seconds';
 
 function withRestTimerAt(session: Session, time: OffsetDateTime | undefined) {
-  return session.with({ restTimer: time ? new RestTimerModel(time) : undefined });
-}
-
-function computeSessionStats(session: Session): SessionStats {
-  let setsCompleted = 0;
-  let setsTotal = 0;
-  let reps = 0;
-  for (const exercise of session.recordedExercises) {
-    if (exercise instanceof RecordedWeightedExercise) {
-      for (const potentialSet of exercise.potentialSets) {
-        setsTotal += 1;
-        if (potentialSet.set) {
-          setsCompleted += 1;
-          reps += potentialSet.set.repsCompleted;
-        }
-      }
-    } else if (exercise instanceof RecordedCardioExercise) {
-      for (const set of exercise.sets) {
-        setsTotal += 1;
-        if (set.isCompletelyFilled) {
-          setsCompleted += 1;
-        }
-      }
-    }
-  }
-  const volumeKg = session.totalWeightLifted.convertTo('kilograms');
-  return {
-    setsCompleted,
-    setsTotal,
-    volume: localeFormatBigNumber(volumeKg.value.decimalPlaces(0)),
-    reps: String(reps),
-    // Sample data, always badged as such in the strip.
-    avgBpm: '128',
-  };
-}
-
-/** Whether at least one set has been logged — the footer Finish gate. */
-function sessionHasLoggedSet(session: Session): boolean {
-  return session.recordedExercises.some((exercise) =>
-    match(exercise)
-      .with(P.instanceOf(RecordedWeightedExercise), (ex) => ex.potentialSets.some((ps) => ps.set !== undefined))
-      .with(P.instanceOf(RecordedCardioExercise), (ex) => ex.sets.some((s) => s.isCompletelyFilled))
-      .otherwise(() => false),
-  );
-}
-
-function sessionStartedExerciseCount(session: Session): number {
-  return session.recordedExercises.filter((exercise) =>
-    match(exercise)
-      .with(P.instanceOf(RecordedWeightedExercise), (ex) => ex.isStarted)
-      .with(P.instanceOf(RecordedCardioExercise), (ex) => ex.isStarted)
-      .otherwise(() => false),
-  ).length;
+  return session.with({
+    restTimer: time ? new RestTimerModel(time) : undefined,
+  });
 }
 
 function ActiveSessionView(props: {
