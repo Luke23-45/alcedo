@@ -9,6 +9,13 @@ import { RemoteData } from '@/models/remote';
 import { selectPreferredWeightUnit } from '../settings';
 import { calculateStats } from '@/store/stats/calculate-stats';
 
+/**
+ * The error value the stats effect reports when the user has never recorded a
+ * session. Pages distinguish it from real failures to render their first-run
+ * empty state instead of error chrome.
+ */
+export const NO_SESSIONS_ERROR = 'No sessions';
+
 export function applyStatsEffects(addEffect: AddEffectFn) {
   addEffect(fetchOverallStats, async (_, { getState, dispatch }) => {
     const state = getState();
@@ -23,7 +30,9 @@ export function applyStatsEffects(addEffect: AddEffectFn) {
       let timeframe = state.stats.overallViewTime;
       if (timeframe === 'all-time') {
         if (!state.storedSessions.earliestSession) {
-          dispatch(setOverallStats(RemoteData.error('No sessions')));
+          // No recorded sessions: an empty first-run state, not a failure.
+          // Pages render their empty state for this instead of error chrome.
+          dispatch(setOverallStats(RemoteData.error(NO_SESSIONS_ERROR)));
           return;
         }
         timeframe = {

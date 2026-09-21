@@ -254,3 +254,28 @@ describe('findExerciseByName', () => {
     expect(findExerciseByName(items, 'Nope')).toBeUndefined();
   });
 });
+
+describe('first run (no recorded stats)', () => {
+  it('lists the full library with zero session counts', () => {
+    const entries = buildPickerExercises(library, []);
+    expect(entries).toHaveLength(Object.keys(library).length);
+    expect(entries.every((e) => e.sessionCount === 0)).toBe(true);
+  });
+
+  it('shows no pinned shortcuts and the A-Z list stays reachable', () => {
+    const entries = buildPickerExercises(library, []);
+    const sections = buildSections({
+      pinned: pinnedExercises(entries),
+      recent: [],
+      alpha: groupByLetter(filterExercises(entries, '', 'all')),
+      showShortcuts: true,
+    });
+    expect(sections.every((s) => s.kind === 'alpha')).toBe(true);
+    expect(sections.length).toBeGreaterThan(0);
+  });
+
+  it('reports no matches for a query that hits nothing', () => {
+    const entries = buildPickerExercises(library, []);
+    expect(filterExercises(entries, 'zzzz-no-such-lift', 'all')).toEqual([]);
+  });
+});

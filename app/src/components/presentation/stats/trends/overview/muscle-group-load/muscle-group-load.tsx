@@ -6,11 +6,8 @@ import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { HomeText } from '@/components/presentation/home/shared/home-text';
 import { SampleBadge } from '@/components/presentation/home/shared/sample-badge';
 import { TrendsSectionHeader } from '../shared/trends-section-header';
-import {
-  MUSCLE_TRACK_MAX_SETS,
-  PT_PER_SET,
-  CanonicalMuscleGroup,
-} from '../constants';
+import { CanonicalMuscleGroup } from '../constants';
+import { trackFractions } from './muscle-track';
 import { MuscleCallout, MuscleLoadRow } from '../trends-overview-data';
 import { trendsPalette } from '../trends-colors';
 import {
@@ -128,10 +125,9 @@ export function MuscleGroupLoad({
 
           {rows.map((row) => {
             const under = callout?.muscle === row.group;
-            const bandLeft = row.low * PT_PER_SET;
-            const bandWidth = (row.high - row.low) * PT_PER_SET;
-            const fillWidth =
-              Math.min(row.sets, MUSCLE_TRACK_MAX_SETS) * PT_PER_SET;
+            // Percentages of the measured track width, so bars scale on every
+            // device instead of the fixed 321 pt reference widths.
+            const { bandLeftPct, bandWidthPct, fillPct } = trackFractions(row);
             return (
               <MuscleRow key={row.group}>
                 <NameRow>
@@ -161,17 +157,20 @@ export function MuscleGroupLoad({
                 <Track $bg={trackBg}>
                   <Band
                     $bg={palette.targetBand}
-                    $left={bandLeft}
-                    $width={bandWidth}
+                    $leftPct={bandLeftPct}
+                    $widthPct={bandWidthPct}
                   />
-                  {fillWidth > 0 ? (
+                  {fillPct > 0 ? (
                     <Fill
                       $color={under ? palette.undertrained : green}
-                      $width={fillWidth}
+                      $widthPct={fillPct}
                     />
                   ) : null}
-                  <BandDot $left={bandLeft} $color={dotColor} />
-                  <BandDot $left={bandLeft + bandWidth} $color={dotColor} />
+                  <BandDot $leftPct={bandLeftPct} $color={dotColor} />
+                  <BandDot
+                    $leftPct={bandLeftPct + bandWidthPct}
+                    $color={dotColor}
+                  />
                 </Track>
               </MuscleRow>
             );

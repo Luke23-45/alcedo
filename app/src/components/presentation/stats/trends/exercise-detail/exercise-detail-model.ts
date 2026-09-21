@@ -57,7 +57,7 @@ export interface ExerciseDetailData {
   bestE1rm: number;
   sessionCount: number;
   trailing7dVolume: number;
-  /** Sessions in the trailing 28 days ÷ 4. */
+  /** Sessions in the trailing 7 days — the weekly rate for the identity chip. */
   weeklyFrequency: number;
   /** Most recent recorded bodyweight, display unit. Absent when never logged. */
   latestBodyweight: number | null;
@@ -75,13 +75,13 @@ export function formatBare(value: number): string {
   return localeFormatBigNumber(new BigNumber(value), Number.isInteger(rounded) ? 0 : 1);
 }
 
-/** Signed percent delta, e.g. "+11.1%" / "-2.3%". */
+/** Signed percent delta, e.g. "+11.1%" / "−2.3%" (U+2212, matches the reference). */
 export function formatDeltaPercent(from: number, to: number): string | null {
   if (from <= 0) {
     return null;
   }
   const pct = ((to - from) / from) * 100;
-  const sign = pct > 0 ? '+' : pct < 0 ? '-' : '';
+  const sign = pct > 0 ? '+' : pct < 0 ? '−' : '';
   return `${sign}${Math.abs(pct).toFixed(1)}%`;
 }
 

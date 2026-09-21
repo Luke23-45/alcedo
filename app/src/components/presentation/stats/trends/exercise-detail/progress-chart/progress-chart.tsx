@@ -164,7 +164,7 @@ export function ProgressChart({
   const prLabelX = prCoord ? Math.min(Math.max(prCoord.x, 44), contentWidth - 44) : 0;
 
   const delta = formatDeltaPercent(values[0]!, values[lastIndex]!);
-  const deltaColor = delta?.startsWith('-') ? '#FF453A' : '#4ADE80';
+  const deltaColor = delta?.startsWith('−') ? '#FF453A' : '#4ADE80';
   const strengthRatio = latestBodyweight && latestBodyweight > 0 ? (bestE1rm / latestBodyweight).toFixed(2) : null;
 
   const selectedIndex = MODES.findIndex((m) => m.key === mode);
@@ -233,15 +233,20 @@ export function ProgressChart({
                 strokeWidth={1}
               />
             ))}
-            <Path d={areaPath} fill="url(#edArea)" />
-            <Path
-              d={linePath}
-              fill="none"
-              stroke="url(#edLine)"
-              strokeWidth={2.6}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            {/* Fewer than two sessions: nodes only, never an implied trend. */}
+            {coords.length >= 2 ? (
+              <>
+                <Path d={areaPath} fill="url(#edArea)" />
+                <Path
+                  d={linePath}
+                  fill="none"
+                  stroke="url(#edLine)"
+                  strokeWidth={2.6}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </>
+            ) : null}
             {coords.map((c, i) =>
               i === weightPrIndex || i === lastIndex ? null : (
                 <Circle key={i} cx={c.x} cy={c.y} r={3.4} fill={halo} stroke="#FF6A3D" strokeWidth={2} />

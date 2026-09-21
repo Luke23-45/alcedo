@@ -106,9 +106,6 @@ export const DEFAULT_MUSCLE_TARGET_BANDS: Readonly<
 /** The bar track spans 0–24 sets (spec: 321 pt / 24 sets = 13.375 pt/set). */
 export const MUSCLE_TRACK_MAX_SETS = 24;
 
-/** Points of bar-track width per set, from the 321 pt reference track. */
-export const PT_PER_SET = 321 / MUSCLE_TRACK_MAX_SETS;
-
 export type TrendRange = '7D' | '4W' | '6M' | '1Y' | 'ALL';
 
 export const TREND_RANGES: readonly TrendRange[] = [

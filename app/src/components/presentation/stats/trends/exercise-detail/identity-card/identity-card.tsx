@@ -1,5 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { G, Rect } from 'react-native-svg';
+import { useTranslate } from '@tolgee/react';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { formatWeeklyRate } from '../exercise-detail-model';
 import * as S from './identity-card.styles';
@@ -33,6 +34,7 @@ export function IdentityCard({
   /** Sessions per week, trailing 7 days. */
   weeklyFrequency: number;
 }) {
+  const { t } = useTranslate();
   return (
     <HomeCard radius={30} pad={0}>
       <S.CardInner>
@@ -65,7 +67,11 @@ export function IdentityCard({
               </S.Chip>
             ) : null}
             <S.Chip>
-              <S.ChipText>{formatWeeklyRate(weeklyFrequency)}× / WEEK</S.ChipText>
+              <S.ChipText>
+                {t('stats.exercise_detail.identity.per_week', {
+                  rate: formatWeeklyRate(weeklyFrequency),
+                })}
+              </S.ChipText>
             </S.Chip>
           </S.ChipRow>
         </S.TextBlock>

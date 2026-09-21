@@ -35,6 +35,7 @@ timing, real-device performance. Device checklist comes later with a dev build.
 | 4 | Exercise editor | docs/new_design/exercise-editor-redesign.md | done 2026-09-22 |
 | 5 | Diff-save / Update Plan | docs/new_design/diff-save-redesign.md | done 2026-09-22 |
 | 6 | History | docs/new_design/history-dark.md | done 2026-09-22 |
+| 7 | Trends (overview, exercise picker, exercise detail) | docs/new_design/trends-dark.md | done 2026-09-22 |
 
 ## Per-page log
 ### 1. Home
@@ -180,7 +181,7 @@ confirmation on device — no device used.
 | 4 | Exercise editor | docs/new_design/exercise-editor-redesign.md | done 2026-09-22 |
 | 5 | Diff-save (Update Plan) | docs/new_design/diff-save-redesign.md | done 2026-09-22 |
 | 6 | History | docs/new_design/history-dark.md | done 2026-09-22 |
-| 7 | Trends | docs/new_design | pending |
+| 7 | Trends | docs/new_design | done 2026-09-22 |
 | 8 | Feed timeline | docs/new_design/social-dark.md | pending |
 | 9 | Feed post detail | docs/new_design/social-dark.md | pending |
 | 10 | Feed share composer | docs/new_design/social-dark.md | pending |
@@ -538,3 +539,97 @@ used.
 
 **Not claimed:** pixel/animation feel, real-device performance — no device
 used.
+
+### 7. Trends
+- Verified 2026-09-22 against `docs/new_design/trends-dark.md`. Routes:
+  `app/src/app/(tabs)/stats/index.tsx` (overview),
+  `app/src/app/(tabs)/stats/exercise-list.tsx` (exercise picker),
+  `app/src/app/(tabs)/stats/expanded-weighted-exercise.tsx` (exercise detail).
+- Overview sections inventoried (render order): header/calendar, range
+  selector (7D/4W/6M/1Y/ALL), hero chart (Volume/Est. 1RM/Body Weight),
+  metric tiles, personal bests, muscle-group load, consistency heatmap,
+  streaks/totals, PR timeline, trend insights, export health data.
+- Picker sections: search, muscle filters, current selection, derived pinned
+  exercises, session-memory recents, A–Z list, search/filter empty state,
+  alphabet scrubber, sticky confirmation.
+- Detail sections: nav, identity, stat strip, progress chart, muscle
+  involvement, last session, session history, actions (log session,
+  edit details).
+- State matrix simulated: populated, first-run (no sessions), single-point
+  chart, loading, error-with-retry, offline (all local — trends compute
+  from stored sessions after hydration; no network involved).
+- Data/store/persistence: `useFocusEffect` forces the stats view to
+  all-time and dispatches `fetchOverallStats()`; `store/stats/effects.ts`
+  waits for hydration and derives stats from `storedSessions`. Detail
+  derives full all-time exercise history from finished sessions directly
+  (bypasses the old 90-day aggregate). Export dispatches
+  `exportPlainText({format: 'CSV'})`. Picker confirmation records a
+  session-memory recent view (survives picker reopenings within the app
+  run, not process relaunch), dismisses, then opens the detail route.
+  Pinned exercises are derived smart defaults (the two exercises with the
+  most recorded sessions) — no persisted pin model exists.
+- Navigation targets traced: history row → `/history/edit?sessionId=…`,
+  view all → `/exercise-history?name=…&type=weighted`, log session →
+  fresh preloaded session or session-tab fallback, edit details →
+  `/settings/manage-exercises`, first-run CTA → `/(tabs)/(session)`.
+- Sampled (kept honest with `SampleBadge`): muscle involvement percentages
+  and last-session RPE (not in the model); extra sets beyond the four
+  sampled RPE values show `—`. Muscle target bands are documented design
+  defaults, not user-configured values. Other locales fall back to
+  English for the new Trends keys.
+
+**Bugs found and fixed:**
+1. `index.tsx` — initial range was `4W` while the spec visibly selects
+   `7D`. Now `7D`.
+2. `index.tsx` / `effects.ts` / `remote.tsx` / `trends-empty/*` — first
+   run (no sessions) rendered generic error chrome. The store now
+   exports `NO_SESSIONS_ERROR`; the overview maps it to a neutral
+   first-run state ("No session logged yet" + "Start Workout" CTA);
+   genuine errors keep the shared `RemoteDefaultError`, now exported
+   and retryable.
+3. `exercise-list.tsx` — the picker depended on stats success, so it was
+   unusable on first run. With no sessions it now renders the full
+   library with zero session counts; genuine errors stay retryable.
+4. `muscle-group-load.tsx` / `muscle-track.ts` (new) / `constants.ts` —
+   bars used fixed 321/24 pt widths from the reference device and
+   under-filled on wider screens. Positions and widths are now
+   percentages of the measured track; fill clamps at 24 sets.
+5. `exercise-detail-model.ts` / `progress-chart.tsx` — negative deltas
+   used ASCII `-`; now U+2212 `−`, matching the reference.
+6. `identity-card.tsx` — hard-coded `× / WEEK`; now localized
+   (`stats.exercise_detail.identity.per_week`).
+7. `hero-chart.tsx` / `progress-chart.tsx` — a single data point drew a
+   line/area implying a trend. Line and area now render only with ≥ 2
+   points; the single node still renders.
+8. `exercise-detail-model.ts` — stale `weeklyFrequency` comment ("trailing
+   28 days ÷ 4") corrected to trailing-7-day session count.
+9. `remote.tsx` — `RemoteDefaultError` extracted from the default
+   renderer; lint-clean (replaced `spacing[4]`-over-`any` access with the
+   resolved 16pt token value).
+
+**Tests (50 new, all green):**
+- `chart-math.spec.ts` (10): empty/single/flat/two-point layout and
+  paths; single-point line is move-only, no curve.
+- `muscle-track.spec.ts` (4): percentage scaling, fill clamping, zero
+  fill, zero-start band.
+- `exercise-detail-model.spec.ts` (18): delta/number/weekly-rate
+  formatting, unknown exercise, all-time derivation, newest-first order,
+  PR ownership, trailing-7-day volume/frequency, descriptor/equipment/
+  short-name derivation, case-insensitive names, imperial conversion,
+  single-session honesty, unstarted-exercise exclusion, log-session
+  creation/fallback.
+- `trends-overview-data.spec.ts` (11): signed formatting, 7D/4W/6M/1Y/ALL
+  bucket construction, first-run ALL fallback.
+- `exercise-picker-model.spec.ts` (+3): first-run full library with zero
+  counts, no pinned shortcuts, no-results query. (Existing 30+ picker
+  and recent-view tests kept.)
+- Store stats specs (existing, kept green) cover the stats effect paths.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 115 files /
+1,683 tests green; oxlint 0 errors on touched files; oxfmt clean on
+all new files and all touched files that were clean at baseline (the 6
+touched files already non-conformant at HEAD were left at baseline
+formatting to avoid diff noise — no new format issues introduced).
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.

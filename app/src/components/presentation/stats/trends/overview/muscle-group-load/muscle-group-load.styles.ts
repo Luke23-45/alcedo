@@ -61,29 +61,30 @@ export const Track = styled.View<{ $bg: string }>`
   overflow: visible;
 `;
 
-export const Band = styled.View<{ $bg: string; $left: number; $width: number }>`
+export const Band = styled.View<{ $bg: string; $leftPct: number; $widthPct: number }>`
   position: absolute;
-  left: ${({ $left }) => $left}px;
+  left: ${({ $leftPct }) => $leftPct}%;
   top: 0;
-  width: ${({ $width }) => $width}px;
+  width: ${({ $widthPct }) => $widthPct}%;
   height: 6px;
   border-radius: 3px;
   background-color: ${({ $bg }) => $bg};
 `;
 
-export const Fill = styled.View<{ $color: string; $width: number }>`
+export const Fill = styled.View<{ $color: string; $widthPct: number }>`
   position: absolute;
   left: 0;
   top: 0;
-  width: ${({ $width }) => $width}px;
+  width: ${({ $widthPct }) => $widthPct}%;
   height: 6px;
   border-radius: 3px;
   background-color: ${({ $color }) => $color};
 `;
 
-export const BandDot = styled.View<{ $left: number; $color: string }>`
+export const BandDot = styled.View<{ $leftPct: number; $color: string }>`
   position: absolute;
-  left: ${({ $left }) => $left - 1.6}px;
+  left: ${({ $leftPct }) => $leftPct}%;
+  margin-left: -1.6px;
   top: 1.4px;
   width: 3.2px;
   height: 3.2px;

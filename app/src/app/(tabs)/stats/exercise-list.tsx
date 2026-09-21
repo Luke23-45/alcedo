@@ -1,7 +1,8 @@
-import { Remote } from '@/components/presentation/foundation/remote';
+import { Remote, RemoteDefaultError } from '@/components/presentation/foundation/remote';
 import { ExercisePickerScreen } from '@/components/presentation/stats/trends/exercise-picker/exercise-picker-screen';
 import { useAppSelector } from '@/store';
 import { fetchOverallStats, selectOverallView } from '@/store/stats';
+import { NO_SESSIONS_ERROR } from '@/store/stats/effects';
 import { Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
@@ -27,6 +28,19 @@ export default function ExerciseListPage() {
       <Stack.Screen options={{ headerShown: false }} />
       <Remote
         value={stats}
+        retry={() => dispatch(fetchOverallStats())}
+        error={(err) =>
+          // First run: no sessions means no stats, but the exercise library is
+          // still fully browsable — session counts are simply zero.
+          err === NO_SESSIONS_ERROR ? (
+            <ExercisePickerScreen
+              weightedExerciseStats={[]}
+              initialExerciseName={typeof exerciseName === 'string' ? exerciseName : undefined}
+            />
+          ) : (
+            <RemoteDefaultError value={err} retry={() => dispatch(fetchOverallStats())} />
+          )
+        }
         success={(view) => (
           <ExercisePickerScreen
             weightedExerciseStats={view.weightedExerciseStats}

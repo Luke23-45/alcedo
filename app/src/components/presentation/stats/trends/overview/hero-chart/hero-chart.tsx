@@ -251,15 +251,20 @@ export function HeroChart({
             ))}
             {pts.length > 0 ? (
               <G>
-                <Path d={area} fill="url(#trendArea)" />
-                <Path
-                  d={line}
-                  fill="none"
-                  stroke="url(#trendLine)"
-                  strokeWidth={2.6}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                {/* Fewer than two points: points only, never an implied trend. */}
+                {pts.length >= 2 ? (
+                  <>
+                    <Path d={area} fill="url(#trendArea)" />
+                    <Path
+                      d={line}
+                      fill="none"
+                      stroke="url(#trendLine)"
+                      strokeWidth={2.6}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </>
+                ) : null}
                 {pts.slice(0, -1).map((p, i) => (
                   <Circle
                     key={i}

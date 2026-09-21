@@ -1,5 +1,5 @@
 import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
-import { Remote } from '@/components/presentation/foundation/remote';
+import { Remote, RemoteDefaultError } from '@/components/presentation/foundation/remote';
 import {
   HomeAuras,
   HomeScreenBackground,
@@ -19,6 +19,7 @@ import { PrTimeline } from '@/components/presentation/stats/trends/overview/pr-t
 import { RangeSelector } from '@/components/presentation/stats/trends/overview/range-selector/range-selector';
 import { StreaksTotals } from '@/components/presentation/stats/trends/overview/streaks-totals/streaks-totals';
 import { TrendInsights } from '@/components/presentation/stats/trends/overview/trend-insights/trend-insights';
+import { TrendsEmpty } from '@/components/presentation/stats/trends/overview/trends-empty/trends-empty';
 import {
   HeaderGroup,
   SectionGap12,
@@ -33,7 +34,8 @@ import {
   selectOverallView,
   setOverallViewTime,
 } from '@/store/stats';
-import { Stack, useFocusEffect } from 'expo-router';
+import { NO_SESSIONS_ERROR } from '@/store/stats/effects';
+import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -44,12 +46,15 @@ import { useDispatch } from 'react-redux';
  * session history, personal records, and the all-time stats view. The stats
  * query is forced to the all-time window on focus — bodyweight, streaks, and
  * the ALL range all need full history, which the old 90-day window cut off.
+ * First run (no sessions yet) renders the TrendsEmpty state, not error chrome.
  */
 export default function TrendsOverviewPage() {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
-  const [range, setRange] = useState<TrendRange>('4W');
+  const { push } = useRouter();
+  // The reference design opens on 7D; keep the initial state identical.
+  const [range, setRange] = useState<TrendRange>('7D');
   const [activeMetric, setActiveMetric] = useState<HeroMetricKey>('volume');
 
   useFocusEffect(() => {
@@ -58,6 +63,7 @@ export default function TrendsOverviewPage() {
   });
 
   const stats = useAppSelector(selectOverallView);
+  const retryStats = () => dispatch(fetchOverallStats());
 
   return (
     <FullHeightScrollView
@@ -72,6 +78,15 @@ export default function TrendsOverviewPage() {
       <HomeAuras />
       <Remote
         value={stats}
+        retry={retryStats}
+        error={(err) =>
+          // First run (no recorded sessions) is an empty state, not a failure.
+          err === NO_SESSIONS_ERROR ? (
+            <TrendsEmpty onStartWorkout={() => push('/(tabs)/(session)')} />
+          ) : (
+            <RemoteDefaultError value={err} retry={retryStats} />
+          )
+        }
         success={(stats) => (
           <Overview
             stats={stats}
