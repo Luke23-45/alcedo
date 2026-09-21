@@ -12,10 +12,7 @@ export function addExportBackupEffects(addEffect: AddEffectFn) {
       .replaceAll(':', '')
       .replaceAll('T', '_')
       .replaceAll('-', '');
-    await fileExportService.exportBytes(
-      `export.alcedobackup.${now}.sqlite.gz`,
-      await getBackupBytes({ includeFeed, expoDb }),
-      'application/octet-stream',
-    );
+    const { bytes } = await getBackupBytes({ includeFeed, expoDb });
+    await fileExportService.exportBytes(`export.alcedobackup.${now}.sqlite.gz`, bytes, 'application/octet-stream');
   });
 }

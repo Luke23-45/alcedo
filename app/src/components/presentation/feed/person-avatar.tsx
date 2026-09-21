@@ -38,11 +38,7 @@ export function PersonAvatar({ userId, name, size = DEFAULT_SIZE }: PersonAvatar
       }}
     >
       {initials ? (
-        <SurfaceText
-          font={size < 32 ? 'text-xs' : 'text-base'}
-          weight="bold"
-          style={{ color: foregroundColor }}
-        >
+        <SurfaceText font={size < 32 ? 'text-xs' : 'text-base'} weight="bold" style={{ color: foregroundColor }}>
           {initials}
         </SurfaceText>
       ) : (

@@ -85,3 +85,51 @@ export const instantCodec: Codec<Instant> = {
   },
   serialize: (value) => value.toString(),
 };
+
+/** A fixed string union persisted as its literal value; anything else falls back to the default. */
+export function stringUnionCodec<T extends string>(allowed: readonly T[]): Codec<T> {
+  return {
+    deserialize: (raw) => (raw !== undefined && (allowed as readonly string[]).includes(raw) ? (raw as T) : undefined),
+    serialize: (value) => value,
+  };
+}
+
+/** A string list persisted as JSON; unparseable payloads fall back to the default. */
+export const stringListCodec: Codec<string[]> = {
+  deserialize: (raw) => {
+    if (!raw) return undefined;
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      return Array.isArray(parsed) && parsed.every((entry) => typeof entry === 'string') ? parsed : undefined;
+    } catch {
+      return undefined;
+    }
+  },
+  serialize: (value) => JSON.stringify(value),
+};
+
+/** A decimal number persisted as its literal value; unparseable payloads fall back to the default. */
+export const floatCodec: Codec<number> = {
+  deserialize: (raw) => {
+    if (!raw) return undefined;
+    const parsed = parseFloat(raw);
+    return isNaN(parsed) ? undefined : parsed;
+  },
+  serialize: (value) => value.toString(),
+};
+
+/** A list of days of the week persisted as JSON day names, e.g. ["MONDAY","WEDNESDAY"]. */
+export const dayOfWeekListCodec: Codec<DayOfWeek[]> = {
+  deserialize: (raw) => {
+    if (!raw) return undefined;
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return undefined;
+      const days = parsed.map((entry) => (typeof entry === 'string' ? dayOfWeekCodec.deserialize(entry) : undefined));
+      return days.every((d): d is DayOfWeek => d !== undefined) ? days : undefined;
+    } catch {
+      return undefined;
+    }
+  },
+  serialize: (value) => JSON.stringify(value.map((day) => day.name())),
+};

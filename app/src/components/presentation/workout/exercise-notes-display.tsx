@@ -6,10 +6,13 @@ import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import { Card, Divider, Text } from 'react-native-paper';
 import IconButton from '@/components/presentation/foundation/icon-button';
+import { NotesText, NotesWrap } from './exercise-notes-display.styles';
 
 interface ExerciseNotesDisplayProps {
   exercise: RecordedExercise;
   previousExercise: RecordedExercise | undefined;
+  /** Renders plain text for embedding in the active-session card (no Paper surface). */
+  embedded?: boolean;
 }
 export default function ExerciseNotesDisplay(props: ExerciseNotesDisplayProps) {
   const theme = useAppTheme();
@@ -64,6 +67,15 @@ export default function ExerciseNotesDisplay(props: ExerciseNotesDisplayProps) {
   if (!hasNotes) {
     return undefined;
   }
+  if (props.embedded) {
+    return (
+      <NotesWrap>
+        {notes ? <NotesText testID="exercise-notes">{notes}</NotesText> : null}
+        {blueprintNotes ? <NotesText testID="exercise-blueprint-notes">{blueprintNotes}</NotesText> : null}
+        {previousNotes ? <NotesText testID="exercise-previous-notes">{previousNotes}</NotesText> : null}
+      </NotesWrap>
+    );
+  }
   return (
     <Card mode="contained" style={[{ marginTop: theme.space.base }]}>
       <Card.Content style={{ flexDirection: 'row' }}>
@@ -95,7 +107,7 @@ export default function ExerciseNotesDisplay(props: ExerciseNotesDisplayProps) {
               <View style={{ flex: 1, paddingRight: theme.space.sm }}>
                 <View style={{ position: 'absolute', gap: theme.space.sm }}>{renderText(maxNumberOfLines)}</View>
                 {/* Render this so it doesn't jump around when expanding - need to always reserve the full text space */}
-                <View style={{ visibility: 'hidden', opacity: 0, gap: theme.space.sm }}>{renderText(undefined)}</View>
+                <View style={{ opacity: 0, gap: theme.space.sm }}>{renderText(undefined)}</View>
               </View>
             </View>
           </AccordionItem>

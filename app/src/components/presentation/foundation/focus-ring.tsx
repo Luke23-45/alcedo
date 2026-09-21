@@ -1,4 +1,4 @@
-import { useAppTheme } from "@/hooks/useAppTheme";
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { ReactNode, useEffect, useRef } from 'react';
 import { View, ViewProps, Animated, Easing } from 'react-native';
 

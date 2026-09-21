@@ -1,44 +1,38 @@
 import { Remote } from '@/components/presentation/foundation/remote';
-import { WeightedExerciseListSearcher } from '@/components/presentation/stats/weighted-exercise-list-searcher';
+import { ExercisePickerScreen } from '@/components/presentation/stats/trends/exercise-picker/exercise-picker-screen';
 import { useAppSelector } from '@/store';
-import { fetchOverallStats, selectOverallView, WeightedExerciseStatistics } from '@/store/stats';
-import { useTranslate } from '@tolgee/react';
-import { Stack, useFocusEffect, useRouter } from 'expo-router';
-import { HeaderHeightContext } from 'expo-router/react-navigation';
-import { useContext } from 'react';
-import { Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { fetchOverallStats, selectOverallView } from '@/store/stats';
+import { Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
 
+/**
+ * Exercise picker (Phase 3, Screen 3): sheet-style chooser. The native header
+ * is hidden; the screen renders its own grabber + Cancel + title chrome while
+ * keeping the OS status bar. Cancel dismisses, exactly as before.
+ */
 export default function ExerciseListPage() {
-  const { t } = useTranslate();
   const dispatch = useDispatch();
-  const { dismiss, push } = useRouter();
+  const { exerciseName } = useLocalSearchParams<{ exerciseName?: string }>();
   useFocusEffect(() => {
     dispatch(fetchOverallStats());
   });
   const stats = useAppSelector(selectOverallView);
-
-  const onItemPress = (item: WeightedExerciseStatistics) => {
-    dismiss();
-    push(`/stats/expanded-weighted-exercise?exerciseName=${encodeURIComponent(item.exerciseName)}`);
-  };
-
-  const headerHeight = useContext(HeaderHeightContext); // Intentionally don't use useHeaderHeight as it might not be in a stack
-  const topInsetHeight = Platform.select({ ios: headerHeight }) ?? 0;
+  const insets = useSafeAreaInsets();
   return (
     <SafeAreaView
       edges={{ bottom: 'additive', left: 'additive', right: 'additive', top: 'off' }}
-      style={{ flex: 1, paddingTop: topInsetHeight }}
+      style={{ flex: 1, paddingTop: insets.top }}
     >
-      <Stack.Screen
-        options={{
-          title: t('stats.weighted_exercise_list.title'),
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
       <Remote
         value={stats}
-        success={(stats) => <WeightedExerciseListSearcher stats={stats} onItemPress={onItemPress} />}
+        success={(view) => (
+          <ExercisePickerScreen
+            weightedExerciseStats={view.weightedExerciseStats}
+            initialExerciseName={typeof exerciseName === 'string' ? exerciseName : undefined}
+          />
+        )}
       />
     </SafeAreaView>
   );

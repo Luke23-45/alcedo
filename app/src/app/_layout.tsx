@@ -3,6 +3,7 @@ import { I18nManager, LogBox, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppStateProvider } from '@/components/smart/app-state-provider';
 import { PlanImportGate } from '@/components/smart/plan-import-gate';
+import { AutoPauseOnLock } from '@/components/smart/auto-pause-on-lock';
 import SnackbarProvider from '@/components/smart/snackbar-provider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -39,6 +40,7 @@ export default function RootLayout() {
                 <SnackbarProvider>
                   {Platform.OS === 'android' && <StatusBar style="auto" />}
                   <PlanImportGate />
+                  <AutoPauseOnLock />
                   <Layout />
                 </SnackbarProvider>
               </AppStateProvider>
@@ -59,10 +61,6 @@ function Layout() {
       <Stack.Screen
         name="exercise-history"
         options={{
-          presentation: 'formSheet',
-          sheetAllowedDetents: [0.6, 0.95],
-          sheetGrabberVisible: true,
-          sheetCornerRadius: 28,
           headerShown: false,
         }}
       />

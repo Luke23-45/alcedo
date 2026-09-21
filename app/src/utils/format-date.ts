@@ -1,4 +1,4 @@
-import { DayOfWeek, Duration, LocalDate } from '@js-joda/core';
+import { DayOfWeek, Duration, Instant, LocalDate } from '@js-joda/core';
 import { match } from 'ts-pattern';
 
 export function getDateOnDay(dayOfWeek: DayOfWeek) {
@@ -51,4 +51,14 @@ export function parseDuration(val: string): Duration {
   const millis = millisStr ? Number(millisStr) : 0;
 
   return Duration.ofDays(days).plusHours(hours).plusMinutes(minutes).plusSeconds(seconds).plusMillis(millis);
+}
+
+/**
+ * "Sep 22, 2026, 11:12 AM" — device locale, medium date + short time. Used for
+ * the remote backup "Last tested" timestamp so the label stays localized.
+ */
+export function formatDateTimeMedium(value: Instant): string {
+  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(
+    new Date(value.toEpochMilli()),
+  );
 }

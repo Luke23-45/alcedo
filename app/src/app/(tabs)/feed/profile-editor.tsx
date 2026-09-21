@@ -1,7 +1,7 @@
-import { FeedProfileEditor } from '@/components/smart/feed-profile-editor';
+import { ProfileEditorScreen } from '@/components/smart/profile-editor-screen';
 import { useLocalSearchParams } from 'expo-router';
 
 export default function FeedProfileEditorPage() {
   const { focusPublish } = useLocalSearchParams<{ focusPublish?: string }>();
-  return <FeedProfileEditor focusPublish={!!focusPublish} />;
+  return <ProfileEditorScreen focusPublish={!!focusPublish} />;
 }

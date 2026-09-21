@@ -35,7 +35,9 @@ export function FeedWeekStrip() {
   return (
     <Card mode="contained" style={{ marginBottom: theme.space.sm }}>
       <Card.Content style={{ gap: theme.space.sm }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: theme.space.sm }}>
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: theme.space.sm }}
+        >
           <SurfaceText font="text-lg" weight="bold" numberOfLines={1}>
             {t('feed.this_week.title')}
           </SurfaceText>

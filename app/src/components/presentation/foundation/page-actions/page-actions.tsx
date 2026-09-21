@@ -1,4 +1,4 @@
-import { useAppTheme } from "@/hooks/useAppTheme";
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { PageAction, PageActionsProps } from './page-actions-props';
 import { Button, HStack, Host } from '@expo/ui/swift-ui';
 import {
@@ -61,7 +61,16 @@ export function PageActions({ primary, secondary = [], primaryExpanded, accessor
     >
       <Host matchContents seedColor={theme.color.interactive.tint} colorScheme={theme.mode}>
         {/* The shadow rides the stack, not the buttons: glass swallows a shadow set on itself. */}
-        <HStack spacing={8} modifiers={[shadow({ radius: theme.elevation.sm.shadowRadius, y: theme.elevation.sm.shadowOffset.height, color: theme.color.background.scrim })]}>
+        <HStack
+          spacing={8}
+          modifiers={[
+            shadow({
+              radius: theme.elevation.sm.shadowRadius,
+              y: theme.elevation.sm.shadowOffset.height,
+              color: theme.color.background.scrim,
+            }),
+          ]}
+        >
           {glassButton(primary, true, expanded)}
           {secondary.map((action) => glassButton(action, false))}
         </HStack>

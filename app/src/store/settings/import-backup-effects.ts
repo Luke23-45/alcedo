@@ -3,8 +3,16 @@ import { Logger } from '@/services/logger';
 import { showSnackbar } from '@/store/app';
 import { AddEffectFn } from '@/store/store';
 import { upsertSavedPlans } from '@/store/program';
-import { beginFeedImport, importBackupData, importData, importDataProto, importDataSql } from '@/store/settings';
+import {
+  beginFeedImport,
+  importBackupData,
+  importData,
+  importDataProto,
+  importDataSql,
+  setLastExternalImport,
+} from '@/store/settings';
 import { upsertExercises, upsertStoredSessions } from '@/store/stored-sessions';
+import { Instant } from '@js-joda/core';
 import { streamToUint8Array, writeInChunks } from '@/utils/stream';
 import { sleep } from '@/utils/sleep';
 import { Session } from '@/models/session-models';
@@ -84,11 +92,23 @@ export function addImportBackupEffects(addEffect: AddEffectFn) {
   });
 
   addEffect(importBackupData, async ({ payload }, { dispatch, extra: { db, databaseMigrationService } }) => {
-    const { workouts, programs, exercises, feed, successMessage } = payload;
+    const { workouts, programs, exercises, feed, successMessage, externalImport } = payload;
     dispatch(upsertStoredSessions(workouts));
     dispatch(upsertSavedPlans(programs));
     if (exercises) {
       dispatch(upsertExercises(exercises));
+    }
+    if (externalImport) {
+      // The sessions are in the store now — this is the real success point
+      // for the last-imported card, not the dispatch of the import request.
+      dispatch(
+        setLastExternalImport({
+          time: Instant.now(),
+          workoutCount: externalImport.workoutCount,
+          format: externalImport.format,
+          setCount: externalImport.setCount,
+        }),
+      );
     }
     dispatch(
       showSnackbar({

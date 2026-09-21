@@ -58,7 +58,6 @@ export function PotentialSetDisplay(props: PotentialSetDisplayProps) {
   return (
     <View
       style={{
-        userSelect: 'none',
         minWidth: size.minWidth,
         maxWidth: size.maxWidth,
         flexGrow: size.maxWidth === undefined ? undefined : 1,

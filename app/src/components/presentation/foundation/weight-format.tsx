@@ -5,7 +5,16 @@ import { Text, TextStyle } from 'react-native';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { type as typeHelper, type TextStyleName } from '@/styles/theme';
 
-type LegacyFontChoice = 'text-2xs' | 'text-xs' | 'text-sm' | 'text-base' | 'text-lg' | 'text-xl' | 'text-2xl' | 'text-3xl' | 'text-4xl';
+type LegacyFontChoice =
+  | 'text-2xs'
+  | 'text-xs'
+  | 'text-sm'
+  | 'text-base'
+  | 'text-lg'
+  | 'text-xl'
+  | 'text-2xl'
+  | 'text-3xl'
+  | 'text-4xl';
 
 const legacyToVariant: Record<LegacyFontChoice, TextStyleName> = {
   'text-2xs': 'caption2',

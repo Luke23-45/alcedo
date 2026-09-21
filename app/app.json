@@ -78,17 +78,11 @@
               "host": "app.liftlog.online"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         },
         {
           "action": "VIEW",
-          "category": [
-            "DEFAULT",
-            "BROWSABLE"
-          ],
+          "category": ["DEFAULT", "BROWSABLE"],
           "data": [
             {
               "scheme": "content",
@@ -118,10 +112,7 @@
         },
         {
           "action": "VIEW",
-          "category": [
-            "DEFAULT",
-            "BROWSABLE"
-          ],
+          "category": ["DEFAULT", "BROWSABLE"],
           "data": [
             {
               "scheme": "content",
@@ -158,9 +149,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.limajuice.liftlog",
-      "associatedDomains": [
-        "applinks:app.liftlog.online"
-      ],
+      "associatedDomains": ["applinks:app.liftlog.online"],
       "supportsTablet": true,
       "infoPlist": {
         "UIViewControllerBasedStatusBarAppearance": true,
@@ -170,23 +159,16 @@
           {
             "CFBundleTypeName": "LiftLog Plan",
             "LSHandlerRank": "Owner",
-            "LSItemContentTypes": [
-              "com.limajuice.liftlog.plan"
-            ]
+            "LSItemContentTypes": ["com.limajuice.liftlog.plan"]
           }
         ],
         "UTExportedTypeDeclarations": [
           {
             "UTTypeIdentifier": "com.limajuice.liftlog.plan",
             "UTTypeDescription": "LiftLog Plan",
-            "UTTypeConformsTo": [
-              "public.json"
-            ],
+            "UTTypeConformsTo": ["public.json"],
             "UTTypeTagSpecification": {
-              "public.filename-extension": [
-                "liftlogplan",
-                "alcedoplan"
-              ]
+              "public.filename-extension": ["liftlogplan", "alcedoplan"]
             }
           }
         ],

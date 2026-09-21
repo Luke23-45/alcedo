@@ -1,246 +1,247 @@
-import CardActions from '@/components/presentation/foundation/card-actions';
-import ConfirmationDialog from '@/components/presentation/foundation/confirmation-dialog';
-import EmptyInfo from '@/components/presentation/foundation/empty-info';
-import IconButton from '@/components/presentation/foundation/icon-button';
-import { HistoryActivityCalendar } from '@/components/smart/history-activity-calendar';
-import { HistoryPrBadges } from '@/components/smart/pr-badges';
-import { WhoElseTrainedCard } from '@/components/smart/who-else-trained-card';
-import { ReactionSummary } from '@/components/smart/reaction-summary';
-import LimitedHtml from '@/components/presentation/foundation/limited-html';
-import SessionSummary from '@/components/presentation/summary/session-summary';
-import SessionSummaryTitle from '@/components/presentation/summary/session-summary-title';
-import SplitCardControl from '@/components/presentation/foundation/split-card-control';
-import { StreakCard } from '@/components/presentation/summary/streak-card';
-import { useAppTheme } from '@/hooks/useAppTheme';
-import { useScroll } from '@/hooks/useScrollListener';
+import { DaySectionLabel, DaySummary } from '@/components/presentation/history/day-summary/day-summary';
+import {
+  EmptyMonth,
+  EmptySelectedDay,
+  NoFilterResults,
+} from '@/components/presentation/history/empty-states/empty-states';
+import {
+  EMPTY_FILTERS,
+  isFilterActive,
+  sessionMatchesFilters,
+  type HistoryFilters,
+} from '@/components/presentation/history/filter-sheet/filter-logic';
+import { FilterSheet } from '@/components/presentation/history/filter-sheet/filter-sheet';
+import { HistoryHeader } from '@/components/presentation/history/history-header/history-header';
+import { calendarGridRange } from '@/components/presentation/history/history-design';
+import { sessionVolumeKg } from '@/components/presentation/history/history-stats';
+import { MonthCalendar } from '@/components/presentation/history/month-calendar/month-calendar';
+import { MonthSummary } from '@/components/presentation/history/month-summary/month-summary';
+import { WeekList } from '@/components/presentation/history/week-list/week-list';
+import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
+import { useFormatDate } from '@/hooks/useFormatDate';
 import { useToday } from '@/hooks/useToday';
 import { Session } from '@/models/session-models';
-import { selectStreakStats } from '@/store/activity';
 import { useAppSelector, useAppSelectorWhenFocused, useAppSelectorWhenFocusedWithArg } from '@/store';
-import { addUnpublishedSessionId, encryptAndShare, removeReactionsForEvents } from '@/store/feed';
 import {
-  deleteStoredSession,
   putStoredSession,
-  selectActiveSession,
+  selectHistoryPersonalRecords,
+  selectSessions,
   selectSessionsBy,
   selectSessionsInMonth,
 } from '@/store/stored-sessions';
-import { uuid } from '@/utils/uuid';
 import { LocalDate, YearMonth } from '@js-joda/core';
-import { T, useTranslate } from '@tolgee/react';
 import { Stack, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { View } from 'react-native';
-import { LegendList } from '@legendapp/list';
+import { useMemo, useState } from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Card, Tooltip } from 'react-native-paper';
-import Button from '@/components/presentation/foundation/button';
 import { useDispatch } from 'react-redux';
-import { useFormatDate } from '@/hooks/useFormatDate';
-import { useStartWorkout } from '@/hooks/useStartWorkout';
-import { SharedSession } from '@/models/feed-models';
+import { Defs, RadialGradient, Rect, Stop, Svg } from 'react-native-svg';
+import { CalendarSection, EmptyDayWrap, Page, ScreenRoot, Section } from './history-screen.styles';
+
+/** Ambient color fields behind the screen gradient — amber upper right, green lower left. */
+function Aurora() {
+  const amberOpacity = 0.1;
+  const greenOpacity = 0.07;
+  return (
+    <Svg
+      style={StyleSheet.absoluteFill}
+      width="100%"
+      height="100%"
+      viewBox="0 0 393 852"
+      preserveAspectRatio="xMidYMid slice"
+      pointerEvents="none"
+    >
+      <Defs>
+        <RadialGradient id="history-aurora-amber" cx="86%" cy="6%" r="42%">
+          <Stop offset="0" stopColor="#FF9F0A" stopOpacity={amberOpacity} />
+          <Stop offset="1" stopColor="#FF9F0A" stopOpacity={0} />
+        </RadialGradient>
+        <RadialGradient id="history-aurora-green" cx="8%" cy="92%" r="46%">
+          <Stop offset="0" stopColor="#30D158" stopOpacity={greenOpacity} />
+          <Stop offset="1" stopColor="#30D158" stopOpacity={0} />
+        </RadialGradient>
+      </Defs>
+      <Rect x={0} y={0} width={393} height={852} fill="url(#history-aurora-amber)" />
+      <Rect x={0} y={0} width={393} height={852} fill="url(#history-aurora-green)" />
+    </Svg>
+  );
+}
 
 export default function History() {
-  const theme = useAppTheme();
-  const { t } = useTranslate();
-  const dispatch = useDispatch();
   const formatDate = useFormatDate();
-  const [currentYearMonth, setCurrentYearMonth] = useState(YearMonth.now());
-  const { handleScroll } = useScroll();
+  const { push, back, canGoBack } = useRouter();
+  const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
+  const today = useToday();
+
+  const [currentYearMonth, setCurrentYearMonth] = useState(() => YearMonth.from(today));
+  const [selectedDate, setSelectedDate] = useState<LocalDate>(today);
+  const [filters, setFilters] = useState<HistoryFilters>(EMPTY_FILTERS);
+  const [filterVisible, setFilterVisible] = useState(false);
+
   const latesBodyweight = useAppSelector((x) =>
     x.program.upcomingSessions.map((x) => x.at(0)?.bodyweight).unwrapOr(undefined),
   );
-  const [selectedDate, setSelectedDate] = useState<LocalDate>();
-  // These sweep the whole history, and this screen stays mounted under /history/edit - so they must
-  // not recompute while a session is being edited on top of it.
+
+  // These sweep history while the screen stays mounted under pushed routes, so
+  // they must not recompute while a session is edited on top of it.
+  const allSessions = useAppSelectorWhenFocused(selectSessions);
   const sessionsInMonth = useAppSelectorWhenFocusedWithArg(selectSessionsInMonth, currentYearMonth);
-  const sessionsOnSelectedDate = useAppSelectorWhenFocused((state) =>
-    selectedDate ? selectSessionsBy(state, selectedDate, selectedDate) : undefined,
+  const gridRange = useMemo(() => calendarGridRange(currentYearMonth), [currentYearMonth]);
+  const sessionsInGrid = useAppSelectorWhenFocused((s) => selectSessionsBy(s, gridRange.start, gridRange.end));
+  const sessionsOnSelectedDate = useAppSelectorWhenFocused((s) =>
+    selectedDate ? selectSessionsBy(s, selectedDate, selectedDate) : undefined,
   );
-  const visibleSessions = sessionsOnSelectedDate ?? sessionsInMonth;
-  const today = useToday();
-  const streakStats = useAppSelectorWhenFocusedWithArg(selectStreakStats, today);
-  const { push } = useRouter();
-  const currentWorkoutSession = useAppSelector(selectActiveSession);
-  const startWorkoutSession = useStartWorkout();
-  const onSelectSession = (session: Session) => {
-    push(`/history/edit?sessionId=${encodeURIComponent(session.id)}`);
-  };
+  const prBySessionId = useAppSelectorWhenFocused(selectHistoryPersonalRecords);
+
+  const filterActive = isFilterActive(filters);
+  const matchesFilters = (session: Session): boolean =>
+    !filterActive ||
+    sessionMatchesFilters(
+      session.blueprint.name,
+      session.recordedExercises.map((e) => e.blueprint.name),
+      (prBySessionId.get(session.id) ?? []).length > 0,
+      filters,
+    );
+
+  const gridSessions = filterActive ? sessionsInGrid.filter(matchesFilters) : sessionsInGrid;
+  const monthSessions = filterActive ? sessionsInMonth.filter(matchesFilters) : sessionsInMonth;
+  // Copy before sorting: the selector results are memoized and must not be mutated.
+  const dayBase = filterActive ? (sessionsOnSelectedDate ?? []).filter(matchesFilters) : (sessionsOnSelectedDate ?? []);
+  const daySessions = [...dayBase].sort((a, b) => b.date.compareTo(a.date));
+
+  // Calendar rings: day → summed volume, covering the out-of-month spillover.
+  const dayVolumes = new Map<string, number>();
+  for (const session of gridSessions) {
+    const key = session.date.toString();
+    dayVolumes.set(key, (dayVolumes.get(key) ?? 0) + sessionVolumeKg(session));
+  }
+
+  // "Earlier this week": Monday–Sunday of the selected day, excluding the day itself.
+  const weekStart = selectedDate.minusDays(selectedDate.dayOfWeek().ordinal() % 7);
+  const weekEnd = weekStart.plusDays(6);
+  const weekSessions = [...gridSessions]
+    .filter((s) => !s.date.isEqual(selectedDate) && !s.date.isBefore(weekStart) && !s.date.isAfter(weekEnd))
+    .sort((a, b) => b.date.compareTo(a.date));
+  const rangeLabel = weekStart.month().equals(weekEnd.month())
+    ? `${formatDate(weekStart, { month: 'short', day: 'numeric' })} – ${formatDate(weekEnd, { day: 'numeric' })}`
+    : `${formatDate(weekStart, { month: 'short', day: 'numeric' })} – ${formatDate(weekEnd, { month: 'short', day: 'numeric' })}`;
+
+  // Distinct real workout names, newest first, for the filter chips.
+  const latestByName = new Map<string, LocalDate>();
+  for (const session of allSessions) {
+    const prev = latestByName.get(session.blueprint.name);
+    if (!prev || session.date.isAfter(prev)) {
+      latestByName.set(session.blueprint.name, session.date);
+    }
+  }
+  const workoutTypes = [...latestByName.entries()].sort((a, b) => b[1].compareTo(a[1])).map(([name]) => name);
+
+  // Header: real lifetime total and the earliest logged month.
+  let earliest: LocalDate | undefined;
+  for (const session of allSessions) {
+    if (!earliest || session.date.isBefore(earliest)) {
+      earliest = session.date;
+    }
+  }
+
+  // Empty selected day keeps the real add-workout path: a freeform session at
+  // that date, opened in the editor.
   const createSessionAtDate = (date: LocalDate) => {
     const newSession = Session.freeformSession(date, latesBodyweight);
     dispatch(putStoredSession(newSession));
-    onSelectSession(newSession);
-  };
-  const [replaceCurrentSessionConfirmOpen, setReplaceCurrentSessionConfirmOpen] = useState(false);
-  const [deleteSelectedWorkoutConfirmOpen, setDeleteSelectedWorkoutConfirmOpen] = useState(false);
-  const [selectedWorkout, setSelectedWorkout] = useState<Session>();
-  const deleteWorkout = (session: Session, force = false) => {
-    if (!force) {
-      setSelectedWorkout(session);
-      setDeleteSelectedWorkoutConfirmOpen(true);
-    } else if (selectedWorkout) {
-      dispatch(deleteStoredSession(selectedWorkout.id));
-      dispatch(addUnpublishedSessionId(selectedWorkout.id));
-      dispatch(removeReactionsForEvents([selectedWorkout.id]));
-      setDeleteSelectedWorkoutConfirmOpen(false);
-      setSelectedWorkout(undefined);
-    }
+    push(`/history/edit?sessionId=${encodeURIComponent(newSession.id)}`);
   };
 
-  const startWorkout = (session: Session, force = false) => {
-    if (currentWorkoutSession && !force) {
-      setSelectedWorkout(session);
-      setReplaceCurrentSessionConfirmOpen(true);
-    } else {
-      startWorkoutSession(session.withNothingCompleted().with({ date: LocalDate.now(), id: uuid() }));
-      setReplaceCurrentSessionConfirmOpen(false);
-      setSelectedWorkout(undefined);
+  const onSessionPress = (session: Session) => {
+    push(`/history/post-workout?sessionId=${encodeURIComponent(session.id)}&source=history`);
+  };
 
-      push('/(tabs)/(session)/session', { withAnchor: true });
-    }
-  };
-  const handleSharePress = (session: Session) => {
-    dispatch(
-      encryptAndShare({
-        item: new SharedSession(session),
-        title: t('workout.shared_item.title'),
-      }),
-    );
-  };
+  const nothingMatches = filterActive && monthSessions.length === 0;
+
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: t('generic.history.title'),
-        }}
-      />
-      <LegendList
-        testID="history-list"
-        maintainVisibleContentPosition={false}
-        data={visibleSessions}
-        keyExtractor={(session) => session.id}
-        onScroll={handleScroll}
-        contentContainerStyle={{
-          paddingHorizontal: theme.layout.screenPadding,
-          paddingBottom: insets.bottom,
-        }}
-        ItemSeparatorComponent={() => <View style={{ height: theme.space.sm }} />}
-        ListHeaderComponent={
-          <View style={{ gap: theme.space.base, marginBottom: theme.space.base }}>
-            <StreakCard stats={streakStats} />
-            <HistoryActivityCalendar
-              currentYearMonth={currentYearMonth}
-              selectedDate={selectedDate}
-              onMonthChange={(yearMonth) => {
-                setCurrentYearMonth(yearMonth);
-                setSelectedDate(undefined);
-              }}
-              onDateSelect={setSelectedDate}
+      <Stack.Screen options={{ headerShown: false }} />
+      <ScreenRoot>
+        <HomeGradient variant="screen" style={StyleSheet.absoluteFill} />
+        <Aurora />
+        <ScrollView
+          contentContainerStyle={{
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom + 32,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
+          <Page>
+            <HistoryHeader
+              totalSessions={allSessions.length}
+              earliestMonth={earliest ? formatDate(earliest, { month: 'long', year: 'numeric' }) : undefined}
+              filterActive={filterActive}
+              canGoBack={canGoBack()}
+              onBack={back}
+              onFilter={() => setFilterVisible(true)}
             />
-            {selectedDate && <WhoElseTrainedCard date={selectedDate} />}
-          </View>
-        }
-        renderItem={({ item: session }) => (
-          <Card mode="contained">
-            <Card.Content>
-              <SplitCardControl
-                titleContent={<SessionSummaryTitle showDate session={session} />}
-                mainContent={
-                  <View style={{ gap: theme.space.sm }}>
-                    <SessionSummary isFilled showWeight session={session} />
-                    <HistoryPrBadges sessionId={session.id} />
-                  </View>
-                }
+            <CalendarSection>
+              <MonthCalendar
+                yearMonth={currentYearMonth}
+                selectedDate={selectedDate}
+                today={today}
+                dayVolumes={dayVolumes}
+                onMonthChange={setCurrentYearMonth}
+                onDateSelect={setSelectedDate}
               />
-              <ReactionSummary eventId={session.id} />
-            </Card.Content>
-            <CardActions style={{ marginTop: theme.space.sm }}>
-              <Tooltip title={t('workout.share_workout.button')}>
-                <IconButton icon={'share'} mode="contained" onPress={() => handleSharePress(session)} />
-              </Tooltip>
-              <Tooltip title={t('workout.start_this.button')}>
-                <IconButton mode="contained" icon={'playCircle'} onPress={() => startWorkout(session)} />
-              </Tooltip>
-              <Tooltip title={t('generic.delete.button')}>
-                <IconButton mode="contained" icon={'delete'} onPress={() => deleteWorkout(session)} />
-              </Tooltip>
-              <Button
-                onPress={() => onSelectSession(session)}
-                icon="edit"
-                mode="contained"
-                testID="history-edit-workout"
-              >
-                <T keyName="workout.edit.button" />
-              </Button>
-            </CardActions>
-          </Card>
-        )}
-        ListEmptyComponent={
-          selectedDate ? (
-            <View style={{ gap: theme.space.base, alignItems: 'center' }}>
-              <EmptyInfo>
-                <LimitedHtml
-                  value={t('history.calendar.no_sessions_on_day.message', {
-                    date: formatDate(selectedDate, { day: 'numeric', month: 'long' }),
-                  })}
-                />
-              </EmptyInfo>
-              <Button
-                mode="contained"
-                icon="plus"
-                testID="history-add-workout-on-day"
-                onPress={() => createSessionAtDate(selectedDate)}
-              >
-                <T keyName="history.calendar.add_workout.button" />
-              </Button>
-            </View>
-          ) : (
-            <EmptyInfo>
-              <LimitedHtml
-                value={t('workout.no_sessions_in_month.message', {
-                  month: formatDate(currentYearMonth.atDay(1), {
-                    month: 'long',
-                  }),
-                })}
-              />
-            </EmptyInfo>
-          )
-        }
-      />
-      <ConfirmationDialog
-        headline={t('workout.replace_current.confirm.title')}
-        textContent={t('workout.replace_in_progress.confirm.body')}
-        open={replaceCurrentSessionConfirmOpen}
-        okText={t('generic.replace.button')}
-        onOk={() => selectedWorkout && startWorkout(selectedWorkout, true)}
-        onCancel={() => {
-          setSelectedWorkout(undefined);
-          setReplaceCurrentSessionConfirmOpen(false);
-        }}
-      />
-      <ConfirmationDialog
-        headline={t('workout.delete.confirm.title')}
-        textContent={
-          <LimitedHtml
-            value={t('workout.delete.confirm.body', {
-              sessionName: selectedWorkout?.blueprint.name ?? '',
-              date: formatDate(selectedWorkout?.date ?? LocalDate.now(), {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              }),
-            })}
-          />
-        }
-        open={deleteSelectedWorkoutConfirmOpen}
-        okText={t('generic.delete.button')}
-        onOk={() => selectedWorkout && deleteWorkout(selectedWorkout, true)}
-        onCancel={() => {
-          setSelectedWorkout(undefined);
-          setDeleteSelectedWorkoutConfirmOpen(false);
-        }}
-      />
+            </CalendarSection>
+            {nothingMatches ? (
+              <Section>
+                <NoFilterResults onClear={() => setFilters(EMPTY_FILTERS)} />
+              </Section>
+            ) : (
+              <>
+                <Section>
+                  {daySessions.length > 0 ? (
+                    <DaySummary
+                      date={selectedDate}
+                      sessions={daySessions}
+                      prBySessionId={prBySessionId}
+                      onSessionPress={onSessionPress}
+                    />
+                  ) : (
+                    <EmptyDayWrap>
+                      <DaySectionLabel date={selectedDate} />
+                      <EmptySelectedDay date={selectedDate} onAdd={() => createSessionAtDate(selectedDate)} />
+                    </EmptyDayWrap>
+                  )}
+                </Section>
+                {weekSessions.length > 0 && (
+                  <Section>
+                    <WeekList
+                      sessions={weekSessions}
+                      rangeLabel={rangeLabel}
+                      prBySessionId={prBySessionId}
+                      onSessionPress={onSessionPress}
+                    />
+                  </Section>
+                )}
+                <Section>
+                  {monthSessions.length > 0 || filterActive ? (
+                    <MonthSummary yearMonth={currentYearMonth} today={today} sessions={monthSessions} />
+                  ) : (
+                    <EmptyMonth onStartWorkout={() => createSessionAtDate(today)} />
+                  )}
+                </Section>
+              </>
+            )}
+          </Page>
+        </ScrollView>
+        <FilterSheet
+          visible={filterVisible}
+          onClose={() => setFilterVisible(false)}
+          filters={filters}
+          onFiltersChange={setFilters}
+          workoutTypes={workoutTypes}
+          matchCount={monthSessions.length}
+        />
+      </ScreenRoot>
     </>
   );
 }

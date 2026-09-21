@@ -1,10 +1,15 @@
-import { importBackupData, importFromExternal, ExternalImportFormat } from '@/store/settings';
+import { importBackupData, importFromExternal, setLastExternalImport, ExternalImportFormat } from '@/store/settings';
 import { addImportExternalEffects } from '@/store/settings/import-external-effects';
 import { getImportForFitNotes, getImportForStrongLifts } from '@/services/csv-import';
 import { csvImportFixtureBytes } from '@/services/csv-import/__test__/fixtures';
 import { createAddEffectTestBed } from '@/utils/__test__/add-effect-testbed';
 import { describe, expect, it, vi } from 'vitest';
-import { showSnackbar } from '@/store/app';
+import { showSnackbar, SnackbarDescriptor } from '@/store/app';
+
+/** Narrows the snackbar union to its one-line text (these specs only assert legacy snackbars). */
+function snackbarText(payload: SnackbarDescriptor): string | undefined {
+  return 'text' in payload ? payload.text : undefined;
+}
 import { setStatsIsDirty } from '@/store/stats';
 import { Session } from '@/models/session-models';
 
@@ -68,6 +73,36 @@ describe('import-external-effects', () => {
     expect(testBed.getDispatchedAction(setStatsIsDirty).payload).toBe(true);
   });
 
+  it('carries last-import metadata on the importBackupData payload', async () => {
+    const testBed = makeExternalImportBed({
+      format: 'FitNotes',
+      bytes: csvImportFixtureBytes('fitnotes-android-export-kgs.csv'),
+    });
+    await testBed.dispatchHandled(importFromExternal({ format: 'FitNotes' }));
+
+    // The importBackupData effect records setLastExternalImport after the
+    // upserts commit — the external effect only supplies the metadata.
+    const imported = testBed.getDispatchedAction(importBackupData);
+    expect(imported.payload.externalImport).toMatchObject({
+      workoutCount: 2,
+      format: 'FitNotes',
+    });
+    expect(imported.payload.externalImport!.setCount).toBeGreaterThan(0);
+  });
+
+  it('does not record last-import metadata when every workout is a duplicate', async () => {
+    const backup = getImportForFitNotes(csvImportFixtureBytes('fitnotes-android-export-kgs.csv'));
+    const existing = Object.fromEntries(backup.workouts.map((w) => [w.id, w]));
+    const testBed = makeExternalImportBed({
+      format: 'FitNotes',
+      bytes: csvImportFixtureBytes('fitnotes-android-export-kgs.csv'),
+      sessions: existing,
+    });
+    await testBed.dispatchHandled(importFromExternal({ format: 'FitNotes' }));
+
+    expect(() => testBed.getDispatchedAction(setLastExternalImport)).toThrow();
+  });
+
   it.each([
     {
       name: 'FitNotes',
@@ -88,7 +123,9 @@ describe('import-external-effects', () => {
 
     expect(() => testBed.getDispatchedAction(importBackupData)).toThrow();
     expect(() => testBed.getDispatchedAction(setStatsIsDirty)).toThrow();
-    expect(testBed.getDispatchedAction(showSnackbar).payload.text).toBe('Those workouts are already in History');
+    expect(snackbarText(testBed.getDispatchedAction(showSnackbar).payload)).toBe(
+      'Those workouts are already in History',
+    );
   });
 
   it('skips a FitNotes day already in History even when sets changed', async () => {
@@ -109,7 +146,9 @@ describe('import-external-effects', () => {
     await testBed.dispatchHandled(importFromExternal({ format: 'FitNotes' }));
 
     expect(() => testBed.getDispatchedAction(importBackupData)).toThrow();
-    expect(testBed.getDispatchedAction(showSnackbar).payload.text).toBe('Those workouts are already in History');
+    expect(snackbarText(testBed.getDispatchedAction(showSnackbar).payload)).toBe(
+      'Those workouts are already in History',
+    );
   });
 
   it('imports only sessions not already in History', async () => {
@@ -138,7 +177,7 @@ describe('import-external-effects', () => {
     await testBed.dispatchHandled(importFromExternal({ format: 'FitNotes' }));
 
     expect(() => testBed.getDispatchedAction(importBackupData)).toThrow();
-    expect(testBed.getDispatchedAction(showSnackbar).payload.text).toMatch(/Could not import:/);
+    expect(snackbarText(testBed.getDispatchedAction(showSnackbar).payload)).toMatch(/Could not import:/);
   });
 
   it('no-ops when the user cancels the picker', async () => {

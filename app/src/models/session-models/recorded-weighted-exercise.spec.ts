@@ -357,3 +357,22 @@ describe('RecordedWeightedExercise JSON', () => {
     expect(filled.equals(empty)).toBe(false);
   });
 });
+
+// ─── withAddedSet ─────────────────────────────────────────────────────────────
+
+describe('RecordedWeightedExercise.withAddedSet', () => {
+  it('appends an empty set seeded from the last set', () => {
+    const exercise = makeRecordedExercise(makeWeightedBlueprint(), [undefined, undefined]);
+    const last = exercise.potentialSets.at(-1)!;
+    const result = exercise.withAddedSet();
+    expect(result.potentialSets.length).toBe(3);
+    const added = result.potentialSets[2]!;
+    expect(added.set).toBeUndefined();
+    expect(added.weight.equals(last.weight)).toBe(true);
+  });
+
+  it('returns the same exercise when there are no sets', () => {
+    const exercise = new RecordedWeightedExercise(makeWeightedBlueprint(), [], undefined);
+    expect(exercise.withAddedSet()).toBe(exercise);
+  });
+});

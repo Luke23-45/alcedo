@@ -7,6 +7,7 @@ import SessionSummaryTitle from '@/components/presentation/summary/session-summa
 import SplitCardControl from '@/components/presentation/foundation/split-card-control';
 import { SurfaceText } from '@/components/presentation/foundation/surface-text';
 import { getFeedItemHref } from '@/components/smart/feed-item';
+import { FeedComposerPosts } from '@/components/smart/feed-composer-posts';
 import { getFeedProfileEditorHref } from '@/components/smart/feed-profile-editor';
 import { FeedWeekStrip } from '@/components/smart/feed-week-strip';
 import { ReactionBar } from '@/components/smart/reaction-bar';
@@ -56,7 +57,12 @@ export default function Feed() {
       ref={listRef}
       testID="feed-list"
       maintainVisibleContentPosition={false}
-      ListHeaderComponent={<FeedProfileHeader />}
+      ListHeaderComponent={
+        <>
+          <FeedProfileHeader />
+          <FeedComposerPosts />
+        </>
+      }
       onRefresh={() => {
         dispatch(fetchInboxItems({ fromUserAction: true }));
         dispatch(fetchFeedItems({ fromUserAction: true }));

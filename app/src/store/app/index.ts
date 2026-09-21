@@ -1,16 +1,21 @@
 import { ExerciseDescriptor } from '@/models/exercise-models';
 import { createAction, createSlice, PayloadAction, UnknownAction } from '@reduxjs/toolkit';
 
+const MAX_RECENT_EXERCISE_SEARCHES = 5;
+
 const initialState: AppState = {
   isHydrated: false,
   currentSnackbar: undefined,
   exerciseSearchResult: undefined,
+  recentExerciseSearchIds: [],
 };
 
 type AppState = {
   isHydrated: boolean;
   currentSnackbar: SnackbarDescriptor | undefined;
   exerciseSearchResult: ExerciseSearchResult | undefined;
+  /** Exercise ids most recently picked from the exercise search, newest first. */
+  recentExerciseSearchIds: string[];
 };
 
 // The exercise search is its own route, so it hands its result back through the store rather than a
@@ -40,6 +45,18 @@ const appSlice = createSlice({
     clearExerciseSearchResult(state) {
       state.exerciseSearchResult = undefined;
     },
+
+    recordRecentExerciseSearch(state, action: PayloadAction<string>) {
+      const id = action.payload;
+      state.recentExerciseSearchIds = [id, ...state.recentExerciseSearchIds.filter((x) => x !== id)].slice(
+        0,
+        MAX_RECENT_EXERCISE_SEARCHES,
+      );
+    },
+
+    clearRecentExerciseSearches(state) {
+      state.recentExerciseSearchIds = [];
+    },
   },
 });
 
@@ -48,6 +65,13 @@ export const initializeAppStateSlice = createAction('initializeAppStateSlice');
 export const shareString = createAction<{ title: string; value: string }>('shareString');
 export const copyLogs = createAction('copyLogs');
 
+export type SnackbarTone = "success" | "error" | "neutral";
+
+/**
+ * Legacy one-line variant: `text` only. Rich two-line toast variant: `title`
+ * (+ optional `subtitle`) with a semantic tone. The provider renders the toast
+ * pinned below the nav; legacy callers render exactly as before.
+ */
 export type SnackbarDescriptor =
   | {
       text: string;
@@ -66,10 +90,43 @@ export type SnackbarDescriptor =
       action: string;
       onAction: () => void;
       dispatchAction?: undefined;
+    }
+  | {
+      /** Title line, rendered in the tone color. */
+      title: string;
+      /** Subtitle line in the secondary text color. */
+      subtitle?: string;
+      /** Semantic tone; defaults to neutral. */
+      tone?: SnackbarTone;
+      action?: undefined;
+      dispatchAction?: undefined;
+      onAction?: undefined;
+    }
+  | {
+      title: string;
+      subtitle?: string;
+      tone?: SnackbarTone;
+      action: string;
+      dispatchAction: UnknownAction | UnknownAction[];
+      onAction?: undefined;
+    }
+  | {
+      title: string;
+      subtitle?: string;
+      tone?: SnackbarTone;
+      action: string;
+      onAction: () => void;
+      dispatchAction?: undefined;
     };
 export const showSnackbar = createAction<SnackbarDescriptor & { duration?: number }>('snackBarWithAction');
 
-export const { setIsHydrated, setCurrentSnackbar, setExerciseSearchResult, clearExerciseSearchResult } =
-  appSlice.actions;
+export const {
+  setIsHydrated,
+  setCurrentSnackbar,
+  setExerciseSearchResult,
+  clearExerciseSearchResult,
+  recordRecentExerciseSearch,
+  clearRecentExerciseSearches,
+} = appSlice.actions;
 
 export default appSlice.reducer;

@@ -1,8 +1,8 @@
-import { FeedItem } from '@/components/smart/feed-item';
+import { PostDetailScreen } from '@/components/presentation/feed/post-detail';
 import { useLocalSearchParams } from 'expo-router';
 
 export default function FeedItemPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  return <FeedItem eventId={id} />;
+  return <PostDetailScreen postId={id} />;
 }

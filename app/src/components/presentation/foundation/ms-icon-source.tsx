@@ -118,6 +118,14 @@ import { msAvgTime } from '@material-symbols-react-native/outlined-400/msAvgTime
 import { msAnchor } from '@material-symbols-react-native/outlined-400/msAnchor';
 import { msFunction } from '@material-symbols-react-native/outlined-400/msFunction';
 import { msHeartCheck } from '@material-symbols-react-native/outlined-400/msHeartCheck';
+import { msPalette } from '@material-symbols-react-native/outlined-400/msPalette';
+import { msStraighten } from '@material-symbols-react-native/outlined-400/msStraighten';
+import { msMenuBook } from '@material-symbols-react-native/outlined-400/msMenuBook';
+import { msWatch } from '@material-symbols-react-native/outlined-400/msWatch';
+import { msFlag } from '@material-symbols-react-native/outlined-400/msFlag';
+import { msShield } from '@material-symbols-react-native/outlined-400/msShield';
+import { msCode } from '@material-symbols-react-native/outlined-400/msCode';
+import { msStorage } from '@material-symbols-react-native/outlined-400/msStorage';
 import { msContentPasteSearch } from '@material-symbols-react-native/outlined-400/msContentPasteSearch';
 import { msLink } from '@material-symbols-react-native/outlined-400/msLink';
 import { msSteps } from '@material-symbols-react-native/outlined-400/msSteps';
@@ -276,6 +284,14 @@ const MaterialSymbols = {
   anchor: msAnchor,
 
   pause: msPause,
+  palette: msPalette,
+  straighten: msStraighten,
+  menuBook: msMenuBook,
+  watch: msWatch,
+  flag: msFlag,
+  shield: msShield,
+  code: msCode,
+  storage: msStorage,
 };
 
 export type AppIconSource = keyof typeof MaterialSymbols | keyof typeof CustomIcons | (() => JSX.Element);

@@ -273,6 +273,15 @@ export class RecordedCardioExercise {
     });
   }
 
+  /** Appends an empty set cloned from the last set's blueprint. */
+  withAddedSet(): RecordedCardioExercise {
+    const last = this.sets.at(-1);
+    if (!last) {
+      return this;
+    }
+    return this.with({ sets: [...this.sets, RecordedCardioExerciseSet.empty(last.blueprint)] });
+  }
+
   withSet(setIndex: number, reducer: (s: RecordedCardioExerciseSet) => RecordedCardioExerciseSet) {
     const existingSet = this.sets[setIndex];
     if (!existingSet) {

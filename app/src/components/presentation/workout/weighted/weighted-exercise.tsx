@@ -1,7 +1,5 @@
 import PotentialSetCounter from '@/components/presentation/workout/weighted/potential-set-counter';
-import { useAppTheme } from '@/hooks/useAppTheme';
 import { RecordedWeightedExercise } from '@/models/session-models';
-import { useState } from 'react';
 import { View } from 'react-native';
 import ExerciseSection from '@/components/presentation/workout/exercise-section';
 import { OffsetDateTime } from '@js-joda/core';
@@ -13,6 +11,10 @@ interface WeightedExerciseProps {
   toStartNext: boolean;
   isReadonly: boolean;
   showPreviousButton: boolean;
+  /** Position of this exercise in the session (1-based index tile). */
+  index?: number;
+  /** 'active' renders the workout-flow reference card; 'classic' keeps the legacy layout. */
+  variant?: 'active' | 'classic';
 
   timeProvider: () => OffsetDateTime;
   updateExercise: (update: Updater<RecordedWeightedExercise>) => void;
@@ -22,12 +24,13 @@ interface WeightedExerciseProps {
 }
 
 export default function WeightedExercise(props: WeightedExerciseProps) {
-  const theme = useAppTheme();
   const { updateExercise, timeProvider, resetSetTimer } = props;
   const { recordedExercise } = props;
-  useState(false);
 
   const setToStartNext = recordedExercise.potentialSets.findIndex((x) => !x.set);
+  const previousExercise = props.previousRecordedExercises
+    .filter((x) => x.progressionKey() === props.recordedExercise.progressionKey())
+    .at(0);
 
   return (
     <ExerciseSection
@@ -39,12 +42,18 @@ export default function WeightedExercise(props: WeightedExerciseProps) {
       updateExercise={props.updateExercise}
       onEditExercise={props.onEditExercise}
       onRemoveExercise={props.onRemoveExercise}
+      index={props.index}
+      variant={props.variant}
+      // The reference draws the Add Set row on completed exercises only.
+      onAddSet={!props.isReadonly && recordedExercise.isComplete ? () => updateExercise((ex) => ex.withAddedSet()) : undefined}
     >
-      <View style={{ flexDirection: 'row', gap: theme.space.sm, flexWrap: 'wrap' }}>
+      <View>
         {recordedExercise.potentialSets.map((set, index) => (
           <PotentialSetCounter
             isReadonly={props.isReadonly}
             key={index}
+            index={index}
+            variant={props.variant}
             repsTarget={recordedExercise.repsTargetForSet(index)}
             onTap={() => {
               const previousSet = set.set;
@@ -56,11 +65,8 @@ export default function WeightedExercise(props: WeightedExerciseProps) {
                 resetSetTimer();
               }
             }}
-            previousRepCount={
-              props.previousRecordedExercises
-                .filter((x) => x.progressionKey() === props.recordedExercise.progressionKey())
-                .at(0)?.potentialSets[index]?.set?.repsCompleted
-            }
+            previousRepCount={previousExercise?.potentialSets[index]?.set?.repsCompleted}
+            previousWeight={previousExercise?.potentialSets[index]?.weight}
             onUpdateReps={(reps) => {
               updateExercise((ex) => ex.withRepCount(index, reps, timeProvider()));
               resetSetTimer();

@@ -1,4 +1,4 @@
-import { useAppTheme } from "@/hooks/useAppTheme";
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { PageAction, PageActionsProps } from './page-actions-props';
 import {
   Button,

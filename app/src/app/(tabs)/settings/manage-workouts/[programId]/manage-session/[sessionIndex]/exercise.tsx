@@ -1,15 +1,16 @@
-import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
-import { ExerciseEditor } from '@/components/presentation/workout-editor/exercise-editor';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { ExerciseBlueprint } from '@/models/blueprint-models';
 import { useAppSelector } from '@/store';
 import { selectProgramSessionExercise, updateProgram } from '@/store/program';
-import { useTranslate } from '@tolgee/react';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { ExerciseEditorScreen } from '@/components/presentation/settings/programs/exercise-editor-screen';
 
+/**
+ * The per-exercise editor inside a program session. Thin wrapper; the UI
+ * lives in components/presentation/settings/programs/.
+ */
 export default function ExercisePage() {
-  const { t } = useTranslate();
   const { sessionIndex, programId, exerciseIndex } = useLocalSearchParams<{
     sessionIndex: string;
     programId: string;
@@ -23,6 +24,17 @@ export default function ExercisePage() {
   const exercise = useAppSelector((x) => selectProgramSessionExercise(x, location));
   const dispatch = useDispatch();
   const { dismiss } = useRouter();
+
+  const hasExercise = !!exercise;
+  useEffect(() => {
+    if (!hasExercise) {
+      dismiss();
+    }
+  }, [hasExercise, dismiss]);
+  if (!exercise) {
+    return;
+  }
+
   const saveExercise = (exerciseToSave: ExerciseBlueprint) => {
     dispatch(
       updateProgram({
@@ -34,25 +46,6 @@ export default function ExercisePage() {
       }),
     );
   };
-  const hasExercise = !!exercise;
-  useEffect(() => {
-    if (!hasExercise) {
-      dismiss();
-    }
-  }, [hasExercise, dismiss]);
-  if (!exercise) {
-    return;
-  }
 
-  return (
-    <FullHeightScrollView avoidKeyboard>
-      <ExerciseEditor
-        exercise={exercise}
-        updateExercise={(ex) => {
-          saveExercise(ex);
-        }}
-      />
-      <Stack.Screen options={{ title: t('exercise.edit.title') }} />
-    </FullHeightScrollView>
-  );
+  return <ExerciseEditorScreen exercise={exercise} updateExercise={saveExercise} />;
 }

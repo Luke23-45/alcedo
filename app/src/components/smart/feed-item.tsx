@@ -73,7 +73,9 @@ export function FeedItem({ eventId }: { eventId: string }) {
                   </View>
                 </View>
                 <FeedPrBadges eventId={feedItem.eventId} />
-                <View style={{ paddingTop: theme.space.sm, borderTopWidth: 1, borderTopColor: theme.color.border.hairline }}>
+                <View
+                  style={{ paddingTop: theme.space.sm, borderTopWidth: 1, borderTopColor: theme.color.border.hairline }}
+                >
                   {isOwnItem ? (
                     <ReactionSummary eventId={feedItem.eventId} animateOnMount />
                   ) : (

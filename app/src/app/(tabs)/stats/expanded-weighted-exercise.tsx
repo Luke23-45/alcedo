@@ -1,225 +1,173 @@
-import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
-import { Remote } from '@/components/presentation/foundation/remote';
-import { RepsBarChart } from '@/components/presentation/stats/reps-bar-chart';
-import SingleValueStatisticCard from '@/components/presentation/stats/single-value-statistic-card';
-import { SingleValueStatisticsGrid } from '@/components/presentation/stats/single-value-statistics-grid';
-import { TimePeriodSelector } from '@/components/presentation/stats/time-period-selector';
-import { TitledSection } from '@/components/presentation/stats/titled-section';
-import { StatisticBarChart } from '@/components/presentation/stats/statistic-bar-chart';
-import { StatisticLineChart } from '@/components/presentation/stats/statistic-line-chart';
-import { useLoadAxis, useRepsAxis } from '@/components/presentation/stats/quantity-axis';
-import { useAppTheme } from '@/hooks/useAppTheme';
+import {
+  ExerciseDetailLayout,
+  Body,
+  EmptyWrap,
+  EmptyText,
+} from '@/components/presentation/stats/trends/exercise-detail/screen-layout/screen-layout';
+import { DetailNavBar } from '@/components/presentation/stats/trends/exercise-detail/nav-bar/nav-bar';
+import { IdentityCard } from '@/components/presentation/stats/trends/exercise-detail/identity-card/identity-card';
+import { StatStrip } from '@/components/presentation/stats/trends/exercise-detail/stat-strip/stat-strip';
+import { ProgressChart } from '@/components/presentation/stats/trends/exercise-detail/progress-chart/progress-chart';
+import { MuscleInvolvement } from '@/components/presentation/stats/trends/exercise-detail/muscle-involvement/muscle-involvement';
+import { LastSessionDetail } from '@/components/presentation/stats/trends/exercise-detail/last-session/last-session';
+import { SessionHistory } from '@/components/presentation/stats/trends/exercise-detail/session-history/session-history';
+import { ExerciseDetailActions } from '@/components/presentation/stats/trends/exercise-detail/exercise-detail-actions/exercise-detail-actions';
+import {
+  ExerciseDetailData,
+  buildLogSession,
+  selectExerciseDetail,
+} from '@/components/presentation/stats/trends/exercise-detail/exercise-detail-model';
+import { useStartWorkoutWithConfirmation } from '@/hooks/useStartWorkoutWithConfirmation';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
-import { fetchOverallStats, selectExerciseView, setOverallViewTime, WeightedExerciseStatistics } from '@/store/stats';
+import { translateExerciseMeta } from '@/utils/exercise-meta';
 import { T, useTranslate } from '@tolgee/react';
-import { Stack, useFocusEffect } from 'expo-router';
+import { Href, Stack } from 'expo-router';
 import { useLocalSearchParams, useRouter } from 'expo-router/build/hooks';
-import { ReactNode, useEffect } from 'react';
-import { View } from 'react-native';
-import { Card, Text } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 
-export default function ExpandedExercisePage() {
-  const theme = useAppTheme();
-  const dispatch = useDispatch();
-  const timePeriod = useAppSelector((x) => x.stats.overallViewTime);
+/**
+ * Exercise Progress Detail (trends-dark Screen 2): all-time detail for one
+ * weighted exercise, derived from finished sessions. Geometry follows the
+ * reference SVG: 16pt side margins, 12pt card gaps, in-content nav.
+ *
+ * Navigation stays real: history rows open the session editor, the header's
+ * "{n} total" opens the exercise's full history, "Log {name} Session" starts
+ * a fresh preloaded session, and "Edit Exercise Details" opens the exercise
+ * manager where descriptors are edited. The nav ⋯ menu mirrors those two
+ * actions so every control goes somewhere.
+ */
+export default function ExerciseDetailPage() {
   const { exerciseName } = useLocalSearchParams<{ exerciseName: string }>();
-  const { dismissTo } = useRouter();
-  useFocusEffect(() => {
-    dispatch(fetchOverallStats());
-  });
+  const { dismissTo, push, back } = useRouter();
+  const { t } = useTranslate();
+  const useImperialUnits = useAppSelector((x) => x.settings.useImperialUnits);
+  const detail = useAppSelectorWithArg(selectExerciseDetail, exerciseName ?? '');
+  const { start, confirmationDialog } = useStartWorkoutWithConfirmation();
+
   useEffect(() => {
     if (!exerciseName) {
       dismissTo('/stats');
     }
   }, [exerciseName, dismissTo]);
-  const stats = useAppSelectorWithArg(selectExerciseView, exerciseName);
-  return (
-    <FullHeightScrollView contentContainerStyle={{ gap: theme.space.sm }}>
-      <Stack.Screen
-        options={{
-          title: exerciseName,
-        }}
-      />
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingRight: theme.space.sm }}>
-        <TimePeriodSelector timePeriod={timePeriod} setTimePeriod={(value) => dispatch(setOverallViewTime(value))} />
-      </View>
-      <Remote value={stats} success={(stats) => <LoadedStats stats={stats} />} />
-    </FullHeightScrollView>
-  );
-}
 
-function LoadedStats({ stats }: { stats: WeightedExerciseStatistics | undefined }) {
-  const theme = useAppTheme();
-  return stats ? (
-    <LoadedStatsFilled stats={stats} />
-  ) : (
-    <Text>
-      <T keyName="stats.no_data.message" />
-    </Text>
-  );
-}
-
-function LoadedStatsFilled({ stats }: { stats: WeightedExerciseStatistics }) {
-  const theme = useAppTheme();
-  const { t } = useTranslate();
-  const loadAxis = useLoadAxis();
-  const repsAxis = useRepsAxis();
-  return (
-    <View style={{ gap: theme.space.base }}>
-      <OverallStatsGrid stats={stats} />
-      {stats.primary === 'reps' ? (
-        <StatCardWithTitle title={t('stats.exercise.max_reps.title')}>
-          <StatisticLineChart statistics={stats.series.reps} axis={repsAxis} />
-        </StatCardWithTitle>
-      ) : (
-        <StatCardWithTitle title={t('stats.exercise.max_weight.title')}>
-          <StatisticLineChart statistics={stats.series.load} axis={loadAxis} />
-        </StatCardWithTitle>
-      )}
-      {/* 1RM and volume both need a load and a rep count, so a reps-only exercise has neither. */}
-      {stats.primary === 'load' && (
-        <>
-          <StatCardWithTitle title={t('stats.exercise.1rm_progress.title')}>
-            <StatisticLineChart statistics={stats.max1RMPerSessionStatistics} axis={loadAxis} />
-          </StatCardWithTitle>
-          <StatCardWithTitle title={t('stats.exercise.volume_per_workout.title')}>
-            <StatisticBarChart statistics={stats.totalVolumeStatistics} axis={loadAxis} />
-          </StatCardWithTitle>
-        </>
-      )}
-      <StatCardWithTitle title={t('stats.exercise.reps_breakdown.title')}>
-        <RepsBarChart statistics={stats.repsStatistics} />
-        <Text style={{ textAlign: 'center' }}>{t('stats.exercise.reps_breakdown_sets_x_axis.label')}</Text>
-      </StatCardWithTitle>
-    </View>
-  );
-}
-
-function StatCardWithTitle(props: { title: string; children: ReactNode }) {
-  const theme = useAppTheme();
-  return (
-    <TitledSection title={props.title}>
-      <Card
-        mode="contained"
-        style={{
-          backgroundColor: theme.color.background.secondary,
-        }}
-      >
-        <Card.Content style={{ paddingVertical: theme.space.xxl }}>{props.children}</Card.Content>
-      </Card>
-    </TitledSection>
-  );
-}
-
-function OverallStatsGrid({ stats }: { stats: WeightedExerciseStatistics }) {
-  const { t } = useTranslate();
-  const usualRepRange = getUsualRepRange(stats);
-  const repsAxis = useRepsAxis();
-  const onReps = stats.primary === 'reps';
-  // The grid lays each child out as its own cell, so this has to stay a flat list.
-  return (
-    <TitledSection title={t('stats.exercise.overview.title')}>
-      <SingleValueStatisticsGrid>
-        {[
-          <SingleValueStatisticCard
-            key="sets-per-week"
-            title={t('stats.exercise.sets_per_week.label')}
-            icon={'function'}
-            value={formatWeeklyRate(stats.setsPerWeek)}
-          />,
-          <SingleValueStatisticCard
-            key="current"
-            title={onReps ? t('stats.exercise.current_reps.label') : t('stats.exercise.current_weight.label')}
-            icon={onReps ? 'barChart' : 'weight'}
-            value={
-              onReps
-                ? repsAxis.format(stats.series.reps.currentValue)
-                : stats.series.load.currentValue.shortLocaleFormat()
-            }
-          />,
-          <SingleValueStatisticCard
-            key="max"
-            title={onReps ? t('stats.exercise.max_reps.label') : t('stats.exercise.max_weight.label')}
-            icon={'fitnessCenter'}
-            value={
-              onReps ? repsAxis.format(stats.series.reps.maxValue) : stats.series.load.maxValue.shortLocaleFormat()
-            }
-          />,
-          onReps ? (
-            <SingleValueStatisticCard
-              key="total"
-              title={t('stats.exercise.total_reps.label')}
-              icon={'anchor'}
-              value={repsAxis.format(stats.series.reps.totalValue)}
-            />
-          ) : (
-            <SingleValueStatisticCard
-              key="total"
-              title={t('stats.exercise.total_lifted.label')}
-              icon={'anchor'}
-              value={stats.totalVolumeStatistics.totalValue.shortLocaleFormat(0)}
-            />
-          ),
-          // A 1RM needs a load and a rep count, so a reps-only exercise has none to offer.
-          ...(onReps
-            ? []
-            : [
-                <SingleValueStatisticCard
-                  key="1rm"
-                  title={t('stats.exercise.estimated_1rm.label')}
-                  icon={'function'}
-                  value={stats.max1RMPerSessionStatistics.currentValue.shortLocaleFormat(0)}
-                />,
-              ]),
-          <SingleValueStatisticCard
-            key="rep-range"
-            title={t('stats.exercise.usual_rep_range.label')}
-            icon={'barChart'}
-            value={usualRepRange}
-          />,
-        ]}
-      </SingleValueStatisticsGrid>
-    </TitledSection>
-  );
-}
-
-function formatWeeklyRate(value: number) {
-  return Math.abs(value - Math.round(value)) < 0.05 ? Math.round(value).toString() : value.toFixed(1);
-}
-
-function getUsualRepRange(stats: WeightedExerciseStatistics) {
-  const breakdown = Object.entries(stats.repsStatistics.breakdown)
-    .map(([reps, { numberOfSets }]) => ({
-      reps: Number(reps),
-      numberOfSets,
-    }))
-    .sort((a, b) => a.reps - b.reps);
-
-  const totalSets = breakdown.reduce((sum, entry) => sum + entry.numberOfSets, 0);
-  if (!totalSets) {
-    return '-';
+  if (!exerciseName) {
+    return null;
   }
 
-  const lowerBound = getPercentileRepCount(breakdown, totalSets, 0.1);
-  const upperBound = getPercentileRepCount(breakdown, totalSets, 0.9);
-  return `${lowerBound}-${upperBound}`;
-}
-
-function getPercentileRepCount(
-  breakdown: { reps: number; numberOfSets: number }[],
-  totalSets: number,
-  percentile: number,
-) {
-  const target = Math.ceil(totalSets * percentile);
-  let cumulativeSets = 0;
-
-  for (const entry of breakdown) {
-    cumulativeSets += entry.numberOfSets;
-    if (cumulativeSets >= target) {
-      return entry.reps.toString();
+  const logSession = () => {
+    const session = detail ? buildLogSession(detail, useImperialUnits) : null;
+    if (session) {
+      start(session);
+    } else {
+      push('/(tabs)/(session)');
     }
-  }
+  };
+  const editDetails = () => push('/(tabs)/settings/manage-exercises' as Href);
+  const openSession = (sessionId: string) =>
+    push(`/history/edit?sessionId=${encodeURIComponent(sessionId)}` as Href);
+  const openFullHistory = () =>
+    push(`/exercise-history?name=${encodeURIComponent(exerciseName)}&type=weighted` as Href);
 
-  return breakdown.at(-1)?.reps.toString() ?? '-';
+  const shortName = detail?.shortName ?? exerciseName;
+  const menuItems = [
+    {
+      label: t('stats.exercise_detail.actions.log_session', { name: shortName }),
+      onPress: logSession,
+    },
+    { label: t('stats.exercise_detail.actions.edit_details'), onPress: editDetails },
+  ];
+
+  return (
+    <>
+      <Stack.Screen options={{ headerShown: false }} />
+      <ExerciseDetailLayout>
+        <DetailNavBar title={shortName} onBack={back} menuItems={menuItems} />
+        {detail ? (
+          <LoadedDetail
+            detail={detail}
+            t={t}
+            onSessionPress={openSession}
+            onViewAll={openFullHistory}
+            onLogSession={logSession}
+            onEditDetails={editDetails}
+          />
+        ) : (
+          <EmptyWrap>
+            <EmptyText>
+              <T keyName="stats.no_data.message" />
+            </EmptyText>
+          </EmptyWrap>
+        )}
+      </ExerciseDetailLayout>
+      {confirmationDialog}
+    </>
+  );
 }
+
+function LoadedDetail({
+  detail,
+  t,
+  onSessionPress,
+  onViewAll,
+  onLogSession,
+  onEditDetails,
+}: {
+  detail: ExerciseDetailData;
+  t: ReturnType<typeof useTranslate>['t'];
+  onSessionPress: (sessionId: string) => void;
+  onViewAll: () => void;
+  onLogSession: () => void;
+  onEditDetails: () => void;
+}) {
+  const metaLine = [
+    detail.equipment ? translateExerciseMeta(t, 'equipment', detail.equipment) : null,
+    ...detail.muscles.map((m) => translateExerciseMeta(t, 'muscle', m)),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+  const typeChip = detail.mechanic
+    ? translateExerciseMeta(t, 'mechanic', detail.mechanic).toUpperCase()
+    : null;
+  const latest = detail.sessions[0]!;
+
+  return (
+    <Body>
+      <IdentityCard
+        name={detail.exerciseName}
+        metaLine={metaLine}
+        typeChip={typeChip}
+        weeklyFrequency={detail.weeklyFrequency}
+      />
+      <StatStrip
+        values={{
+          bestTopSet: detail.bestTopSet,
+          bestE1rm: detail.bestE1rm,
+          sessionCount: detail.sessionCount,
+          trailing7dVolume: detail.trailing7dVolume,
+        }}
+        unitLabel={detail.unitLabel}
+      />
+      <ProgressChart
+        sessions={detail.sessions}
+        bestE1rm={detail.bestE1rm}
+        latestBodyweight={detail.latestBodyweight}
+        unitLabel={detail.unitLabel}
+      />
+      {detail.muscles.length > 0 ? <MuscleInvolvement muscles={detail.muscles} /> : null}
+      <LastSessionDetail session={latest} unitLabel={detail.unitLabel} />
+      <SessionHistory
+        sessions={detail.sessions}
+        unitLabel={detail.unitLabel}
+        sessionCount={detail.sessionCount}
+        onSessionPress={onSessionPress}
+        onViewAll={onViewAll}
+      />
+      <ExerciseDetailActions
+        shortName={detail.shortName}
+        onLogSession={onLogSession}
+        onEditDetails={onEditDetails}
+      />
+    </Body>
+  );
+}
+

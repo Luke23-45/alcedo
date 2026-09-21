@@ -2,11 +2,11 @@ import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
 import LimitedHtml from '@/components/presentation/foundation/limited-html';
 import { Remote } from '@/components/presentation/foundation/remote';
 import { SurfaceText } from '@/components/presentation/foundation/surface-text';
+import { FeedShareComposer } from '@/components/smart/feed-share-composer';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { PendingFeedUser } from '@/models/feed-models';
-import { RemoteData } from '@/models/remote';
 import { useAppSelector } from '@/store';
-import { fetchAndSetSharedFeedUser, requestFollowUser, selectSharedFeedUser, setSharedFeedUser } from '@/store/feed';
+import { fetchAndSetSharedFeedUser, requestFollowUser, selectSharedFeedUser } from '@/store/feed';
 import { useTranslate } from '@tolgee/react';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect } from 'react';
@@ -15,21 +15,29 @@ import { Card, Icon } from 'react-native-paper';
 import Button from '@/components/presentation/foundation/button';
 import { useDispatch } from 'react-redux';
 
+/**
+ * /feed/share serves two flows:
+ * - with `?id=` — the existing profile share-request deep link (unchanged);
+ * - without params — the Share Composer (Screen 3), which hides the stack
+ *   header and draws its own nav.
+ */
 export default function FeedSharePage() {
+  const { id } = useLocalSearchParams<{ id?: string }>();
+
+  if (!id) {
+    return <FeedShareComposer />;
+  }
+  return <FeedShareRequest id={id} />;
+}
+
+function FeedShareRequest({ id }: { id: string }) {
   const theme = useAppTheme();
   const { t } = useTranslate();
-  const { id, name } = useLocalSearchParams<{
-    id?: string;
-    name?: string;
-  }>();
+  const { name } = useLocalSearchParams<{ name?: string }>();
   const dispatch = useDispatch();
   const { back } = useRouter();
 
   const fetchUser = useCallback(() => {
-    if (!id) {
-      dispatch(setSharedFeedUser(RemoteData.error('Failed to load user')));
-      return;
-    }
     dispatch(
       fetchAndSetSharedFeedUser({
         idOrLookup: id,

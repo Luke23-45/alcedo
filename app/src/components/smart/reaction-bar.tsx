@@ -2,6 +2,7 @@ import { FloatingEmoji, FloatingEmojiLayer } from '@/components/presentation/fee
 import { SurfaceText } from '@/components/presentation/foundation/surface-text';
 import TouchableRipple from '@/components/presentation/foundation/touchable-ripple';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useCelebrationsEnabled } from '@/hooks/useMotionSettings';
 import { REACTION_EMOJIS, ReactionEmoji } from '@/models/feed-models';
 import { useAppSelector } from '@/store';
 import { cheerFeedItem, selectSentReactionsByEvent } from '@/store/feed';
@@ -23,19 +24,28 @@ export function ReactionBar({ eventId, animateOnMount }: ReactionBarProps) {
 
   const [floating, setFloating] = useState<FloatingEmoji[]>([]);
   const nextKey = useRef(0);
+  // The floating burst is decorative: it needs the celebration opt-in AND
+  // calm motion to stay off. The cheer itself always dispatches.
+  const celebrationsEnabled = useCelebrationsEnabled();
 
   const countFor = (emoji: ReactionEmoji) =>
     sent.filter((x) => x.emoji === emoji).reduce((total, x) => total + x.count, 0);
 
-  const emit = useCallback((emoji: string, quantity: number) => {
-    const created = Array.from({ length: Math.min(quantity, 8) }, (_, i) => ({
-      key: `${nextKey.current++}`,
-      emoji,
-      drift: Math.round(Math.random() * 24) - 6,
-      delayMs: i * 90,
-    }));
-    setFloating((current) => [...current, ...created]);
-  }, []);
+  const emit = useCallback(
+    (emoji: string, quantity: number) => {
+      if (!celebrationsEnabled) {
+        return;
+      }
+      const created = Array.from({ length: Math.min(quantity, 8) }, (_, i) => ({
+        key: `${nextKey.current++}`,
+        emoji,
+        drift: Math.round(Math.random() * 24) - 6,
+        delayMs: i * 90,
+      }));
+      setFloating((current) => [...current, ...created]);
+    },
+    [celebrationsEnabled],
+  );
 
   const hasReplayed = useRef(false);
   useEffect(() => {

@@ -123,7 +123,10 @@ export function ProgressionRulesEditor(props: Props) {
             onChange={(next) => replaceRule(index, next)}
           />
           {deadFrom === index + 1 && (
-            <Text variant="bodySmall" style={{ color: theme.color.status.danger.base, marginBlockStart: theme.space.sm }}>
+            <Text
+              variant="bodySmall"
+              style={{ color: theme.color.status.danger.base, marginBlockStart: theme.space.sm }}
+            >
               {rule.axis === 'load'
                 ? t('exercise.progression.blocks_later.load.body')
                 : t('exercise.progression.blocks_later.reps.body')}
@@ -344,10 +347,13 @@ function ProgressionExample(props: { exercise: WeightedExerciseBlueprint }) {
               {rungs.map((rung, index) => (
                 <View key={index} style={{ gap: theme.space.base, alignItems: 'center' }}>
                   {index > 0 && <Icon source={'arrowDownward'} size={24} />}
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: theme.space.sm }}>
+                  <View
+                    style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: theme.space.sm }}
+                  >
                     {rung.potentialSets.map((set, setIndex) => (
                       <DummySet
                         key={setIndex}
+                        index={setIndex}
                         set={set}
                         resistance={resistance}
                         repsTarget={rung.repsTargetForSet(setIndex)}
@@ -386,16 +392,18 @@ function hitTargets(exercise: RecordedWeightedExercise): RecordedWeightedExercis
   );
 }
 
-function DummySet(props: { set: PotentialSet; resistance: Resistance; repsTarget: { min: number; max: number } }) {
+function DummySet(props: { index: number; set: PotentialSet; resistance: Resistance; repsTarget: { min: number; max: number } }) {
   return (
     <PotentialSetCounter
       isReadonly
+      index={props.index}
       resistance={props.resistance}
       repsTarget={props.repsTarget}
       onTap={() => {}}
       onUpdateReps={() => {}}
       onUpdateWeight={() => {}}
       previousRepCount={undefined}
+      previousWeight={undefined}
       set={props.set}
       toStartNext={false}
       weightIncrement={BigNumber(0)}

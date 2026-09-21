@@ -127,10 +127,7 @@ export function Button({
           $variant={variant}
           $size={size}
           $disabled={disabled}
-          style={[
-            { borderCurve: 'continuous' },
-            pressed && !disabled ? { opacity: 0.72 } : null,
-          ]}
+          style={[{ borderCurve: 'continuous' }, pressed && !disabled ? { opacity: 0.72 } : null]}
         >
           <Text variant="headline" tone={tone}>
             {label}
@@ -151,8 +148,7 @@ export function Button({
  * -------------------------------------------------------------------------- */
 
 export const Card = styled.View`
-  background-color: ${({ theme }) =>
-    theme.isDark ? theme.color.background.elevated : theme.color.background.base};
+  background-color: ${({ theme }) => (theme.isDark ? theme.color.background.elevated : theme.color.background.base)};
   border-radius: ${({ theme }) => theme.components.card.radius}px;
   padding: ${({ theme }) => theme.components.card.padding}px;
   gap: ${({ theme }) => theme.components.card.gap}px;
@@ -220,7 +216,15 @@ const ChipLabel = styled.Text<{ $status: 'success' | 'warning' | 'danger' | 'inf
  * Small controls still need 44pt of touch
  * -------------------------------------------------------------------------- */
 
-export function IconButton({ size = 24, onPress, children }: { size?: number; onPress?: () => void; children: React.ReactNode }) {
+export function IconButton({
+  size = 24,
+  onPress,
+  children,
+}: {
+  size?: number;
+  onPress?: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <Pressable onPress={onPress} hitSlop={hitSlopFor(size)} accessibilityRole="button">
       {children}

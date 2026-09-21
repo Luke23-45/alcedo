@@ -16,7 +16,14 @@ export default function SessionStatGraphCard(props: { sessionStats: OptionalStat
   const weightUnit = usePreferredWeightUnit();
   const { t } = useTranslate();
   const theme = useAppTheme();
-  const pointColors = [...theme.color.graph.series, theme.color.zone.recovery, theme.color.zone.endurance, theme.color.zone.tempo, theme.color.zone.threshold, theme.color.zone.max];
+  const pointColors = [
+    ...theme.color.graph.series,
+    theme.color.zone.recovery,
+    theme.color.zone.endurance,
+    theme.color.zone.tempo,
+    theme.color.zone.threshold,
+    theme.color.zone.max,
+  ];
   const points: lineDataItem[][] = props.sessionStats.map((x) =>
     x.statistics.map(
       (stat): lineDataItem => ({
@@ -39,7 +46,11 @@ export default function SessionStatGraphCard(props: { sessionStats: OptionalStat
     return undefined;
   }
   return (
-    <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)} style={{ gap: theme.space.sm }} testID="session-stat-card">
+    <View
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      style={{ gap: theme.space.sm }}
+      testID="session-stat-card"
+    >
       <SurfaceText font="text-2xl" style={{ textAlign: 'center' }}>
         {t('workout.sessions.title')}
       </SurfaceText>

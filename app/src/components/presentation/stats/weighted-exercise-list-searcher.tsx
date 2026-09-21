@@ -8,7 +8,6 @@ import { View } from 'react-native';
 import { Searchbar, Text } from 'react-native-paper';
 
 export function WeightedExerciseListSearcher({
-
   stats: { weightedExerciseStats },
   onItemPress,
 }: {

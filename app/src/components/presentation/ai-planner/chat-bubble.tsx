@@ -18,7 +18,6 @@ export function ChatBubble(props: {
   const theme = useAppTheme();
   const { message, sameSenderBelow, sameSenderAbove } = props;
   const isUser = message.from === 'User';
-  
 
   const smallRadius = theme.space.xs;
   const normalRadius = theme.space.base;

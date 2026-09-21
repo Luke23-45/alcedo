@@ -57,7 +57,10 @@ function Feature({ entry, onPress }: { entry: WhatsNewEntry; onPress: (route: Hr
           <T keyName={entry.titleKey} />
         </Text>
       </View>
-      <Text variant="bodySmall" style={{ color: theme.color.status.info.content, marginTop: theme.space.sm, opacity: 0.9 }}>
+      <Text
+        variant="bodySmall"
+        style={{ color: theme.color.status.info.content, marginTop: theme.space.sm, opacity: 0.9 }}
+      >
         <T keyName={entry.bodyKey} />
       </Text>
       {entry.cta && (

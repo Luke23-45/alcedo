@@ -690,6 +690,128 @@ export const gradients = {
   },
 } as const satisfies Record<string, Gradient>;
 
+/* --- Home screen (Kinetic reference) -------------------------------------- *
+ * Pixel-spec tokens for the redesigned home screen, measured off
+ * docs/new_design/home_page_screen1.svg (dark) and home_screen_light_mode.svg.
+ * These are the Apple-style surface treatments (diagonal 3-stop card bodies,
+ * gradient edge strokes); they intentionally differ from the app-wide
+ * semantic background tokens, so they live here rather than being hardcoded.
+ * ------------------------------------------------------------------------- */
+
+export interface HomeGradientSpec {
+  colors: readonly [string, string, string];
+  start: { x: number; y: number };
+  end: { x: number; y: number };
+}
+
+export interface HomeTokens {
+  screenBackground: HomeGradientSpec;
+  /** Diagonal 3-stop card body, lit from above. */
+  card: HomeGradientSpec;
+  /** 1pt edge stroke, white fading downward (dark) / black (light). */
+  cardEdge: HomeGradientSpec;
+  radius: { hero: number; tile: number; row: number; duo: number; program: number };
+  /** Accent text colors that shift between modes for contrast. */
+  seeAll: string;
+  amber: string;
+  delta: string;
+}
+
+function homeTokens(mode: ThemeMode): HomeTokens {
+  const diagonal = { start: { x: 0, y: 0 }, end: { x: 0.45, y: 1 } };
+  const vertical = { start: { x: 0, y: 0 }, end: { x: 0, y: 1 } };
+  const radius = { hero: 30, tile: 24, row: 22, duo: 28, program: 26 };
+  return mode === 'dark'
+    ? {
+        screenBackground: {
+          colors: ['#0B0B0E', '#050507', '#08080B'] as const,
+          start: { x: 0, y: 0 },
+          end: { x: 0.25, y: 1 },
+        },
+        card: { colors: ['#1F1F23', '#17171A', '#131316'] as const, ...diagonal },
+        cardEdge: {
+          colors: [alpha('#FFFFFF', 0.17), alpha('#FFFFFF', 0.06), alpha('#FFFFFF', 0.025)] as const,
+          ...vertical,
+        },
+        radius,
+        seeAll: '#FF9F0A',
+        amber: '#FFB84D',
+        delta: '#30D158',
+      }
+    : {
+        screenBackground: {
+          colors: ['#F8F8FC', '#F1F1F6', '#F3F3F8'] as const,
+          start: { x: 0, y: 0 },
+          end: { x: 0.25, y: 1 },
+        },
+        card: { colors: ['#FFFFFF', '#FDFDFF', '#FAFAFC'] as const, ...diagonal },
+        cardEdge: {
+          colors: [alpha('#000000', 0.045), alpha('#000000', 0.06), alpha('#000000', 0.115)] as const,
+          ...vertical,
+        },
+        radius,
+        seeAll: '#C93400',
+        amber: '#C93400',
+        delta: '#248A3D',
+      };
+}
+
+/* --- Exercise history screen ------------------------------------------------ *
+ * Pixel-spec tokens for the Exercise History screen, measured off
+ * docs/new_design/workout-flow-dark.md (Exercise History section) and its
+ * light-mode table. The gold PR treatment is identical in both modes: an
+ * earned-celebration moment, not a theme surface.
+ * ------------------------------------------------------------------------- */
+
+export interface ExerciseHistoryTokens {
+  /** The gold PR banner and its ink: identical in light and dark. */
+  gold: {
+    gradient: readonly [string, string, string];
+    heading: string;
+    value: string;
+    star: string;
+  };
+  /** Top-set trend line and its area wash. */
+  line: { start: string; end: string; area: string; areaOpacity: number };
+  grid: string;
+  /** X-axis labels: oldest session, the PR session, the latest session. */
+  xOld: string;
+  xPr: string;
+  xCurrent: string;
+  /** Gold annotation above the peak dot (the "102.5" label) and the peak dot
+   *  itself: gold stays gold in both modes, like the PR banner. */
+  prValue: string;
+  /** Date tile and the PR day numeral. */
+  tile: string;
+  tilePrDay: string;
+  chevron: string;
+  auraOpacity: number;
+}
+
+function exerciseHistoryTokens(mode: ThemeMode): ExerciseHistoryTokens {
+  return {
+    gold: {
+      gradient: ['#FFE9A8', '#FFD84D', '#D9A441'] as const,
+      heading: '#7A5A00',
+      value: '#2B1E00',
+      star: '#5C4300',
+    },
+    line:
+      mode === 'dark'
+        ? { start: '#FF9F0A', end: '#FF2D55', area: '#FF6A3D', areaOpacity: 0.34 }
+        : { start: '#E07800', end: '#D70015', area: '#FF6A3D', areaOpacity: 0.2 },
+    grid: mode === 'dark' ? alpha('#FFFFFF', 0.05) : alpha('#3C3C43', 0.1),
+    xOld: mode === 'dark' ? '#6C6C70' : '#8E8E93',
+    xPr: '#A08000',
+    xCurrent: mode === 'dark' ? '#98989F' : '#AEAEB2',
+    prValue: '#FFD84D',
+    tile: mode === 'dark' ? alpha('#FFFFFF', 0.06) : alpha('#787880', 0.12),
+    tilePrDay: mode === 'dark' ? '#FFD84D' : '#8A6D00',
+    chevron: mode === 'dark' ? '#48484A' : '#C7C7CC',
+    auraOpacity: mode === 'dark' ? 0.14 : 0.07,
+  };
+}
+
 /* ========================================================================== *
  * 5. COMPONENT METRICS
  * ========================================================================== */
@@ -772,6 +894,8 @@ export interface AppTheme {
   material: Materials;
   gradient: typeof gradients;
   components: typeof components;
+  home: HomeTokens;
+  exerciseHistory: ExerciseHistoryTokens;
 }
 
 export function createTheme(mode: ThemeMode = 'dark', platform: Platform = 'ios'): AppTheme {
@@ -797,6 +921,8 @@ export function createTheme(mode: ThemeMode = 'dark', platform: Platform = 'ios'
     material: isDark ? darkMaterials : lightMaterials,
     gradient: gradients,
     components,
+    home: homeTokens(mode),
+    exerciseHistory: exerciseHistoryTokens(mode),
   };
 }
 

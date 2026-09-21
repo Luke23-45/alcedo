@@ -1,6 +1,7 @@
 import { showSnackbar } from '@/store/app';
 import { Card, Icon, Text } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
+import { Fragment } from 'react';
 import { View } from 'react-native';
 import EmptyInfo from '@/components/presentation/foundation/empty-info';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -26,6 +27,7 @@ import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
 import { getSessionExerciseEditorHref } from '@/components/smart/session-exercise-editor';
 import { LocalTime, OffsetDateTime, ZoneId } from '@js-joda/core';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { selectRecentlyCompletedExercises } from '@/store/stored-sessions';
 import { PageActions } from '@/components/presentation/foundation/page-actions';
@@ -34,11 +36,138 @@ import { SurfaceText } from '@/components/presentation/foundation/surface-text';
 import { match, P } from 'ts-pattern';
 import { CardioExercise } from '@/components/presentation/workout/cardio/cardio-exercise';
 import WeightFormat from '../presentation/foundation/weight-format';
+import { shortFormatWeightUnit } from '@/models/weight';
 import { formatDuration } from '@/utils/format-date';
+import { localeFormatBigNumber } from '@/utils/locale-bignumber';
 import { useAddExercise } from '@/hooks/useAddExercise';
+import SessionMoreMenuComponent from '@/components/smart/session-more-menu-component';
+import { HomeScreenBackground } from '@/components/presentation/home/shared/home-auras';
+import { SessionNav } from '@/components/presentation/workout/session/session-nav/session-nav';
+import { ElapsedCard } from '@/components/presentation/workout/session/elapsed-card/elapsed-card';
+import { SessionStats, StatStrip } from '@/components/presentation/workout/session/stat-strip/stat-strip';
+import { ExercisesHeader } from '@/components/presentation/workout/session/exercises-header/exercises-header';
+import { EmptySession } from '@/components/presentation/workout/session/empty-session/empty-session';
+import { SessionFooter } from '@/components/presentation/workout/session/session-footer/session-footer';
+import { SessionAuras } from '@/components/presentation/workout/session/session-auras/session-auras';
+import { useElapsedSeconds } from '@/components/presentation/workout/session/use-elapsed-seconds';
 
 function withRestTimerAt(session: Session, time: OffsetDateTime | undefined) {
   return session.with({ restTimer: time ? new RestTimerModel(time) : undefined });
+}
+
+function computeSessionStats(session: Session): SessionStats {
+  let setsCompleted = 0;
+  let setsTotal = 0;
+  let reps = 0;
+  for (const exercise of session.recordedExercises) {
+    if (exercise instanceof RecordedWeightedExercise) {
+      for (const potentialSet of exercise.potentialSets) {
+        setsTotal += 1;
+        if (potentialSet.set) {
+          setsCompleted += 1;
+          reps += potentialSet.set.repsCompleted;
+        }
+      }
+    } else if (exercise instanceof RecordedCardioExercise) {
+      for (const set of exercise.sets) {
+        setsTotal += 1;
+        if (set.isCompletelyFilled) {
+          setsCompleted += 1;
+        }
+      }
+    }
+  }
+  const volumeKg = session.totalWeightLifted.convertTo('kilograms');
+  return {
+    setsCompleted,
+    setsTotal,
+    volume: localeFormatBigNumber(volumeKg.value.decimalPlaces(0)),
+    reps: String(reps),
+    // Sample data, always badged as such in the strip.
+    avgBpm: '128',
+  };
+}
+
+/** Whether at least one set has been logged — the footer Finish gate. */
+function sessionHasLoggedSet(session: Session): boolean {
+  return session.recordedExercises.some((exercise) =>
+    match(exercise)
+      .with(P.instanceOf(RecordedWeightedExercise), (ex) => ex.potentialSets.some((ps) => ps.set !== undefined))
+      .with(P.instanceOf(RecordedCardioExercise), (ex) => ex.sets.some((s) => s.isCompletelyFilled))
+      .otherwise(() => false),
+  );
+}
+
+function sessionStartedExerciseCount(session: Session): number {
+  return session.recordedExercises.filter((exercise) =>
+    match(exercise)
+      .with(P.instanceOf(RecordedWeightedExercise), (ex) => ex.isStarted)
+      .with(P.instanceOf(RecordedCardioExercise), (ex) => ex.isStarted)
+      .otherwise(() => false),
+  ).length;
+}
+
+function ActiveSessionView(props: {
+  session: Session;
+  addExercise: () => void;
+  renderItem: (item: RecordedExercise, index: number) => ReactNode;
+  notesComponent: ReactNode;
+  bodyweight: ReactNode;
+  timer: ReactNode;
+  showRestSlot: boolean;
+  canFinish: boolean;
+  onFinishWorkout: () => void;
+  menu: ReactNode;
+}) {
+  const { session } = props;
+  const { back } = useRouter();
+  const insets = useSafeAreaInsets();
+  const elapsed = useElapsedSeconds(session);
+  const isEmpty = session.recordedExercises.length === 0;
+  const stats = computeSessionStats(session);
+
+  return (
+    <FullHeightScrollView
+      screenBackground={
+        <>
+          <HomeScreenBackground />
+          <SessionAuras />
+        </>
+      }
+      floatingChildren={
+        <SessionFooter
+          timer={props.timer}
+          showRestSlot={props.showRestSlot}
+          canFinish={props.canFinish}
+          onFinish={props.onFinishWorkout}
+        />
+      }
+    >
+      <View style={{ paddingTop: insets.top }}>
+        <SessionNav title={session.blueprint.name} onBack={back} menu={props.menu} />
+      </View>
+      <View style={{ marginTop: 6 }}>
+        <ElapsedCard seconds={elapsed} />
+      </View>
+      <View style={{ marginTop: 12 }}>
+        <StatStrip stats={stats} dimmed={isEmpty} />
+      </View>
+      {isEmpty ? (
+        <EmptySession onAddExercise={props.addExercise} />
+      ) : (
+        <View>
+          <ExercisesHeader done={sessionStartedExerciseCount(session)} total={session.recordedExercises.length} />
+          <View style={{ gap: 12 }}>
+            {session.recordedExercises.map((item, index) => (
+              <Fragment key={index}>{props.renderItem(item, index)}</Fragment>
+            ))}
+          </View>
+        </View>
+      )}
+      {props.notesComponent}
+      {props.bodyweight}
+    </FullHeightScrollView>
+  );
 }
 
 export default function SessionComponent(props: {
@@ -53,6 +182,8 @@ export default function SessionComponent(props: {
   showBodyweight: boolean;
   header?: ReactNode;
   openPostWorkoutSummary?: () => void;
+  /** Active session only: runs the finish flow (confirmation included) from the sticky footer. */
+  onFinishWorkout?: () => void;
 }) {
   const { session, isActiveWorkout } = props;
   const theme = useAppTheme();
@@ -132,7 +263,7 @@ export default function SessionComponent(props: {
       </EmptyInfo>
     ) : null;
 
-  const renderItem = (item: RecordedExercise, index: number) => {
+  const renderItem = (variant: 'active' | 'classic') => (item: RecordedExercise, index: number) => {
     return match(item)
       .with(P.instanceOf(RecordedWeightedExercise), (item) => (
         <WeightedExercise
@@ -155,6 +286,8 @@ export default function SessionComponent(props: {
           isReadonly={isReadonly}
           showPreviousButton={!!isActiveWorkout}
           previousRecordedExercises={recentlyCompletedExercises(item.movementKey()) as RecordedWeightedExercise[]}
+          variant={variant}
+          index={index + 1}
         />
       ))
       .with(P.instanceOf(RecordedCardioExercise), (item) => (
@@ -173,6 +306,8 @@ export default function SessionComponent(props: {
           isReadonly={isReadonly}
           showPreviousButton={!!isActiveWorkout}
           previousRecordedExercises={recentlyCompletedExercises(item.movementKey()) as RecordedCardioExercise[]}
+          variant={variant}
+          index={index + 1}
         />
       ))
       .exhaustive();
@@ -189,7 +324,7 @@ export default function SessionComponent(props: {
       >
         <Text
           style={{
-            ...(typeHelper(theme, 'body') as any),
+            ...typeHelper(theme, 'body'),
             fontWeight: 'bold',
             color: theme.color.content.primary,
           }}
@@ -224,6 +359,46 @@ export default function SessionComponent(props: {
     lastExercise instanceof RecordedWeightedExercise &&
     lastRecordedSet.set.repsCompleted <
       lastExercise.repsTargetForSet(lastExercise.potentialSets.indexOf(lastRecordedSet)).min;
+  // Complete-state "Log Set": mirror tapping the check on the next unlogged set of the next exercise.
+  const nextWeightedExercise = nextExercise instanceof RecordedWeightedExercise ? nextExercise : undefined;
+  const nextWeightedIndex = nextWeightedExercise ? session.recordedExercises.indexOf(nextWeightedExercise) : -1;
+  const nextSetPosition = nextWeightedExercise?.potentialSets.findIndex((potential) => !potential.set) ?? -1;
+  const canLogNextSet =
+    isActiveWorkout && nextWeightedExercise !== undefined && nextWeightedIndex >= 0 && nextSetPosition >= 0;
+  const logNextSet = canLogNextSet
+    ? () => {
+        const now = OffsetDateTime.now();
+        updateSession((s) => {
+          const exercise = s.recordedExercises[nextWeightedIndex] as RecordedWeightedExercise;
+          const setIndex = exercise.potentialSets.findIndex((potential) => !potential.set);
+          if (setIndex < 0) {
+            return s;
+          }
+          return withRestTimerAt(s.withExercise(nextWeightedIndex, exercise.withCycledRepCount(setIndex, now)), now);
+        });
+      }
+    : undefined;
+  const nextSetTitle =
+    canLogNextSet && nextWeightedExercise !== undefined
+      ? t('rest_timer.next_set.title', {
+          number: nextSetPosition + 1,
+          exercise: nextWeightedExercise.blueprint.name,
+        })
+      : undefined;
+  const nextSetDetail = (() => {
+    if (!canLogNextSet || nextWeightedExercise === undefined || nextSetPosition < 0) {
+      return undefined;
+    }
+    const potential = nextWeightedExercise.potentialSets[nextSetPosition];
+    if (potential === undefined) {
+      return undefined;
+    }
+    const weightText =
+      potential.weight.value.isZero() && nextWeightedExercise.blueprint.resistance === 'bodyweight'
+        ? t('exercise.short_bodyweight.label')
+        : `${localeFormatBigNumber(potential.weight.value.decimalPlaces(potential.weight.value.isInteger() ? 0 : 1))} ${shortFormatWeightUnit(potential.weight.unit)}`.trim();
+    return `${weightText} × ${nextWeightedExercise.repsTargetForSet(nextSetPosition).max}`;
+  })();
   const restTimer = showRestTimer ? (
     <RestTimer
       rest={restBetweenSets}
@@ -233,6 +408,9 @@ export default function SessionComponent(props: {
       onRestart={() => resetTimer(OffsetDateTime.now())}
       onDismiss={dismissTimer}
       onTogglePause={toggleRestTimerPaused}
+      onLogSet={logNextSet}
+      nextSetTitle={nextSetTitle}
+      nextSetDetail={nextSetDetail}
     />
   ) : undefined;
 
@@ -254,6 +432,23 @@ export default function SessionComponent(props: {
   ) : undefined;
 
   const timer = cardioTimer ?? restTimer;
+
+  if (isActiveWorkout) {
+    return (
+      <ActiveSessionView
+        session={session}
+        addExercise={addExercise}
+        renderItem={renderItem('active')}
+        notesComponent={notesComponent}
+        bodyweight={bodyweight}
+        timer={timer}
+        showRestSlot={restTimersEnabled && !isReadonly}
+        canFinish={sessionHasLoggedSet(session)}
+        onFinishWorkout={props.onFinishWorkout ?? (() => {})}
+        menu={<SessionMoreMenuComponent session={session} isActiveWorkout />}
+      />
+    );
+  }
 
   // The timer rides above the action, so the action stays put whether or not a rest is running.
   const floatingBottomContainer = isReadonly ? null : (
@@ -311,7 +506,7 @@ export default function SessionComponent(props: {
       {props.header}
       {notesComponent}
       {emptyInfo}
-      <ItemList items={session.recordedExercises} renderItem={renderItem} />
+      <ItemList items={session.recordedExercises} renderItem={renderItem('classic')} />
       {bodyweight}
       {workoutSummary}
     </FullHeightScrollView>

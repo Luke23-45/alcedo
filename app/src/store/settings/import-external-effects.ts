@@ -3,6 +3,8 @@ import { importBackupData, importFromExternal, selectPreferredWeightUnit } from 
 import { AddEffectFn } from '@/store/store';
 import { setStatsIsDirty } from '@/store/stats';
 import { getExternalImporter } from '@/services/csv-import';
+import { computeExportPreviewCounts } from '@/services/plaintext-export-preview';
+import Enumerable from 'linq';
 
 export function addImportExternalEffects(addEffect: AddEffectFn) {
   addEffect(
@@ -39,6 +41,12 @@ export function addImportExternalEffects(addEffect: AddEffectFn) {
             successMessage: tolgee.t('backup.import_from_other_apps.complete.message', {
               count: newWorkouts.length,
             }),
+            // The importBackupData effect records this after the upserts commit.
+            externalImport: {
+              format,
+              workoutCount: newWorkouts.length,
+              setCount: computeExportPreviewCounts(Enumerable.from(newWorkouts)).completedSets,
+            },
           }),
         );
         // History merge only: full restore via importBackupData leaves stats dirty handling unchanged.

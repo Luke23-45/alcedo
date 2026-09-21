@@ -84,7 +84,7 @@ describe('export-plaintext-effects', () => {
 
       expect(fileExportService.exportBytes).toHaveBeenCalledOnce();
       const [fileName, , contentType] = fileExportService.exportBytes.mock.calls[0]!;
-      expect(fileName).toMatch(/^alcedo-export\.\d{8}_\d{6}\.csv$/);
+      expect(fileName).toMatch(/^kinetic-export\.\d{8}_\d{6}\.csv$/);
       expect(contentType).toBe('text/csv');
     });
 
@@ -248,7 +248,7 @@ describe('export-plaintext-effects', () => {
 
       expect(fileExportService.exportBytes).toHaveBeenCalledOnce();
       const [fileName, , contentType] = fileExportService.exportBytes.mock.calls[0]!;
-      expect(fileName).toMatch(/^alcedo-export\.\d{8}_\d{6}\.json$/);
+      expect(fileName).toMatch(/^kinetic-export\.\d{8}_\d{6}\.json$/);
       expect(contentType).toBe('application/json');
     });
 

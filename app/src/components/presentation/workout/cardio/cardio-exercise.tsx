@@ -31,6 +31,10 @@ interface CardioExerciseProps {
   toStartNext: boolean;
   isReadonly: boolean;
   showPreviousButton: boolean;
+  /** Position of this exercise in the session (1-based index tile). */
+  index?: number;
+  /** 'active' renders the workout-flow reference card; 'classic' keeps the legacy layout. */
+  variant?: 'active' | 'classic';
 
   updateExercise: (update: Updater<RecordedCardioExercise>) => void;
   updateSet: (setIndex: number, update: Updater<RecordedCardioExerciseSet>) => void;
@@ -53,6 +57,10 @@ export function CardioExercise(props: CardioExerciseProps) {
       updateExercise={updateExercise}
       onEditExercise={props.onEditExercise}
       onRemoveExercise={props.onRemoveExercise}
+      index={props.index}
+      variant={props.variant}
+      // The reference draws the Add Set row on completed exercises only.
+      onAddSet={!props.isReadonly && recordedExercise.isComplete ? () => updateExercise((ex) => ex.withAddedSet()) : undefined}
     >
       <View style={{ gap: theme.space.base }}>
         {recordedExercise.sets.map((set, setIndex) => (
@@ -192,11 +200,7 @@ function CardioExerciseSet(props: CardioExerciseSetProps) {
           </CardioValueTile>
         )}
         {set.tracksDuration && !isReadonly && (
-          <FocusRing
-            isSelected={props.toStartNext && !set.isTimerRunning}
-            padding={0}
-            radius={theme.radius.lg}
-          >
+          <FocusRing isSelected={props.toStartNext && !set.isTimerRunning} padding={0} radius={theme.radius.lg}>
             <CardioTimerButton
               isTimerRunning={set.isTimerRunning}
               onStart={props.onStartTimer}

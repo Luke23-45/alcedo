@@ -256,6 +256,7 @@ export const {
   selectActiveSessionId,
   selectExercises,
   selectLatestExercises,
+  selectCompletedDistinctSessionNames,
 } = storedSessionsSlice.selectors;
 
 /** Fired when a session is done being edited: publish it, export it, and re-derive what depends on it. */
@@ -303,6 +304,32 @@ export const selectRecentlyCompletedExercises = createSelector(
     (exercise: MovementKey): RecordedExercise[] =>
       recentlyCompletedExercises[exercise] ?? noRecordedExercises,
 );
+
+/** One past performance of a movement, paired with the session it belongs to. */
+export interface ExerciseHistoryEntry {
+  exercise: RecordedExercise;
+  session: Session;
+}
+
+const noExerciseHistoryEntries: ExerciseHistoryEntry[] = [];
+
+/**
+ * Every past performance of a movement, newest first, each paired with its session - for the
+ * Exercise History screen. Same movement key and exclusions as selectRecentlyCompletedExercises,
+ * but the session travels along so rows can navigate to it.
+ */
+export const selectExerciseHistoryEntries = createSelector([selectSessionsExcluding], (sessions) => {
+  const byMovement = Enumerable.from(sessions)
+    .selectMany((session) =>
+      session.recordedExercises.filter((exercise) => exercise.isStarted).map((exercise) => ({ exercise, session })),
+    )
+    .groupBy((entry) => entry.exercise.movementKey())
+    .toObject(
+      (group) => group.key(),
+      (group) => group.orderByDescending((entry) => entry.exercise.latestTime, TemporalComparer).toArray(),
+    );
+  return (exercise: MovementKey): ExerciseHistoryEntry[] => byMovement[exercise] ?? noExerciseHistoryEntries;
+});
 
 export const selectPreviousComparableSession = createSelector(
   [selectSessions, (_, session: Session | undefined) => session],

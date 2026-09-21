@@ -182,10 +182,10 @@ describe('PreferenceService - firstDayOfWeek', () => {
     ['saturday', DayOfWeek.SATURDAY],
   ];
 
-  it('defaults to SUNDAY when unset or unknown', async () => {
-    expect(await makeService().service.getPreference('firstDayOfWeek')).toBe(DayOfWeek.SUNDAY);
+  it('defaults to MONDAY when unset or unknown', async () => {
+    expect(await makeService().service.getPreference('firstDayOfWeek')).toBe(DayOfWeek.MONDAY);
     expect(await makeService({ firstDayOfWeek: 'someday' }).service.getPreference('firstDayOfWeek')).toBe(
-      DayOfWeek.SUNDAY,
+      DayOfWeek.MONDAY,
     );
   });
 

@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="393" height="1004" viewBox="0 0 393 1004" role="img" aria-labelledby="ttl dsc"
+     font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+     text-rendering="optimizeLegibility" shape-rendering="geometricPrecision">
+
+<title id="ttl">Kinetic — Update plan (diff-save)</title>
+<desc id="dsc">Plan-diff review screen: body copy, save-as-new-workout switch card, four diff sections with selectable change rows (session changes, added, removed, modified), and a sticky brand-gradient Save bar.</desc>
+
+<defs>
+  <clipPath id="frame"><rect x="0" y="0" width="393" height="1004"/></clipPath>
+
+  <!-- ══════ ENVIRONMENT ══════ -->
+  <linearGradient id="gBg" x1="0" y1="0" x2="0.25" y2="1">
+    <stop offset="0" stop-color="#0B0B0E"/><stop offset="0.5" stop-color="#050507"/><stop offset="1" stop-color="#08080B"/>
+  </linearGradient>
+  <radialGradient id="gAuraA" gradientUnits="userSpaceOnUse" cx="70" cy="120" r="280">
+    <stop offset="0" stop-color="#FF9F0A" stop-opacity="0.10"/><stop offset="1" stop-color="#FF9F0A" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="gAuraB" gradientUnits="userSpaceOnUse" cx="360" cy="760" r="300">
+    <stop offset="0" stop-color="#30D158" stop-opacity="0.07"/><stop offset="1" stop-color="#30D158" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- ══════ MATERIAL ══════ -->
+  <linearGradient id="gCard" x1="0" y1="0" x2="0.45" y2="1">
+    <stop offset="0" stop-color="#1F1F23"/><stop offset="0.55" stop-color="#17171A"/><stop offset="1" stop-color="#131316"/>
+  </linearGradient>
+  <linearGradient id="gBar" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#141417" stop-opacity="0.88"/><stop offset="1" stop-color="#0A0A0C" stop-opacity="0.94"/>
+  </linearGradient>
+
+  <!-- ══════ BRAND ══════ -->
+  <linearGradient id="gEmber" x1="0" y1="0" x2="1" y2="0.35">
+    <stop offset="0" stop-color="#FF9F0A"/><stop offset="0.55" stop-color="#FF4D2E"/><stop offset="1" stop-color="#E8003F"/>
+  </linearGradient>
+  <linearGradient id="gGloss" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+  </linearGradient>
+  <radialGradient id="gEmberGlow" gradientUnits="userSpaceOnUse" cx="196.5" cy="961" r="170">
+    <stop offset="0" stop-color="#FF4D2E" stop-opacity="0.22"/><stop offset="1" stop-color="#FF4D2E" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<g clip-path="url(#frame)">
+<rect x="0" y="0" width="393" height="1004" fill="url(#gBg)"/>
+<rect x="0" y="0" width="393" height="1004" fill="url(#gAuraA)"/>
+<rect x="0" y="0" width="393" height="1004" fill="url(#gAuraB)"/>
+
+<!-- ══════ NAV BAR (pushed) ══════ -->
+<polyline points="26,29 17,38 26,47" fill="none" stroke="#FF9F0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="196.5" y="44" text-anchor="middle" font-size="17" font-weight="600" fill="#F5F5F7">Update plan</text>
+
+<!-- ══════ BODY COPY (real string: plan.diff.dialog_update.body) ══════ -->
+<text x="16" y="102" font-size="17" font-weight="400" fill="#EBEBF5" fill-opacity="0.72">
+  <tspan x="16" dy="0">Would you like to save your changes</tspan>
+  <tspan x="16" dy="23">from this workout to your plan?</tspan>
+</text>
+
+<!-- ══════ SAVE-AS-NEW CARD ══════ -->
+<g>
+  <rect x="16" y="140" width="361" height="88" rx="18" fill="url(#gCard)" stroke="#FFFFFF" stroke-opacity="0.09"/>
+  <line x1="34" y1="141.5" x2="359" y2="141.5" stroke="#FFFFFF" stroke-opacity="0.07"/>
+  <text x="36" y="173" font-size="17" font-weight="600" fill="#FFFFFF">Save as new workout</text>
+  <text x="36" y="197" font-size="14" font-weight="400" fill="#EBEBF5" fill-opacity="0.6">
+    <tspan font-style="italic">Push Day</tspan><tspan> will be updated.</tspan>
+  </text>
+  <!-- iOS switch, OFF = update existing -->
+  <rect x="306" y="162.5" width="51" height="31" rx="15.5" fill="#3A3A3C"/>
+  <rect x="306.5" y="163" width="50" height="30" rx="15" fill="none" stroke="#000000" stroke-opacity="0.18"/>
+  <ellipse cx="321.5" cy="179" rx="13.5" ry="4" fill="#000000" opacity="0.22"/>
+  <circle cx="321.5" cy="178" r="13.5" fill="#FFFFFF"/>
+</g>
+
+<!-- ══════ SECTION LABEL ══════ -->
+<text x="32" y="254" font-size="12" font-weight="700" letter-spacing="0.8" fill="#8E8E93">REVIEW CHANGES</text>
+<text x="361" y="254" text-anchor="end" font-size="12.5" font-weight="600" fill="#EBEBF5" fill-opacity="0.55">6 selected</text>
+
+<!-- ══════ CARD A · SESSION CHANGES ══════ -->
+<g>
+  <rect x="16" y="268" width="361" height="172" rx="18" fill="url(#gCard)" stroke="#FFFFFF" stroke-opacity="0.09"/>
+  <line x1="34" y1="269.5" x2="359" y2="269.5" stroke="#FFFFFF" stroke-opacity="0.07"/>
+  <text x="36" y="296" font-size="13" font-weight="600" fill="#EBEBF5" fill-opacity="0.55">Session changes</text>
+
+  <!-- row: session name (locked — always applied, checkbox disabled) -->
+  <g opacity="0.62">
+    <circle cx="48" cy="336" r="12" fill="none" stroke="#8E8E93" stroke-width="1.6"/>
+    <text x="76" y="331" font-size="16" font-weight="500" fill="#EBEBF5">Session name</text>
+    <text x="76" y="353" font-size="13" font-weight="400" fill="#8E8E93">Push Day · always applied</text>
+    <g transform="translate(340,328)" stroke="#8E8E93" stroke-width="1.6" fill="none">
+      <rect x="-6" y="-2" width="12" height="10" rx="2.5"/>
+      <path d="M-3.5,-2 v-2.5 a3.5,3.5 0 0 1 7,0 v2.5"/>
+    </g>
+  </g>
+  <line x1="36" y1="368.5" x2="361" y2="368.5" stroke="#FFFFFF" stroke-opacity="0.07"/>
+
+  <!-- row: session notes (selected) -->
+  <circle cx="48" cy="404" r="12" fill="#30D158"/>
+  <path d="M43,404 l3.4,3.4 L54,400" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="76" y="399" font-size="16" font-weight="600" fill="#FFFFFF">Session notes</text>
+  <text x="76" y="421" font-size="13" font-weight="400" fill="#EBEBF5" fill-opacity="0.6">Session notes changed</text>
+</g>
+
+<!-- ══════ CARD B · ADDED ══════ -->
+<g>
+  <rect x="16" y="456" width="361" height="108" rx="18" fill="url(#gCard)" stroke="#FFFFFF" stroke-opacity="0.09"/>
+  <line x1="34" y1="457.5" x2="359" y2="457.5" stroke="#FFFFFF" stroke-opacity="0.07"/>
+  <text x="36" y="484" font-size="13" font-weight="600" fill="#30D158">Added</text>
+  <circle cx="48" cy="520" r="12" fill="#30D158"/>
+  <path d="M43,520 l3.4,3.4 L54,516" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="76" y="515" font-size="16" font-weight="600" fill="#30D158">+ Incline Dumbbell Press</text>
+  <text x="76" y="537" font-size="13" font-weight="400" fill="#EBEBF5" fill-opacity="0.6">Add exercise: Incline Dumbbell Press</text>
+</g>
+
+<!-- ══════ CARD C · REMOVED ══════ -->
+<g>
+  <rect x="16" y="580" width="361" height="108" rx="18" fill="url(#gCard)" stroke="#FFFFFF" stroke-opacity="0.09"/>
+  <line x1="34" y1="581.5" x2="359" y2="581.5" stroke="#FFFFFF" stroke-opacity="0.07"/>
+  <text x="36" y="608" font-size="13" font-weight="600" fill="#FF6B60">Removed</text>
+  <circle cx="48" cy="644" r="12" fill="#30D158"/>
+  <path d="M43,644 l3.4,3.4 L54,640" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="76" y="639" font-size="16" font-weight="600" fill="#FF6B60">- Pec Deck</text>
+  <text x="76" y="661" font-size="13" font-weight="400" fill="#EBEBF5" fill-opacity="0.6">Remove exercise: Pec Deck</text>
+</g>
+
+<!-- ══════ CARD D · MODIFIED · BENCH PRESS ══════ -->
+<g>
+  <rect x="16" y="704" width="361" height="208" rx="18" fill="url(#gCard)" stroke="#FFFFFF" stroke-opacity="0.09"/>
+  <line x1="34" y1="705.5" x2="359" y2="705.5" stroke="#FFFFFF" stroke-opacity="0.07"/>
+  <text x="36" y="732" font-size="13" font-weight="600" fill="#EBEBF5" fill-opacity="0.55">Modified exercises</text>
+  <text x="36" y="758" font-size="15" font-weight="600" fill="#FFFFFF">Bench Press</text>
+  <line x1="36" y1="770.5" x2="361" y2="770.5" stroke="#FFFFFF" stroke-opacity="0.07"/>
+
+  <circle cx="48" cy="806" r="12" fill="#30D158"/>
+  <path d="M43,806 l3.4,3.4 L54,802" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="76" y="801" font-size="16" font-weight="600" fill="#FFFFFF">Sets</text>
+  <text x="76" y="823" font-size="13" font-weight="400" fill="#EBEBF5" fill-opacity="0.6" font-variant-numeric="tabular-nums">4 → 5</text>
+  <line x1="36" y1="838.5" x2="361" y2="838.5" stroke="#FFFFFF" stroke-opacity="0.07"/>
+
+  <circle cx="48" cy="874" r="12" fill="#30D158"/>
+  <path d="M43,874 l3.4,3.4 L54,870" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="76" y="869" font-size="16" font-weight="600" fill="#FFFFFF">Rest</text>
+  <text x="76" y="891" font-size="13" font-weight="400" fill="#EBEBF5" fill-opacity="0.6" font-variant-numeric="tabular-nums">90 s → 120 s</text>
+</g>
+
+<!-- ══════ STICKY SAVE BAR ══════ -->
+<g>
+  <rect x="0" y="924" width="393" height="80" fill="url(#gBar)"/>
+  <line x1="0" y1="924.5" x2="393" y2="924.5" stroke="#FFFFFF" stroke-opacity="0.09"/>
+  <rect x="0" y="924" width="393" height="80" fill="url(#gEmberGlow)"/>
+  <rect x="16" y="934" width="361" height="54" rx="16" fill="url(#gEmber)"/>
+  <rect x="16" y="934" width="361" height="27" rx="13.5" fill="url(#gGloss)"/>
+  <!-- square.and.arrow.down glyph -->
+  <g transform="translate(160,961)" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-9,-2 h18 v9 a3,3 0 0 1 -3,3 h-12 a3,3 0 0 1 -3,-3 z"/>
+    <line x1="0" y1="-12" x2="0" y2="2"/>
+    <polyline points="-4.5,-2.5 0,2 4.5,-2.5"/>
+  </g>
+  <text x="208" y="968" text-anchor="middle" font-size="17" font-weight="600" fill="#FFFFFF">Save</text>
+</g>
+
+</g>
+</svg>

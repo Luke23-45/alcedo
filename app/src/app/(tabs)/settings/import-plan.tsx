@@ -1,71 +1,18 @@
-import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
-import { PageActions } from '@/components/presentation/foundation/page-actions';
-import AssignmentAddIcon from '@expo/material-symbols/assignment_add.xml';
-import { SurfaceText } from '@/components/presentation/foundation/surface-text';
-import SessionSummary from '@/components/presentation/summary/session-summary';
-import SessionSummaryTitle from '@/components/presentation/summary/session-summary-title';
-import { useAppTheme } from '@/hooks/useAppTheme';
-import { usePreferredWeightUnit } from '@/hooks/usePreferredWeightUnit';
-import { Session } from '@/models/session-models';
-import { useAppSelector } from '@/store';
-import { clearPendingImport, savePlan, selectPendingImport } from '@/store/program';
-import { uuid } from '@/utils/uuid';
+import { Stack } from 'expo-router';
 import { useTranslate } from '@tolgee/react';
-import { Stack, useRouter } from 'expo-router';
-import { Fragment } from 'react';
-import { View } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { useOnDismiss } from '@/hooks/useOnDismiss';
+import { settingsKey } from '@/components/presentation/settings/shared/settings-i18n';
+import { ImportPlanScreen } from '@/components/presentation/settings/programs/import-plan-screen';
 
-export default function ImportPlan() {
-  const theme = useAppTheme();
-  const pending = useAppSelector(selectPendingImport);
-  const dispatch = useDispatch();
+/**
+ * Screen 5 (bottom) — import a plan from pasted text. Thin wrapper; the UI
+ * lives in components/presentation/settings/programs/.
+ */
+export default function ImportPlanPage() {
   const { t } = useTranslate();
-  const { replace } = useRouter();
-  const preferredWeightUnit = usePreferredWeightUnit();
-
-  useOnDismiss(() => dispatch(clearPendingImport()));
-
-  const save = () => {
-    if (!pending) {
-      return;
-    }
-    const programId = uuid();
-    dispatch(savePlan({ programId, programBlueprint: pending }));
-    replace(`/settings/program-list?focusprogramId=${programId}`);
-  };
-
   return (
-    <FullHeightScrollView
-      floatingChildren={
-        pending ? (
-          <PageActions
-            primaryKind="commit"
-            primary={{
-              label: t('plan.import.save.button'),
-              icon: AssignmentAddIcon,
-              systemImage: 'plus',
-              onPress: save,
-            }}
-          />
-        ) : undefined
-      }
-    >
-      <Stack.Screen options={{ title: t('plan.import.title') }} />
-      {pending && (
-        <View style={{ gap: theme.space.sm, padding: theme.layout.screenPadding }}>
-          <SurfaceText font="text-2xl" weight="bold">
-            {pending.name}
-          </SurfaceText>
-          {pending.sessions.map((session, i) => (
-            <Fragment key={i}>
-              <SessionSummaryTitle session={Session.getEmptySession(session, preferredWeightUnit)} />
-              <SessionSummary session={Session.getEmptySession(session, preferredWeightUnit)} />
-            </Fragment>
-          ))}
-        </View>
-      )}
-    </FullHeightScrollView>
+    <>
+      <Stack.Screen options={{ title: t(settingsKey('settings.programs.import.nav_title')) }} />
+      <ImportPlanScreen />
+    </>
   );
 }

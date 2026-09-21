@@ -11,6 +11,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { applySettingsEffects } from '@/store/settings/effects';
 import { applyStoredSessionsEffects } from '@/store/stored-sessions/effects';
 import { applyFeedEffects } from '@/store/feed/effects';
+import { addFeedCommentEffects } from '@/store/feed/comments-effects';
+import { applyComposerPostsEffects } from '@/store/feed/composer-posts';
+import { initializeFeedComments } from '@/store/feed/comments';
 import { applyStatsEffects } from '@/store/stats/effects';
 import { applyAiPlannerEffects } from '@/store/ai-planner/effects';
 import { applyBackendsEffects } from '@/store/backends/effects';
@@ -31,11 +34,14 @@ export function resolveStore(db: ExpoSQLiteDatabase, expoDb: SQLiteDatabase) {
   applySettingsEffects(addEffect);
   applyStoredSessionsEffects(addEffect);
   applyFeedEffects(addEffect);
+  addFeedCommentEffects(addEffect);
+  applyComposerPostsEffects(addEffect);
   applyStatsEffects(addEffect);
   applyAiPlannerEffects(addEffect);
   applyBackendsEffects(addEffect);
 
   store.dispatch(initializeAppStateSlice());
+  store.dispatch(initializeFeedComments());
   return { store, services };
 }
 

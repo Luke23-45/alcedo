@@ -258,3 +258,12 @@ describe('RecordedCardioExercise.lastCompletedSet', () => {
     expect(RecordedCardioExercise.empty(makeCardioBlueprint(2)).lastCompletedSet).toBeUndefined();
   });
 });
+
+describe('RecordedCardioExercise.withAddedSet', () => {
+  it('appends an empty set cloned from the last set blueprint', () => {
+    const exercise = RecordedCardioExercise.empty(makeCardioBlueprint(2));
+    const result = exercise.withAddedSet();
+    expect(result.sets.length).toBe(3);
+    expect(result.sets[2]!.isCompletelyFilled).toBe(false);
+  });
+});

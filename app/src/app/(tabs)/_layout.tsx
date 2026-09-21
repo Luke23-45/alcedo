@@ -16,7 +16,11 @@ export default function TabsLayout() {
       rippleColor={alpha(theme.color.content.primary, 0.1)}
       backgroundColor={theme.color.background.base}
       labelVisibilityMode="labeled"
-      iconColor={theme.color.content.secondary}
+      iconColor={{ default: theme.color.content.secondary, selected: theme.color.interactive.accent }}
+      labelStyle={{
+        default: { color: theme.color.content.secondary },
+        selected: { color: theme.color.interactive.accent },
+      }}
     >
       <NativeTabs.Trigger name="(session)">
         <NativeTabs.Trigger.Label>{t('workout.workout.label')}</NativeTabs.Trigger.Label>

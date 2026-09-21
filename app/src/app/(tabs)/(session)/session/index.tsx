@@ -1,6 +1,5 @@
 import ConfirmationDialog from '@/components/presentation/foundation/confirmation-dialog';
 import SessionComponent from '@/components/smart/session-component';
-import SessionMoreMenuComponent from '@/components/smart/session-more-menu-component';
 import { useAppSelector } from '@/store';
 import { useDispatch } from 'react-redux';
 import { selectActiveSession, updateStoredSession } from '@/store/stored-sessions';
@@ -49,12 +48,9 @@ export default function Index() {
   return (
     <>
       {keepAwake && <KeepAwake />}
-      <Stack.Screen
-        options={{
-          title: session.blueprint.name,
-        }}
-      />
-      <SessionMoreMenuComponent session={session} isActiveWorkout save={save} />
+      {/* The active session draws its own nav (back chevron, title, ⋯ menu);
+          the native header stays hidden and the OS provides the status bar. */}
+      <Stack.Screen options={{ headerShown: false }} />
       <SessionComponent
         session={session}
         updateSession={(update) => dispatch(updateStoredSession({ sessionId: session.id, update }))}
@@ -63,6 +59,7 @@ export default function Index() {
         openPostWorkoutSummary={() =>
           push(`/session/post-workout?sessionId=${encodeURIComponent(session.id)}&source=live`)
         }
+        onFinishWorkout={() => save()}
       />
       <ConfirmationDialog
         okText={t('generic.finish.button')}

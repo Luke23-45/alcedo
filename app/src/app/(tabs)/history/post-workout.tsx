@@ -1,70 +1,64 @@
-import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
-import { PageActions } from '@/components/presentation/foundation/page-actions';
-import CheckIcon from '@expo/material-symbols/check.xml';
-import { SessionComparisonTable } from '@/components/presentation/workout/session-comparison-table';
-import { ReactionSummary } from '@/components/smart/reaction-summary';
-import { useAppTheme } from '@/hooks/useAppTheme';
+import { SessionDetailScreen } from '@/components/presentation/history/session-detail-screen/session-detail-screen';
+import { PostWorkoutScreen } from '@/components/presentation/summary/post-workout-screen/post-workout-screen';
 import { useAppSelectorWithArg } from '@/store';
-import { selectPreviousComparableSession, selectSession } from '@/store/stored-sessions';
+import { selectSession } from '@/store/stored-sessions';
 import { useTranslate } from '@tolgee/react';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { View } from 'react-native';
 
 export default function PostWorkoutPage() {
-  const theme = useAppTheme();
   const { sessionId, source } = useLocalSearchParams<{
     sessionId?: string;
     source?: 'finished' | 'live' | 'history';
   }>();
   const session = useAppSelectorWithArg(selectSession, sessionId ?? '');
+  const isHistory = source === 'history';
   const openedAfterFinishingWorkout = source === 'finished';
-  const showFinishButton = openedAfterFinishingWorkout;
   const showBackButton = !openedAfterFinishingWorkout;
-  const previousComparableSession = useAppSelectorWithArg(selectPreviousComparableSession, session);
-  const { dismissTo } = useRouter();
+  const { dismissTo, back, canGoBack } = useRouter();
   const { t } = useTranslate();
 
   useEffect(() => {
     if (!sessionId || !session) {
-      dismissTo('/session');
+      dismissTo(isHistory ? '/history' : '/session');
     }
-  }, [dismissTo, session, sessionId]);
+  }, [dismissTo, isHistory, session, sessionId]);
 
   if (!sessionId || !session) {
     return null;
   }
 
-  const floatingBottomContainer = showFinishButton ? (
-    <PageActions
-      primaryKind="commit"
-      primary={{
-        label: t('generic.finish.button'),
-        icon: CheckIcon,
-        systemImage: 'checkmark',
-        onPress: () => dismissTo('/(tabs)/(session)'),
-      }}
-    />
-  ) : undefined;
+  if (isHistory) {
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false, gestureEnabled: true }} />
+        <SessionDetailScreen
+          session={session}
+          onBack={() => {
+            if (canGoBack()) {
+              back();
+            } else {
+              dismissTo('/history');
+            }
+          }}
+          onDeleted={() => dismissTo('/history')}
+        />
+      </>
+    );
+  }
 
   return (
-    <FullHeightScrollView
-      floatingChildren={floatingBottomContainer}
-      scrollStyle={{ paddingHorizontal: theme.layout.screenPadding }}
-    >
+    <>
       <Stack.Screen
         options={{
           presentation: 'modal',
           title: t('workout.post_workout.title'),
           gestureEnabled: showBackButton,
           headerBackVisible: showBackButton,
-          headerLeft: showFinishButton ? () => null : undefined!,
+          headerLeft: openedAfterFinishingWorkout ? () => null : undefined!,
         }}
       />
-      <View style={{ marginVertical: theme.space.base, gap: theme.space.base }}>
-        <SessionComparisonTable mode="full" previousSession={previousComparableSession} session={session} />
-        <ReactionSummary eventId={session.id} animateOnMount />
-      </View>
-    </FullHeightScrollView>
+      <PostWorkoutScreen sessionId={session.id} onDone={() => dismissTo('/(tabs)/(session)')} />
+    </>
   );
 }

@@ -156,7 +156,7 @@ function PrepareAiPlannerPage() {
     );
   });
 
-  return <Redirect href={'/settings/ai/planner'} />;
+  return <Redirect href={'/settings/ai/planner-chat'} />;
 }
 
 function buildStatsSessionData(dispatch: ReturnType<typeof useDispatch>) {

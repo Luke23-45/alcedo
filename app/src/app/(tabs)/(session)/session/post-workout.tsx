@@ -1,27 +1,19 @@
-import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
-import { PageActions } from '@/components/presentation/foundation/page-actions';
-import CheckIcon from '@expo/material-symbols/check.xml';
-import { SessionComparisonTable } from '@/components/presentation/workout/session-comparison-table';
-import { useAppTheme } from '@/hooks/useAppTheme';
-import { useAppSelectorWithArg } from '@/store';
+import { PostWorkoutScreen } from '@/components/presentation/summary/post-workout-screen/post-workout-screen';
 import { useFinishWorkout } from '@/hooks/useFinishWorkout';
-import { selectPreviousComparableSession, selectSession } from '@/store/stored-sessions';
+import { useAppSelectorWithArg } from '@/store';
+import { selectSession } from '@/store/stored-sessions';
 import { useTranslate } from '@tolgee/react';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { View } from 'react-native';
 
 export default function PostWorkoutPage() {
-  const theme = useAppTheme();
   const { sessionId, source } = useLocalSearchParams<{
     sessionId?: string;
     source?: 'finished' | 'live' | 'history';
   }>();
   const session = useAppSelectorWithArg(selectSession, sessionId ?? '');
   const openedAfterFinishingWorkout = source === 'finished';
-  const showFinishButton = openedAfterFinishingWorkout;
   const showBackButton = !openedAfterFinishingWorkout;
-  const previousComparableSession = useAppSelectorWithArg(selectPreviousComparableSession, session);
   const { dismissTo, push } = useRouter();
   const finishWorkout = useFinishWorkout(sessionId);
   const { t } = useTranslate();
@@ -36,41 +28,32 @@ export default function PostWorkoutPage() {
     return null;
   }
 
-  const floatingBottomContainer = showFinishButton ? (
-    <PageActions
-      primaryKind="commit"
-      primary={{
-        label: t('generic.finish.button'),
-        icon: CheckIcon,
-        systemImage: 'checkmark',
-        onPress: () => {
-          const hasDiff = finishWorkout();
-          dismissTo('/');
-          if (hasDiff) {
-            push('/diff-save');
-          }
-        },
-      }}
-    />
-  ) : undefined;
-
   return (
-    <FullHeightScrollView
-      floatingChildren={floatingBottomContainer}
-      scrollStyle={{ paddingHorizontal: theme.layout.screenPadding }}
-    >
+    <>
       <Stack.Screen
         options={{
           presentation: 'modal',
           title: t('workout.post_workout.title'),
           gestureEnabled: showBackButton,
           headerBackVisible: showBackButton,
-          headerLeft: showFinishButton ? () => null : undefined!,
+          headerLeft: openedAfterFinishingWorkout ? () => null : undefined!,
         }}
       />
-      <View style={{ marginVertical: theme.space.base }}>
-        <SessionComparisonTable mode="full" previousSession={previousComparableSession} session={session} />
-      </View>
-    </FullHeightScrollView>
+      <PostWorkoutScreen
+        sessionId={session.id}
+        onDone={() => {
+          if (!openedAfterFinishingWorkout) {
+            // Live sources never finish the workout from here — back navigation only.
+            dismissTo('/(tabs)/(session)');
+            return;
+          }
+          const hasDiff = finishWorkout();
+          dismissTo('/');
+          if (hasDiff) {
+            push('/diff-save');
+          }
+        }}
+      />
+    </>
   );
 }

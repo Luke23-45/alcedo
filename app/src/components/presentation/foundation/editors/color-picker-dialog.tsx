@@ -90,7 +90,10 @@ function PalettePreview({ seed }: { seed: HexColor }) {
       </SurfaceText>
       <View style={{ flexDirection: 'row', gap: theme.space.sm }}>
         {swatches.map((color, i) => (
-          <View key={i} style={{ flex: 1, height: theme.space.xxxl, borderRadius: theme.space.sm, backgroundColor: color }} />
+          <View
+            key={i}
+            style={{ flex: 1, height: theme.space.xxxl, borderRadius: theme.space.sm, backgroundColor: color }}
+          />
         ))}
       </View>
     </View>

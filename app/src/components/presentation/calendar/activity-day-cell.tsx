@@ -66,7 +66,11 @@ export const ActivityDayCell = memo(function ActivityDayCell({
             gap: 2,
             borderRadius: 1000,
             backgroundColor: background,
-            borderColor: isSelected ? theme.color.interactive.tint : outlineToday ? theme.color.border.hairline : 'transparent',
+            borderColor: isSelected
+              ? theme.color.interactive.tint
+              : outlineToday
+                ? theme.color.border.hairline
+                : 'transparent',
             borderWidth: isSelected ? 2 : 1,
           }}
         >

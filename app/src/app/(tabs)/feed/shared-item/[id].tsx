@@ -1,11 +1,10 @@
 import { Remote } from '@/components/presentation/foundation/remote';
-import SharedItem from '@/components/smart/shared-item';
+import SharedItem, { SharedItemChrome } from '@/components/smart/shared-item';
 import { RemoteData } from '@/models/remote';
 import { useAppSelector } from '@/store';
 import { fetchSharedItem, selectSharedItem, setSharedItem } from '@/store/feed';
 import { fromUrlSafeHexString } from '@/utils/to-url-safe-hex-string';
-import { useTranslate } from '@tolgee/react';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -16,7 +15,6 @@ export default function SharedItemPage() {
   }>();
   const sharedRemote = useAppSelector(selectSharedItem);
   const dispatch = useDispatch();
-  const { t } = useTranslate();
   const fetch = useCallback(() => {
     const parsedKey = fromUrlSafeHexString(k);
     if (parsedKey) {
@@ -29,13 +27,8 @@ export default function SharedItemPage() {
     fetch();
   }, [fetch]);
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: t('feed.shared_item.title'),
-        }}
-      />
+    <SharedItemChrome>
       <Remote success={(x) => <SharedItem sharedItem={x} />} value={sharedRemote} retry={fetch} />
-    </>
+    </SharedItemChrome>
   );
 }

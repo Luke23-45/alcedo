@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { View } from 'react-native';
 import { Dialog, Portal } from 'react-native-paper';
 import Button from '@/components/presentation/foundation/button';
+import { useAppTheme } from '@/hooks/useAppTheme';
 
 type ConfirmationDialogWithoutAdditionalActionProps = {
   open: boolean;
@@ -12,6 +13,8 @@ type ConfirmationDialogWithoutAdditionalActionProps = {
   cancelText?: string;
   okText?: string;
   preventCancel?: boolean;
+  /** Renders the confirm action in the destructive color. */
+  destructive?: boolean;
   additionalActionText?: undefined;
   onAdditionalAction?: undefined;
   onCancel: () => void;
@@ -25,7 +28,10 @@ type WithAdditionalActions = {
 
 type ConfirmationDialogProps =
   | ConfirmationDialogWithoutAdditionalActionProps
-  | (Omit<ConfirmationDialogWithoutAdditionalActionProps, 'additionalActionText' | 'onAdditionalAction'> &
+  | (Omit<
+      ConfirmationDialogWithoutAdditionalActionProps,
+      'additionalActionText' | 'onAdditionalAction'
+    > &
       WithAdditionalActions);
 
 export default function ConfirmationDialog(props: ConfirmationDialogProps) {
@@ -38,9 +44,11 @@ export default function ConfirmationDialog(props: ConfirmationDialogProps) {
     onCancel,
     onOk,
     preventCancel,
+    destructive,
     additionalActionText,
     onAdditionalAction,
   } = props;
+  const { isDark } = useAppTheme();
 
   const cancelButton = (
     <Button testID="action-cancel" onPress={onCancel}>
@@ -48,7 +56,11 @@ export default function ConfirmationDialog(props: ConfirmationDialogProps) {
     </Button>
   );
   const okButton = (
-    <Button testID="action-ok" onPress={onOk}>
+    <Button
+      testID="action-ok"
+      onPress={onOk}
+      textColor={destructive ? (isDark ? '#FF6B60' : '#D70015') : undefined}
+    >
       {okText ?? <T keyName="generic.ok.button" />}
     </Button>
   );

@@ -139,6 +139,17 @@ export class RecordedWeightedExercise {
     });
   }
 
+  /** Appends an empty set seeded from the last set's weight and target. */
+  withAddedSet(): RecordedWeightedExercise {
+    const last = this.potentialSets.at(-1);
+    if (!last) {
+      return this;
+    }
+    return this.with({
+      potentialSets: [...this.potentialSets, PotentialSet.of({ weight: last.weight, target: last.target })],
+    });
+  }
+
   withWeight(setIndex: number, weight: Weight, applyTo: WeightAppliesTo) {
     return match(applyTo)
       .with('thisSet', () => this.withSet(setIndex, (s) => s.with({ weight })))

@@ -14,6 +14,7 @@ export default function FullHeightScrollView({
   avoidKeyboard,
   contentContainerStyle,
   safeAreaEdges = { left: 'additive', right: 'additive', top: 'off', bottom: 'off' },
+  screenBackground,
 }: {
   children: React.ReactNode;
   floatingChildren?: React.ReactNode;
@@ -22,6 +23,8 @@ export default function FullHeightScrollView({
   scrollStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
   safeAreaEdges?: Edges;
+  /** Rendered absolutely behind the scroll view, covering the whole screen. */
+  screenBackground?: React.ReactNode;
 }) {
   const theme = useAppTheme();
   const { handleScroll } = useScroll();
@@ -39,6 +42,7 @@ export default function FullHeightScrollView({
         },
       ]}
     >
+      {screenBackground}
       {!avoidKeyboard ? (
         <ScrollView
           ref={scrollRef}

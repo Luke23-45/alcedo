@@ -1,238 +1,47 @@
-import CardActions from '@/components/presentation/foundation/card-actions';
-import CardList from '@/components/presentation/foundation/card-list';
-import ConfirmationDialog from '@/components/presentation/foundation/confirmation-dialog';
-import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
-import IconButton from '@/components/presentation/foundation/icon-button';
-import { PageActions } from '@/components/presentation/foundation/page-actions';
-import FitnessCenterIcon from '@expo/material-symbols/fitness_center.xml';
-import NativeButton from '@/components/presentation/foundation/native-button';
-import EditIcon from '@expo/material-symbols/edit.xml';
-import { useFormatDate } from '@/hooks/useFormatDate';
-import PlanMenu, { usePlanNavigation } from '@/components/smart/plan-menu';
-import { Remote } from '@/components/presentation/foundation/remote';
-import SessionSummary from '@/components/presentation/summary/session-summary';
-import SessionSummaryTitle from '@/components/presentation/summary/session-summary-title';
-import SplitCardControl from '@/components/presentation/foundation/split-card-control';
-import { useAppTheme } from '@/hooks/useAppTheme';
 import { Session } from '@/models/session-models';
 import { useAppSelector, useAppSelectorWhenFocused } from '@/store';
-import { deleteStoredSession, selectActiveSession } from '@/store/stored-sessions';
-import { encryptAndShare, publishUnpublishedSessions } from '@/store/feed';
-import { fetchUpcomingSessions, selectActiveProgram } from '@/store/program';
+import { fetchUpcomingSessions } from '@/store/program';
+import { publishUnpublishedSessions } from '@/store/feed';
 import { executeRemoteBackup } from '@/store/settings';
-import { LocalDate } from '@js-joda/core';
-import { T, useTranslate } from '@tolgee/react';
-import { Stack, useFocusEffect, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { View } from 'react-native';
-import { Card, Icon as PaperIcon, Text, Tooltip } from 'react-native-paper';
-import Button from '@/components/presentation/foundation/button';
-import { useDispatch } from 'react-redux';
+import { selectActiveSession } from '@/store/stored-sessions';
+import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
+import Menu from '@/components/presentation/foundation/menu';
+import Icon from '@/components/presentation/foundation/icon';
+import { Remote } from '@/components/presentation/foundation/remote';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { useStartWorkoutWithConfirmation } from '@/hooks/useStartWorkoutWithConfirmation';
+import { usePlanNavigation } from '@/components/smart/plan-menu';
 import { WelcomeWizard } from '@/components/smart/welcome-wizard';
 import { WhatsNewBanner } from '@/components/smart/whats-new-banner';
-import { SharedSession } from '@/models/feed-models';
-import { useStartWorkoutWithConfirmation } from '@/hooks/useStartWorkoutWithConfirmation';
-
-function ListUpcomingWorkouts({
-  upcoming,
-  startSession,
-}: {
-  upcoming: readonly Session[];
-  startSession: (s: Session) => void;
-}) {
-  const theme = useAppTheme();
-  const plan = useAppSelector(selectActiveProgram);
-  const { t } = useTranslate();
-  const formatDate = useFormatDate();
-  const currentSession = useAppSelectorWhenFocused(selectActiveSession);
-  const planId = useAppSelector((x) => x.program.activePlanId);
-  const { push } = useRouter();
-  const dispatch = useDispatch();
-  const [confirmDeleteSessionOpen, setConfirmDeleteSessionOpen] = useState(false);
-  const clearCurrentSession = () => {
-    if (currentSession) {
-      dispatch(deleteStoredSession(currentSession.id));
-    }
-    dispatch(fetchUpcomingSessions());
-  };
-  const handleSharePress = (session: Session) => {
-    dispatch(
-      encryptAndShare({
-        item: new SharedSession(session),
-        title: t('workout.shared_item.title'),
-      }),
-    );
-  };
-
-  return (
-    <View style={{ flex: 1, gap: theme.space.sm, paddingTop: theme.space.base }}>
-      <WelcomeWizard />
-      <WhatsNewBanner />
-      {currentSession && (
-        <>
-          <SectionHeader
-            title={t('workout.current.title')}
-            trailing={formatDate(currentSession.date, {
-              year: currentSession.date.year() !== LocalDate.now().year() ? 'numeric' : undefined,
-              day: 'numeric',
-              weekday: 'long',
-              month: 'long',
-            })}
-          />
-          <Card mode="contained">
-            <Card.Content>
-              <SessionCardContent session={currentSession} />
-            </Card.Content>
-            <CardActions style={{ marginTop: theme.space.sm }}>
-              <Tooltip title={t('workout.share_workout.button')}>
-                <IconButton icon={'share'} mode="contained" onPress={() => handleSharePress(currentSession)} />
-              </Tooltip>
-              <Tooltip title={t('workout.clear_current.button')}>
-                <IconButton
-                  testID="clear-current-workout"
-                  icon={'delete'}
-                  mode="contained"
-                  onPress={() => setConfirmDeleteSessionOpen(true)}
-                />
-              </Tooltip>
-              <Button
-                icon={'playCircle'}
-                mode="contained"
-                testID="resume-workout-button"
-                onPress={() => startSession(currentSession)}
-              >
-                <T keyName="workout.resume.button" />
-              </Button>
-            </CardActions>
-          </Card>
-        </>
-      )}
-      {!!upcoming.length && <SectionHeader title={t('workout.upcoming.title')} trailing={plan.name} />}
-      <CardList
-        keySelector={(x) => x.id}
-        cardType="contained"
-        items={upcoming}
-        emptyTemplate={currentSession ? undefined : <NoUpcomingWorkouts />}
-        renderItemContent={(session) => {
-          return (
-            <Card.Content>
-              <SessionCardContent session={session} />
-            </Card.Content>
-          );
-        }}
-        renderItemActions={(session) => {
-          const sessionPlanIndex = plan.sessions.findIndex((x) => x.equals(session.blueprint));
-          const handleEditPress = () => {
-            push(`/settings/manage-workouts/${planId}/manage-session/${sessionPlanIndex}`, { withAnchor: true });
-          };
-          return (
-            <CardActions style={{ marginTop: theme.space.sm }}>
-              <IconButton icon={'share'} mode="contained" onPress={() => handleSharePress(session)} />
-              {sessionPlanIndex !== -1 ? (
-                <IconButton icon={'edit'} mode="contained" onPress={handleEditPress} />
-              ) : undefined}
-              <Button
-                mode="contained"
-                icon={'playCircle'}
-                testID="start-resume-workout-button"
-                onPress={() => startSession(session)}
-              >
-                {session.isStarted ? <T keyName="workout.resume.button" /> : <T keyName="workout.start.button" />}
-              </Button>
-            </CardActions>
-          );
-        }}
-      />
-      <ConfirmationDialog
-        headline={t('workout.clear_current.confirm.title')}
-        textContent={t('workout.clear_current.confirm.body')}
-        okText={t('generic.clear.button')}
-        onOk={() => {
-          clearCurrentSession();
-          setConfirmDeleteSessionOpen(false);
-        }}
-        open={confirmDeleteSessionOpen}
-        onCancel={() => setConfirmDeleteSessionOpen(false)}
-      />
-    </View>
-  );
-}
-
-function SectionHeader({ title, trailing }: { title: string; trailing: string }) {
-  const theme = useAppTheme();
-
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'baseline',
-        justifyContent: 'space-between',
-        gap: theme.space.base,
-        marginTop: theme.space.sm,
-      }}
-    >
-      <Text variant="titleMedium">{title}</Text>
-      <Text variant="bodyMedium" numberOfLines={1} style={{ flexShrink: 1, color: theme.color.content.secondary }}>
-        {trailing}
-      </Text>
-    </View>
-  );
-}
-
-function NoUpcomingWorkouts() {
-  const { t } = useTranslate();
-  const theme = useAppTheme();
-  const { choosePlan, editWorkouts } = usePlanNavigation();
-
-  return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: theme.space.xxl,
-        paddingBottom: 48,
-        paddingHorizontal: theme.space.base,
-      }}
-    >
-      <View style={{ alignItems: 'center', gap: theme.space.md }}>
-        <PaperIcon source="fitnessCenter" size={40} color={theme.color.content.secondary} />
-        <Text variant="titleLarge" style={{ textAlign: 'center' }}>
-          {t('plan.no_upcoming_workouts.title')}
-        </Text>
-        <Text variant="bodyMedium" style={{ textAlign: 'center', color: theme.color.content.secondary }}>
-          {t('plan.no_upcoming_workouts.message')}
-        </Text>
-      </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: theme.space.sm }}>
-        <NativeButton
-          variant="filled"
-          icon={EditIcon}
-          systemImage="pencil"
-          label={t('workout.edit_workouts.button')}
-          onPress={editWorkouts}
-        />
-        <NativeButton variant="text" label={t('plan.choose.button')} onPress={choosePlan} />
-      </View>
-    </View>
-  );
-}
-
-function SessionCardContent({ session }: { session: Session }) {
-  return (
-    <SplitCardControl
-      titleContent={<SessionSummaryTitle session={session} />}
-      mainContent={<SessionSummary session={session} isFilled={false} showWeight />}
-    />
-  );
-}
+import { useHomeData } from '@/components/presentation/home/use-home-data';
+import { HomeAuras, HomeScreenBackground } from '@/components/presentation/home/shared/home-auras';
+import { HomeDuoCell, HomeDuoRow } from '@/components/presentation/home/shared/home-duo-row';
+import { GreetingHeader } from '@/components/presentation/home/greeting-header/greeting-header';
+import { ActivityRings } from '@/components/presentation/home/activity-rings/activity-rings';
+import { StatTiles } from '@/components/presentation/home/stat-tiles/stat-tiles';
+import { TodaySession } from '@/components/presentation/home/today-session/today-session';
+import { WeeklyVolume } from '@/components/presentation/home/weekly-volume/weekly-volume';
+import { HrZones } from '@/components/presentation/home/hr-zones/hr-zones';
+import { ProgramsSection } from '@/components/presentation/home/programs/programs';
+import { RecentActivitySection } from '@/components/presentation/home/recent-activity/recent-activity';
+import { AchievementsSection } from '@/components/presentation/home/achievements/achievements';
+import { HydrationSection } from '@/components/presentation/home/hydration/hydration';
+import { MacrosSection } from '@/components/presentation/home/macros/macros';
+import { PersonalRecordsSection } from '@/components/presentation/home/personal-records/personal-records';
+import { WeeklyChallengeSection } from '@/components/presentation/home/weekly-challenge/weekly-challenge';
+import { CoachCard } from '@/components/presentation/home/coach-card/coach-card';
+import { LocalDate } from '@js-joda/core';
+import { useTranslate } from '@tolgee/react';
+import { Stack, useFocusEffect, useRouter } from 'expo-router';
+import { Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
 
 export default function Index() {
   const theme = useAppTheme();
-  const upcomingSessions = useAppSelector((s) => s.program.upcomingSessions);
+  const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
-  const { t } = useTranslate();
-  const currentBodyweight = upcomingSessions.map((x) => x.at(0)?.bodyweight).unwrapOr(undefined);
+  const upcomingSessions = useAppSelector((s) => s.program.upcomingSessions);
   const { start, confirmationDialog } = useStartWorkoutWithConfirmation();
 
   useFocusEffect(() => {
@@ -241,41 +50,116 @@ export default function Index() {
     dispatch(executeRemoteBackup({}));
   });
 
-  const createFreeformSession = () => {
-    start(Session.freeformSession(LocalDate.now(), currentBodyweight));
-  };
-
-  const floatingBottomContainer = (
-    <PageActions
-      primary={{
-        label: t('workout.freeform.title'),
-        icon: FitnessCenterIcon,
-        systemImage: 'dumbbell',
-        onPress: createFreeformSession,
-      }}
-    />
-  );
-
   return (
     <FullHeightScrollView
-      floatingChildren={floatingBottomContainer}
-      scrollStyle={{ paddingHorizontal: theme.layout.screenPadding }}
-      contentContainerStyle={{ flexGrow: 1 }}
+      screenBackground={<HomeScreenBackground />}
+      scrollStyle={{ paddingHorizontal: theme.layout.screenPadding, paddingTop: insets.top + theme.space.sm }}
+      contentContainerStyle={{ flexGrow: 1, gap: theme.space.md, paddingBottom: theme.space.xxl }}
     >
-      <Stack.Screen
-        options={{
-          title: 'Alcedo',
-          headerBackVisible: false,
-        }}
-      />
-      <PlanMenu />
-      <Remote
-        value={upcomingSessions}
-        success={(upcoming) => {
-          return <ListUpcomingWorkouts startSession={start} upcoming={upcoming} />;
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
+      <HomeAuras />
+      <Remote value={upcomingSessions} success={(upcoming) => <HomeScreen upcoming={upcoming} onStart={start} />} />
       {confirmationDialog}
     </FullHeightScrollView>
+  );
+}
+
+function HomeScreen({ upcoming, onStart }: { upcoming: readonly Session[]; onStart: (session: Session) => void }) {
+  const theme = useAppTheme();
+  const { t } = useTranslate();
+  const { push } = useRouter();
+  const data = useHomeData(upcoming);
+  const activeSession = useAppSelectorWhenFocused(selectActiveSession);
+  const { choosePlan, editWorkouts } = usePlanNavigation();
+
+  const currentBodyweight = upcoming.at(0)?.bodyweight;
+  const createFreeformSession = () => {
+    onStart(Session.freeformSession(LocalDate.now(), currentBodyweight));
+  };
+
+  const session = activeSession ?? data.todaySession;
+  const sessionTitle = session?.blueprint.name ?? t('workout.freeform.title');
+  const sessionSubtitle =
+    session != null
+      ? t('home.today_session.subtitle', { count: session.recordedExercises.length }) // en: "{count} exercises"
+      : t('home.today_session.empty_subtitle'); // en: "Start a freeform workout"
+  const startLabel = t(session?.isStarted ? 'workout.resume.button' : 'workout.start.button');
+
+  const planMenuItems = [
+    {
+      label: t('workout.freeform.title'),
+      icon: 'fitnessCenter' as const,
+      systemImage: 'dumbbell' as const,
+      onPress: createFreeformSession,
+    },
+    {
+      label: t('plan.choose.button'),
+      icon: 'assignment' as const,
+      systemImage: 'list.clipboard' as const,
+      onPress: choosePlan,
+    },
+    {
+      label: t('workout.edit_workouts.button'),
+      icon: 'edit' as const,
+      systemImage: 'pencil' as const,
+      onPress: editWorkouts,
+    },
+  ];
+
+  return (
+    <>
+      <GreetingHeader
+        dateLabel={data.dateLabel}
+        greeting={data.greeting}
+        trailing={
+          <Menu
+            testID="home-plan-menu"
+            trigger={(open) => (
+              <Pressable
+                onPress={open}
+                hitSlop={12}
+                accessibilityRole="button"
+                accessibilityLabel={t('home.menu.label') /* en: "Workout options" */}
+                style={{
+                  width: 44,
+                  height: 44,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Icon source="moreHoriz" size={24} color={theme.color.content.secondary} />
+              </Pressable>
+            )}
+            items={planMenuItems}
+          />
+        }
+      />
+      <WhatsNewBanner />
+      <ActivityRings />
+      <StatTiles />
+      <TodaySession
+        title={sessionTitle}
+        subtitle={sessionSubtitle}
+        startLabel={startLabel}
+        onStart={() => (session != null ? onStart(session) : createFreeformSession())}
+      />
+      <WeeklyVolume data={data.weeklyVolume} />
+      <HrZones />
+      <ProgramsSection programs={data.programs} onSeeAll={() => push('/settings/program-list')} />
+      <CoachCard />
+      <RecentActivitySection items={data.recentActivity} onSeeAll={() => push('/(tabs)/history')} />
+      <AchievementsSection />
+      <HomeDuoRow>
+        <HomeDuoCell>
+          <HydrationSection />
+        </HomeDuoCell>
+        <HomeDuoCell>
+          <MacrosSection />
+        </HomeDuoCell>
+      </HomeDuoRow>
+      <PersonalRecordsSection records={data.personalRecords} />
+      <WeeklyChallengeSection />
+      <WelcomeWizard />
+    </>
   );
 }

@@ -1,30 +1,21 @@
-import { SettingsPage } from '@/components/layout/settings-page';
-import { importPlanFromPicker } from '@/store/program';
-import { useTranslate } from '@tolgee/react';
+import { Stack } from 'expo-router';
 import { useDispatch } from 'react-redux';
-import { PageActions } from '@/components/presentation/foundation/page-actions';
-import FileOpenIcon from '@expo/material-symbols/file_open.xml';
+import { useTranslate } from '@tolgee/react';
+import { importPlanFromPicker } from '@/store/program';
+import { settingsKey } from '@/components/presentation/settings/shared/settings-i18n';
+import { ImportReviewScreen } from '@/components/presentation/settings/programs/import-review-screen';
 
+/**
+ * Reviews a pending plan import before saving it to the library. Thin
+ * wrapper; the UI lives in components/presentation/settings/programs/.
+ */
 export default function ImportPlanInfoPage() {
   const { t } = useTranslate();
   const dispatch = useDispatch();
-
   return (
-    <SettingsPage
-      title={t('plan.import.title')}
-      caption={t('plan.import.explanation')}
-      docs="PlanFileFormat.md"
-      actions={
-        <PageActions
-          primaryKind="commit"
-          primary={{
-            label: t('plan.import.choose_file.button'),
-            onPress: () => dispatch(importPlanFromPicker()),
-            icon: FileOpenIcon,
-            systemImage: 'folder',
-          }}
-        />
-      }
-    />
+    <>
+      <Stack.Screen options={{ title: t(settingsKey('settings.programs.review.nav_title')) }} />
+      <ImportReviewScreen importPlanFromPicker={() => dispatch(importPlanFromPicker())} />
+    </>
   );
 }

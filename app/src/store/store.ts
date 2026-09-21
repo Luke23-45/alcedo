@@ -10,6 +10,8 @@ import { settingsReducer } from './settings';
 import programReducer from './program';
 import appReducer from './app';
 import feedReducer from './feed';
+import feedCommentsReducer from './feed/comments';
+import { composerPostsReducer } from './feed/composer-posts';
 import { storedSessionsReducer } from './stored-sessions';
 import { statsReducer } from '@/store/stats';
 import { createServices, Services } from '@/services';
@@ -23,6 +25,10 @@ const rootReducer = combineReducers({
   settings: settingsReducer,
   program: programReducer,
   feed: feedReducer,
+  /** Local comment threads + kudos for the feed post-detail screen. */
+  feedComments: feedCommentsReducer,
+  /** Workout shares created from the Share Composer (Screen 3). */
+  composerPosts: composerPostsReducer,
   app: appReducer,
   storedSessions: storedSessionsReducer,
   stats: statsReducer,

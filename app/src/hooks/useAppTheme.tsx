@@ -3,8 +3,10 @@ import React, { createContext, ReactNode, useContext, useEffect, useMemo } from 
 import { Appearance, Platform, useColorScheme } from 'react-native';
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from 'react-native-paper';
 import { DarkTheme, ThemeProvider as NavigationThemeProvider, DefaultTheme } from 'expo-router';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components/native';
 import { MsIconSrc } from '@/components/presentation/foundation/ms-icon-source';
 import { createTheme, type AppTheme, type Platform as AlcedoPlatform } from '@/styles/theme';
+import { accentSeedFor } from '@/styles/accent-seeds';
 
 // Pure Alcedo ground truth — no legacy Material3, spacing, font, or HCT ramp.
 // Source: app/styles/theme.ts (palette, SemanticColors, space/radius/layout, etc.)
@@ -47,7 +49,9 @@ export type ColorChoice = string;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AppThemeColors = any;
 
-const AppThemeContext = createContext<(AppTheme & { colors: any; spacing: any; font: any; rounding: any }) | undefined>(undefined);
+const AppThemeContext = createContext<(AppTheme & { colors: any; spacing: any; font: any; rounding: any }) | undefined>(
+  undefined,
+);
 
 export const useAppTheme = (): AppTheme & { colors: any; spacing: any; font: any; rounding: any } => {
   const context = useContext(AppThemeContext);
@@ -64,6 +68,7 @@ interface AppThemeProviderProps {
 export const AppThemeProvider: React.FC<AppThemeProviderProps> = ({ children }) => {
   const trueBlack = useAppSelector((state) => state.settings.trueBlackDarkTheme);
   const themeMode = useAppSelector((state) => state.settings.themeMode);
+  const colorSchemeSeed = useAppSelector((state) => state.settings.colorSchemeSeed);
 
   const systemColorScheme = useColorScheme();
 
@@ -77,6 +82,22 @@ export const AppThemeProvider: React.FC<AppThemeProviderProps> = ({ children }) 
   const alcedoTheme = useMemo(() => {
     const platform = (Platform.OS === 'web' ? 'web' : Platform.OS === 'android' ? 'android' : 'ios') as AlcedoPlatform;
     let t = createTheme(colorScheme, platform);
+    // The Appearance accent swatches: override the app-wide accent ramp with
+    // the user's seed. Ember is the ramp createTheme already uses, so the
+    // default path is unchanged.
+    const seed = accentSeedFor(colorSchemeSeed);
+    t = {
+      ...t,
+      color: {
+        ...t.color,
+        interactive: {
+          ...t.color.interactive,
+          accent: seed.accent,
+          accentPressed: seed.accentPressed,
+          accentBright: seed.accentBright,
+        },
+      },
+    };
     if (trueBlack && isDark) {
       t = {
         ...t,
@@ -94,7 +115,7 @@ export const AppThemeProvider: React.FC<AppThemeProviderProps> = ({ children }) 
       };
     }
     return t;
-  }, [colorScheme, isDark, trueBlack]);
+  }, [colorScheme, isDark, trueBlack, colorSchemeSeed]);
 
   const paperTheme = useMemo(() => {
     const base = isDark ? MD3DarkTheme : MD3LightTheme;
@@ -154,21 +175,46 @@ export const AppThemeProvider: React.FC<AppThemeProviderProps> = ({ children }) 
 
   const legacyValue: AppTheme & { colors: any; spacing: any; font: any; rounding: any } = {
     ...alcedoTheme,
-    colors: { ...alcedoTheme.color, ...alcedoTheme.color, elevation: (paperTheme as any).colors.elevation, onSurface: alcedoTheme.color.content.primary, onSurfaceVariant: alcedoTheme.color.content.secondary, primary: alcedoTheme.color.interactive.tint, secondary: alcedoTheme.color.interactive.tint, secondaryContainer: alcedoTheme.color.fill.secondary, tertiary: alcedoTheme.color.interactive.accent, tertiaryContainer: alcedoTheme.color.fill.tertiary, onTertiaryContainer: alcedoTheme.color.content.primary, surface: alcedoTheme.color.background.base, surfaceVariant: alcedoTheme.color.fill.primary, surfaceContainer: alcedoTheme.color.background.secondary, surfaceContainerHigh: alcedoTheme.color.background.elevated, surfaceContainerHighest: alcedoTheme.color.background.tertiary, outline: alcedoTheme.color.border.hairline, outlineVariant: alcedoTheme.color.border.hairline, error: alcedoTheme.color.status.danger.base, onError: alcedoTheme.color.content.inverse, seedColor: alcedoTheme.color.interactive.tint, scheme: alcedoTheme.mode },
+    colors: {
+      ...alcedoTheme.color,
+      ...alcedoTheme.color,
+      elevation: (paperTheme as any).colors.elevation,
+      onSurface: alcedoTheme.color.content.primary,
+      onSurfaceVariant: alcedoTheme.color.content.secondary,
+      primary: alcedoTheme.color.interactive.tint,
+      secondary: alcedoTheme.color.interactive.tint,
+      secondaryContainer: alcedoTheme.color.fill.secondary,
+      tertiary: alcedoTheme.color.interactive.accent,
+      tertiaryContainer: alcedoTheme.color.fill.tertiary,
+      onTertiaryContainer: alcedoTheme.color.content.primary,
+      surface: alcedoTheme.color.background.base,
+      surfaceVariant: alcedoTheme.color.fill.primary,
+      surfaceContainer: alcedoTheme.color.background.secondary,
+      surfaceContainerHigh: alcedoTheme.color.background.elevated,
+      surfaceContainerHighest: alcedoTheme.color.background.tertiary,
+      outline: alcedoTheme.color.border.hairline,
+      outlineVariant: alcedoTheme.color.border.hairline,
+      error: alcedoTheme.color.status.danger.base,
+      onError: alcedoTheme.color.content.inverse,
+      seedColor: alcedoTheme.color.interactive.tint,
+      scheme: alcedoTheme.mode,
+    },
     spacing,
     font,
     rounding,
   } as any;
   return (
     <AppThemeContext.Provider value={legacyValue}>
-      <PaperProvider
-        theme={paperTheme}
-        settings={{
-          icon: (props) => <MsIconSrc {...props} color={props.color ?? alcedoTheme.color.content.primary} />,
-        }}
-      >
-        <NavigationThemeProvider value={navigationTheme}>{children}</NavigationThemeProvider>
-      </PaperProvider>
+      <StyledThemeProvider theme={alcedoTheme}>
+        <PaperProvider
+          theme={paperTheme}
+          settings={{
+            icon: (props) => <MsIconSrc {...props} color={props.color ?? alcedoTheme.color.content.primary} />,
+          }}
+        >
+          <NavigationThemeProvider value={navigationTheme}>{children}</NavigationThemeProvider>
+        </PaperProvider>
+      </StyledThemeProvider>
     </AppThemeContext.Provider>
   );
 };

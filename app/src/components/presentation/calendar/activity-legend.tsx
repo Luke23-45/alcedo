@@ -45,8 +45,17 @@ export function ActivityLegend({ showFriends }: { showFriends: boolean }) {
 
       {showFriends && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.space.xs }}>
-          <View style={{ width: DOT_SIZE, height: DOT_SIZE, borderRadius: 1000, backgroundColor: theme.palette.turquoise[400] }} />
-          <View style={{ width: DOT_SIZE, height: DOT_SIZE, borderRadius: 1000, backgroundColor: theme.palette.ember[300] }} />
+          <View
+            style={{
+              width: DOT_SIZE,
+              height: DOT_SIZE,
+              borderRadius: 1000,
+              backgroundColor: theme.palette.turquoise[400],
+            }}
+          />
+          <View
+            style={{ width: DOT_SIZE, height: DOT_SIZE, borderRadius: 1000, backgroundColor: theme.palette.ember[300] }}
+          />
           <SurfaceText font="text-xs" color="onSurfaceVariant">
             {t('history.calendar.legend.friends')}
           </SurfaceText>

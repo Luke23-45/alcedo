@@ -128,7 +128,9 @@ export function WeightedExerciseEditor({
                     label={t('rest.rest.label')}
                     icon={'airlineSeatReclineExtraFill'}
                     onPress={() => setRestDialogOpen(true)}
-                    right={<RestFormat style={{ color: theme.color.content.primary }} rest={exercise.restBetweenSets} />}
+                    right={
+                      <RestFormat style={{ color: theme.color.content.primary }} rest={exercise.restBetweenSets} />
+                    }
                   />,
                 ]
               : []),

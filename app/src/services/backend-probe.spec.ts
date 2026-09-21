@@ -1,5 +1,10 @@
 import { Backend } from '@/models/backend';
-import { backupProbeHeader, legacyBackupProbeHeader, probeBackendFeatures, probeBackupEndpoint } from '@/services/backend-probe';
+import {
+  backupProbeHeader,
+  legacyBackupProbeHeader,
+  probeBackendFeatures,
+  probeBackupEndpoint,
+} from '@/services/backend-probe';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const backend: Backend = {

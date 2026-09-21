@@ -30,7 +30,12 @@ export default function Menu({ trigger, items }: MenuProps) {
                     key={item.label}
                     enabled={item.disabled ? false : true}
                     elementColors={
-                      item.destructive ? { textColor: theme.color.status.danger.base, leadingIconColor: theme.color.status.danger.base } : undefined
+                      item.destructive
+                        ? {
+                            textColor: theme.color.status.danger.base,
+                            leadingIconColor: theme.color.status.danger.base,
+                          }
+                        : undefined
                     }
                     onClick={() => {
                       item.onPress();
