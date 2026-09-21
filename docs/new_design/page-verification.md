@@ -36,6 +36,8 @@ timing, real-device performance. Device checklist comes later with a dev build.
 | 5 | Diff-save / Update Plan | docs/new_design/diff-save-redesign.md | done 2026-09-22 |
 | 6 | History | docs/new_design/history-dark.md | done 2026-09-22 |
 | 7 | Trends (overview, exercise picker, exercise detail) | docs/new_design/trends-dark.md | done 2026-09-22 |
+| 8 | Feed timeline | docs/new_design/social-dark.md Screen 1 | done 2026-09-22 |
+| 9 | Feed post detail | docs/new_design/social-dark.md Screen 2 | done 2026-09-22 |
 
 ## Per-page log
 ### 1. Home
@@ -707,3 +709,97 @@ touched files; `oxfmt --check` clean on touched files.
 
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.
+### 9. Feed post detail
+- Verified 2026-09-22 against `docs/new_design/social-dark.md` Screen 2
+  (Post Detail with comment thread).
+  Route: `app/src/app/(tabs)/feed/item/[id].tsx`; screen
+  `components/presentation/feed/post-detail/post-detail-screen.tsx`;
+  model resolution in `post-models.ts`; thread state in
+  `store/feed/comments.ts`; own-post kudos shared with the timeline via
+  `components/presentation/feed/shared/own-post-kudos.ts`.
+- Sections inventoried (render order): native stack header (back chevron,
+  "Post" title, no composer action — detail is not the compose entry),
+  full post card (same post-frame anatomy as the timeline), comments
+  header ("3 comments"), comment thread (three top-level comments, one
+  nested Alex reply under Mia's, 2/5/1 kudos on Mia/Jon/Sofia's comments),
+  reply-mode composer (quoted parent name + cancel, send button at 50%
+  opacity when the input is blank, trimmed-empty sends ignored),
+  unavailable state ("This post isn't available." for unknown ids,
+  deleted own post, or reported posts).
+- State matrix simulated: populated own post (real session derivation +
+  local composer draft caption), populated reference posts (Mia/Jon/Sofia
+  with SampleBadge disclosure), empty thread (honest "No comments yet"),
+  unknown id → unavailable, own-post delete → removes the real event,
+  clears comment/kudos state, hides `alex` persistently and pops back,
+  reference-post report → persistent hide + back. First mount in either
+  timeline/detail order seeds Alex's six contract kudos (Mia, Jon, Sofia,
+  Dev, Lena, Tom) without depending on visiting Feed first.
+- Data/store/persistence: comment thread keyed `'alex'` — the same key
+  the timeline uses, fixing a timeline/detail state divergence where the
+  two screens kept separate copies. Own-post kudos read model shared with
+  the timeline (`useOwnPostKudos`): received cheers from the designed
+  reaction store, local `'alex'` heart toggle persisted in
+  `postKudos`, faces Mia/Jon/Sofia in identity order. Thread timing
+  corrected to publish-relative +3m/+7m (Mia, Jon), +9m (Alex reply),
+  +15m (Sofia) matching the reference spread. Metadata formatting is
+  locale-aware (`preferredLanguage`, 12/24h) via cached Intl formatters —
+  no hard-coded `en-US`. Delete/report persist via `useHiddenPosts`.
+- Navigation targets traced: back chevron → `router.back()`, share →
+  native share sheet payload, comment focus action, report → persistent
+  hide + back. No dead controls found.
+
+**Bugs found and fixed:**
+1. Thread key divergence — detail keyed its comment/kudos state by the
+   post's event id while the timeline used `'alex'` for own posts, so
+   the six contract kudos and the thread existed in two separate states.
+   Unified on `'alex'` (`resolveDetailCommentKey`) with a shared
+   `own-post-kudos.ts` read model, so timeline and detail show the same
+   count and the same heart-toggle state.
+2. Contract poster fallback — Alex's detail card showed a hard-coded
+   poster instead of the real session user. Detail now derives poster
+   values through the same `deriveComposerSessionData` path as the
+   timeline/composer, keeping the hard-coded fixture only as fallback.
+3. Deep-link kudos seed — mounting detail before the timeline left
+   Alex's card with 0 received cheers. Detail seeds the six contract
+   cheers on mount when none exist (`needsKudosSeed`).
+4. Delete/report did not persist — deleting Alex or reporting a
+   reference post from detail left the card visible on the timeline.
+   Detail now uses `useHiddenPosts` with `keyValueStore`: deleting Alex
+   removes the real event, clears comment/kudos state, hides `'alex'`
+   persistently and pops back; reporting hides the post persistently.
+5. Comment timing drift — the seed placed Mia/Jon/Alex-reply/Sofia at
+   +9/+18/+23/+35 minutes, stretching the reference's displayed spread.
+   Reseeded to +3m/+7m/+9m/+15m relative to publish.
+6. Hard-coded `en-US` metadata — replaced with locale-aware cached
+   Intl formatting honoring the 12/24-hour preference.
+7. Reference posts undisclosed — Mia/Jon/Sofia detail cards now carry
+   the compact `SampleBadge`, consistent with the timeline.
+
+**Tests (19 new + 4 updated, all green):**
+- `post-detail/post-detail-simulation.spec.tsx` (new, 19 tests):
+  thread timing/nesting (3 top-level, Alex reply nested under Mia,
+  "3 comments" header math), shared `'alex'` comment key, delete
+  cleanup (`removePostData` removes the thread), six-kudo identity order
+  (Mia, Jon, Sofia, Dev, Lena, Tom — seed matches timeline), received
+  count + first three faces, heart toggle +1/fill/+0/unfill, seed-needed
+  when no cheers, no kudos without a real session, own/reference/unknown
+  model resolution (real published event resolves own by its event id,
+  unknown id resolves undefined), comment-count math (3 top-level +
+  1 nested reply = 4 comments, 3 shown in header).
+- `store/feed/comments.spec.ts` (4 tests updated for the +3/+7/+9/+15
+  timing reseed).
+- Pattern note: `@/store` cannot load under vitest (native SQLite
+  chain); the hook tests use the repo's established
+  `vi.mock('@/store')` selector-mock pattern (cf.
+  `composer-data.spec.ts`) with a real `configureStore` behind the
+  mocks and an explicit `rerender()` after toggle (mocks have no store
+  subscription).
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 117 files /
+1,737 tests green; oxlint 0 errors on touched files; eslint (react
+compiler) clean on touched files; `oxfmt --check` clean on touched
+files.
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.
+

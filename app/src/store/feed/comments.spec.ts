@@ -28,9 +28,9 @@ describe('alexPostSeed', () => {
   it('anchors the contract thread to the publish time', () => {
     const seed = alexPostSeed(POST, PUBLISHED_AT);
     const byAuthor = Object.fromEntries(seed.comments.map((c) => [c.authorId, c]));
-    expect(byAuthor['mia']!.createdAt).toBe(PUBLISHED_AT + 5 * 60_000);
-    expect(byAuthor['jon']!.createdAt).toBe(PUBLISHED_AT + 9 * 60_000);
-    expect(byAuthor['sofia']!.createdAt).toBe(PUBLISHED_AT + 17 * 60_000);
+    expect(byAuthor['mia']!.createdAt).toBe(PUBLISHED_AT + 3 * 60_000);
+    expect(byAuthor['jon']!.createdAt).toBe(PUBLISHED_AT + 7 * 60_000);
+    expect(byAuthor['sofia']!.createdAt).toBe(PUBLISHED_AT + 15 * 60_000);
     expect(seed.kudos).toEqual({ kudoed: false, total: 6, people: ['mia', 'jon', 'sofia'] });
   });
 
@@ -40,7 +40,7 @@ describe('alexPostSeed', () => {
     const reply = seed.comments.find((c) => c.parentId !== null)!;
     expect(reply.authorId).toBe('alex');
     expect(reply.parentId).toBe(mia.id);
-    expect(reply.createdAt).toBe(PUBLISHED_AT + 11 * 60_000);
+    expect(reply.createdAt).toBe(PUBLISHED_AT + 9 * 60_000);
   });
 
   it('matches the contract kudos: Mia 2, Jon 5 (kudoed), Sofia 1', () => {

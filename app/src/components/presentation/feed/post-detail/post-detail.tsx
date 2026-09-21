@@ -1,24 +1,36 @@
 import { useTranslate } from '@tolgee/react';
-import { useDispatch } from 'react-redux';
-import { useAppSelector, useAppSelectorWithArg } from '@/store';
+import { useAppSelectorWithArg } from '@/store';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { selectPostKudos, selectTopLevelComments, togglePostKudos } from '@/store/feed/comments';
+import { selectTopLevelComments } from '@/store/feed/comments';
 import { FeedAvatar } from '../shared/feed-avatar';
 import { IdentityBadge } from '../shared/identity-badge';
 import { SharePoster } from '../shared/share-poster';
 import { FeedActionBar } from '../shared/feed-action-bar';
 import { feedKey } from '../shared/feed-i18n';
-import { personById, type FeedPerson } from '../shared/people';
+import { personById } from '../shared/people';
+import { SampleBadge } from '@/components/presentation/home/shared/sample-badge';
+import type { OwnPostKudos } from '../shared/own-post-kudos';
 import * as KS from '../shared/kudos-stack.styles';
 import { MilestonePoster } from './milestone-poster';
 import { CommentThread } from './comment-thread';
-import { formatKudosLabel, type PostDetailModel } from './post-models';
+import { formatKudosLabel, type PostDetailModel, type PostPosterData } from './post-models';
 import { relativeAgeLong } from './relative-time';
 import type { ReplyTarget } from './comment-bar';
 import * as S from './post-detail.styles';
 
 interface PostDetailProps {
   model: PostDetailModel;
+  /** Local record key: 'alex' for the own post (shared with the timeline), the post id otherwise. */
+  threadId: string;
+  /** Resolved caption: the composer draft for the own post, the reference caption for samples. */
+  caption: string | null;
+  /** Resolved poster: real-session derivation for the own post, the contract block otherwise. */
+  poster: PostPosterData;
+  /** Locale-aware meta line, formatted by the screen. */
+  meta: string;
+  /** Resolved kudos: the shared read model, so the count matches the timeline. */
+  kudos: OwnPostKudos;
+  onToggleKudos: () => void;
   onReply: (target: ReplyTarget) => void;
   onFocusComment: () => void;
   onShare: () => void;
@@ -27,27 +39,34 @@ interface PostDetailProps {
 /**
  * The post itself: author row, poster, caption (real or omitted), meta,
  * kudos row, the detail action bar, and the comment thread. The screen owns
- * the nav header, the sticky composer, and the overflow menu.
+ * the nav header, the sticky composer, and the overflow menu. Mia/Jon/Sofia
+ * are fictional sample posts and carry the feed's SampleBadge, like the
+ * timeline's footer does.
  */
-export function PostDetail({ model, onReply, onFocusComment, onShare }: PostDetailProps) {
+export function PostDetail({
+  model,
+  threadId,
+  caption,
+  poster,
+  meta,
+  kudos,
+  onToggleKudos,
+  onReply,
+  onFocusComment,
+  onShare,
+}: PostDetailProps) {
   const theme = useAppTheme();
   const { t } = useTranslate();
-  const dispatch = useDispatch();
 
   const author = personById(model.authorId);
-  const storedKudos = useAppSelectorWithArg(selectPostKudos, model.id);
-  const use24HourTime = useAppSelector((s) => s.settings.use24HourTime);
-  // The screen seeds before first paint; the fallback only guards the gap.
-  const kudos = storedKudos ?? { kudoed: false, total: 0, people: [] as string[] };
-  const topLevel = useAppSelectorWithArg(selectTopLevelComments, model.id);
+  const topLevel = useAppSelectorWithArg(selectTopLevelComments, threadId);
   const commentCount = model.commentCountBase + topLevel.length;
 
   if (!author) {
     return null;
   }
 
-  const people: FeedPerson[] = kudos.people.map((id) => personById(id)).filter((p): p is FeedPerson => !!p);
-  const kudosLabel = formatKudosLabel(people, kudos.total, (count) =>
+  const kudosLabel = formatKudosLabel(kudos.faces, kudos.total, (count) =>
     t(feedKey('feed.detail.kudos.others'), 'and {count} others', { count }),
   );
   const kudosCountText =
@@ -55,17 +74,6 @@ export function PostDetail({ model, onReply, onFocusComment, onShare }: PostDeta
       ? t(feedKey('feed.detail.kudos.count_one'), '1 kudo')
       : t(feedKey('feed.detail.kudos.count'), '{count} kudos', { count: kudos.total });
 
-  const postedAt = new Date(model.postedAtMs);
-  const meta = [
-    postedAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: !use24HourTime }),
-    postedAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-    t(
-      feedKey(model.audience === 'friends' ? 'feed.detail.meta.visible.friends' : 'feed.detail.meta.visible.public'),
-      model.audience === 'friends' ? 'Visible to Friends' : 'Visible to Public',
-    ),
-  ].join(' · ');
-
-  const poster = model.poster;
   const posterNode =
     poster.kind === 'milestone' ? (
       <MilestonePoster value={poster.value} unit={poster.unit} subtitle={poster.subtitle} range={poster.range} />
@@ -92,7 +100,7 @@ export function PostDetail({ model, onReply, onFocusComment, onShare }: PostDeta
       />
     );
 
-  const faces = people.slice(0, 3);
+  const faces = kudos.faces.slice(0, 3);
   const overflow = Math.max(0, kudos.total - faces.length);
   // Spec Screen 2 pins the kudos-stack knockout to #17171A (light: #FFFFFF),
   // not the page background — see the light-mode delta table.
@@ -117,9 +125,14 @@ export function PostDetail({ model, onReply, onFocusComment, onShare }: PostDeta
 
       <S.PosterWrap>{posterNode}</S.PosterWrap>
 
-      {model.caption ? <S.Caption>{model.caption}</S.Caption> : null}
+      {caption ? <S.Caption>{caption}</S.Caption> : null}
 
       <S.Meta>{meta}</S.Meta>
+      {model.isOwn ? null : (
+        <S.SampleRow>
+          <SampleBadge compact />
+        </S.SampleRow>
+      )}
 
       <S.Divider />
 
@@ -146,14 +159,14 @@ export function PostDetail({ model, onReply, onFocusComment, onShare }: PostDeta
           kudos={kudos.total}
           kudoed={kudos.kudoed}
           comments={commentCount}
-          onKudos={() => dispatch(togglePostKudos(model.id))}
+          onKudos={onToggleKudos}
           onComment={onFocusComment}
           onShare={onShare}
         />
       </S.ActionBarWrap>
 
       <S.ThreadWrap>
-        <CommentThread postId={model.id} postAuthorId={model.authorId} totalCount={commentCount} onReply={onReply} />
+        <CommentThread postId={threadId} postAuthorId={model.authorId} totalCount={commentCount} onReply={onReply} />
       </S.ThreadWrap>
 
       {model.sessionId ? (

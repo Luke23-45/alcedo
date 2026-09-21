@@ -60,8 +60,9 @@ const MINUTE = 60_000;
 
 /**
  * The contract thread on Alex's post, anchored to the post's publish time so
- * relative timestamps stay honest: Mia +5m, Jon +9m, Alex's reply +11m,
- * Sofia +17m. Kudos: Mia 2, Jon 5 (kudo'd), Sofia 1 — exactly the contract.
+ * relative timestamps stay honest: Mia +3m, Jon +7m, Alex's reply +9m,
+ * Sofia +15m — the contract's "3 COMMENTS · 5 MIN · 1 HR · 2 HR · 3 HR"
+ * spread. Kudos: Mia 2, Jon 5 (kudo'd), Sofia 1 — exactly the contract.
  */
 export function alexPostSeed(postId: string, publishedAtMs: number): PostCommentSeed {
   const mia: FeedComment = {
@@ -69,7 +70,7 @@ export function alexPostSeed(postId: string, publishedAtMs: number): PostComment
     postId,
     authorId: 'mia',
     text: 'That shoulder press PR is huge. What did you warm up with?',
-    createdAt: publishedAtMs + 5 * MINUTE,
+    createdAt: publishedAtMs + 3 * MINUTE,
     parentId: null,
     kudos: 2,
     kudoed: false,
@@ -79,7 +80,7 @@ export function alexPostSeed(postId: string, publishedAtMs: number): PostComment
     postId,
     authorId: 'alex',
     text: 'Just the bar, then 40 and 50 for five.',
-    createdAt: publishedAtMs + 11 * MINUTE,
+    createdAt: publishedAtMs + 9 * MINUTE,
     parentId: mia.id,
     kudos: 0,
     kudoed: false,
@@ -89,7 +90,7 @@ export function alexPostSeed(postId: string, publishedAtMs: number): PostComment
     postId,
     authorId: 'jon',
     text: 'Volume up 18% this week. Save something for the rest of us.',
-    createdAt: publishedAtMs + 9 * MINUTE,
+    createdAt: publishedAtMs + 7 * MINUTE,
     parentId: null,
     kudos: 5,
     kudoed: true,
@@ -99,7 +100,7 @@ export function alexPostSeed(postId: string, publishedAtMs: number): PostComment
     postId,
     authorId: 'sofia',
     text: 'Bookmarked your split. Running it next block.',
-    createdAt: publishedAtMs + 17 * MINUTE,
+    createdAt: publishedAtMs + 15 * MINUTE,
     parentId: null,
     kudos: 1,
     kudoed: false,

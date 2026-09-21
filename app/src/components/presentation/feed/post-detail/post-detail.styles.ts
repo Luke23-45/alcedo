@@ -60,6 +60,12 @@ export const Meta = styled.Text`
   margin-top: 12px;
 `;
 
+/** Honesty marker for the fictional sample posts (Mia/Jon/Sofia), like the timeline footer. */
+export const SampleRow = styled.View`
+  margin-top: 8px;
+  align-items: flex-start;
+`;
+
 /** Hairline between the meta and the kudos row, at 16pt page margins. */
 export const Divider = styled.View`
   height: 0.67px;

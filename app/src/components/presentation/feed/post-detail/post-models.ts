@@ -2,6 +2,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '@/store/store';
 import { selectFeedSessionItems, selectOwnFeedUserId } from '@/store/feed';
 import type { SessionUserEvent } from '@/models/feed-models';
+import type { Session } from '@/models/session-models/session';
 import { type FeedPerson, personById, type FeedPersonId } from '../shared/people';
 
 /**
@@ -53,6 +54,12 @@ export interface PostDetailModel {
   audience: 'friends' | 'public';
   /** Real session id when available; the contract id for the reference showcase. */
   sessionId?: string;
+  /**
+   * The real published session behind Alex's post. Present only when the post
+   * is a real published session — the detail poster is derived from it, never
+   * from the contract placeholder.
+   */
+  session?: Session;
   /** Real feed event id, present only when the post is a real published session. */
   eventId?: string;
   poster: PostPosterData;
@@ -87,6 +94,7 @@ function alexModel(item: SessionUserEvent | undefined): PostDetailModel {
     postedAtMs: item ? item.timestamp.toEpochMilli() : Date.now() - 21 * 60_000,
     audience: 'friends',
     sessionId: item?.session.id ?? 'S-0609-A',
+    session: item?.session,
     eventId: item?.eventId,
     poster: ALEX_POSTER,
     // KUDOS ON ALEX'S JUN 9 POST = 6 → Mia, Jon, Sofia, Dev, Lena, Tom.

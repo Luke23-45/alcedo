@@ -2,14 +2,12 @@ import { useLayoutEffect, useState } from 'react';
 import { FlatList, RefreshControl } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'expo-router';
-import { Instant } from '@js-joda/core';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useScroll } from '@/hooks/useScrollListener';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { shareString } from '@/store/app';
-import { fetchFeedItems, fetchInboxItems, selectReceivedReactionsByEvent, upsertReceivedReactions } from '@/store/feed';
-import { ReceivedReaction } from '@/models/feed-models';
+import { fetchFeedItems, fetchInboxItems, upsertReceivedReactions } from '@/store/feed';
 import {
   alexPostSeed,
   ensurePostSeeded,
@@ -22,6 +20,7 @@ import type { KeyValueStore } from '@/services/key-value-store';
 import { PEOPLE, personById, type FeedPerson } from '../shared/people';
 import { deriveComposerSessionData, latestSession } from '../composer/composer-data';
 import { useComposerDraftCaption } from '../shared/composer-draft';
+import { buildAlexKudosSeed, useOwnPostKudos } from '../shared/own-post-kudos';
 import { ChallengeBanner } from './challenge-banner';
 import { FeedBackground } from './feed-background';
 import { FeedFooter } from './feed-footer';
@@ -53,29 +52,6 @@ const REFERENCE_KUDOS_SEEDS = buildReferencePosts(0).map((p) => ({
   total: p.kudos.total,
   faceIds: p.kudos.faceIds,
 }));
-
-/**
- * Reference kudos for Alex's own post, seeded as received cheers in the
- * existing reaction store ("cheers others sent you — only ever populated for
- * your own workouts", keyed by session id). The reference's six kudos are
- * Mia, Jon, Sofia, Dev, Lena and Tom.
- */
-const ALEX_KUDOS_SENDERS = ['mia', 'jon', 'sofia', 'dev', 'lena', 'tom'] as const;
-
-function buildAlexKudosSeed(sessionId: string): ReceivedReaction[] {
-  const now = Instant.now();
-  return ALEX_KUDOS_SENDERS.map(
-    (fromUserId, index) =>
-      new ReceivedReaction(
-        `seed-alex-kudos-${fromUserId}`,
-        sessionId,
-        fromUserId,
-        '💪',
-        1,
-        now.minusSeconds(index * 3600),
-      ),
-  );
-}
 
 interface PostRowProps {
   post: TimelinePost;
@@ -176,27 +152,13 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
   const hidden = useHiddenPosts(keyValueStore);
   const bookmarks = useBookmarks(keyValueStore);
 
-  // Alex's own post reads kudos from the existing reaction store: the row counts
-  // the received cheers for the session. The kudoed state is the same
-  // persisted local kudo record every other post uses (via selectPostKudos /
-  // togglePostKudos on post id 'alex'), so the heart stays filled and never
-  // hits the cheer pipeline's drop-for-unfollowed-author rollback. The session
-  // id doubles as the feed event id for this lookup.
-  const receivedByEvent = useAppSelector(selectReceivedReactionsByEvent);
-  const alexStoredKudos = useAppSelectorWithArg(selectPostKudos, 'alex');
+  // Alex's own post reads kudos through the shared own-post hook (Screen 2
+  // uses the same one): the row counts the received cheers for the session
+  // while the heart toggle is the persisted local kudo record keyed 'alex'.
+  // The session id doubles as the feed event id for this lookup.
   const sessionId = latest?.id;
-  const alexReceived = sessionId ? (receivedByEvent.get(sessionId) ?? []) : [];
-  const alexKudos: PostKudos | undefined =
-    sessionId !== undefined
-      ? {
-          total: alexReceived.reduce((sum, r) => sum + r.count, 0) + (alexStoredKudos?.kudoed ? 1 : 0),
-          faces: alexReceived
-            .map((r) => personById(r.fromUserId))
-            .filter((p): p is FeedPerson => p !== undefined)
-            .slice(0, 3),
-          kudoed: alexStoredKudos?.kudoed ?? false,
-        }
-      : undefined;
+  const ownPostKudos = useOwnPostKudos(sessionId);
+  const alexKudos: PostKudos | undefined = ownPostKudos.kudos;
 
   const referencePosts = buildReferencePosts(Date.now());
 
@@ -229,7 +191,7 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
   // Seed kudos (and Alex's comment thread) before first paint so seeded values
   // never flash through an empty state. Idempotent per post id.
   const ownPostedAt = ownPost?.postedAt;
-  const needsAlexKudosSeed = sessionId !== undefined && alexReceived.length === 0;
+  const needsAlexKudosSeed = ownPostKudos.needsKudosSeed;
   useLayoutEffect(() => {
     if (ownPostedAt !== undefined) {
       dispatch(ensurePostSeeded({ postId: 'alex', seed: alexPostSeed('alex', ownPostedAt) }));
@@ -279,7 +241,7 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
             <TimelinePostRow
               post={post}
               kudosOverride={isAlexPost ? alexKudos : undefined}
-              onToggleKudosOverride={isAlexPost ? () => dispatch(togglePostKudos('alex')) : undefined}
+              onToggleKudosOverride={isAlexPost ? ownPostKudos.toggleKudos : undefined}
               caption={caption}
               bookmarked={bookmarks.has(post.id)}
               shareText={shareText}
