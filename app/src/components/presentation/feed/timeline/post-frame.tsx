@@ -100,7 +100,11 @@ export function PostFrame({
         </S.MenuWrap>
       </S.Header>
       <S.PosterWrap>{hero}</S.PosterWrap>
-      {caption && <S.Caption $dark={dark}>{caption}</S.Caption>}
+      {caption && (
+        <S.Caption $dark={dark} numberOfLines={2} ellipsizeMode="tail">
+          {caption}
+        </S.Caption>
+      )}
       <S.KudosWrap>
         <KudosStack
           people={kudos.faces}

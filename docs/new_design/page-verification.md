@@ -182,7 +182,7 @@ confirmation on device — no device used.
 | 5 | Diff-save (Update Plan) | docs/new_design/diff-save-redesign.md | done 2026-09-22 |
 | 6 | History | docs/new_design/history-dark.md | done 2026-09-22 |
 | 7 | Trends | docs/new_design | done 2026-09-22 |
-| 8 | Feed timeline | docs/new_design/social-dark.md | pending |
+| 8 | Feed timeline | docs/new_design/social-dark.md | done 2026-09-22 |
 | 9 | Feed post detail | docs/new_design/social-dark.md | pending |
 | 10 | Feed share composer | docs/new_design/social-dark.md | pending |
 | 11 | Feed profile editor | docs/new_design/social-dark.md | pending |
@@ -630,6 +630,80 @@ used.
 all new files and all touched files that were clean at baseline (the 6
 touched files already non-conformant at HEAD were left at baseline
 formatting to avoid diff noise — no new format issues introduced).
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.
+
+### 8. Feed timeline
+- Verified 2026-09-22 against `docs/new_design/social-dark.md` Screen 1.
+  Route: `app/src/app/(tabs)/feed/index.tsx`; container
+  `components/presentation/feed/timeline/feed-timeline.tsx`.
+- Sections inventoried (render order): native nav header (Feed title +
+  44×44 compose target pushing `../share`; no root back chevron — the tab
+  root is a leaf, a deliberate and documented deviation from the reference),
+  challenge banner (361×76, gold medallion, title + pluralized
+  "3 days left · 128 participants", 200pt track filled 165.7pt from
+  10,340/12,480, "#3" + "10,340 PTS"), horizontal filter chips (All,
+  Following, PRs, Milestones, Challenge — 28pt pills with hitSlop to 44pt,
+  last chip bleeds past the edge), post cards (uniform 388pt: 36pt avatar,
+  name + YOU/MILESTONE badge, "@handle · age · audience" meta, 44×44 "···"
+  menu, 329×190 hero, caption, kudos stack of 3 faces + "+N" + label,
+  hairline, tri-split action bar), footer ("Showing N of 128 posts from
+  your circle" + the feed's single `SampleBadge` + "Load earlier" pill),
+  per-filter empty states.
+- State matrix simulated: populated (own post + 3 reference posts), first
+  run / no sessions (3 sample posts + footer badge — the samples are
+  identified, never presented as live data), all-posts-hidden empty state,
+  each filter's empty state, pull-to-refresh spinner, refresh failure
+  (spinner resets via `finally`, snackbar via `feedApiError` with
+  `fromUserAction`), hidden-post/bookmark persistence (incl. corrupt-JSON
+  and non-string-entry degradation), composer-draft caption flowing into
+  Alex's card.
+- Data/store/persistence: Alex's card derives from the real latest session
+  via the shared composer derivation (volume/sets/duration from completed
+  sets, PR pills uppercased, honest VOLUME PR only when this session leads,
+  kicker through the cached Intl formatter — the `a4abc1b` js-joda fix is
+  present). Kudos count reads the designed reaction-store source
+  (`selectReceivedReactionsByEvent`, seeded with the reference's six
+  cheers) and grows when real cheers arrive; the heart toggle uses the
+  same persisted local kudo record as every post. Hidden posts and
+  bookmarks persist in `KeyValueStore` (`feed.timeline.hidden.v1`,
+  `feed.timeline.bookmarks.v1`). Refresh dispatches real
+  `fetchInboxItems` + `fetchFeedItems`; the "Load earlier" pill reuses that
+  refresh (it is never a visual no-op — kept per the recorded Screen 1
+  decision).
+- Navigation targets traced: comment → `item/alex|mia|jon|sofia`
+  (Screen 2), compose → `../share` (Screen 3), share → native share sheet,
+  menu → Share / Bookmark / Delete (own) / Report (others) via the
+  44×44 menu trigger. No dead controls found.
+- i18n: all 55 timeline keys resolve in `en.json`; the challenge sub uses
+  the ICU plural form with matching `daysLeft`/`participants` params; the
+  kudos "many" key uses `{count}` matching the call site.
+
+**Bugs found and fixed:**
+1. `post-frame.tsx` — the caption had no line clamp inside the fixed-388pt
+   card. A composer draft caption (up to 280 chars) pushed the kudos row,
+   hairline, and action bar out of the card shell. The caption is now
+   `numberOfLines={2} ellipsizeMode="tail"` — matching the spec's two-line
+   captions and the uniform-card-height mandate.
+
+**Tests (35 new, all green):**
+- `timeline/timeline-simulation.spec.ts` (new, 35 tests): all five filter
+  semantics (incl. PR-pill-dependent own post), kudos-label derivation
+  (none/one/two/"Mia, Jon and 4 others", tail counted from the total),
+  reference-post truthfulness (2h/18h/24h ages, 14/32/21 kudos totals,
+  audience mix, all in-challenge), challenge math (165.7pt fill, rank 3,
+  128 participants, en-US point grouping), `formatPostAge` boundaries
+  (now/21m/2h/18h/1d, short-date fallback, future-dated clamp), composer
+  derivation (volume/sets/duration from real sets, unlogged sets ignored,
+  PR-pill uppercasing, honest VOLUME PR, Intl kicker), hidden/bookmark
+  persistence (load, add/toggle, corrupt JSON, non-string entries),
+  caption-clamp regression (source guard), footer honesty (SampleBadge,
+  pill wired to a real handler).
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 116 files /
+1,718 tests green; oxlint 0 errors on touched files; eslint clean on
+touched files; `oxfmt --check` clean on touched files.
 
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.
