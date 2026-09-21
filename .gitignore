@@ -12,7 +12,6 @@
 *.idea
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
-.agents
 site/build
 .vscode
 service-account.json
