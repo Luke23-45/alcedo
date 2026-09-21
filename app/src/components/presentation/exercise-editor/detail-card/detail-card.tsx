@@ -3,7 +3,7 @@ import { useTranslate } from '@tolgee/react';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { CardioExerciseBlueprint, WeightedExerciseBlueprint } from '@/models/blueprint-models';
 import { Card, LinkGlyph, SubHead } from '../editor-primitives';
-import { clampNotes, isValidHttpUrl, NOTES_MAX_LENGTH } from '../exercise-editor-logic';
+import { clampNotes, isValidHttpUrl, linkGlyphColor, NOTES_MAX_LENGTH } from '../exercise-editor-logic';
 import {
   DetailPad,
   FieldInput,
@@ -57,7 +57,7 @@ export function DetailCard({
         </SubHeadRow>
         <LinkWell $focused={focused === 'link'}>
           <LinkGlyphWrap>
-            <LinkGlyph active={linkValid} />
+            <LinkGlyph color={linkGlyphColor(exercise.link)} />
           </LinkGlyphWrap>
           <FieldInput
             value={exercise.link}

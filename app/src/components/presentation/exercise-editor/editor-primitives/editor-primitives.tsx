@@ -81,9 +81,11 @@ export function SwapGlyph() {
   );
 }
 
-export function LinkGlyph({ active = false }: { active?: boolean }) {
+export function LinkGlyph({ color }: { color: string }) {
+  // The ink is decided by linkGlyphColor (exercise-editor-logic): ember only
+  // for a real http(s) link, neutral grey otherwise — the S1 empty state.
   return glyph(
-    active ? '#FF6A3D' : '#64D2FF',
+    color,
     2.0,
     'M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5',
   );
@@ -161,6 +163,9 @@ export function SegmentedControl<T extends string>({
           <SegmentButton
             key={option.value}
             onPress={() => onChange(option.value)}
+            // The reference draws 36pt segments in the rules editor; the
+            // vertical slop keeps the effective target at 44pt.
+            hitSlop={{ top: 4, bottom: 4 }}
             accessibilityRole="tab"
             accessibilityState={{ selected }}
             accessibilityLabel={option.label}
@@ -203,6 +208,9 @@ export function Stepper({
   const Value = small ? SmallStepperValue : StepperValue;
   const canDecrease = !disabled && value - step >= min;
   const canIncrease = !disabled && (max === undefined || value + step <= max);
+  // The small steppers draw 22pt (S2-C grid density); the wider hitSlop keeps
+  // the effective target at 44pt without changing the reference geometry.
+  const slop = small ? 11 : 8;
   return (
     <StepperRow accessibilityRole="adjustable" accessibilityLabel={label} accessibilityValue={{ text }}>
       <StepperButton
@@ -211,7 +219,7 @@ export function Stepper({
         onPress={() => onChange(Math.max(min, value - step))}
         disabled={!canDecrease}
         accessibilityLabel={`Decrease ${label}`}
-        hitSlop={8}
+        hitSlop={slop}
       >
         <MinusGlyph />
       </StepperButton>
@@ -222,7 +230,7 @@ export function Stepper({
         onPress={() => onChange(max === undefined ? value + step : Math.min(max, value + step))}
         disabled={!canIncrease}
         accessibilityLabel={`Increase ${label}`}
-        hitSlop={8}
+        hitSlop={slop}
       >
         <PlusGlyph />
       </StepperButton>

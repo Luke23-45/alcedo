@@ -7,5 +7,7 @@ export default function ExerciseEditorPage() {
     index: string;
     isNew?: string;
   }>();
-  return <SessionExerciseEditor sessionId={sessionId} index={Number(index)} isNew={!!isNew} />;
+  // The only in-app producer emits `isNew=1` or omits it; parse explicitly so
+  // a deep link like `?isNew=0` can never flip the editor into add mode.
+  return <SessionExerciseEditor sessionId={sessionId} index={Number(index)} isNew={isNew === '1'} />;
 }

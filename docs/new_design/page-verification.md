@@ -31,6 +31,8 @@ timing, real-device performance. Device checklist comes later with a dev build.
 |---|------|------|--------|
 | 1 | Home | docs/new_design (home dark/light) | done 2026-09-21 |
 | 2 | Workout flow (session) | docs/new_design | done 2026-09-22 |
+| 3 | Workout editor | docs/new_design/workout-editor-redesign.md | done 2026-09-22 |
+| 4 | Exercise editor | docs/new_design/exercise-editor-redesign.md | done 2026-09-22 |
 
 ## Per-page log
 ### 1. Home
@@ -260,3 +262,97 @@ the suite went fully green.)
 
 **Not claimed:** pixel/animation feel, drag-gesture feel, real-device
 performance — no device used.
+
+### 4. Exercise editor (/exercise-editor)
+- Verified 2026-09-22 (route `app/src/app/exercise-editor.tsx`, container
+  `components/smart/session-exercise-editor/session-exercise-editor.tsx`,
+  screen `components/presentation/exercise-editor/`).
+- Sections inventoried (in render order): nav row (back chevron, Add/Edit
+  Exercise title, Done — disabled until a name is chosen in add mode), amber
+  draft strip ("Unsaved draft · commits when you leave"), add-mode
+  search-first cards (focused search field with ember glow, results with tile
+  accents, hint / no-results states), identity card (name well with swap
+  glyph, type picker Weighted/Cardio footer), set-config card (reps-mode
+  segmented Fixed/Range/Per set, sets + reps steppers, add/remove set,
+  drop-set tail caption, 3-per-row per-set grid), detail card (notes with
+  counter, link well with validity glyph), options card (rest-between-sets
+  row, track-superset toggle, superset hint), resistance card (External /
+  Bodyweight / No added resistance radios), progression card (rule rows,
+  add/edit/remove), cardio set card (distance/time steppers, HMS duration,
+  unit picker, track toggles, per-set rest, add/remove set floor of 1),
+  rest sheet (big −/+ steppers, preset chips, slider, Apply to all sets),
+  type-switch dialog (Cancel / Switch & Reset).
+- State matrix simulated: add (search-first, Done disabled) vs edit, swap
+  (keeps sets·notes·link), fixed/range/per-set reps, 9-set wrapping,
+  drop-set tail detection, cardio distance/time conversion and tracking
+  locks, add/remove set floors, rest enabled/disabled + presets + apply-all,
+  progression add/edit/remove, type-switch cancel/confirm both directions,
+  dirty strip show/hide, commit-on-dismiss for Done and Back, deleted-while-
+  open dismisses, invalid/empty link, notes cap, empty query, no results,
+  long-name two-line wrap, imperial units (mi/yd), keyboard avoidance via
+  FullHeightScrollView.
+- Draft/persistence traced end to end: local draft in component state
+  (draftRef guards the unmount closure) → `useOnDismiss` →
+  `exerciseEditorDismissUpdate` → `updateStoredSession` → Redux reducer →
+  store effect → SQLite upsert of the session payload. No network in any
+  editor path; fully offline-capable.
+- 44×44 audit: nav buttons, Done, add/remove-set (48px), all rows (44–64px),
+  toggles (hitSlop 10), trash (hitSlop 10), dialog actions (52px), rest-sheet
+  big steppers (44px). Three sub-44 visuals fixed with hitSlop (no geometry
+  change): small steppers 22px → slop 11 (44 effective), 36px segments →
+  vertical slop 4 (44 effective), 28px rest chips → vertical slop 8 (44
+  effective). Adjacent-target overlap checked for the per-set grid and HMS
+  steppers — none.
+
+**Bugs found and fixed:**
+1. `useAddExercise.ts` — the hook pre-named the placeholder with the
+   localized "New Exercise" and inherited 3×10 defaults, which made the
+   designed S6 search-first add state (`showAddSearch`, Done-disabled) and
+   the 1×8 default unreachable from day one. It now inserts
+   `newExercisePlaceholder()` (blank name, 1×8 fixed), matching the workout
+   editor's own add flow and the S6 reference. The orphaned
+   `exercise.new.default_name` key was removed from `en.json`.
+2. `exercise-editor-logic.ts` (new `newExercisePlaceholder()`) and
+   `session-workout-editor.tsx` — both add entry points now share the one
+   helper, so the placeholder construction cannot drift again.
+3. `resistance-card` — the selected row rendered no radio (only the ember
+   well) while the S1 reference shows a selected ring + dot. Selected rows
+   now render the ember ring + dot; the stale "no radio" comment was
+   corrected.
+4. `editor-primitives.tsx` / `detail-card.tsx` — the link glyph used a
+   cyan third state for empty/invalid links; the reference only ever shows
+   grey (empty) and ember (valid http(s)). Glyph ink is now decided by the
+   tested `linkGlyphColor()` helper: ember for a real link, grey otherwise.
+5. `en.json` + `set-config-card.tsx` — the drop-set tail caption claimed
+   sets "step down automatically". Nothing performs an automatic step-down;
+   the caption is a stored-target detector. Copy corrected to "step down."
+   (regression-tested against `en.json`).
+6. `en.json` + `type-switch-dialog.tsx` — the dialog only warned about
+   reps/targets being reset and implied the rest was kept. It now names the
+   full reset honestly: weighted→cardio resets reps, resistance, progression,
+   rest and superset; cardio→weighted resets targets, tracking and rest.
+   Name, notes and link are still kept.
+7. `app/exercise-editor.tsx` — `isNew={!!isNew}` would treat any non-empty
+   param (e.g. `?isNew=0`) as add mode. Now parsed explicitly
+   (`isNew === '1'`); the sole in-app producer only ever emits `isNew=1`.
+
+**Refactors (behavior unchanged):**
+- `switchExerciseKind()` extracted from `ExerciseEditorScreen.confirmTypeSwitch`
+  into `exercise-editor-logic.ts` so the destructive reset (fresh blueprint of
+  the target kind, preserving only name/notes/link) is unit-tested.
+
+**Tests (8 new, all green):**
+- `exercise-editor-logic.spec.ts` (+8): `switchExerciseKind` both directions
+  (identity preserved, config genuinely reset), `linkGlyphColor` (ember only
+  for http(s), grey for empty/invalid), `newExercisePlaceholder` (blank name,
+  1×8 fixed), drop-set copy regression (never claims "automatically").
+
+**Honest deviations (unchanged, correct):** imperial distance uses mi/yd
+(the model has no feet); progression has no Each session/Each week toggle
+(the model stores no frequency).
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 109 files /
+1,604 tests green; oxlint 0 errors and oxfmt clean on all touched files.
+
+**Not claimed:** pixel/animation feel, haptic feel, real-device performance —
+no device used.

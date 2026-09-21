@@ -236,6 +236,39 @@ export function isValidHttpUrl(value: string): boolean {
   }
 }
 
+/**
+ * Link glyph ink: ember when the stored link is a real http(s) URL, neutral
+ * grey otherwise (empty or invalid). The reference never shows a third state.
+ */
+export function linkGlyphColor(link: string): string {
+  return isValidHttpUrl(link) ? '#FF6A3D' : '#8E8E93';
+}
+
+/**
+ * The S6 add flow placeholder: a blank name opens the search-first layout
+ * (Done stays disabled until an exercise is picked) and new exercises default
+ * to 1 x 8. Shared by the workout editor and the add-exercise hook so every
+ * entry point starts identical.
+ */
+export function newExercisePlaceholder(): WeightedExerciseBlueprint {
+  return WeightedExerciseBlueprint.of({ sets: 1, repsConfig: { type: 'fixed', reps: 8 } });
+}
+
+/**
+ * What confirming the S4-A type switch produces: a fresh blueprint of the
+ * target kind carrying only name, notes and link — the rep/target
+ * configuration is genuinely reset, never silently migrated.
+ */
+export function switchExerciseKind(
+  exercise: WeightedExerciseBlueprint | CardioExerciseBlueprint,
+  target: ExerciseKind,
+): WeightedExerciseBlueprint | CardioExerciseBlueprint {
+  const preserved = { name: exercise.name, notes: exercise.notes, link: exercise.link };
+  return target === 'cardio'
+    ? CardioExerciseBlueprint.empty().with(preserved)
+    : WeightedExerciseBlueprint.of(preserved);
+}
+
 /** Clamp note text to the design's 280-character cap (legacy had no cap — behavior change). */
 export function clampNotes(value: string): string {
   return value.length > NOTES_MAX_LENGTH ? value.slice(0, NOTES_MAX_LENGTH) : value;

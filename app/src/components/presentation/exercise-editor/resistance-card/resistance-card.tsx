@@ -4,7 +4,14 @@ import { Resistance, WeightedExerciseBlueprint } from '@/models/blueprint-models
 import { Card, Hairline } from '../editor-primitives';
 import { formatBodyweight } from '../exercise-editor-logic';
 import { Weight } from '@/models/weight';
-import { Radio, ResistanceBody, ResistanceLabel, ResistanceRow, ResistanceTextColumn } from './resistance-card.styles';
+import {
+  Radio,
+  RadioDot,
+  ResistanceBody,
+  ResistanceLabel,
+  ResistanceRow,
+  ResistanceTextColumn,
+} from './resistance-card.styles';
 
 const OPTIONS: Resistance[] = ['external', 'bodyweight', 'none'];
 
@@ -67,7 +74,7 @@ export function ResistanceCard({
                   <ResistanceLabel $selected={selected}>{label(option)}</ResistanceLabel>
                   <ResistanceBody $selected={selected}>{explanation(option)}</ResistanceBody>
                 </ResistanceTextColumn>
-                {selected ? null : <Radio />}
+                <Radio $selected={selected}>{selected ? <RadioDot /> : null}</Radio>
               </ResistanceRow>
             </View>
           );

@@ -32,12 +32,12 @@ export function TypeSwitchDialog({
     copy.lostKind === 'reps'
       ? t(
           'exercise.editor.type_switch.lost_reps',
-          'This resets the rep configuration for all {count} sets of this exercise.',
+          'This resets the set configuration for all {count} sets — reps, resistance, progression, rest and superset.',
           { count: copy.lostCount },
         )
       : t(
           'exercise.editor.type_switch.lost_targets',
-          'This resets the target configuration for all {count} sets of this exercise.',
+          'This resets the set configuration for all {count} sets — targets, tracking and rest.',
           { count: copy.lostCount },
         );
   return (

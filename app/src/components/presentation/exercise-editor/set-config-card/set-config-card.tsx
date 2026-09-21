@@ -93,7 +93,7 @@ export function SetConfigCard({
             </SetGrid>
             {tail ? (
               <TailCaption>
-                {t('exercise.editor.drop_set_tail', 'Drop-set tail: sets {from}–{to} step down automatically.', {
+                {t('exercise.editor.drop_set_tail', 'Drop-set tail: sets {from}–{to} step down.', {
                   from: tail.from,
                   to: tail.to,
                 })}

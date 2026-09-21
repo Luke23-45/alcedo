@@ -101,6 +101,9 @@ export function RestSheet({
                 key={seconds}
                 $selected={selectedPreset === seconds}
                 onPress={() => onChange(restPresetFor(seconds))}
+                // Chips draw 28pt tall (S4-B); the vertical slop keeps the
+                // effective target at 44pt without changing the geometry.
+                hitSlop={{ top: 8, bottom: 8 }}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: selectedPreset === seconds }}
                 accessibilityLabel={presetLabel(seconds)}

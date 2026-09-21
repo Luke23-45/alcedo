@@ -3,10 +3,11 @@ import Menu from '@/components/presentation/foundation/menu';
 import { HomeScreenBackground } from '@/components/presentation/home/shared/home-auras';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { getSessionExerciseEditorHref } from '@/components/smart/session-exercise-editor';
+import { newExercisePlaceholder } from '@/components/presentation/exercise-editor/exercise-editor-logic';
 import { useAppReducedMotion } from '@/hooks/useMotionSettings';
 import { useOnDismiss } from '@/hooks/useOnDismiss';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { ExerciseBlueprint, WeightedExerciseBlueprint } from '@/models/blueprint-models';
+import { ExerciseBlueprint } from '@/models/blueprint-models';
 import { Session } from '@/models/session-models';
 import { Weight } from '@/models/weight';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
@@ -388,12 +389,7 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
       return;
     }
     const newIndex = workout.recordedExercises.length;
-    updateSession((s) =>
-      s.withAddedExercise(
-        WeightedExerciseBlueprint.of({ sets: 1, repsConfig: { type: 'fixed', reps: 8 } }),
-        useImperialUnits,
-      ),
-    );
+    updateSession((s) => s.withAddedExercise(newExercisePlaceholder(), useImperialUnits));
     push(getSessionExerciseEditorHref(sessionId, newIndex, { isNew: true }));
   };
 

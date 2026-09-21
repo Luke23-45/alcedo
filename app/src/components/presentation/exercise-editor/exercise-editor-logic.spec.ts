@@ -8,6 +8,7 @@ import {
 import { Weight } from '@/models/weight';
 import { Duration } from '@js-joda/core';
 import BigNumber from 'bignumber.js';
+import en from '@/i18n/en.json';
 import { describe } from 'vitest';
 import { expect, it } from 'vitest';
 import {
@@ -24,6 +25,8 @@ import {
   formatDurationShort,
   formatRestValue,
   isValidHttpUrl,
+  linkGlyphColor,
+  newExercisePlaceholder,
   progressionSummary,
   removeCardioSet,
   repsModeOf,
@@ -34,6 +37,7 @@ import {
   searchExercises,
   setCountOf,
   setTrackFlag,
+  switchExerciseKind,
   trackStateOf,
   typeSwitchCopy,
   updateWeightedSet,
@@ -325,5 +329,72 @@ describe('searchExercises', () => {
 
   it('returns nothing for a blank query', () => {
     expect(searchExercises(catalog, '   ')).toEqual([]);
+  });
+});
+
+describe('newExercisePlaceholder', () => {
+  it('starts blank so add mode opens the search-first layout', () => {
+    const placeholder = newExercisePlaceholder();
+    expect(placeholder.name).toBe('');
+  });
+
+  it('defaults to 1 x 8 fixed, per the S6 reference', () => {
+    const placeholder = newExercisePlaceholder();
+    expect(placeholder.plannedSets).toHaveLength(1);
+    expect(placeholder.plannedSets[0]!.reps.min).toBe(8);
+    expect(placeholder.plannedSets[0]!.reps.max).toBe(8);
+  });
+});
+
+describe('switchExerciseKind', () => {
+  const source = WeightedExerciseBlueprint.of({
+    name: 'Bench',
+    notes: 'Wide grip',
+    link: 'https://example.com/bench',
+    plannedSets: [{ reps: { min: 5, max: 5 } }],
+  }).with({ progression: [ProgressionRule.load(new BigNumber(2.5))] });
+
+  it('weighted -> cardio keeps identity and resets the configuration', () => {
+    const next = switchExerciseKind(source, 'cardio');
+    expect(next).toBeInstanceOf(CardioExerciseBlueprint);
+    expect(next.name).toBe('Bench');
+    expect(next.notes).toBe('Wide grip');
+    expect(next.link).toBe('https://example.com/bench');
+    // The rep configuration is genuinely gone, not migrated.
+    expect((next as CardioExerciseBlueprint).sets.length).toBe(1);
+  });
+
+  it('cardio -> weighted keeps identity and resets the configuration', () => {
+    const cardio = switchExerciseKind(source, 'cardio');
+    const next = switchExerciseKind(cardio, 'weighted');
+    expect(next).toBeInstanceOf(WeightedExerciseBlueprint);
+    expect(next.name).toBe('Bench');
+    expect(next.notes).toBe('Wide grip');
+    expect(next.link).toBe('https://example.com/bench');
+    const sets = (next as WeightedExerciseBlueprint).plannedSets;
+    expect(sets.length).toBe(3);
+    expect(sets.every((s) => s.reps.min === 10 && s.reps.max === 10)).toBe(true);
+    expect((next as WeightedExerciseBlueprint).progression).toEqual([]);
+  });
+});
+
+describe('linkGlyphColor', () => {
+  it('is ember only for a real http(s) link', () => {
+    expect(linkGlyphColor('https://example.com')).toBe('#FF6A3D');
+    expect(linkGlyphColor('http://example.com/x')).toBe('#FF6A3D');
+  });
+
+  it('is neutral grey for empty or invalid links (the S1 empty state)', () => {
+    expect(linkGlyphColor('')).toBe('#8E8E93');
+    expect(linkGlyphColor('   ')).toBe('#8E8E93');
+    expect(linkGlyphColor('not a url')).toBe('#8E8E93');
+    expect(linkGlyphColor('ftp://example.com')).toBe('#8E8E93');
+  });
+});
+
+describe('drop-set tail copy', () => {
+  it('never claims the tail steps down automatically', () => {
+    const copy = (en as Record<string, string>)['exercise.editor.drop_set_tail'] ?? '';
+    expect(copy).not.toMatch(/automatically/i);
   });
 });

@@ -3,8 +3,9 @@ import { editorPalette } from '../exercise-editor-tokens';
 
 /**
  * Reference: 64pt rows; the selected row carries an ember well
- * (#FF6A3D @.10, rx 16, inset 8pt from the card edges) and no radio;
- * unselected rows show the r10 outline radio on the right.
+ * (#FF6A3D @.10, rx 16, inset 8pt from the card edges) and the selected
+ * radio (ember ring + ember dot); unselected rows show the r10 outline
+ * radio on the right.
  */
 export const ResistanceRow = styled.Pressable<{ $selected: boolean }>`
   flex-direction: row;
@@ -43,11 +44,21 @@ export const ResistanceBody = styled.Text<{ $selected: boolean }>`
   color: ${({ theme, $selected }) => ($selected ? '#98989F' : editorPalette(theme.isDark).text.caption)};
 `;
 
-export const Radio = styled.View`
+export const Radio = styled.View<{ $selected?: boolean }>`
   width: 20px;
   height: 20px;
   border-radius: 10px;
   border-curve: continuous;
-  border-width: 1.6px;
-  border-color: ${({ theme }) => editorPalette(theme.isDark).radio};
+  border-width: ${({ $selected }) => ($selected ? 2 : 1.6)}px;
+  border-color: ${({ theme, $selected }) =>
+    $selected ? editorPalette(theme.isDark).accent.ember : editorPalette(theme.isDark).radio};
+  align-items: center;
+  justify-content: center;
+`;
+
+export const RadioDot = styled.View`
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: ${({ theme }) => editorPalette(theme.isDark).accent.ember};
 `;

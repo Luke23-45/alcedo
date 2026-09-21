@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import { useTranslate } from '@tolgee/react';
-import {
-  CardioExerciseBlueprint,
-  CardioExerciseSetBlueprint,
-  ExerciseBlueprint,
-  WeightedExerciseBlueprint,
-} from '@/models/blueprint-models';
+import { CardioExerciseSetBlueprint, ExerciseBlueprint, WeightedExerciseBlueprint } from '@/models/blueprint-models';
 import { ExerciseDescriptor } from '@/models/exercise-models';
 import { Weight } from '@/models/weight';
 import { translateExerciseMeta } from '@/utils/exercise-meta';
@@ -26,6 +21,7 @@ import {
   removeCardioSet,
   restPresetFor,
   searchExercises,
+  switchExerciseKind,
   typeSwitchCopy,
 } from '../exercise-editor-logic';
 import {
@@ -108,12 +104,7 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
     if (!pendingType) {
       return;
     }
-    const preserved = { name: exercise.name, notes: exercise.notes, link: exercise.link };
-    onExerciseChange(
-      pendingType === 'cardio'
-        ? CardioExerciseBlueprint.empty().with(preserved)
-        : WeightedExerciseBlueprint.of(preserved),
-    );
+    onExerciseChange(switchExerciseKind(exercise, pendingType));
     setPendingType(null);
   };
 
