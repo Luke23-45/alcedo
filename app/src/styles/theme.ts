@@ -427,6 +427,18 @@ export interface SemanticColors {
     /** Categorical series, ordered for maximum separation. */
     series: readonly string[];
   };
+  /** Bottom tab bar chrome. From docs/new_design/tab-bar-icons.svg §4. */
+  tabBar: {
+    /** Selected glyph + label. Spec: #FF2D55 light / #FF375F dark. */
+    selected: string;
+    /** Unselected glyph + label. Spec: #8E8E93 both modes. */
+    unselected: string;
+    /** Bar surface gradient, top → bottom. */
+    backgroundTop: string;
+    backgroundBottom: string;
+    /** 0.5pt top hairline. */
+    hairline: string;
+  };
 }
 
 const lightColors: SemanticColors = {
@@ -493,6 +505,13 @@ const lightColors: SemanticColors = {
       palette.ember[300],
       palette.ink[600],
     ],
+  },
+  tabBar: {
+    selected: '#FF2D55', // spec §4 — 3.65:1 on the light bar surface
+    unselected: '#8E8E93', // iOS system gray, both modes
+    backgroundTop: 'rgba(255, 255, 255, 0.92)',
+    backgroundBottom: 'rgba(244, 244, 247, 0.98)',
+    hairline: 'rgba(0, 0, 0, 0.10)',
   },
 };
 
@@ -561,6 +580,13 @@ const darkColors: SemanticColors = {
       palette.ember[300],
       palette.ink[400],
     ],
+  },
+  tabBar: {
+    selected: '#FF375F', // spec §4 — electric coral on the dark bar surface
+    unselected: '#8E8E93', // iOS system gray, both modes
+    backgroundTop: 'rgba(24, 24, 27, 0.94)',
+    backgroundBottom: 'rgba(9, 9, 11, 0.99)',
+    hairline: 'rgba(255, 255, 255, 0.12)',
   },
 };
 

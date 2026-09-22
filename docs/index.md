@@ -18,6 +18,7 @@ doc is added, removed, renamed, or repurposed, update this index in the same cha
 - [new_design/social-dark.md](new_design/social-dark.md) — Feed (social) redesign spec: timeline, post detail, share composer, profile editor.
 - [new_design/diff-save-redesign.md](new_design/diff-save-redesign.md) — "Update Plan" (/diff-save) redesign spec.
 - [new_design/exercise-editor-redesign.md](new_design/exercise-editor-redesign.md) — exercise editor redesign spec (six canvases).
+- [new_design/tab-bar-icons.svg](new_design/tab-bar-icons.svg) — bottom tab bar icon system spec (5 custom glyphs, outline + filled, runtime rigs).
 - [new_design/trends-dark.md](new_design/trends-dark.md) — Trends redesign spec.
 - [new_design/workout-flow-dark.md](new_design/workout-flow-dark.md) — workout flow spec.
 - [new_design/workout-flow-brief.md](new_design/workout-flow-brief.md) — workout flow brief.
