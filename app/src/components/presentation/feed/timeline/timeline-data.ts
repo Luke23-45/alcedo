@@ -1,13 +1,12 @@
-import { PEOPLE, type FeedPerson } from '../shared/people';
+import type { FeedPerson } from '../shared/people';
 
 /**
- * Feed timeline data contract — Screen 1 of docs/new_design/social-dark.md.
- *
- * People: the locked social graph lives in shared/people.ts (contract order).
- * Reference posts (Mia, Jon, Sofia) are fictional sample content: their ages
- * are seeded truthfully relative to `now` at build time so the "2h / 18h /
- * 1d" labels are always honest. Alex's own post is assembled by the screen
- * container from the user's real latest session (composer-data derivation).
+ * The bundled default feed: twelve posts from the default social graph,
+ * served when no backend is connected so the feed is never an empty shell.
+ * Ages are seeded truthfully relative to `now` at build time, so the
+ * "2h / 5h / 9h …" labels are always honest. Photos and the clip are bundled
+ * assets (see ../feed-seed.ts); Alex's own post is assembled separately
+ * by the screen container from the user's real latest session.
  */
 
 export type TimelineFilter = 'all' | 'following' | 'prs' | 'milestones' | 'challenge';
@@ -118,9 +117,29 @@ export interface TimelineWorkoutPost extends TimelinePostBase {
 
 export interface TimelineMilestonePost extends TimelinePostBase {
   kind: 'milestone';
+  milestone: {
+    value: string;
+    unit: string;
+    tagline: string;
+    dateRange: string;
+  };
 }
 
-export type TimelinePost = TimelineWorkoutPost | TimelineMilestonePost;
+export interface TimelinePhotoPost extends TimelinePostBase {
+  kind: 'photo';
+  /** Bundled photo (Metro asset id), rendered as the card hero. */
+  photo: number;
+}
+
+export interface TimelineVideoPost extends TimelinePostBase {
+  kind: 'video';
+  /** Bundled clip (Metro asset id), plays on tap. */
+  video: number;
+  /** Still shown until the user taps play. */
+  poster: number;
+}
+
+export type TimelinePost = TimelineWorkoutPost | TimelineMilestonePost | TimelinePhotoPost | TimelineVideoPost;
 
 export function postHasPrPills(post: TimelinePost): boolean {
   return post.kind === 'workout' && post.poster.prPills.length > 0;
@@ -170,92 +189,6 @@ export function describeKudosLabel(names: string[], total: number): KudosLabelPa
   return { kind: 'many', first: names[0], second: names[1], others: total - 2 };
 }
 
-/** Reference ages, seeded truthfully relative to now (contract: 2h, 18h, 1d). */
-const HOUR = 3_600_000;
-const REFERENCE_AGES: Record<'mia' | 'jon' | 'sofia', number> = {
-  mia: 2 * HOUR,
-  jon: 18 * HOUR,
-  sofia: 24 * HOUR,
-};
-
-/**
- * The three fictional sample posts. Captions are the contract copy with the
- * single emoji stripped (no emojis anywhere in the app). Gradients are the
- * exact contract values.
- */
-export function buildReferencePosts(now: number): TimelinePost[] {
-  return [
-    {
-      kind: 'workout',
-      id: 'mia',
-      person: PEOPLE.mia!,
-      isOwn: false,
-      badge: null,
-      audience: 'public',
-      postedAt: now - REFERENCE_AGES.mia,
-      caption: 'Squat 125 for five — third attempt at this weight, and the belt finally stayed on.',
-      poster: {
-        kicker: 'KINETIC · MONDAY, JUNE 9',
-        heroValue: '7,860',
-        heroUnit: 'kg',
-        workoutName: 'Legs · Hypertrophy',
-        duration: '52:40',
-        sets: '22',
-        prPills: ['SQUAT PR', '125 KG × 5', 'PERSONAL BEST'],
-        gradient: { colors: ['#FF5AC8', '#6A1B7A'] },
-      },
-      kudos: {
-        faceIds: ['alex', 'jon', 'sofia'],
-        total: 14,
-      },
-      comments: 5,
-      inChallenge: true,
-    },
-    {
-      kind: 'milestone',
-      id: 'jon',
-      person: PEOPLE.jon!,
-      isOwn: false,
-      badge: 'milestone',
-      audience: 'public',
-      postedAt: now - REFERENCE_AGES.jon,
-      caption: 'Three years, one hundred sessions. Started at 40 kg on the bar and no idea what a split was.',
-      kudos: {
-        faceIds: ['alex', 'mia', 'sofia'],
-        total: 32,
-      },
-      comments: 11,
-      inChallenge: true,
-    },
-    {
-      kind: 'workout',
-      id: 'sofia',
-      person: PEOPLE.sofia!,
-      isOwn: false,
-      badge: null,
-      audience: 'friends',
-      postedAt: now - REFERENCE_AGES.sofia,
-      caption: 'Deadlift 160 for three. Two years of chipping away at the same bar.',
-      poster: {
-        kicker: 'KINETIC · SUNDAY, JUNE 8',
-        heroValue: '6,240',
-        heroUnit: 'kg',
-        workoutName: 'Pull Day',
-        duration: '48:15',
-        sets: '18',
-        prPills: ['DEADLIFT PR', '160 KG × 3'],
-        gradient: { colors: ['#4ADE80', '#0B5C46'] },
-      },
-      kudos: {
-        faceIds: ['alex', 'mia', 'jon'],
-        total: 21,
-      },
-      comments: 4,
-      inChallenge: true,
-    },
-  ];
-}
-
 /** Weekly-challenge banner contract values (Screen 1 spec). */
 export const CHALLENGE = {
   titlePoints: 10_340,
@@ -269,9 +202,6 @@ export const CHALLENGE = {
     return (this.titlePoints / this.leaderPoints) * this.trackWidth;
   },
 } as const;
-
-/** Circle post total shown in the footer ("Showing N of 128 posts"). */
-export const CIRCLE_POST_TOTAL = 128;
 
 export function formatChallengePoints(points: number): string {
   return points.toLocaleString('en-US');

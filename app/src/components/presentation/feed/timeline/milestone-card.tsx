@@ -6,10 +6,16 @@ import { useTimelineT } from './timeline-i18n';
 import { GOLD_GRADIENT, GOLD_GRADIENT_LOCATIONS, HERO_GLOSS, HERO_INK_UNIT } from './timeline-tokens';
 import * as S from './milestone-card.styles';
 
-function GoldHero() {
+function GoldHero({ milestone }: { milestone: TimelineMilestonePost['milestone'] }) {
   const t = useTimelineT();
   return (
-    <S.Hero accessibilityRole="image" accessibilityLabel={t('feed.timeline.milestone.a11y', 'Milestone: 100 sessions')}>
+    <S.Hero
+      accessibilityRole="image"
+      accessibilityLabel={t(
+        'feed.timeline.milestone.a11y',
+        `Milestone: ${milestone.value} ${milestone.unit.toLowerCase()}`,
+      )}
+    >
       <LinearGradient
         colors={[...GOLD_GRADIENT]}
         locations={[...GOLD_GRADIENT_LOCATIONS]}
@@ -26,10 +32,10 @@ function GoldHero() {
       <S.Medallion>
         <StarGlyph size={21} color={HERO_INK_UNIT} />
       </S.Medallion>
-      <S.Value>100</S.Value>
-      <S.Unit>SESSIONS</S.Unit>
-      <S.Tagline>Three years in the making</S.Tagline>
-      <S.DateRange>MARCH 2022 – JUNE 2025</S.DateRange>
+      <S.Value>{milestone.value}</S.Value>
+      <S.Unit>{milestone.unit}</S.Unit>
+      <S.Tagline>{milestone.tagline}</S.Tagline>
+      <S.DateRange>{milestone.dateRange}</S.DateRange>
     </S.Hero>
   );
 }
@@ -68,7 +74,7 @@ export function MilestoneCard({
       caption={caption}
       bookmarked={bookmarked}
       shareText={shareText}
-      hero={<GoldHero />}
+      hero={<GoldHero milestone={post.milestone} />}
       onToggleKudos={onToggleKudos}
       onToggleBookmark={onToggleBookmark}
       onHide={onHide}

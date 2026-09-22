@@ -212,13 +212,21 @@ export function PostDetailScreen({ postId, keyValueStore }: { postId: string; ke
               value: poster.value,
               unit: poster.unit,
             })
-          : t(feedKey('feed.detail.share.workout'), '{author} — {workout}: {value} {unit} in {duration}', {
-              author: authorName,
-              workout: poster.workoutName,
-              value: poster.heroValue,
-              unit: poster.heroUnit,
-              duration: poster.duration,
-            });
+          : poster.kind === 'photo'
+            ? t(feedKey('feed.detail.share.photo'), '{author} — shared a photo on Kinetic', {
+                author: authorName,
+              })
+            : poster.kind === 'video'
+              ? t(feedKey('feed.detail.share.video'), '{author} — shared a video on Kinetic', {
+                  author: authorName,
+                })
+              : t(feedKey('feed.detail.share.workout'), '{author} — {workout}: {value} {unit} in {duration}', {
+                  author: authorName,
+                  workout: poster.workoutName,
+                  value: poster.heroValue,
+                  unit: poster.heroUnit,
+                  duration: poster.duration,
+                });
     dispatch(
       shareString({
         title: t(feedKey('feed.detail.share.subject'), 'Kinetic post'),

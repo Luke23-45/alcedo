@@ -29,10 +29,18 @@ export interface AiChatPlanResponse {
 export interface AiChatMessageResponse {
   type: 'messageResponse';
   message: string;
+  /**
+   * Render as a new chat bubble instead of updating the in-flight one.
+   * Set only by deterministic local scripts (e.g. the offline greeting):
+   * remote streaming responses always update the current bubble.
+   */
+  appendAsNew?: boolean;
 }
 
 export interface AiChatPurchaseProResponse {
   type: 'purchasePro';
+  /** Same contract as {@link AiChatMessageResponse.appendAsNew}. */
+  appendAsNew?: boolean;
 }
 
 export type AiChatResponse = AiChatMessageResponse | AiChatPlanResponse | AiChatPurchaseProResponse;

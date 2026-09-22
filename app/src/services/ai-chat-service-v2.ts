@@ -4,6 +4,7 @@ import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 import { AsyncIterableSubject } from 'data-async-iterators';
 import { match, P } from 'ts-pattern';
 import { HubConnectionFactory } from '@/services/hub-connection-factory';
+import { offlineCoachScript } from '@/services/ai-chat-offline-script';
 import { selectBackendForFeature } from '@/store/backends';
 import { ResolvedBackendForFeature } from '@/models/backend';
 import { RootState } from '@/store';
@@ -47,6 +48,11 @@ export class AiChatServiceV2 {
   }
 
   async *sendMessage(message: string): AsyncIterableIterator<AiChatResponseV2> {
+    const offline = offlineCoachScript(this.getState(), message);
+    if (offline) {
+      yield* offline;
+      return;
+    }
     if (this.requiresPro()) {
       yield {
         type: 'purchasePro',

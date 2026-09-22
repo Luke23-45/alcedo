@@ -15,14 +15,18 @@ interface FeedAvatarProps {
 }
 
 /**
- * Initial avatar for a locked social-graph person: gradient or solid fill,
- * white .18 inner ring, knockout stroke. Identical in dark and light mode —
- * the avatar is an identity, not a surface.
+ * Avatar for a default-graph person: the bundled photo when one exists,
+ * otherwise the gradient-or-solid identity with its initial. The white .18
+ * inner ring renders over both, so photos get the same lit edge as the
+ * identity avatars. Identical in dark and light mode — the avatar is an
+ * identity, not a surface.
  */
 export function FeedAvatar({ person, size = 36, ringColor }: FeedAvatarProps) {
   return (
     <S.Avatar size={size} ringColor={ringColor}>
-      {person.gradient ? (
+      {person.photo != null ? (
+        <S.Photo source={person.photo} resizeMode="cover" />
+      ) : person.gradient ? (
         <LinearGradient
           colors={[person.gradient[0], person.gradient[1]]}
           start={{ x: 0, y: 0 }}
@@ -33,7 +37,7 @@ export function FeedAvatar({ person, size = 36, ringColor }: FeedAvatarProps) {
         <S.SolidFill color={person.color} />
       )}
       <S.InnerRing size={size} />
-      <S.Initial size={size}>{person.initial}</S.Initial>
+      {person.photo == null && <S.Initial size={size}>{person.initial}</S.Initial>}
     </S.Avatar>
   );
 }

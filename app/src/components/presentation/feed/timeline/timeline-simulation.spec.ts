@@ -23,9 +23,7 @@ import { Weight } from '@/models/weight';
 import { makeRecordedExercise, makeWeightedBlueprint } from '@/models/session-models/__test__/helpers';
 import type { KeyValueStore } from '@/services/key-value-store';
 import {
-  buildReferencePosts,
   CHALLENGE,
-  CIRCLE_POST_TOTAL,
   describeKudosLabel,
   formatChallengePoints,
   postMatchesFilter,
@@ -33,7 +31,13 @@ import {
   type TimelinePost,
   type TimelineWorkoutPost,
 } from './timeline-data';
-import { deriveComposerSessionData, formatPostAge, type ComposerFormatDate, type ComposerFormatNumber } from '../composer/composer-data';
+import { buildDefaultPosts } from '../feed-seed';
+import {
+  deriveComposerSessionData,
+  formatPostAge,
+  type ComposerFormatDate,
+  type ComposerFormatNumber,
+} from '../composer/composer-data';
 import { useBookmarks, useHiddenPosts } from './timeline-state';
 import { PEOPLE } from '../shared/people';
 
@@ -75,7 +79,7 @@ function ownPostWith(prPills: string[]): TimelineWorkoutPost {
 }
 
 describe('timeline filters', () => {
-  const refs = buildReferencePosts(NOW);
+  const defaults = buildDefaultPosts(NOW);
   const ownWithPrs = ownPostWith(['SHOULDER PRESS PR']);
   const ownWithoutPrs = ownPostWith([]);
 
@@ -84,36 +88,66 @@ describe('timeline filters', () => {
   });
 
   it('all shows every post', () => {
-    const posts = [ownWithPrs, ...refs];
-    expect(posts.filter((p) => postMatchesFilter(p, 'all'))).toHaveLength(4);
+    const posts = [ownWithPrs, ...defaults];
+    expect(posts.filter((p) => postMatchesFilter(p, 'all'))).toHaveLength(13);
   });
 
   it('following excludes your own post', () => {
-    const posts = [ownWithPrs, ...refs];
+    const posts = [ownWithPrs, ...defaults];
     const shown = posts.filter((p) => postMatchesFilter(p, 'following'));
-    expect(shown.map((p) => p.id).sort()).toEqual(['jon', 'mia', 'sofia']);
+    expect(shown.map((p) => p.id).sort()).toEqual([
+      'ana-trail-run',
+      'dev-push-day',
+      'dev-sunrise-run',
+      'jon-100-sessions',
+      'kenji-front-squat',
+      'lena-bench-pr',
+      'marcus-press',
+      'mia-squat-pr',
+      'priya-first-pullup',
+      'sofia-deadlift-video',
+      'tom-leg-day',
+      'zoe-park-circuit',
+    ]);
   });
 
   it('prs shows only posts carrying a PR pill', () => {
-    // Mia and Sofia carry PR pills; Jon's milestone has none; Alex's depends.
+    // The five workout posts carry PR pills; milestones, photos, and the
+    // video have none; Alex's depends.
     expect(
-      refs
+      defaults
         .filter((p) => postMatchesFilter(p, 'prs'))
         .map((p) => p.id)
         .sort(),
-    ).toEqual(['mia', 'sofia']);
+    ).toEqual(['dev-push-day', 'kenji-front-squat', 'lena-bench-pr', 'marcus-press', 'mia-squat-pr']);
     expect(postMatchesFilter(ownWithPrs, 'prs')).toBe(true);
     expect(postMatchesFilter(ownWithoutPrs, 'prs')).toBe(false);
   });
 
   it('milestones shows only milestone posts', () => {
-    expect(refs.filter((p) => postMatchesFilter(p, 'milestones')).map((p) => p.id)).toEqual(['jon']);
+    expect(defaults.filter((p) => postMatchesFilter(p, 'milestones')).map((p) => p.id)).toEqual([
+      'jon-100-sessions',
+      'priya-first-pullup',
+    ]);
     expect(postMatchesFilter(ownWithPrs, 'milestones')).toBe(false);
   });
 
-  it('challenge shows every in-challenge post', () => {
-    const posts: TimelinePost[] = [ownWithPrs, ...refs];
-    expect(posts.every((p) => postMatchesFilter(p, 'challenge'))).toBe(true);
+  it('challenge shows exactly the in-challenge posts', () => {
+    const posts: TimelinePost[] = [ownWithPrs, ...defaults];
+    expect(
+      posts
+        .filter((p) => postMatchesFilter(p, 'challenge'))
+        .map((p) => p.id)
+        .sort(),
+    ).toEqual([
+      'alex',
+      'dev-sunrise-run',
+      'jon-100-sessions',
+      'marcus-press',
+      'mia-squat-pr',
+      'sofia-deadlift-video',
+      'zoe-park-circuit',
+    ]);
   });
 
   it('every filter has a non-empty empty-state copy pair', () => {
@@ -157,31 +191,63 @@ describe('kudos label derivation', () => {
   });
 });
 
-describe('reference posts stay truthful', () => {
-  const refs = buildReferencePosts(NOW);
+describe('default posts stay truthful', () => {
+  const defaults = buildDefaultPosts(NOW);
 
-  it('seeds exactly the three contract sample posts', () => {
-    expect(refs.map((p) => p.id)).toEqual(['mia', 'jon', 'sofia']);
+  it('seeds exactly the twelve default sample posts, newest first', () => {
+    expect(defaults.map((p) => p.id)).toEqual([
+      'mia-squat-pr',
+      'dev-sunrise-run',
+      'sofia-deadlift-video',
+      'jon-100-sessions',
+      'lena-bench-pr',
+      'tom-leg-day',
+      'priya-first-pullup',
+      'marcus-press',
+      'ana-trail-run',
+      'kenji-front-squat',
+      'zoe-park-circuit',
+      'dev-push-day',
+    ]);
   });
 
-  it('ages are the contract 2h / 18h / 1d, always relative to now', () => {
-    const [mia, jon, sofia] = refs;
-    expect(formatPostAge(mia!.postedAt, NOW, t)).toBe('2h');
-    expect(formatPostAge(jon!.postedAt, NOW, t)).toBe('18h');
-    expect(formatPostAge(sofia!.postedAt, NOW, t)).toBe('1d');
+  it('ages are seeded relative to now, so the labels are always honest', () => {
+    const byId = new Map(defaults.map((p) => [p.id, p]));
+    expect(formatPostAge(byId.get('mia-squat-pr')!.postedAt, NOW, t)).toBe('2h');
+    expect(formatPostAge(byId.get('dev-sunrise-run')!.postedAt, NOW, t)).toBe('5h');
+    expect(formatPostAge(byId.get('sofia-deadlift-video')!.postedAt, NOW, t)).toBe('9h');
+    expect(formatPostAge(byId.get('jon-100-sessions')!.postedAt, NOW, t)).toBe('18h');
+    expect(formatPostAge(byId.get('dev-push-day')!.postedAt, NOW, t)).toBe('3d');
   });
 
   it('carries the contract kudos totals and audience mix', () => {
-    const byId = new Map(refs.map((p) => [p.id, p]));
-    expect(byId.get('mia')!.kudos.total).toBe(14);
-    expect(byId.get('jon')!.kudos.total).toBe(32);
-    expect(byId.get('sofia')!.kudos.total).toBe(21);
-    expect(byId.get('mia')!.audience).toBe('public');
-    expect(byId.get('sofia')!.audience).toBe('friends');
+    const byId = new Map(defaults.map((p) => [p.id, p]));
+    expect(byId.get('mia-squat-pr')!.kudos.total).toBe(14);
+    expect(byId.get('jon-100-sessions')!.kudos.total).toBe(32);
+    expect(byId.get('sofia-deadlift-video')!.kudos.total).toBe(27);
+    expect(byId.get('mia-squat-pr')!.audience).toBe('public');
+    expect(byId.get('sofia-deadlift-video')!.audience).toBe('friends');
   });
 
-  it('marks every reference post as a challenge participant', () => {
-    expect(refs.every((p) => p.inChallenge)).toBe(true);
+  it('mixes all four post kinds', () => {
+    const kinds = new Set(defaults.map((p) => p.kind));
+    expect(kinds).toEqual(new Set(['workout', 'photo', 'video', 'milestone']));
+  });
+
+  it('marks exactly the six challenge posts as participants', () => {
+    expect(
+      defaults
+        .filter((p) => p.inChallenge)
+        .map((p) => p.id)
+        .sort(),
+    ).toEqual([
+      'dev-sunrise-run',
+      'jon-100-sessions',
+      'marcus-press',
+      'mia-squat-pr',
+      'sofia-deadlift-video',
+      'zoe-park-circuit',
+    ]);
   });
 });
 
@@ -194,7 +260,6 @@ describe('challenge banner math', () => {
     expect(CHALLENGE.rank).toBe(3);
     expect(CHALLENGE.participants).toBe(128);
     expect(CHALLENGE.daysLeft).toBe(3);
-    expect(CIRCLE_POST_TOTAL).toBe(128);
   });
 
   it('formats points with the en-US grouping the banner shows', () => {
@@ -357,6 +422,11 @@ describe('feed footer honesty', () => {
 
   it('marks the fictional sample posts with the SampleBadge', () => {
     expect(footer).toContain('SampleBadge');
+  });
+
+  it('labels the total as sample posts, never an invented circle size', () => {
+    expect(footer).toContain('footer.showing_samples');
+    expect(footer).not.toContain('128');
   });
 
   it('wires the "Load earlier" pill to a real refresh handler', () => {

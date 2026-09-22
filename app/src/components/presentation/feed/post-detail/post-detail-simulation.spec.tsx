@@ -237,17 +237,17 @@ describe('post model resolution', () => {
     expect(model?.session).toEqual({ id: 'S-1' });
   });
 
-  it('resolves the reference posts with their contract metadata', () => {
-    const mia = selectPostDetailModel(rootState(), 'mia');
-    const jon = selectPostDetailModel(rootState(), 'jon');
-    const sofia = selectPostDetailModel(rootState(), 'sofia');
+  it('resolves the default posts with their contract metadata', () => {
+    const mia = selectPostDetailModel(rootState(), 'mia-squat-pr');
+    const jon = selectPostDetailModel(rootState(), 'jon-100-sessions');
+    const sofia = selectPostDetailModel(rootState(), 'sofia-deadlift-video');
     expect(mia?.isOwn).toBe(false);
     expect(mia?.commentCountBase).toBe(5);
     expect(mia?.kudosSeed).toEqual({ total: 14, people: ['alex', 'jon', 'sofia'] });
     expect(jon?.commentCountBase).toBe(11);
     expect(jon?.kudosSeed.total).toBe(32);
-    expect(sofia?.commentCountBase).toBe(4);
-    expect(sofia?.kudosSeed.total).toBe(21);
+    expect(sofia?.commentCountBase).toBe(6);
+    expect(sofia?.kudosSeed.total).toBe(27);
     for (const model of [mia, jon, sofia]) {
       expect(model?.seedThread).toBe(false);
       expect(model?.caption).toBeTruthy();
@@ -271,17 +271,20 @@ describe('comment count math', () => {
     expect(count).toBe(3);
   });
 
-  it('shows the contract counts for reference posts, whose threads stay honestly empty', () => {
+  it('shows the contract counts for default posts, whose threads stay honestly empty', () => {
     const state = commentsReducer(
       undefined,
       ensurePostSeeded({
-        postId: 'mia',
+        postId: 'mia-squat-pr',
         seed: { comments: [], kudos: { kudoed: false, total: 14, people: ['alex', 'jon', 'sofia'] } },
       }),
     );
-    const model = selectPostDetailModel({ feed: { feed: [], identity: RemoteData.notAsked() } } as never, 'mia');
-    const count = (model?.commentCountBase ?? 0) + selectTopLevelComments(wrapComments(state), 'mia').length;
+    const model = selectPostDetailModel(
+      { feed: { feed: [], identity: RemoteData.notAsked() } } as never,
+      'mia-squat-pr',
+    );
+    const count = (model?.commentCountBase ?? 0) + selectTopLevelComments(wrapComments(state), 'mia-squat-pr').length;
     expect(count).toBe(5);
-    expect(selectTopLevelComments(wrapComments(state), 'mia')).toHaveLength(0);
+    expect(selectTopLevelComments(wrapComments(state), 'mia-squat-pr')).toHaveLength(0);
   });
 });

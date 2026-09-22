@@ -39,27 +39,38 @@ export function applyAiPlannerEffects(addEffect: AddEffectFn) {
       isLoading: true,
     };
     dispatch(addMessage(originalMessage));
-    let latestMessage: AiChatResponseV2 | undefined = undefined;
+    let currentId = originalMessage.id;
+    let currentPayload: ChatMessage = originalMessage;
+    const finalizeCurrent = () => {
+      dispatch(updateMessage({ ...currentPayload, id: currentId, isLoading: false }));
+    };
     for await (const chatResponse of aiChatService.sendMessage(wireMessage)) {
-      latestMessage = chatResponse;
-      dispatch(
-        updateMessage({
-          id: originalMessage.id,
+      // A deterministic local script (e.g. the offline greeting) speaks in
+      // several bubbles: finalize the current one and open a new bubble
+      // instead of overwriting it. Remote streaming never sets this flag.
+      const startNewBubble = 'appendAsNew' in chatResponse && chatResponse.appendAsNew === true;
+      if (startNewBubble) {
+        finalizeCurrent();
+        const next: ChatMessage = {
+          id: uuid(),
           from: 'Agent',
+          message: '',
+          type: 'messageResponse',
           isLoading: true,
-          ...chatResponse,
-        }),
-      );
-    }
-
-    dispatch(
-      updateMessage({
-        id: originalMessage.id,
+        };
+        dispatch(addMessage(next));
+        currentId = next.id;
+        currentPayload = next;
+      }
+      currentPayload = {
+        id: currentId,
         from: 'Agent',
-        ...(latestMessage ?? originalMessage),
-        isLoading: false,
-      }),
-    );
+        isLoading: true,
+        ...chatResponse,
+      };
+      dispatch(updateMessage(currentPayload));
+    }
+    finalizeCurrent();
   });
   addEffect(stopAiGenerator, async (_, { extra: { aiChatService } }) => {
     await aiChatService.stopInProgress();

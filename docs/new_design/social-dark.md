@@ -37,6 +37,13 @@ PEOPLE (avatar initial · hue · weekly-challenge points)
  Dev Patel    @dev      D  #FF9F0A             8,410  (rank 5)
  Lena Fischer @lena     L  #AF52DE             7,905
  Tom Okafor   @tom      T  #32ADE6             6,440
+ Priya Nair   @priya    P  #64D2FF             6,120
+ Marcus Webb  @marcus   M  #FF6A3D             5,880
+ Ana Petrova  @ana      A  #7D7AFF             5,410
+ Kenji Tanaka @kenji    K  #D9A441             4,970
+ Zoe Adams    @zoe      Z  #BF5AF2             4,620
+ Every default person except Alex carries a bundled avatar photo
+ (app/assets/feed/avatars/<id>.jpg); the gradient/initial stays as fallback.
  Challenge: 128 participants · 3 days left (matches home chip ✓)
  Alex's audience "Friends" = 84 mutual follows; Followers 128; Following 112  (84 ≤ 112 ✓)
 
@@ -55,6 +62,30 @@ FEED ITEMS (newest first)
  4 Sofia Marques Sun 7:12 AM      1d   Pull Day
      6,240 kg · 48:15 · 18 sets · 144 reps · Deadlift PR 160 × 3 (e1RM 176.0)
      21 kudos · 4 comments
+ — the default catalog continues (fictional sample posts, newest first):
+ 5 Dev Patel     5h   PHOTO — sunrise 5K run (bundled photo)
+     18 kudos · 3 comments · in challenge
+ 6 Sofia Marques 9h   VIDEO — deadlift clip, tap-to-play (bundled mp4 + still)
+     27 kudos · 6 comments · friends · in challenge
+ 7 Lena Fischer  24h  Push · Strength — 5,410 kg · 47:20 · 19 sets · Bench PR 80 × 5
+     16 kudos · 4 comments
+ 8 Tom Okafor    31h  PHOTO — squat rack (bundled photo)
+     12 kudos · 2 comments · friends
+ 9 Priya Nair    38h  MILESTONE — first strict pull-up
+     24 kudos · 7 comments
+10 Marcus Webb   46h  Shoulders · Strength — 4,980 kg · 43:05 · 16 sets · Press PR 60 × 5
+     11 kudos · 2 comments · in challenge
+11 Ana Petrova   55h  PHOTO — forest trail run (bundled photo)
+     15 kudos · 3 comments
+12 Kenji Tanaka  64h  Legs · Strength — 6,120 kg · 49:50 · 20 sets · Front squat PR 100 × 3
+     9 kudos · 1 comment · friends
+13 Zoe Adams     72h  PHOTO — park kettlebell circuit (bundled photo)
+     21 kudos · 5 comments · in challenge
+14 Dev Patel     80h  Push · Hypertrophy — 5,940 kg · 44:10 · 17 sets · Dip PR +10 kg × 8
+     8 kudos · 0 comments
+ The timeline footer reads "Showing N of N sample posts" (honest count of the
+ served catalog) with the single SampleBadge. Photo/video heroes reuse the
+ poster's 190pt slot, 22pt radius, and shadow. The video never autoplays.
 
 COMMENT THREAD ON POST 1 (3 top-level + 1 reply = "3 comments")
  Mia   18m  "That shoulder press PR is huge. What did you warm up with?"   2 kudos

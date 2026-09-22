@@ -7,12 +7,13 @@ import { type FeedPerson, personById, type FeedPersonId } from '../shared/people
 
 /**
  * The post behind the detail screen: Alex's own post resolves to the real
- * published session; mia/jon/sofia resolve to the contract reference posts;
- * anything else is unknown (the route renders the "item unavailable" state).
+ * published session; the twelve default posts resolve to the shared seed
+ * catalog (see ../feed-seed.ts); anything else is unknown (the route renders
+ * the "item unavailable" state).
  *
  * Source of truth: docs/new_design/social-dark.md — SOCIAL DATA CONTRACT and
  * SCREEN 2. Fields marked "real" below come from the store; the poster block
- * is the contract's exact reference values, pixel-to-pixel.
+ * is the seed catalog's exact values, pixel-to-pixel.
  */
 
 export interface WorkoutPosterData {
@@ -41,7 +42,18 @@ export interface MilestonePosterData {
   range: string;
 }
 
-export type PostPosterData = WorkoutPosterData | MilestonePosterData;
+export interface PhotoPosterData {
+  kind: 'photo';
+  photo: number;
+}
+
+export interface VideoPosterData {
+  kind: 'video';
+  video: number;
+  poster: number;
+}
+
+export type PostPosterData = WorkoutPosterData | MilestonePosterData | PhotoPosterData | VideoPosterData;
 
 export interface PostDetailModel {
   id: string;
@@ -70,7 +82,8 @@ export interface PostDetailModel {
   seedThread: boolean;
 }
 
-const HOUR = 3_600_000;
+import { buildDefaultPosts } from '../feed-seed';
+import type { TimelinePost } from '../timeline/timeline-data';
 
 const ALEX_POSTER: WorkoutPosterData = {
   kind: 'workout',
@@ -104,88 +117,79 @@ function alexModel(item: SessionUserEvent | undefined): PostDetailModel {
   };
 }
 
-function referencePost(
-  id: FeedPersonId,
-  partial: Omit<PostDetailModel, 'id' | 'authorId' | 'isOwn' | 'caption' | 'eventId'>,
-): PostDetailModel {
-  return { id, authorId: id, isOwn: false, caption: undefined, eventId: undefined, ...partial };
-}
-
-function referencePosts(now: number): Record<'mia' | 'jon' | 'sofia', PostDetailModel> {
-  return {
-    mia: referencePost('mia', {
-      postedAtMs: now - 2 * HOUR,
-      audience: 'public',
-      sessionId: undefined,
-      poster: {
+function seedPoster(post: TimelinePost): PostPosterData {
+  switch (post.kind) {
+    case 'workout':
+      return {
         kind: 'workout',
         theme: 'custom',
-        gradient: ['#FF5AC8', '#6A1B7A'],
-        kicker: 'KINETIC · MONDAY, JUNE 9',
-        heroValue: '7,860',
-        heroUnit: 'kg',
-        workoutName: 'Legs · Hypertrophy',
-        duration: '52:40',
-        sets: '22',
-        prPills: ['SQUAT PR', '125 KG × 5', 'PERSONAL BEST'],
-      },
-      kudosSeed: { total: 14, people: ['alex', 'jon', 'sofia'] },
-      commentCountBase: 5,
-      seedThread: false,
-    }),
-    jon: referencePost('jon', {
-      postedAtMs: now - 18 * HOUR,
-      audience: 'public',
-      sessionId: undefined,
-      poster: {
+        // The seed sets a gradient on every workout post; the person's hue
+        // is the honest fallback if a future post omits it.
+        gradient: post.poster.gradient?.colors ?? [post.person.color, post.person.color],
+        kicker: post.poster.kicker,
+        heroValue: post.poster.heroValue,
+        heroUnit: post.poster.heroUnit,
+        workoutName: post.poster.workoutName,
+        duration: post.poster.duration,
+        sets: post.poster.sets,
+        prPills: post.poster.prPills,
+      };
+    case 'milestone':
+      return {
         kind: 'milestone',
-        value: '100',
-        unit: 'SESSIONS',
-        subtitle: 'Three years in the making',
-        range: 'MARCH 2022 – JUNE 2025',
-      },
-      kudosSeed: { total: 32, people: ['alex', 'mia', 'sofia'] },
-      commentCountBase: 11,
-      seedThread: false,
-    }),
-    sofia: referencePost('sofia', {
-      postedAtMs: now - 24 * HOUR,
-      audience: 'friends',
-      sessionId: undefined,
-      poster: {
-        kind: 'workout',
-        theme: 'custom',
-        gradient: ['#4ADE80', '#0B5C46'],
-        kicker: 'KINETIC · SUNDAY, JUNE 8',
-        heroValue: '6,240',
-        heroUnit: 'kg',
-        workoutName: 'Pull Day',
-        duration: '48:15',
-        sets: '18',
-        prPills: ['DEADLIFT PR', '160 KG × 3'],
-      },
-      kudosSeed: { total: 21, people: ['alex', 'mia', 'jon'] },
-      commentCountBase: 4,
-      seedThread: false,
-    }),
-  };
+        value: post.milestone.value,
+        unit: post.milestone.unit,
+        subtitle: post.milestone.tagline,
+        range: post.milestone.dateRange,
+      };
+    case 'photo':
+      return { kind: 'photo', photo: post.photo };
+    case 'video':
+      return { kind: 'video', video: post.video, poster: post.poster };
+  }
 }
 
-/** Reference captions, verbatim from the contract (Screen 1). */
-export const REFERENCE_CAPTIONS: Record<'mia' | 'jon' | 'sofia', string> = {
-  mia: 'Squat 125 for five — third attempt at this weight, and the belt finally stayed on.',
-  jon: 'Three years, one hundred sessions. Started at 40 kg on the bar and no idea what a split was.',
-  sofia: 'Deadlift 160 for three. Two years of chipping away at the same bar.',
-};
+/**
+ * The twelve default posts, derived from the single shared seed so the
+ * timeline and the detail screen can never disagree on values, ages, kudos,
+ * or captions.
+ */
+function defaultPosts(now: number): Record<string, PostDetailModel> {
+  const out: Record<string, PostDetailModel> = {};
+  for (const post of buildDefaultPosts(now)) {
+    out[post.id] = {
+      id: post.id,
+      authorId: post.person.id,
+      isOwn: false,
+      caption: post.caption ?? undefined,
+      eventId: undefined,
+      postedAtMs: post.postedAt,
+      audience: post.audience,
+      sessionId: undefined,
+      poster: seedPoster(post),
+      kudosSeed: { total: post.kudos.total, people: post.kudos.faceIds },
+      commentCountBase: post.comments,
+      seedThread: false,
+    };
+  }
+  return out;
+}
+
+/** Default-post captions, from the shared seed (Screen 1). */
+export const DEFAULT_CAPTIONS: Record<string, string> = Object.fromEntries(
+  buildDefaultPosts(0)
+    .filter((p) => p.caption != null)
+    .map((p) => [p.id, p.caption!]),
+);
 
 function resolveModel(
   items: SessionUserEvent[],
   ownUserId: string | undefined,
   postId: string,
 ): PostDetailModel | undefined {
-  if (postId === 'mia' || postId === 'jon' || postId === 'sofia') {
-    const post = referencePosts(Date.now())[postId];
-    return { ...post, caption: REFERENCE_CAPTIONS[postId] };
+  const seed = defaultPosts(Date.now())[postId];
+  if (seed) {
+    return seed;
   }
   if (postId === 'alex') {
     const own = items

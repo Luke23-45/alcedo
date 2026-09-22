@@ -49,3 +49,14 @@ export const Initial = styled.Text<{ size: number }>`
   font-weight: ${({ theme }) => theme.weight.semibold};
   color: #ffffff;
 `;
+
+/** Bundled avatar photo: cover-fills the circle, cropped by the avatar's overflow. */
+export const Photo = styled.Image`
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+`;

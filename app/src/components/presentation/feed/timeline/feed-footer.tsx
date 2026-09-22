@@ -4,10 +4,11 @@ import { useTimelineT } from './timeline-i18n';
 import * as S from './feed-footer.styles';
 
 /**
- * Feed footer (Screen 1 spec): "Showing N of 128 posts from your circle" with
- * the feed's single SampleBadge (the fictional Mia/Jon/Sofia posts are sample
- * content), then the "Load earlier" pill. The pill dispatches a real refresh
- * of feed + inbox — it is never a visual no-op.
+ * Feed footer (Screen 1 spec): "Showing N of M sample posts" with the feed's
+ * single SampleBadge (the default catalog is fictional sample content), then
+ * the "Load earlier" pill. The pill dispatches a real refresh of feed +
+ * inbox — it is never a visual no-op. The total is always the honest count of
+ * the served sample catalog, never an invented circle size.
  */
 export function FeedFooter({
   shown,
@@ -25,7 +26,7 @@ export function FeedFooter({
     <S.Footer>
       <S.ShowingRow>
         <S.ShowingText $dark={dark}>
-          {t('feed.timeline.footer.showing', `Showing ${shown} of ${total} posts from your circle`, {
+          {t('feed.timeline.footer.showing_samples', `Showing ${shown} of ${total} sample posts`, {
             shown,
             total,
           })}

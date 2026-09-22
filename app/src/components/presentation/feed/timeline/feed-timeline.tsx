@@ -27,12 +27,12 @@ import { ChallengeBanner } from './challenge-banner';
 import { FeedBackground } from './feed-background';
 import { FeedFooter } from './feed-footer';
 import { FilterChips } from './filter-chips';
+import { MediaCard } from './media-card';
 import { MilestoneCard } from './milestone-card';
 import { PostCard } from './post-card';
 import { REFRESH_TINT } from './timeline-tokens';
+import { buildDefaultPosts } from '../feed-seed';
 import {
-  buildReferencePosts,
-  CIRCLE_POST_TOTAL,
   postMatchesFilter,
   TIMELINE_FILTERS,
   type PostKudos,
@@ -49,7 +49,7 @@ import * as S from './feed-timeline.styles';
  * values Screen 2 (post detail) seeds, so whichever screen mounts first wins
  * identically.
  */
-const REFERENCE_KUDOS_SEEDS = buildReferencePosts(0).map((p) => ({
+const DEFAULT_KUDOS_SEEDS = buildDefaultPosts(0).map((p) => ({
   postId: p.id,
   total: p.kudos.total,
   faceIds: p.kudos.faceIds,
@@ -73,8 +73,9 @@ interface PostRowProps {
 /**
  * One timeline card.
  *
- * - Reference posts (Mia/Jon/Sofia) are fictional: their kudos toggle lives in
- *   the shared feedComments store, which Screen 2 (post detail) reads too.
+ * - Default posts (the fictional sample catalog) are fictional: their kudos
+ *   toggle lives in the shared feedComments store, which Screen 2 (post
+ *   detail) reads too.
  * - Alex's own post reads its kudos count from the existing reaction store
  *   (`selectReceivedReactionsByEvent` — the store's designed source for cheers
  *   on your own workouts, seeded with the reference's six kudos so the count is
@@ -118,7 +119,13 @@ function TimelinePostRow({
     onComment,
     onShare,
   };
-  return post.kind === 'milestone' ? <MilestoneCard post={post} {...common} /> : <PostCard post={post} {...common} />;
+  return post.kind === 'milestone' ? (
+    <MilestoneCard post={post} {...common} />
+  ) : post.kind === 'workout' ? (
+    <PostCard post={post} {...common} />
+  ) : (
+    <MediaCard post={post} {...common} />
+  );
 }
 
 /**
@@ -127,11 +134,14 @@ function TimelinePostRow({
  * - Alex's card is built from the user's real latest session via the shared
  *   composer derivation (same data the composer preview and share poster
  *   render); the caption is the composer-drafted caption when one exists.
- * - Mia / Jon / Sofia are the contract's fictional sample posts; their ages
- *   are seeded relative to now so "2h / 18h / 1d" are always truthful.
+ * - The default catalog (twelve fictional sample posts from the eleven
+ *   fictional default-graph people; Alex's slot is the real user and carries
+ *   no sample) fills the feed when no backend is connected; their ages are
+ *   seeded relative to now so the relative-time labels are always truthful,
+ *   and the footer discloses the sample nature with an honest sample-only
+ *   count.
  * - Delete (own) / Report (others) hide the post, persisted across restarts.
- * - Comments navigate to the post-detail route (Screen 2): item/alex,
- *   item/mia, item/jon, item/sofia.
+ * - Comments navigate to the post-detail route (Screen 2): item/<post id>.
  */
 export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }) {
   const dispatch = useDispatch();
@@ -169,7 +179,7 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
   // profile username), not the contract's fictional "Alex Rivera".
   const ownPerson = useOwnPerson();
 
-  const referencePosts = buildReferencePosts(Date.now());
+  const defaultPosts = buildDefaultPosts(Date.now());
 
   const ownPost: TimelineWorkoutPost | undefined =
     latest && composerData
@@ -208,7 +218,7 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
     if (needsAlexKudosSeed && sessionId !== undefined) {
       dispatch(upsertReceivedReactions(buildAlexKudosSeed(sessionId)));
     }
-    for (const seed of REFERENCE_KUDOS_SEEDS) {
+    for (const seed of DEFAULT_KUDOS_SEEDS) {
       dispatch(
         ensurePostSeeded({
           postId: seed.postId,
@@ -218,10 +228,14 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
     }
   }, [dispatch, ownPostedAt, needsAlexKudosSeed, sessionId]);
 
-  const posts = [ownPost, ...referencePosts]
-    .filter((p): p is TimelinePost => p !== undefined)
-    .filter((p) => !hidden.has(p.id))
-    .filter((p) => postMatchesFilter(p, filter))
+  const isVisible = (p: TimelinePost) => !hidden.has(p.id) && postMatchesFilter(p, filter);
+  // The default catalog is the fallback: fictional sample posts, never mixed
+  // into genuine remote state. The footer counts samples only — Alex's own
+  // card is the real user, not a sample.
+  const availableSamples = defaultPosts.filter((p) => !hidden.has(p.id));
+  const visibleSamples = availableSamples.filter((p) => postMatchesFilter(p, filter));
+  const posts = [ownPost, ...visibleSamples]
+    .filter((p): p is TimelinePost => p !== undefined && isVisible(p))
     .sort((a, b) => b.postedAt - a.postedAt);
 
   const refresh = () => {
@@ -244,7 +258,11 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
               ? `${post.person.name} on Kinetic: ${caption}`
               : post.kind === 'workout'
                 ? `${post.person.name} on Kinetic: ${post.poster.heroValue} ${post.poster.heroUnit} · ${post.poster.workoutName}`
-                : `${post.person.name} on Kinetic: 100 sessions milestone`;
+                : post.kind === 'milestone'
+                  ? `${post.person.name} on Kinetic: ${post.milestone.value} ${post.milestone.unit.toLowerCase()} milestone`
+                  : post.kind === 'photo'
+                    ? `${post.person.name} on Kinetic: shared a photo`
+                    : `${post.person.name} on Kinetic: shared a video`;
           const isAlexPost = post.id === 'alex';
           return (
             <TimelinePostRow
@@ -277,8 +295,8 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
           </S.EmptyWrap>
         }
         ListFooterComponent={
-          posts.length > 0 ? (
-            <FeedFooter shown={posts.length} total={CIRCLE_POST_TOTAL} onLoadEarlier={refresh} />
+          visibleSamples.length > 0 ? (
+            <FeedFooter shown={visibleSamples.length} total={availableSamples.length} onLoadEarlier={refresh} />
           ) : null
         }
         refreshControl={

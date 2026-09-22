@@ -5,6 +5,8 @@ import { selectTopLevelComments } from '@/store/feed/comments';
 import { FeedAvatar } from '../shared/feed-avatar';
 import { IdentityBadge } from '../shared/identity-badge';
 import { SharePoster } from '../shared/share-poster';
+import { PhotoHero } from '../shared/photo-hero';
+import { VideoHero } from '../shared/video-hero';
 import { FeedActionBar } from '../shared/feed-action-bar';
 import { feedKey } from '../shared/feed-i18n';
 import { personById } from '../shared/people';
@@ -40,9 +42,9 @@ interface PostDetailProps {
 /**
  * The post itself: author row, poster, caption (real or omitted), meta,
  * kudos row, the detail action bar, and the comment thread. The screen owns
- * the nav header, the sticky composer, and the overflow menu. Mia/Jon/Sofia
- * are fictional sample posts and carry the feed's SampleBadge, like the
- * timeline's footer does.
+ * the nav header, the sticky composer, and the overflow menu. The default
+ * posts are fictional sample posts and carry the feed's SampleBadge, like
+ * the timeline's footer does.
  */
 export function PostDetail({
   model,
@@ -81,6 +83,15 @@ export function PostDetail({
   const posterNode =
     poster.kind === 'milestone' ? (
       <MilestonePoster value={poster.value} unit={poster.unit} subtitle={poster.subtitle} range={poster.range} />
+    ) : poster.kind === 'photo' ? (
+      <PhotoHero photo={poster.photo} a11yLabel={t(feedKey('feed.detail.photo.a11y'), 'Photo post')} />
+    ) : poster.kind === 'video' ? (
+      <VideoHero
+        video={poster.video}
+        poster={poster.poster}
+        a11yLabel={t(feedKey('feed.detail.video.a11y'), 'Video post')}
+        durationLabel={t(feedKey('feed.detail.video.duration'), '0:04')}
+      />
     ) : (
       <SharePoster
         theme="ember"
