@@ -1,19 +1,15 @@
-import { SurfaceText } from '@/components/presentation/foundation/surface-text';
-import { useAppTheme } from '@/hooks/useAppTheme';
 import { useTranslate } from '@tolgee/react';
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import Button from '@/components/presentation/foundation/button';
 import { restartChat } from '@/store/ai-planner';
 import LimitedHtml from '@/components/presentation/foundation/limited-html';
 import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui';
 import Purchases, { PRODUCT_CATEGORY, PurchasesStoreProduct } from 'react-native-purchases';
 import { setProToken } from '@/store/settings';
 import { IndeterminateProgress } from '@/components/presentation/foundation/indeterminate-progress';
+import * as S from './pro-prompt.styles';
 
 export function ProPrompt() {
-  const theme = useAppTheme();
   const dispatch = useDispatch();
   const { t } = useTranslate();
   const upgrade = () => {
@@ -33,16 +29,27 @@ export function ProPrompt() {
     run().catch(console.error);
   };
   return (
-    <View style={{ gap: theme.space.sm }}>
-      <SurfaceText>{t('ai.upgrade_to_pro.button')}</SurfaceText>
-      <SurfaceText>
+    <S.ProBody>
+      <S.ProEyebrow>{t('ai.upgrade_to_pro.eyebrow')}</S.ProEyebrow>
+      <S.ProTitle>{t('ai.upgrade_to_pro.title')}</S.ProTitle>
+      <S.ProDescription>
         <LimitedHtml value={t('ai.upgrade_to_pro.explanation')} />
-      </SurfaceText>
+      </S.ProDescription>
       <ProPrice />
-      <Button style={{ alignSelf: 'flex-end' }} mode="contained" onPress={upgrade}>
-        {t('generic.upgrade.button')}
-      </Button>
-    </View>
+      <S.UpgradeTouch
+        onPress={upgrade}
+        accessibilityRole="button"
+        accessibilityLabel={t('generic.upgrade.button')}
+      >
+        <S.UpgradeGradient
+          colors={[...S.PRO_PURPLE]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <S.UpgradeLabel>{t('generic.upgrade.button')}</S.UpgradeLabel>
+        </S.UpgradeGradient>
+      </S.UpgradeTouch>
+    </S.ProBody>
   );
 }
 
@@ -58,13 +65,13 @@ function ProPrice() {
   }, []);
   if (!product) {
     return (
-      <View style={{ alignItems: 'center' }}>
+      <S.ProPriceWrap>
         <IndeterminateProgress />
-      </View>
+      </S.ProPriceWrap>
     );
   }
 
-  return <SurfaceText>{product.priceString}</SurfaceText>;
+  return <S.ProPriceText>{product.priceString}</S.ProPriceText>;
 }
 
 async function presentPaywall(): Promise<boolean> {

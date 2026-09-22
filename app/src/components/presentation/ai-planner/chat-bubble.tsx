@@ -1,13 +1,17 @@
-import { useAppTheme } from '@/hooks/useAppTheme';
-import { View } from 'react-native';
+import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { ChatMessage } from '@/store/ai-planner';
 import { match } from 'ts-pattern';
-import { Loader } from '@/components/presentation/foundation/loader';
 import { GeneralMessage } from '@/components/presentation/ai-planner/general-message';
 import { PlanMessage } from '@/components/presentation/ai-planner/plan-message';
 import { SharedProgramMessage } from '@/components/presentation/ai-planner/shared-program-message';
 import { ProPrompt } from '@/components/presentation/ai-planner/pro-prompt';
 import { UpdatePrompt } from '@/components/presentation/ai-planner/update-prompt';
+import { TypingDots } from '@/components/presentation/ai-planner/typing-dots';
+import { useTranslate } from '@tolgee/react';
+import * as S from './chat-bubble.styles';
+
+const RADIUS = 18;
+const GROUPED_RADIUS = 6;
 
 export function ChatBubble(props: {
   message: ChatMessage;
@@ -15,46 +19,90 @@ export function ChatBubble(props: {
   sameSenderAbove: boolean;
   isLastMessage: boolean;
 }) {
-  const theme = useAppTheme();
+  const { t } = useTranslate();
   const { message, sameSenderBelow, sameSenderAbove } = props;
   const isUser = message.from === 'User';
 
-  const smallRadius = theme.space.xs;
-  const normalRadius = theme.space.base;
-
-  const topDynamicRadius = sameSenderAbove ? smallRadius : normalRadius;
-  const bottomDynamicRadius = sameSenderBelow ? smallRadius : normalRadius;
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: message.from === 'User' ? 'flex-end' : 'flex-start',
-      }}
-    >
-      <View
-        style={{
-          backgroundColor: isUser ? theme.color.interactive.tint : theme.color.background.secondary,
-          borderTopLeftRadius: isUser ? normalRadius : topDynamicRadius,
-          borderTopRightRadius: isUser ? topDynamicRadius : normalRadius,
-          borderBottomLeftRadius: isUser ? normalRadius : bottomDynamicRadius,
-          borderBottomRightRadius: isUser ? bottomDynamicRadius : normalRadius,
-          padding: theme.space.md,
-          maxWidth: '90%',
-        }}
+  return match(message)
+    .with({ type: 'messageResponse' }, (message) => (
+      <MessageBubble
+        isUser={isUser}
+        sameSenderAbove={sameSenderAbove}
+        sameSenderBelow={sameSenderBelow}
       >
-        {match(message)
-          .with({ type: 'messageResponse' }, (message) => <GeneralMessage isUser={isUser} message={message} />)
-          .with({ type: 'chatPlan' }, (message) => <PlanMessage isUser={isUser} message={message} />)
-          .with({ type: 'sharedProgram' }, (message) => <SharedProgramMessage isUser={isUser} message={message} />)
-          .with({ type: 'purchasePro' }, () => <ProPrompt />)
-          .with({ type: 'updateRequired' }, () => <UpdatePrompt />)
-          .exhaustive()}
-        {message.isLoading && <ChatLoader />}
-      </View>
-    </View>
-  );
+        {message.isLoading && !message.message.trim() ? (
+          <TypingDots label={t('ai.chat.typing.label')} />
+        ) : (
+          <GeneralMessage isUser={isUser} message={message} />
+        )}
+      </MessageBubble>
+    ))
+    .with({ type: 'chatPlan' }, (message) => (
+      <S.CardRow>
+        <HomeCard radius={20} pad={16}>
+          <PlanMessage isUser={false} message={message} />
+        </HomeCard>
+      </S.CardRow>
+    ))
+    .with({ type: 'sharedProgram' }, (message) => (
+      <S.CardRow>
+        <HomeCard radius={20} pad={16}>
+          <SharedProgramMessage isUser={false} message={message} />
+        </HomeCard>
+      </S.CardRow>
+    ))
+    .with({ type: 'purchasePro' }, () => (
+      <S.NoticeRow>
+        <S.NoticeCard>
+          <HomeCard radius={20} pad={16}>
+            <ProPrompt />
+          </HomeCard>
+        </S.NoticeCard>
+      </S.NoticeRow>
+    ))
+    .with({ type: 'updateRequired' }, () => (
+      <S.NoticeRow>
+        <S.NoticeCard>
+          <HomeCard radius={20} pad={16}>
+            <UpdatePrompt />
+          </HomeCard>
+        </S.NoticeCard>
+      </S.NoticeRow>
+    ))
+    .exhaustive();
 }
 
-function ChatLoader() {
-  return <Loader loadingText="" />;
+function MessageBubble({
+  isUser,
+  sameSenderAbove,
+  sameSenderBelow,
+  children,
+}: {
+  isUser: boolean;
+  sameSenderAbove: boolean;
+  sameSenderBelow: boolean;
+  children: React.ReactNode;
+}) {
+  const topDynamicRadius = sameSenderAbove ? GROUPED_RADIUS : RADIUS;
+  const bottomDynamicRadius = sameSenderBelow ? GROUPED_RADIUS : RADIUS;
+  // The tail side keeps its full radius; the grouped side tightens.
+  const corners = isUser
+    ? { $tl: RADIUS, $tr: topDynamicRadius, $br: bottomDynamicRadius, $bl: RADIUS }
+    : { $tl: topDynamicRadius, $tr: RADIUS, $br: RADIUS, $bl: bottomDynamicRadius };
+  return (
+    <S.Row $isUser={isUser}>
+      {isUser ? (
+        <S.UserBubble
+          {...corners}
+          colors={[...S.USER_BUBBLE_COLORS]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+        >
+          {children}
+        </S.UserBubble>
+      ) : (
+        <S.AgentBubble {...corners}>{children}</S.AgentBubble>
+      )}
+    </S.Row>
+  );
 }

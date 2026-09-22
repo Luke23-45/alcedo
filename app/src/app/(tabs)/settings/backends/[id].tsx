@@ -1,10 +1,9 @@
 import { SettingsPage } from '@/components/layout/settings-page';
 import { BackendHeaderEditor } from '@/components/presentation/backends/backend-header-editor';
-import ConfirmationDialog from '@/components/presentation/foundation/confirmation-dialog';
-import { FormRow } from '@/components/presentation/foundation/form-row';
+import { ConnectionCard } from '@/components/presentation/backends/connection-card';
+import { KindSection } from '@/components/presentation/backends/kind-section';
+import { ProbeStatusCard } from '@/components/presentation/backends/probe-status-card';
 import { PageActions } from '@/components/presentation/foundation/page-actions';
-import { SegmentedGroup } from '@/components/presentation/foundation/segmented-list';
-import { SegmentedListSelect } from '@/components/presentation/foundation/segmented-list-select';
 import {
   Backend,
   backendFeatureNameKey,
@@ -21,13 +20,13 @@ import {
 } from '@/services/backend-probe';
 import { useAppSelector } from '@/store';
 import { putBackend, removeBackend } from '@/store/backends';
-import { T, TranslationKey, useTranslate } from '@tolgee/react';
+import { TranslationKey, useTranslate } from '@tolgee/react';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import ExperimentIcon from '@expo/material-symbols/experiment.xml';
-import DeleteIcon from '@expo/material-symbols/delete.xml';
-import { HelperText, TextInput } from 'react-native-paper';
+import { Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
+import * as S from './backend-editor.styles';
 
 const kindOptions = [
   { value: 'liftlog', label: 'backends.kind.liftlog.label', body: 'backends.kind.liftlog.body' },
@@ -38,7 +37,10 @@ const kindOptions = [
   },
 ] as const satisfies { value: BackendKind; label: TranslationKey; body: TranslationKey }[];
 
-type ProbeState = { status: 'idle' } | { status: 'checking' } | { status: 'done'; message: string; ok: boolean };
+type ProbeState =
+  | { status: 'idle' }
+  | { status: 'checking' }
+  | { status: 'done'; ok: boolean; title: string; body: string };
 
 /** HTTP/2 has no reason phrase, so the code stands alone rather than trailing a space. */
 const statusLabel = (statusCode: number, statusText: string) => [statusCode, statusText].filter(Boolean).join(' ');
@@ -60,7 +62,6 @@ function BackendEditor({ backend }: { backend: Backend }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const [probe, setProbe] = useState<ProbeState>({ status: 'idle' });
-  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const update = (changes: Partial<Backend>) => dispatch(putBackend({ ...backend, ...changes }));
 
@@ -137,10 +138,12 @@ function BackendEditor({ backend }: { backend: Backend }) {
     // A backup endpoint has no /features to ask, so it is checked the only way the protocol allows.
     if (backend.kind === 'backupEndpoint') {
       const result = await probeBackupEndpoint(backend);
+      const ok = result.status === 'ok';
       setProbe({
         status: 'done',
-        ok: result.status === 'ok',
-        message:
+        ok,
+        title: t(ok ? 'backends.test.connected' : 'backends.test.failed'),
+        body:
           result.status === 'ok'
             ? t('backends.test.backup_ok')
             : result.status === 'refused'
@@ -155,8 +158,30 @@ function BackendEditor({ backend }: { backend: Backend }) {
       return;
     }
     const result = await probeBackendFeatures(backend);
-    setProbe({ status: 'done', message: describeProbe(result), ok: result.status === 'ok' });
+    const ok = result.status === 'ok';
+    setProbe({
+      status: 'done',
+      ok,
+      title: t(ok ? 'backends.test.connected' : 'backends.test.failed'),
+      body: describeProbe(result),
+    });
   };
+
+  const confirmDelete = () => {
+    Alert.alert(t('backends.delete.title'), t('backends.delete.message'), [
+      { text: t('generic.cancel.button'), style: 'cancel' },
+      {
+        text: t('generic.delete.button'),
+        style: 'destructive',
+        onPress: () => {
+          dispatch(removeBackend(backend.id));
+          router.back();
+        },
+      },
+    ]);
+  };
+
+  const selectedKind = kindOptions.find((option) => option.value === backend.kind)!;
 
   return (
     <SettingsPage
@@ -170,72 +195,45 @@ function BackendEditor({ backend }: { backend: Backend }) {
             icon: ExperimentIcon,
             systemImage: 'flask',
           }}
-          secondary={[
-            {
-              label: t('generic.delete.button'),
-              onPress: () => setDeleteOpen(true),
-              icon: DeleteIcon,
-              systemImage: 'trash',
-            },
-          ]}
         />
       }
     >
-      <FormRow noGap>
-        <TextInput
-          mode="outlined"
-          label={t('backends.name.label')}
-          value={backend.name}
-          error={!!nameError}
-          onChangeText={(name) => update({ name })}
-          onBlur={() => update({ name: backend.name.trim() })}
-          autoCorrect={false}
-        />
-        <HelperText type="error">{nameError}</HelperText>
-        <TextInput
-          mode="outlined"
-          label={t('backends.url.label')}
-          placeholder="https://liftlog.example.com"
-          value={backend.url}
-          error={!!urlError}
-          onChangeText={(url) => update({ url })}
-          onBlur={() => update({ url: normalizeBackendUrl(backend.url) })}
-          autoCorrect={false}
-          autoCapitalize="none"
-          keyboardType="url"
-        />
-        <HelperText type="error">{urlError}</HelperText>
-      </FormRow>
+      <ConnectionCard
+        nameField={{
+          label: t('backends.name.label'),
+          value: backend.name,
+          error: nameError,
+          onChange: (name) => update({ name }),
+          onBlur: () => update({ name: backend.name.trim() }),
+        }}
+        urlField={{
+          label: t('backends.url.label'),
+          value: backend.url,
+          error: urlError,
+          placeholder: 'https://liftlog.example.com',
+          autoCapitalize: 'none',
+          keyboardType: 'url',
+          onChange: (url) => update({ url }),
+          onBlur: () => update({ url: normalizeBackendUrl(backend.url) }),
+        }}
+      />
 
-      <SegmentedGroup>
-        <SegmentedListSelect
-          label={t('backends.kind.label')}
-          icon={'settingsFill'}
-          value={backend.kind}
-          options={kindOptions.map(({ value, label }) => ({ value, label: t(label) }))}
-          onChange={(kind) => update({ kind })}
-          supportingText={t(kindOptions.find((option) => option.value === backend.kind)!.body)}
-        />
-      </SegmentedGroup>
+      <KindSection
+        value={backend.kind}
+        options={kindOptions.map(({ value, label }) => ({ value, label: t(label) }))}
+        supportingText={t(selectedKind.body)}
+        onChange={(kind) => update({ kind })}
+      />
 
       <BackendHeaderEditor headers={backend.headers} onChange={(headers) => update({ headers })} />
 
       {probe.status === 'idle' ? null : (
-        <HelperText type={probe.status === 'done' && !probe.ok ? 'error' : 'info'}>
-          {probe.status === 'checking' ? t('backends.test.checking') : probe.message}
-        </HelperText>
+        <ProbeStatusCard probe={probe} checkingLabel={t('backends.test.checking')} />
       )}
 
-      <ConfirmationDialog
-        open={deleteOpen}
-        headline={t('backends.delete.title')}
-        textContent={<T keyName="backends.delete.message" />}
-        onCancel={() => setDeleteOpen(false)}
-        onOk={() => {
-          dispatch(removeBackend(backend.id));
-          router.back();
-        }}
-      />
+      <S.DeleteRow onPress={confirmDelete} accessibilityRole="button">
+        <S.DeleteLabel>{t('backends.delete.action')}</S.DeleteLabel>
+      </S.DeleteRow>
     </SettingsPage>
   );
 }

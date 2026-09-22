@@ -1,14 +1,10 @@
-import { useAppTheme } from '@/hooks/useAppTheme';
-
 import { useTranslate } from '@tolgee/react';
 import { Stack } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { Dimensions, FlatList, I18nManager, Platform, View } from 'react-native';
+import { Alert, Dimensions, FlatList, I18nManager, Platform, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import { useDispatch } from 'react-redux';
-import IconButton from '@/components/presentation/foundation/icon-button';
-import { Appbar, TextInput, Tooltip } from 'react-native-paper';
 import { useAppSelector } from '@/store';
 import {
   addMessage,
@@ -23,13 +19,47 @@ import { useScroll } from '@/hooks/useScrollListener';
 import { useMountEffect } from '@/hooks/useMountEffect';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatBubble } from '@/components/presentation/ai-planner/chat-bubble';
+import { DayDivider } from '@/components/presentation/ai-planner/day-divider';
 import { ShareProgramButton } from '@/components/presentation/ai-planner/share-program-button';
-import { canSendChatMessage, isChatOutOfDate, sanitizeChatInput } from '@/components/smart/planner-chat-logic';
+import { ArrowUpGlyph, RestartGlyph, StopGlyph } from '@/components/presentation/foundation/glyphs';
+import {
+  canSendChatMessage,
+  dayDividerLabel,
+  isChatOutOfDate,
+  sanitizeChatInput,
+  showsDayDivider,
+} from '@/components/smart/planner-chat-logic';
+import * as S from './planner-chat.styles';
 
 const COMPOSER_GAP = 8; // theme.space.sm
 
+/** Header restart action: 44pt target, native destructive confirmation. */
+function RestartChatButton() {
+  const { t } = useTranslate();
+  const dispatch = useDispatch();
+  const confirm = () =>
+    Alert.alert(t('ai.restart_chat.confirm.title'), t('ai.restart_chat.confirm.body'), [
+      { text: t('ai.restart_chat.confirm.cancel'), style: 'cancel' },
+      {
+        text: t('ai.restart_chat.confirm.restart'),
+        style: 'destructive',
+        onPress: () => dispatch(restartChat()),
+      },
+    ]);
+  return (
+    <S.HeaderTouch
+      onPress={confirm}
+      accessibilityRole="button"
+      accessibilityLabel={t('ai.restart_chat.button')}
+    >
+      <S.HeaderCircle>
+        <RestartGlyph color="#0A84FF" size={18} />
+      </S.HeaderCircle>
+    </S.HeaderTouch>
+  );
+}
+
 export default function AiPlannerChat() {
-  const theme = useAppTheme();
   const { t } = useTranslate();
 
   const dispatch = useDispatch();
@@ -79,6 +109,7 @@ export default function AiPlannerChat() {
   // closes the double-send window the store flag cannot see yet.
   const awaitingAiReply = messages[0]?.from === 'User';
   const sendGate = { isLoadingResponse, isOutOfDate, awaitingAiReply };
+  const canSend = canSendChatMessage(sendGate, messageText);
   const sendMessage = (message: string) => {
     const trimmed = sanitizeChatInput(message);
     if (canSendChatMessage(sendGate, message)) {
@@ -93,101 +124,133 @@ export default function AiPlannerChat() {
       );
     }
   };
-  const reset = () => dispatch(restartChat());
+
+  const now = Date.now();
+  const todayLabel = t('ai.chat.day.today');
+  const yesterdayLabel = t('ai.chat.day.yesterday');
 
   return (
-    <View style={{ flex: 1, overflow: 'hidden', paddingLeft: insets.left, paddingRight: insets.right }}>
+    <S.Screen style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
       <Stack.Screen
         options={{
           scrollEdgeEffects: { top: 'hidden' },
           headerBlurEffect: 'systemMaterial',
-          title: t('ai.planner.title'),
-          headerRight: () => (
-            <Tooltip title={t('ai.restart_chat.button')}>
-              <Appbar.Action icon={'replay'} onPress={reset}></Appbar.Action>
-            </Tooltip>
-          ),
+          title: t('ai.chat.title'),
+          headerRight: () => <RestartChatButton />,
         }}
       />
       <Animated.View style={chatStyle}>
-        <FlatList<ChatMessage>
-          ref={listRef}
-          style={{ flex: 1 }}
-          onScroll={handleScroll}
-          keyboardDismissMode="interactive"
-          automaticallyAdjustContentInsets={false}
-          contentInsetAdjustmentBehavior="never"
-          onContentSizeChange={() => listRef.current?.scrollToOffset({ offset: 0, animated: false })}
-          data={messages}
-          inverted
-          contentContainerStyle={{
-            gap: theme.space.xxs,
-            paddingHorizontal: theme.layout.screenPadding,
-            paddingTop: COMPOSER_GAP,
-          }}
-          keyExtractor={(x) => x.id}
-          renderItem={({ item, index }) => {
-            const messageBelow = messages[index - 1]; // visually below (next in inverted list)
-            const messageAbove = messages[index + 1]; // visually above (previous in inverted list)
-            const isLastMessage = index === 0; // In inverted list, index 0 is the last (newest) message
+        {isOutOfDate && (
+          <S.OutOfDateBanner>
+            <S.OutOfDateTitle>{t('ai.chat.out_of_date.title')}</S.OutOfDateTitle>
+            <S.OutOfDateBody>{t('ai.chat.out_of_date.body')}</S.OutOfDateBody>
+          </S.OutOfDateBanner>
+        )}
+        {messages.length === 0 ? (
+          <S.EmptyWrap>
+            <S.EmptyTitle>{t('ai.chat.empty.title')}</S.EmptyTitle>
+            <S.EmptyBody>{t('ai.chat.empty.body')}</S.EmptyBody>
+          </S.EmptyWrap>
+        ) : (
+          <FlatList<ChatMessage>
+            ref={listRef}
+            style={{ flex: 1 }}
+            onScroll={handleScroll}
+            keyboardDismissMode="interactive"
+            automaticallyAdjustContentInsets={false}
+            contentInsetAdjustmentBehavior="never"
+            onContentSizeChange={() => listRef.current?.scrollToOffset({ offset: 0, animated: false })}
+            data={messages}
+            inverted
+            contentContainerStyle={{
+              gap: 4,
+              paddingHorizontal: 16,
+              paddingTop: COMPOSER_GAP,
+            }}
+            keyExtractor={(x) => x.id}
+            renderItem={({ item, index }) => {
+              const messageBelow = messages[index - 1]; // visually below (next in inverted list)
+              const messageAbove = messages[index + 1]; // visually above (previous in inverted list)
+              const isLastMessage = index === 0; // In inverted list, index 0 is the last (newest) message
 
-            return (
-              <ChatBubble
-                message={item}
-                sameSenderBelow={messageBelow?.from === item.from}
-                sameSenderAbove={messageAbove?.from === item.from}
-                isLastMessage={isLastMessage}
-              />
-            );
-          }}
-        />
+              return (
+                <S.ItemColumn>
+                  {showsDayDivider(messages, index) && item.sentAt != null && (
+                    <DayDivider
+                      label={dayDividerLabel(item.sentAt, now, todayLabel, yesterdayLabel)}
+                    />
+                  )}
+                  <ChatBubble
+                    message={item}
+                    sameSenderBelow={messageBelow?.from === item.from}
+                    sameSenderAbove={messageAbove?.from === item.from}
+                    isLastMessage={isLastMessage}
+                  />
+                </S.ItemColumn>
+              );
+            }}
+          />
+        )}
         <View
           ref={composerRef}
           collapsable={false}
           onLayout={onComposerLayout}
-          style={{
-            backgroundColor: theme.color.background.elevated,
-            paddingHorizontal: theme.layout.screenPadding,
-            paddingTop: COMPOSER_GAP,
-            paddingBottom: insets.bottom + COMPOSER_GAP,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
         >
+          <S.ComposerRow
+            style={{ paddingBottom: insets.bottom + COMPOSER_GAP }}
+          >
           <ShareProgramButton disabled={isLoadingResponse || isOutOfDate} />
 
-          <TextInput
-            value={messageText}
-            editable={!isOutOfDate}
-            style={{
-              flex: 1,
-              borderRadius: 30,
-              borderTopLeftRadius: 30,
-              borderTopRightRadius: 30,
-            }}
-            onChangeText={setMessageText}
-            multiline
-            placeholder={t('ai.type_your_message.placeholder')}
-            onSubmitEditing={(e) => setMessageText(e.nativeEvent.text + '\n')}
-            submitBehavior="submit"
-            returnKeyType="default"
-            underlineStyle={{ display: 'none' }}
-          />
+          <S.Pill>
+            <S.Field
+              value={messageText}
+              editable={!isOutOfDate}
+              onChangeText={setMessageText}
+              multiline
+              placeholder={t('ai.type_your_message.placeholder')}
+              placeholderTextColor="#8E8E93"
+              returnKeyType="default"
+              textAlignVertical="center"
+              accessibilityLabel={t('ai.type_your_message.placeholder')}
+            />
+          </S.Pill>
 
-          {isLoadingResponse && (
-            <IconButton mode="outlined" icon={'stop'} size={35} onPress={() => dispatch(stopAiGenerator())} />
+          {isLoadingResponse ? (
+            <S.SendTouch
+              onPress={() => dispatch(stopAiGenerator())}
+              accessibilityRole="button"
+              accessibilityLabel={t('ai.stop_generating.button')}
+            >
+              <S.SendCircle
+                colors={[...S.SEND_BLUE]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <StopGlyph color="#FFFFFF" size={16} />
+              </S.SendCircle>
+            </S.SendTouch>
+          ) : (
+            <S.SendTouch
+              onPress={() => sendMessage(messageText)}
+              disabled={!canSend}
+              accessibilityRole="button"
+              accessibilityLabel={t('ai.send_message.button')}
+              accessibilityState={{ disabled: !canSend }}
+            >
+              <S.SendCircle
+                colors={[...S.SEND_BLUE]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={I18nManager.isRTL ? { transform: [{ scaleX: -1 }] } : undefined}>
+                  <ArrowUpGlyph color="#FFFFFF" size={18} />
+                </View>
+              </S.SendCircle>
+            </S.SendTouch>
           )}
-
-          <IconButton
-            mode="contained"
-            icon={'send'}
-            size={35}
-            disabled={!canSendChatMessage(sendGate, messageText)}
-            mirrored={I18nManager.isRTL}
-            onPress={() => sendMessage(messageText)}
-          />
+          </S.ComposerRow>
         </View>
       </Animated.View>
-    </View>
+    </S.Screen>
   );
 }

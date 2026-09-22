@@ -25,6 +25,8 @@ doc is added, removed, renamed, or repurposed, update this index in the same cha
 - [new_design/workout-editor-redesign.md](new_design/workout-editor-redesign.md) — workout editor redesign spec.
 - [new_design/backup-redesign.md](new_design/backup-redesign.md) — backup hub redesign spec.
 - [new_design/diff-save-dark.svg](new_design/diff-save-dark.svg) — /diff-save reference mockup (dark).
+- [new_design/backend-editor-dark.svg](new_design/backend-editor-dark.svg) — backend editor (/settings/backends/[id]) redesign mockup (dark).
+- [new_design/planner-chat-dark.svg](new_design/planner-chat-dark.svg) — AI planner chat redesign mockup (dark).
 
 ## Working notes
 

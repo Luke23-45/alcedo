@@ -1,10 +1,11 @@
 /**
  * Page 20/20 — `/settings/backends/[id]` editor simulation.
  *
- * DESIGN-FIRST: the user is designing this screen themselves, so the UI is
- * deliberately untouched. This spec verifies the *existing* editor contract
- * (audited 2026-09-21) at the model/store level plus static checks over the
- * route file:
+ * REDESIGNED 2026-09-22: Apple-inspired grouped editor (Connection card with
+ * label-above-field rows, native segmented server type, HTTP headers list
+ * with an iOS add/edit sheet, probe result card, bottom Delete action).
+ * This spec verifies the editor contract (audited 2026-09-21) at the
+ * model/store level plus static checks over the route and editor files:
  *
  * A. Completeness contract: `isBackendComplete` = trimmed non-empty name
  *    and URL matching `^https?://.+`.
@@ -124,13 +125,21 @@ describe('editor scope honesty', () => {
   it('autosaves every change (no Save/Cancel action)', () => {
     const route = readFileSync(join(APP_DIR, 'settings', 'backends', '[id].tsx'), 'utf8');
     expect(route).toMatch(/dispatch\(putBackend\(\{\s*\.\.\.backend,\s*\.\.\.changes/);
-    expect(route).not.toMatch(/generic\.save\.button|generic\.cancel\.button/);
+    // The page itself has no save/cancel flow: the only Cancel on it belongs
+    // to the native delete confirmation, and there is no Save at all.
+    expect(route).not.toMatch(/generic\.save\.button/);
+    expect(route.match(/generic\.cancel\.button/g)?.length).toBe(1);
+    expect(route).toMatch(/Alert\.alert\([\s\S]*?generic\.cancel\.button/);
   });
 
   it('masks sensitive header values', () => {
     const headerEditor = readFileSync(join(BACKENDS_PRESENTATION_DIR, 'backend-header-editor.tsx'), 'utf8');
+    const headerSheet = readFileSync(
+      join(BACKENDS_PRESENTATION_DIR, 'header-sheet', 'header-sheet.tsx'),
+      'utf8',
+    );
     expect(headerEditor).toMatch(/isSecretHeader/);
-    expect(headerEditor).toMatch(/secureTextEntry/);
+    expect(headerEditor + headerSheet).toMatch(/secureTextEntry/);
   });
 });
 
@@ -138,9 +147,18 @@ describe('backend editor i18n completeness', () => {
   it('resolves every literal key used by the editor in en.json', () => {
     const en = JSON.parse(readFileSync(join(SRC, 'i18n', 'en.json'), 'utf8')) as Record<string, unknown>;
     const keys = new Set<string>();
-    const source = readFileSync(join(APP_DIR, 'settings', 'backends', '[id].tsx'), 'utf8');
-    for (const m of source.matchAll(/(?:settingsKey|(?<![\w$])t)\('([^']+)'\)/g)) {
-      keys.add(m[1]!);
+    const sources = [
+      readFileSync(join(APP_DIR, 'settings', 'backends', '[id].tsx'), 'utf8'),
+      readFileSync(join(BACKENDS_PRESENTATION_DIR, 'backend-header-editor.tsx'), 'utf8'),
+      readFileSync(join(BACKENDS_PRESENTATION_DIR, 'connection-card', 'connection-card.tsx'), 'utf8'),
+      readFileSync(join(BACKENDS_PRESENTATION_DIR, 'kind-section', 'kind-section.tsx'), 'utf8'),
+      readFileSync(join(BACKENDS_PRESENTATION_DIR, 'probe-status-card', 'probe-status-card.tsx'), 'utf8'),
+      readFileSync(join(BACKENDS_PRESENTATION_DIR, 'header-sheet', 'header-sheet.tsx'), 'utf8'),
+    ];
+    for (const source of sources) {
+      for (const m of source.matchAll(/(?:settingsKey|(?<![\w$])t)\('([^']+)'\)/g)) {
+        keys.add(m[1]!);
+      }
     }
     expect(keys.size).toBeGreaterThan(0);
     const missing = [...keys].filter((k) => !(k in en));

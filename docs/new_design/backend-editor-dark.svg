@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="393" height="1500" viewBox="0 0 393 1500" role="img" aria-labelledby="ttl dsc"
+     font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+     text-rendering="optimizeLegibility" shape-rendering="geometricPrecision">
+
+<title id="ttl">Kinetic — Backend editor (page 20 redesign)</title>
+<desc id="dsc">Apple-inspired redesign of /settings/backends/[id]: grouped Connection card with native text fields, native segmented server-type control, HTTP headers list, connection test status card, and a bottom delete action. Dark mode.</desc>
+
+<defs>
+  <!-- ══════ ENVIRONMENT ══════ -->
+  <linearGradient id="gBg" x1="0" y1="0" x2="0.25" y2="1">
+    <stop offset="0" stop-color="#0B0B0E"/><stop offset="0.5" stop-color="#050507"/><stop offset="1" stop-color="#08080B"/>
+  </linearGradient>
+  <radialGradient id="gAuraA" gradientUnits="userSpaceOnUse" cx="70" cy="200" r="300">
+    <stop offset="0" stop-color="#0A84FF" stop-opacity="0.14"/><stop offset="1" stop-color="#0A84FF" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gAuraB" gradientUnits="userSpaceOnUse" cx="360" cy="1050" r="320">
+    <stop offset="0" stop-color="#BF5AF2" stop-opacity="0.08"/><stop offset="1" stop-color="#BF5AF2" stop-opacity="0"/></radialGradient>
+
+  <!-- ══════ MATERIAL ══════ -->
+  <linearGradient id="gCard" x1="0" y1="0" x2="0.45" y2="1">
+    <stop offset="0" stop-color="#1F1F23"/><stop offset="0.55" stop-color="#17171A"/><stop offset="1" stop-color="#131316"/>
+  </linearGradient>
+  <linearGradient id="gCardEdge" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.17"/><stop offset="0.35" stop-color="#FFFFFF" stop-opacity="0.06"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.025"/>
+  </linearGradient>
+  <linearGradient id="gTab" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1D1D21" stop-opacity="0.92"/><stop offset="1" stop-color="#0E0E11" stop-opacity="0.99"/>
+  </linearGradient>
+  <linearGradient id="gGlassBtn" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#3A3A3F" stop-opacity="0.85"/><stop offset="1" stop-color="#1C1C20" stop-opacity="0.85"/>
+  </linearGradient>
+  <linearGradient id="gTestTint" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0A84FF"/><stop offset="1" stop-color="#2E9BFF"/>
+  </linearGradient>
+
+  <!-- ══════ FILTERS ══════ -->
+  <filter id="fCard" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity="0.50"/></filter>
+  <filter id="fSoft" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.45"/></filter>
+  <filter id="fPill" x="-60%" y="-60%" width="220%" height="220%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.55"/></filter>
+
+  <!-- ══════ ICONS (24×24, centred, 2pt rounded strokes) ══════ -->
+  <g id="ic-chev" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 -10 L-6 0 L7 10"/>
+  </g>
+  <g id="ic-flask" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.5 -10 H-9.5 M-4.5 -10 V-3.5 L-10 7 A2.4 2.4 0 0 0 -7.9 10.6 H7.9 A2.4 2.4 0 0 0 10 7 L4.5 -3.5 V-10"/>
+    <path d="M-6.5 3.5 H6.8"/>
+  </g>
+  <g id="ic-checkc" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle r="10"/><path d="M-4.5 0.5 L-1 4.2 L5 -4.5"/>
+  </g>
+  <g id="ic-x" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <path d="M-6 -6 L6 6 M6 -6 L-6 6"/>
+  </g>
+  <g id="ic-plus" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <path d="M0 -8 V8 M-8 0 H8"/>
+  </g>
+  <g id="ic-key" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="-4.5" cy="-1" r="4.6"/><path d="M0 0 H11 M7.5 0 V4 M11 0 V3"/>
+  </g>
+  <!-- tab glyphs -->
+  <g id="ic-dumb" fill="currentColor">
+    <rect x="-12" y="-2.5" width="24" height="5" rx="2.5"/><rect x="-16.5" y="-7" width="4.5" height="14" rx="2.2"/>
+    <rect x="-11" y="-5" width="3.6" height="10" rx="1.8"/><rect x="12" y="-7" width="4.5" height="14" rx="2.2"/>
+    <rect x="7.4" y="-5" width="3.6" height="10" rx="1.8"/>
+  </g>
+  <g id="ic-feed" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <circle cx="-7" cy="7" r="1.4" fill="currentColor" stroke="none"/><path d="M-10.5 -3.5 A8 8 0 0 1 -3.5 -10.5"/>
+    <path d="M-10.5 2.5 A14 14 0 0 1 2.5 -10.5"/>
+  </g>
+  <g id="ic-stats" fill="currentColor">
+    <rect x="-11" y="2" width="5" height="8" rx="2"/><rect x="-2.5" y="-3" width="5" height="13" rx="2"/>
+    <rect x="6" y="-8" width="5" height="18" rx="2"/>
+  </g>
+  <g id="ic-hist" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <circle r="9.5"/><path d="M0 -5 V0.5 L4 3"/>
+  </g>
+  <g id="ic-set" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <circle r="5.2"/><path d="M0 -10.5 V-8 M0 8 V10.5 M-10.5 0 H-8 M8 0 H10.5 M-7.4 -7.4 L-5.7 -5.7 M5.7 5.7 L7.4 7.4 M7.4 -7.4 L5.7 -5.7 M-5.7 5.7 L-7.4 7.4"/>
+  </g>
+</defs>
+
+<!-- ═══════════ 00 · CANVAS ═══════════ -->
+<rect x="0" y="0" width="393" height="1500" fill="url(#gBg)"/>
+<rect x="0" y="0" width="393" height="1500" fill="url(#gAuraA)"/>
+<rect x="0" y="0" width="393" height="1500" fill="url(#gAuraB)"/>
+
+<!-- ═══════════ 01 · STATUS BAR ═══════════ -->
+<text x="66" y="36" font-size="16" font-weight="600" letter-spacing="-0.35" fill="#FFFFFF" text-anchor="middle">9:41</text>
+<g fill="#FFFFFF">
+  <rect x="281" y="27" width="3" height="4.5" rx="1.5"/><rect x="286" y="25" width="3" height="6.5" rx="1.5"/>
+  <rect x="291" y="23" width="3" height="8.5" rx="1.5"/><rect x="296" y="20.5" width="3" height="11" rx="1.5"/>
+</g>
+<g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round">
+  <path d="M306.28 23.78 A9.5 9.5 0 0 1 319.72 23.78"/><path d="M308.55 26.05 A6.3 6.3 0 0 1 317.45 26.05"/>
+  <path d="M310.81 28.31 A3.1 3.1 0 0 1 315.19 28.31"/>
+</g>
+<circle cx="313" cy="30.8" r="1.3" fill="#FFFFFF"/>
+<rect x="328" y="23" width="24" height="11" rx="3.2" fill="none" stroke="#FFFFFF" stroke-opacity="0.38"/>
+<rect x="329.8" y="24.8" width="15" height="7.4" rx="2" fill="#FFFFFF"/>
+<path d="M353.6 26.4 C354.9 26.8 354.9 30.2 353.6 30.6 Z" fill="#FFFFFF" fill-opacity="0.42"/>
+<rect x="133.5" y="11" width="126" height="37" rx="18.5" fill="#000000"/>
+<circle cx="245.5" cy="29.5" r="6.2" fill="#0A0C10"/><circle cx="245.5" cy="29.5" r="3.1" fill="#121A24"/>
+<circle cx="244.2" cy="28.2" r="1.05" fill="#3E6E9E" opacity="0.75"/>
+
+<!-- ═══════════ 02 · NAV BAR ═══════════ -->
+<g color="#0A84FF"><use xlink:href="#ic-chev" href="#ic-chev" transform="translate(22,76) scale(0.72)"/></g>
+<text x="34" y="82" font-size="17" font-weight="400" letter-spacing="-0.3" fill="#0A84FF">Backends</text>
+<text x="196.5" y="82" font-size="17" font-weight="600" letter-spacing="-0.3" fill="#FFFFFF" text-anchor="middle">Home Server</text>
+
+<!-- ═══════════ 03 · SECTION — CONNECTION ═══════════ -->
+<text x="24" y="132" font-size="10" font-weight="700" letter-spacing="1.35" fill="#86868B">CONNECTION</text>
+<g filter="url(#fCard)"><rect x="16" y="146" width="361" height="148" rx="20" fill="url(#gCard)"/></g>
+<rect x="16.5" y="146.5" width="360" height="147" rx="19.5" fill="none" stroke="url(#gCardEdge)"/>
+<text x="32" y="178" font-size="13" font-weight="600" letter-spacing="-0.1" fill="#98989F">Name</text>
+<text x="32" y="203" font-size="17" font-weight="400" letter-spacing="-0.3" fill="#F5F5F7">Home Server</text>
+<line x1="32" y1="218.5" x2="377" y2="218.5" stroke="#FFFFFF" stroke-opacity="0.08"/>
+<text x="32" y="243" font-size="13" font-weight="600" letter-spacing="-0.1" fill="#98989F">Server URL</text>
+<text x="32" y="268" font-size="17" font-weight="400" letter-spacing="-0.3" fill="#F5F5F7">https://liftlog.home.arpa</text>
+
+<!-- ═══════════ 04 · SECTION — SERVER TYPE ═══════════ -->
+<text x="24" y="326" font-size="10" font-weight="700" letter-spacing="1.35" fill="#86868B">SERVER TYPE</text>
+<rect x="16" y="340" width="361" height="48" rx="14" fill="#FFFFFF" fill-opacity="0.08"/>
+<rect x="20" y="344" width="176.5" height="40" rx="10" fill="#FFFFFF" fill-opacity="0.16" filter="url(#fSoft)"/>
+<text x="108.25" y="369" font-size="15" font-weight="600" letter-spacing="-0.2" fill="#FFFFFF" text-anchor="middle">Liftlog server</text>
+<text x="284.75" y="369" font-size="15" font-weight="500" letter-spacing="-0.2" fill="#98989F" text-anchor="middle">Backup endpoint</text>
+<text x="24" y="408" font-size="13" font-weight="400" letter-spacing="-0.1" fill="#98989F">A Liftlog server hosts your full account — workouts,</text>
+<text x="24" y="426" font-size="13" font-weight="400" letter-spacing="-0.1" fill="#98989F">programs and feed. A backup endpoint only stores files.</text>
+
+<!-- ═══════════ 05 · SECTION — HTTP HEADERS ═══════════ -->
+<text x="24" y="464" font-size="10" font-weight="700" letter-spacing="1.35" fill="#86868B">HTTP HEADERS</text>
+<g filter="url(#fCard)"><rect x="16" y="478" width="361" height="184" rx="20" fill="url(#gCard)"/></g>
+<rect x="16.5" y="478.5" width="360" height="183" rx="19.5" fill="none" stroke="url(#gCardEdge)"/>
+<g color="#8E8E93"><use xlink:href="#ic-key" href="#ic-key" transform="translate(44,514) scale(0.85)"/></g>
+<text x="62" y="510" font-size="16" font-weight="600" letter-spacing="-0.2" fill="#F5F5F7">Authorization</text>
+<text x="62" y="532" font-size="13" font-weight="400" fill="#6C6C70" letter-spacing="2">••••••••••••</text>
+<g color="#FF453A"><circle cx="353" cy="518" r="13" fill="none" stroke="currentColor" stroke-width="1.6"/><use xlink:href="#ic-x" href="#ic-x" transform="translate(353,518) scale(0.62)"/></g>
+<line x1="32" y1="548.5" x2="377" y2="548.5" stroke="#FFFFFF" stroke-opacity="0.08"/>
+<g color="#8E8E93"><use xlink:href="#ic-key" href="#ic-key" transform="translate(44,578) scale(0.85)"/></g>
+<text x="62" y="574" font-size="16" font-weight="600" letter-spacing="-0.2" fill="#F5F5F7">X-API-Key</text>
+<text x="62" y="596" font-size="13" font-weight="400" fill="#6C6C70" letter-spacing="2">••••••••••••</text>
+<g color="#FF453A"><circle cx="353" cy="582" r="13" fill="none" stroke="currentColor" stroke-width="1.6"/><use xlink:href="#ic-x" href="#ic-x" transform="translate(353,582) scale(0.62)"/></g>
+<line x1="32" y1="612.5" x2="377" y2="612.5" stroke="#FFFFFF" stroke-opacity="0.08"/>
+<g color="#0A84FF"><circle cx="45" cy="637" r="13" fill="none" stroke="currentColor" stroke-width="1.8"/><use xlink:href="#ic-plus" href="#ic-plus" transform="translate(45,637) scale(0.66)"/></g>
+<text x="66" y="643" font-size="16" font-weight="500" letter-spacing="-0.2" fill="#0A84FF">Add Header</text>
+
+<!-- ═══════════ 06 · TEST RESULT CARD ═══════════ -->
+<g filter="url(#fCard)"><rect x="16" y="694" width="361" height="104" rx="20" fill="url(#gCard)"/></g>
+<rect x="16.5" y="694.5" width="360" height="103" rx="19.5" fill="none" stroke="url(#gCardEdge)"/>
+<g color="#30D158"><use xlink:href="#ic-checkc" href="#ic-checkc" transform="translate(50,746) scale(1.5)"/></g>
+<text x="80" y="742" font-size="16" font-weight="700" letter-spacing="-0.2" fill="#FFFFFF">Connected</text>
+<text x="80" y="765" font-size="13" font-weight="400" letter-spacing="-0.1" fill="#98989F">Offers: workouts, programs, feed, coach</text>
+
+<!-- ═══════════ 07 · DELETE ═══════════ -->
+<text x="196.5" y="852" font-size="17" font-weight="400" letter-spacing="-0.3" fill="#FF453A" text-anchor="middle">Delete Server</text>
+
+<!-- ═══════════ 08 · FLOATING TEST ACTION ═══════════ -->
+<g filter="url(#fPill)">
+  <rect x="134.5" y="1240" width="124" height="56" rx="28" fill="url(#gGlassBtn)"/>
+</g>
+<rect x="135" y="1240.5" width="123" height="55" rx="27.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.18"/>
+<rect x="135" y="1240.5" width="123" height="27" rx="13.5" fill="#FFFFFF" fill-opacity="0.06"/>
+<g color="#FFFFFF"><use xlink:href="#ic-flask" href="#ic-flask" transform="translate(162,1268) scale(0.95)"/></g>
+<text x="180" y="1274" font-size="17" font-weight="600" letter-spacing="-0.3" fill="#FFFFFF">Test</text>
+
+<!-- ═══════════ 09 · TAB BAR (persistent) ═══════════ -->
+<rect x="0" y="1416" width="393" height="84" fill="url(#gTab)"/>
+<line x1="0" y1="1416.5" x2="393" y2="1416.5" stroke="#FFFFFF" stroke-opacity="0.11"/>
+<g color="#8E8E93">
+  <use xlink:href="#ic-dumb" href="#ic-dumb" transform="translate(39.3,1446)"/>
+  <use xlink:href="#ic-feed" href="#ic-feed" transform="translate(117.9,1446)"/>
+  <use xlink:href="#ic-stats" href="#ic-stats" transform="translate(196.5,1446)"/>
+  <use xlink:href="#ic-hist" href="#ic-hist" transform="translate(275.1,1446)"/>
+</g>
+<text x="39.3" y="1474" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Workout</text>
+<text x="117.9" y="1474" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Feed</text>
+<text x="196.5" y="1474" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Stats</text>
+<text x="275.1" y="1474" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">History</text>
+<g color="#FF375F" filter="url(#fSoft)"><use xlink:href="#ic-set" href="#ic-set" transform="translate(353.7,1446)"/></g>
+<text x="353.7" y="1474" font-size="10" font-weight="600" letter-spacing="-0.1" fill="#FF375F" text-anchor="middle">Settings</text>
+<rect x="140.5" y="1486" width="112" height="5" rx="2.5" fill="#FFFFFF" fill-opacity="0.88"/>
+
+<rect x="0.5" y="0.5" width="392" height="1499" fill="none" stroke="#FFFFFF" stroke-opacity="0.08"/>
+</svg>

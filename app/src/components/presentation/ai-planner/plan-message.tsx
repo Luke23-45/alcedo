@@ -1,11 +1,7 @@
-import { SurfaceText } from '@/components/presentation/foundation/surface-text';
-import { useAppTheme } from '@/hooks/useAppTheme';
-import { T } from '@tolgee/react';
+import { T, useTranslate } from '@tolgee/react';
 import { useRouter } from 'expo-router';
 import { Fragment } from 'react';
-import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import Button from '@/components/presentation/foundation/button';
 import { uuid } from '@/utils/uuid';
 import SessionSummary from '@/components/presentation/summary/session-summary';
 import SessionSummaryTitle from '@/components/presentation/summary/session-summary-title';
@@ -14,9 +10,10 @@ import { ChatMessage } from '@/store/ai-planner';
 import { savePlan } from '@/store/program';
 import { Session } from '@/models/session-models';
 import { usePreferredWeightUnit } from '@/hooks/usePreferredWeightUnit';
+import * as S from './plan-message.styles';
 
 export function PlanMessage({ message, isUser }: { message: AiChatPlanResponseV2 & ChatMessage; isUser: boolean }) {
-  const theme = useAppTheme();
+  const { t } = useTranslate();
   const dispatch = useDispatch();
   const { push } = useRouter();
   const preferredWeightUnit = usePreferredWeightUnit();
@@ -32,11 +29,10 @@ export function PlanMessage({ message, isUser }: { message: AiChatPlanResponseV2
     push(`/settings/program-list?focusprogramId=${programId}`);
   };
   return (
-    <View style={{ gap: theme.space.sm }}>
-      <SurfaceText font="text-2xl" weight={'bold'} color={isUser ? 'onPrimary' : 'onSurface'}>
-        {message.plan.name}
-      </SurfaceText>
-      <SurfaceText color={isUser ? 'onPrimary' : 'onSurface'}>{message.plan.description}</SurfaceText>
+    <S.PlanCardBody>
+      {!isUser && <S.PlanEyebrow>{t('ai.chat.plan.eyebrow')}</S.PlanEyebrow>}
+      <S.PlanTitle>{message.plan.name}</S.PlanTitle>
+      <S.PlanDescription>{message.plan.description}</S.PlanDescription>
       {blueprint.sessions.map((s, i) => (
         <Fragment key={i}>
           <SessionSummaryTitle session={Session.getEmptySession(s, preferredWeightUnit)} />
@@ -44,12 +40,22 @@ export function PlanMessage({ message, isUser }: { message: AiChatPlanResponseV2
         </Fragment>
       ))}
       {!message.isLoading && (
-        <View style={{ alignSelf: 'flex-end' }}>
-          <Button mode="contained" icon={'assignmentAdd'} onPress={saveAiPlan}>
-            <T keyName="plan.save_new.button" />
-          </Button>
-        </View>
+        <S.UsePlanTouch
+          onPress={saveAiPlan}
+          accessibilityRole="button"
+          accessibilityLabel={t('ai.chat.plan.use_this_plan')}
+        >
+          <S.UsePlanGradient
+            colors={[...S.COACH_PURPLE]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <S.UsePlanLabel>
+              <T keyName="ai.chat.plan.use_this_plan" />
+            </S.UsePlanLabel>
+          </S.UsePlanGradient>
+        </S.UsePlanTouch>
       )}
-    </View>
+    </S.PlanCardBody>
   );
 }

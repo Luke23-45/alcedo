@@ -107,7 +107,8 @@ describe('send gating', () => {
   it('wires the trimmed text into the dispatched message (source sweep)', () => {
     const source = readFileSync(join(SRC_ROOT, 'app', '(tabs)', 'settings', 'ai', 'planner-chat.tsx'), 'utf8');
     expect(source).toMatch(/message: trimmed,/);
-    expect(source).toMatch(/disabled=\{!canSendChatMessage\(sendGate, messageText\)\}/);
+    expect(source).toMatch(/const canSend = canSendChatMessage\(sendGate, messageText\);/);
+    expect(source).toMatch(/disabled={!canSend}/);
   });
 });
 

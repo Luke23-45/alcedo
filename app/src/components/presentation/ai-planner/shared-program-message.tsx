@@ -1,28 +1,26 @@
-import { SurfaceText } from '@/components/presentation/foundation/surface-text';
-import { useAppTheme } from '@/hooks/useAppTheme';
 import { Fragment } from 'react';
-import { View } from 'react-native';
 import SessionSummary from '@/components/presentation/summary/session-summary';
 import SessionSummaryTitle from '@/components/presentation/summary/session-summary-title';
 import { AiChatSharedProgramMessage } from '@/models/ai-models';
 import { Session } from '@/models/session-models';
 import { usePreferredWeightUnit } from '@/hooks/usePreferredWeightUnit';
+import * as S from './shared-program-message.styles';
 
-export function SharedProgramMessage({ message, isUser }: { message: AiChatSharedProgramMessage; isUser: boolean }) {
-  const theme = useAppTheme();
+export function SharedProgramMessage({ message }: { message: AiChatSharedProgramMessage; isUser: boolean }) {
   const preferredWeightUnit = usePreferredWeightUnit();
-  const color = isUser ? 'onPrimary' : 'onSurface';
+  const sessionCount = message.blueprint.sessions.length;
   return (
-    <View style={{ gap: theme.space.sm }}>
-      <SurfaceText font="text-2xl" weight={'bold'} color={color}>
-        {message.programName}
-      </SurfaceText>
+    <S.SharedProgramBody>
+      <S.SharedProgramTitle>{message.programName}</S.SharedProgramTitle>
+      <S.SharedProgramMeta>
+        {sessionCount} {sessionCount === 1 ? 'session' : 'sessions'}
+      </S.SharedProgramMeta>
       {message.blueprint.sessions.map((s, i) => (
         <Fragment key={i}>
-          <SessionSummaryTitle session={Session.getEmptySession(s, preferredWeightUnit)} color={color} />
-          <SessionSummary session={Session.getEmptySession(s, preferredWeightUnit)} color={color} />
+          <SessionSummaryTitle session={Session.getEmptySession(s, preferredWeightUnit)} />
+          <SessionSummary session={Session.getEmptySession(s, preferredWeightUnit)} />
         </Fragment>
       ))}
-    </View>
+    </S.SharedProgramBody>
   );
 }

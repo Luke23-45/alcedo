@@ -1,0 +1,180 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="393" height="1620" viewBox="0 0 393 1620" role="img" aria-labelledby="ttl dsc"
+     font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+     text-rendering="optimizeLegibility" shape-rendering="geometricPrecision">
+
+<title id="ttl">Kinetic — AI planner chat (page 24 redesign)</title>
+<desc id="dsc">Apple-inspired redesign of /settings/ai/planner-chat: iMessage-style bubbles with a blue gradient for the user and system gray for the coach, a three-dot typing indicator, a full-width recommended-plan card, centered system notices, and a floating pill composer with a morphing send button. Dark mode.</desc>
+
+<defs>
+  <!-- ══════ ENVIRONMENT ══════ -->
+  <linearGradient id="cBg" x1="0" y1="0" x2="0.25" y2="1">
+    <stop offset="0" stop-color="#0B0B0E"/><stop offset="0.5" stop-color="#050507"/><stop offset="1" stop-color="#08080B"/>
+  </linearGradient>
+  <radialGradient id="cAuraA" gradientUnits="userSpaceOnUse" cx="320" cy="300" r="300">
+    <stop offset="0" stop-color="#BF5AF2" stop-opacity="0.13"/><stop offset="1" stop-color="#BF5AF2" stop-opacity="0"/></radialGradient>
+  <radialGradient id="cAuraB" gradientUnits="userSpaceOnUse" cx="40" cy="1150" r="300">
+    <stop offset="0" stop-color="#0A84FF" stop-opacity="0.10"/><stop offset="1" stop-color="#0A84FF" stop-opacity="0"/></radialGradient>
+
+  <!-- ══════ MATERIAL ══════ -->
+  <linearGradient id="cCard" x1="0" y1="0" x2="0.45" y2="1">
+    <stop offset="0" stop-color="#1F1F23"/><stop offset="0.55" stop-color="#17171A"/><stop offset="1" stop-color="#131316"/>
+  </linearGradient>
+  <linearGradient id="cCardEdge" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.17"/><stop offset="0.35" stop-color="#FFFFFF" stop-opacity="0.06"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0.025"/>
+  </linearGradient>
+  <linearGradient id="cTab" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1D1D21" stop-opacity="0.92"/><stop offset="1" stop-color="#0E0E11" stop-opacity="0.99"/>
+  </linearGradient>
+  <linearGradient id="cBlue" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0A84FF"/><stop offset="1" stop-color="#2E9BFF"/>
+  </linearGradient>
+  <linearGradient id="cCoachBtn" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#8E7BFF"/><stop offset="1" stop-color="#BF5AF2"/>
+  </linearGradient>
+
+  <!-- ══════ FILTERS ══════ -->
+  <filter id="cCardF" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity="0.50"/></filter>
+  <filter id="cSoft" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.45"/></filter>
+  <filter id="cCoachF" x="-80%" y="-80%" width="260%" height="260%"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#8E7BFF" flood-opacity="0.55"/></filter>
+  <filter id="cBlueF" x="-80%" y="-80%" width="260%" height="260%"><feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0A84FF" flood-opacity="0.55"/></filter>
+
+  <!-- ══════ ICONS (24×24, centred, 2pt rounded strokes) ══════ -->
+  <g id="ic-chev" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 -10 L-6 0 L7 10"/>
+  </g>
+  <g id="ic-restart" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7.8 -4.8 A9 9 0 1 0 8.6 3.6"/><path d="M8.8 -5 V3.6 H0.4"/>
+  </g>
+  <g id="ic-share" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-7 1.5 H7 V9.5 H-7 Z"/><path d="M0 -9.5 V3 M-4.5 -5 L0 -9.5 L4.5 -5"/>
+  </g>
+  <g id="ic-arrup" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 -7 V7 M-5 -2 L0 -7 L5 -2"/>
+  </g>
+  <g id="ic-spark" fill="currentColor">
+    <path d="M0 -9 L2.1 -2.1 L9 0 L2.1 2.1 L0 9 L-2.1 2.1 L-9 0 L-2.1 -2.1 Z"/>
+  </g>
+  <!-- tab glyphs -->
+  <g id="ic-dumb" fill="currentColor">
+    <rect x="-12" y="-2.5" width="24" height="5" rx="2.5"/><rect x="-16.5" y="-7" width="4.5" height="14" rx="2.2"/>
+    <rect x="-11" y="-5" width="3.6" height="10" rx="1.8"/><rect x="12" y="-7" width="4.5" height="14" rx="2.2"/>
+    <rect x="7.4" y="-5" width="3.6" height="10" rx="1.8"/>
+  </g>
+  <g id="ic-feed" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <circle cx="-7" cy="7" r="1.4" fill="currentColor" stroke="none"/><path d="M-10.5 -3.5 A8 8 0 0 1 -3.5 -10.5"/>
+    <path d="M-10.5 2.5 A14 14 0 0 1 2.5 -10.5"/>
+  </g>
+  <g id="ic-stats" fill="currentColor">
+    <rect x="-11" y="2" width="5" height="8" rx="2"/><rect x="-2.5" y="-3" width="5" height="13" rx="2"/>
+    <rect x="6" y="-8" width="5" height="18" rx="2"/>
+  </g>
+  <g id="ic-hist" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <circle r="9.5"/><path d="M0 -5 V0.5 L4 3"/>
+  </g>
+  <g id="ic-set" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <circle r="5.2"/><path d="M0 -10.5 V-8 M0 8 V10.5 M-10.5 0 H-8 M8 0 H10.5 M-7.4 -7.4 L-5.7 -5.7 M5.7 5.7 L7.4 7.4 M7.4 -7.4 L-5.7 -5.7 M-5.7 5.7 L-7.4 7.4"/>
+  </g>
+</defs>
+
+<!-- ═══════════ 00 · CANVAS ═══════════ -->
+<rect x="0" y="0" width="393" height="1620" fill="url(#cBg)"/>
+<rect x="0" y="0" width="393" height="1620" fill="url(#cAuraA)"/>
+<rect x="0" y="0" width="393" height="1620" fill="url(#cAuraB)"/>
+
+<!-- ═══════════ 01 · STATUS BAR ═══════════ -->
+<text x="66" y="36" font-size="16" font-weight="600" letter-spacing="-0.35" fill="#FFFFFF" text-anchor="middle">9:41</text>
+<g fill="#FFFFFF">
+  <rect x="281" y="27" width="3" height="4.5" rx="1.5"/><rect x="286" y="25" width="3" height="6.5" rx="1.5"/>
+  <rect x="291" y="23" width="3" height="8.5" rx="1.5"/><rect x="296" y="20.5" width="3" height="11" rx="1.5"/>
+</g>
+<g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round">
+  <path d="M306.28 23.78 A9.5 9.5 0 0 1 319.72 23.78"/><path d="M308.55 26.05 A6.3 6.3 0 0 1 317.45 26.05"/>
+  <path d="M310.81 28.31 A3.1 3.1 0 0 1 315.19 28.31"/>
+</g>
+<circle cx="313" cy="30.8" r="1.3" fill="#FFFFFF"/>
+<rect x="328" y="23" width="24" height="11" rx="3.2" fill="none" stroke="#FFFFFF" stroke-opacity="0.38"/>
+<rect x="329.8" y="24.8" width="15" height="7.4" rx="2" fill="#FFFFFF"/>
+<path d="M353.6 26.4 C354.9 26.8 354.9 30.2 353.6 30.6 Z" fill="#FFFFFF" fill-opacity="0.42"/>
+<rect x="133.5" y="11" width="126" height="37" rx="18.5" fill="#000000"/>
+<circle cx="245.5" cy="29.5" r="6.2" fill="#0A0C10"/><circle cx="245.5" cy="29.5" r="3.1" fill="#121A24"/>
+<circle cx="244.2" cy="28.2" r="1.05" fill="#3E6E9E" opacity="0.75"/>
+
+<!-- ═══════════ 02 · NAV BAR ═══════════ -->
+<g color="#0A84FF"><use xlink:href="#ic-chev" href="#ic-chev" transform="translate(22,76) scale(0.72)"/></g>
+<text x="34" y="82" font-size="17" font-weight="400" letter-spacing="-0.3" fill="#0A84FF">Planner</text>
+<text x="196.5" y="82" font-size="17" font-weight="600" letter-spacing="-0.3" fill="#FFFFFF" text-anchor="middle">Coach</text>
+<circle cx="361" cy="76" r="16" fill="#FFFFFF" fill-opacity="0.10"/>
+<g color="#FFFFFF"><use xlink:href="#ic-restart" href="#ic-restart" transform="translate(361,76) scale(0.78)"/></g>
+
+<!-- ═══════════ 03 · DAY DIVIDER ═══════════ -->
+<text x="196.5" y="130" font-size="12" font-weight="600" letter-spacing="-0.1" fill="#6C6C70" text-anchor="middle">Today</text>
+
+<!-- ═══════════ 04 · COACH BUBBLE ═══════════ -->
+<rect x="16" y="148" width="292" height="98" rx="22" fill="#26262B"/>
+<text x="32" y="176" font-size="16" font-weight="400" letter-spacing="-0.2" fill="#FFFFFF">Your squat volume is up 12% this month.</text>
+<text x="32" y="200" font-size="16" font-weight="400" letter-spacing="-0.2" fill="#FFFFFF">Want me to build your next 4-week block</text>
+<text x="32" y="224" font-size="16" font-weight="400" letter-spacing="-0.2" fill="#FFFFFF">around 3 lifting days?</text>
+
+<!-- ═══════════ 05 · USER BUBBLE ═══════════ -->
+<g filter="url(#cBlueF)"><rect x="149" y="262" width="228" height="76" rx="22" fill="url(#cBlue)"/></g>
+<text x="361" y="290" font-size="16" font-weight="400" letter-spacing="-0.2" fill="#FFFFFF" text-anchor="end">Yes — 3 days,</text>
+<text x="361" y="314" font-size="16" font-weight="400" letter-spacing="-0.2" fill="#FFFFFF" text-anchor="end">60 minutes each.</text>
+
+<!-- ═══════════ 06 · TYPING INDICATOR ═══════════ -->
+<rect x="16" y="354" width="78" height="46" rx="23" fill="#26262B"/>
+<circle cx="38" cy="377" r="4.5" fill="#FFFFFF" opacity="0.45"/>
+<circle cx="55" cy="377" r="4.5" fill="#FFFFFF" opacity="0.9">
+  <animate attributeName="opacity" values="0.9;0.35;0.9" dur="2s" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1"/>
+</circle>
+<circle cx="72" cy="377" r="4.5" fill="#FFFFFF" opacity="0.45"/>
+
+<!-- ═══════════ 07 · RECOMMENDED PLAN CARD ═══════════ -->
+<g filter="url(#cCardF)"><rect x="16" y="416" width="361" height="268" rx="20" fill="url(#cCard)"/></g>
+<rect x="16.5" y="416.5" width="360" height="267" rx="19.5" fill="none" stroke="url(#cCardEdge)"/>
+<g color="#BF5AF2"><use xlink:href="#ic-spark" href="#ic-spark" transform="translate(40,446) scale(0.72)"/></g>
+<text x="54" y="451" font-size="10" font-weight="700" letter-spacing="1.35" fill="#BF5AF2">RECOMMENDED PLAN</text>
+<text x="32" y="482" font-size="20" font-weight="700" letter-spacing="-0.6" fill="#FFFFFF">4-Week Strength Block</text>
+<text x="32" y="516" font-size="14" font-weight="400" letter-spacing="-0.1" fill="#98989F">Goal</text>
+<text x="361" y="516" font-size="14" font-weight="600" letter-spacing="-0.1" fill="#FFFFFF" text-anchor="end">Build squat and press</text>
+<line x1="32" y1="528.5" x2="361" y2="528.5" stroke="#FFFFFF" stroke-opacity="0.08"/>
+<text x="32" y="554" font-size="14" font-weight="400" letter-spacing="-0.1" fill="#98989F">Training days</text>
+<text x="361" y="554" font-size="14" font-weight="600" letter-spacing="-0.1" fill="#FFFFFF" text-anchor="end">3 per week</text>
+<line x1="32" y1="566.5" x2="361" y2="566.5" stroke="#FFFFFF" stroke-opacity="0.08"/>
+<text x="32" y="592" font-size="14" font-weight="400" letter-spacing="-0.1" fill="#98989F">Session length</text>
+<text x="361" y="592" font-size="14" font-weight="600" letter-spacing="-0.1" fill="#FFFFFF" text-anchor="end">60 min</text>
+<g filter="url(#cCoachF)"><rect x="32" y="610" width="329" height="52" rx="26" fill="url(#cCoachBtn)"/></g>
+<text x="196.5" y="642" font-size="17" font-weight="600" letter-spacing="-0.3" fill="#FFFFFF" text-anchor="middle">Use This Plan</text>
+
+<!-- ═══════════ 08 · SYSTEM NOTICE ═══════════ -->
+<rect x="71" y="704" width="251" height="34" rx="17" fill="#FFFFFF" fill-opacity="0.08"/>
+<text x="196.5" y="725" font-size="12" font-weight="500" letter-spacing="-0.1" fill="#98989F" text-anchor="middle">Coach Pro unlocks unlimited plans</text>
+
+<!-- ═══════════ 09 · COMPOSER ═══════════ -->
+<circle cx="34" cy="1428" r="18" fill="#FFFFFF" fill-opacity="0.10"/>
+<g color="#FFFFFF"><use xlink:href="#ic-share" href="#ic-share" transform="translate(34,1428) scale(0.72)"/></g>
+<rect x="60" y="1402" width="256" height="52" rx="26" fill="#1C1C1E"/>
+<rect x="60.5" y="1402.5" width="255" height="51" rx="25.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.09"/>
+<text x="78" y="1434" font-size="16" font-weight="400" letter-spacing="-0.2" fill="#6C6C70">Message Coach</text>
+<g filter="url(#cBlueF)"><circle cx="342" cy="1428" r="18" fill="url(#cBlue)"/></g>
+<g color="#FFFFFF"><use xlink:href="#ic-arrup" href="#ic-arrup" transform="translate(342,1428) scale(0.8)"/></g>
+
+<!-- ═══════════ 10 · TAB BAR (persistent) ═══════════ -->
+<rect x="0" y="1536" width="393" height="84" fill="url(#cTab)"/>
+<line x1="0" y1="1536.5" x2="393" y2="1536.5" stroke="#FFFFFF" stroke-opacity="0.11"/>
+<g color="#8E8E93">
+  <use xlink:href="#ic-dumb" href="#ic-dumb" transform="translate(39.3,1566)"/>
+  <use xlink:href="#ic-feed" href="#ic-feed" transform="translate(117.9,1566)"/>
+  <use xlink:href="#ic-stats" href="#ic-stats" transform="translate(196.5,1566)"/>
+  <use xlink:href="#ic-hist" href="#ic-hist" transform="translate(275.1,1566)"/>
+</g>
+<text x="39.3" y="1594" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Workout</text>
+<text x="117.9" y="1594" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Feed</text>
+<text x="196.5" y="1594" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">Stats</text>
+<text x="275.1" y="1594" font-size="10" font-weight="500" letter-spacing="-0.1" fill="#8E8E93" text-anchor="middle">History</text>
+<g color="#FF375F" filter="url(#cSoft)"><use xlink:href="#ic-set" href="#ic-set" transform="translate(353.7,1566)"/></g>
+<text x="353.7" y="1594" font-size="10" font-weight="600" letter-spacing="-0.1" fill="#FF375F" text-anchor="middle">Settings</text>
+<rect x="140.5" y="1606" width="112" height="5" rx="2.5" fill="#FFFFFF" fill-opacity="0.88"/>
+
+<rect x="0.5" y="0.5" width="392" height="1619" fill="none" stroke="#FFFFFF" stroke-opacity="0.08"/>
+</svg>
