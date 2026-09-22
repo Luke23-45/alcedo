@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { selectApplicableWhatsNew, selectHasUnseenWhatsNew, setLastSeenWhatsNewId } from '@/store/settings';
 import { useTranslate } from '@tolgee/react';
 import { Stack } from 'expo-router';
+import * as Application from 'expo-application';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -32,12 +33,10 @@ export function WhatsNewScreen() {
   const lastSeenId = useAppSelector((s) => s.settings.lastSeenWhatsNewId);
 
   // Snapshot the unread state at open; the mark-seen effect below must not
-  // clear the pills while the user is still reading.
+  // clear the pills while the user is still reading. useState initializers
+  // run once — no render-time ref writes for the compiler to trip on.
   const [initialUnseen] = useState(hasUnseen);
-  const lastSeenAtOpen = useRef<number | null>(null);
-  if (lastSeenAtOpen.current === null) {
-    lastSeenAtOpen.current = lastSeenId;
-  }
+  const [lastSeenAtOpen] = useState(lastSeenId);
 
   const scrollRef = useRef<ScrollView>(null);
   const [entriesY, setEntriesY] = useState(0);
@@ -53,6 +52,10 @@ export function WhatsNewScreen() {
     scrollRef.current?.scrollTo({ y: Math.max(0, entriesY - 8), animated: !reduceMotion });
   };
 
+  // Real values from the native shell; the fallbacks match app.json.
+  const version = Application.nativeApplicationVersion ?? '1.0.0';
+  const build = Application.nativeBuildVersion ?? '1';
+
   return (
     <FullHeightScrollView scrollRef={scrollRef} screenBackground={<SettingsBackground variant="backup" />}>
       <Stack.Screen options={{ title: t(settingsKey('settings.whatsnew.title')) }} />
@@ -66,16 +69,14 @@ export function WhatsNewScreen() {
             <GroupLabel>{t(settingsKey('settings.whatsnew.section.entries'))}</GroupLabel>
             <S.WhatsNewEntries>
               {[...entries].reverse().map((entry) => (
-                <WhatsNewEntryCard
-                  key={entry.id}
-                  entry={entry}
-                  isNew={entry.id > (lastSeenAtOpen.current ?? lastSeenId)}
-                />
+                <WhatsNewEntryCard key={entry.id} entry={entry} isNew={entry.id > lastSeenAtOpen} />
               ))}
             </S.WhatsNewEntries>
           </View>
         ) : undefined}
-        <ScreenFooter>{t(settingsKey('settings.whatsnew.footer'))}</ScreenFooter>
+        <ScreenFooter>
+          {t(settingsKey('settings.whatsnew.footer'), { version, build })}
+        </ScreenFooter>
       </S.WhatsNewScreenContent>
     </FullHeightScrollView>
   );

@@ -1478,7 +1478,7 @@
   "settings.home.whatsnew.subtitle": "Version 1.0.0",
   "settings.home.whatsnew.title": "What's New",
   "settings.whatsnew.badge": "NEW",
-  "settings.whatsnew.footer": "Kinetic 1.0.0 (238) · Made with care in California",
+  "settings.whatsnew.footer": "Kinetic {version} ({build}) · Made with care in California",
   "settings.whatsnew.section.entries": "Release notes",
   "settings.whatsnew.section.release": "Latest release",
   "settings.whatsnew.title": "What's New",

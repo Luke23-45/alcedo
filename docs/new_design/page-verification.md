@@ -198,7 +198,7 @@ confirmation on device — no device used.
 | 16 | Settings AI planner | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 17 | Settings programs & import | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 18 | Backup hub + remote/export/import | docs/new_design/backup-redesign.md | done 2026-09-22 |
-| 19 | What's New | (settings spec) | pending |
+| 19 | What's New | (settings spec) | done 2026-09-22 |
 | 20 | Backends [id] | — | deferred (no design yet) |
 
 ### 3. Workout editor (/workout-editor)
@@ -1645,3 +1645,55 @@ stability, backup-mode/last-test persistence contract).
 
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.
+
+### 19. What's New
+- Verified 2026-09-22 against `docs/new_design/settings-dark.md` Screen 6
+  family and the house-rule section "Announcing features". Route
+  `app/src/app/(tabs)/settings/whats-new.tsx` (thin wrapper); screens
+  `whats-new/` (`whats-new-screen.tsx`, `whats-new-entry-card.tsx`);
+  data `models/whats-new.ts`; selectors `selectApplicableWhatsNew`,
+  `selectHasUnseenWhatsNew`, `selectUnseenWhatsNew` in
+  `store/settings/index.ts`.
+- Sections inventoried: CURRENT VERSION release card (shared ReleaseCard
+  with real native version/build — fixed in page 18, verified reused
+  here; NEW pill driven by the at-open unread snapshot; "View all release
+  notes" scrolls to entries), RELEASE NOTES (4 real entries from
+  whats-new.ts: health sync, plan file share/import, backends, backup
+  choice — conditions respected, newest first, per-entry NEW pill while
+  unread, CTA deep-links to the feature), footer.
+- State matrix simulated: unseen → seen (mark-seen dispatch on open,
+  pills snapshotted at open so they don't vanish mid-read), entry
+  conditions met/unmet (health export on/off, backends present/absent,
+  backup mode off/chosen), all entries adopted → entries section hidden.
+- Data honesty: the entry list is append-only with monotonic ids and the
+  announce-sparingly rule (only opt-in/wizard-worthy features); no
+  incremental improvements advertised.
+
+**Bugs found and fixed:**
+1. `settings.whatsnew.footer` shipped the fabricated "Kinetic 1.0.0
+   (238)" — same fictional build 238 removed in page 18. Footer now
+   parameterizes `{version}`/`{build}` from `expo-application`
+   (`nativeApplicationVersion`/`nativeBuildVersion`, app.json-matching
+   fallbacks).
+2. `whats-new-screen.tsx` wrote `lastSeenAtOpen` ref during render —
+   works, but the React Compiler rule set discourages it; replaced with
+   a one-shot `useState(lastSeenId)` initializer.
+3. `whats-new-entry-card.tsx` had no `ENTRY_WELLS` entry for the
+   `backup` icon — the backup-choice card silently reused the
+   assignment-blue tint. It now has its own amber well, matching the
+   backup surface's accent.
+
+**Deliberate non-changes:**
+- "Made with care in California" kept as brand copy, not a data claim.
+- No new entries added (announce-sparingly rule).
+
+**Verification:** typecheck 0 errors (clean on three runs); full vitest
+128 files / 1,985 tests all green; oxlint 0 errors on touched files;
+`oxfmt --check` clean on touched files; `whatsnew-simulation.spec.ts`
+(new, 7 tests: i18n key coverage incl. dynamic entry keys, monotonic
+ids + `latestWhatsNewId` truth, entry icons resolving in the
+material-symbols map, CTA routes resolving to real route files, per-icon
+well tints, footer parameterization + fabricated-string sweep).
+
+**Not claimed:** pixel/animation feel, real-device performance — no
+device used.

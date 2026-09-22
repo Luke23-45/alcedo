@@ -13,6 +13,7 @@ const ENTRY_WELLS: Record<string, { hue: string; tint: string }> = {
   heartCheck: { hue: '#FF2D55', tint: '#FF6A88' },
   assignment: { hue: '#0A84FF', tint: '#5EB0FF' },
   dns: { hue: '#AF52DE', tint: '#C77DFF' },
+  backup: { hue: '#FF9F0A', tint: '#FFB84D' },
 };
 
 /**
