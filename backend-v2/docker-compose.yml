@@ -1,0 +1,40 @@
+services:
+  mongo:
+    image: mongo:8.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: alcedo
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    ports:
+      - "27017:27017"
+
+  # Self-hosted LiteLLM gateway. The API never talks to model providers
+  # directly — it calls the stable alias "coach-primary" defined in
+  # ./config/litellm.yaml. Pin the image tag before production use.
+  litellm:
+    image: ghcr.io/berriai/litellm:main-stable
+    restart: unless-stopped
+    volumes:
+      - ./config/litellm.yaml:/app/config.yaml:ro
+    environment:
+      # Operator: export real provider keys in the shell that runs compose.
+      # They are referenced from litellm.yaml via os.environ/... and never
+      # committed.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-litellm-dev-only}
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    ports:
+      - "4000:4000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo-data:

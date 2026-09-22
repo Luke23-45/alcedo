@@ -5,6 +5,7 @@ import { type RootState, createStore } from '@/store/store';
 import { applyProgramEffects } from '@/store/program/effects';
 import { applyProgramImportExportEffects } from '@/store/program/import-export-effects';
 import { applyWorkoutWorkerEffects } from '@/store/workout-worker/effects';
+import { applyAuthEffects } from '@/store/auth/effects';
 import { applyAppEffects } from '@/store/app/effects';
 import { initializeAppStateSlice } from '@/store/app';
 import { useEffect, useMemo, useState } from 'react';
@@ -31,6 +32,7 @@ export function resolveStore(db: ExpoSQLiteDatabase, expoDb: SQLiteDatabase) {
   applyProgramImportExportEffects(addEffect);
   applyWorkoutWorkerEffects(addEffect);
   applyAppEffects(addEffect);
+  applyAuthEffects(addEffect);
   applySettingsEffects(addEffect);
   applyStoredSessionsEffects(addEffect);
   applyFeedEffects(addEffect);

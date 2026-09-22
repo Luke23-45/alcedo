@@ -2,6 +2,7 @@ import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
 import { useTranslate } from '@tolgee/react';
 import { Stack } from 'expo-router';
 import { SettingsBackground } from '../shared/settings-background';
+import { AccountGroup } from './account-group';
 import { CommunityGroup } from './community-group';
 import { DataSyncGroup } from './data-sync-group';
 import { PreferencesGroup } from './preferences-group';
@@ -23,6 +24,7 @@ export function SettingsHome() {
       <Stack.Screen options={{ title: t(settingsKey('settings.home.title')) }} />
       <S.SettingsHomeContent>
         <ProfileHeader />
+        <AccountGroup />
         <TrainingGroup />
         <PreferencesGroup />
         <DataSyncGroup />
