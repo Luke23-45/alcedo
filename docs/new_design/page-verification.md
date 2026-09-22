@@ -1697,3 +1697,51 @@ well tints, footer parameterization + fabricated-string sweep).
 
 **Not claimed:** pixel/animation feel, real-device performance — no
 device used.
+
+### 21. Exercise search (`/exercise-search`)
+- Verified 2026-09-22. Route `app/src/app/exercise-search.tsx` (thin
+  wrapper: `requestId` + `exerciseName` params); screen
+  `components/smart/exercise-search.tsx` + `exercise-search.styles.ts`;
+  requester `components/presentation/workout-editor/exercise-searcher.tsx`.
+- Sections inventoried (render order): search field (autofocus, cancel →
+  dismiss), muscle + equipment filter chips (equipment chips only for
+  values present in the library), results list (LegendList; exact match
+  suppresses the create row, otherwise "Create Custom Exercise" leads),
+  empty state, idle view (RECENTS capped at 3 with Clear, create row,
+  SUGGESTED FOR PUSH/PULL/LEG DAY up to 6), bottom scroll fade.
+- State matrix simulated: empty query, fuzzy text, exact match
+  (case-insensitive), no-results, muscle filter, equipment filter,
+  combined filters, regex metacharacters as literals, recents
+  present/absent/stale ids, suggestion day push/pull/legs/unknown/ties,
+  create-custom with/without typed name, custom inherits muscle filters.
+- Request/result flow traced: per-instance `requestId`, result consumed
+  and cleared by the searcher — no cross-talk, no stale delivery.
+
+**Bugs found and fixed:**
+1. Stale pre-filled results: the initial `useState` filter ran once at
+   mount against whatever catalog was loaded. The built-in catalog loads
+   asynchronously at startup and reloads on language change, so a
+   cold-start deep link (or a language switch) left the pre-filled
+   result frozen on the old catalog. The committed query is now tracked
+   in a ref; a catalog change re-resolves it (mount is skipped — the
+   initializer already handled it).
+2. Extracted the pure filter/suggestion engine into RN-free
+   `exercise-search-logic.ts` (house rule: non-visual modules stay flat)
+   so the simulation can import it without the RN chain.
+
+**Deliberate non-changes:**
+- The escaped query is passed to the fuzzy matcher as well as the exact
+  RegExp (existing behavior; metacharacters match literally).
+- Custom-exercise creation keeps the active muscle filters as its
+  muscles — existing, sensible behavior.
+
+**Verification:** typecheck 0 errors (5 consecutive clean runs; two
+earlier "1 error" lines were `tail`-interleaved oxlint output, proven by
+immediate clean re-runs); full vitest pending page 22–24; oxlint 0
+errors on touched files; `oxfmt --check` clean on touched files;
+`exercise-search-simulation.spec.ts` (new, 13 tests: filter engine,
+day bucketing, recents dedup/cap/clear, request/result flow, staleness
+guard, i18n key coverage).
+
+**Not claimed:** pixel/animation feel, real-device performance — no
+device used.

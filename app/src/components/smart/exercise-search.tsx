@@ -1,4 +1,5 @@
 import { fuzzyMatchScore } from '@/components/presentation/workout-editor/exercise-fuzzy-match';
+import { computeFiltered, dayForMuscles, FilterInput, SuggestionDay } from './exercise-search-logic';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { HomeScreenBackground } from '@/components/presentation/home/shared/home-auras';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -14,7 +15,7 @@ import type { TranslationKey } from '@tolgee/web';
 import { useTranslate } from '@tolgee/react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { Platform, Pressable, ScrollView, TextInput } from 'react-native';
 import type { TextInputProps } from 'react-native';
@@ -255,95 +256,13 @@ function CreateCustomRow({ onPress }: { onPress: () => void }) {
 }
 
 /* ------------------------------------------------------------------ *
- * Filtering — same engine as before (fuzzy name match + muscle/equipment
- * filters + exact-match detection for the custom-exercise suggestion).
+ * Filtering — the engine lives in ./exercise-search-logic (RN-free, so
+ * simulation tests can import it): fuzzy name match + muscle/equipment
+ * filters + exact-match detection for the custom-exercise suggestion.
  * ------------------------------------------------------------------ */
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-type FilterInput = {
-  text: string;
-  muscles: string[];
-  equipment: string[];
-};
-
-function computeFiltered(exercises: Record<string, ExerciseDescriptor>, input: FilterInput) {
-  const trimmed = input.text.trim();
-  const pattern = escapeRegExp(trimmed);
-  const fullMatch = new RegExp('^' + pattern + '$', 'i');
-  let hasExactMatch = false;
-  const scored = Object.entries(exercises)
-    .map(([id, exercise]) => ({
-      id,
-      exercise,
-      score: trimmed ? fuzzyMatchScore(pattern, exercise.name) : 0,
-    }))
-    .filter(
-      (x) =>
-        (!input.muscles.length || x.exercise.muscles.some((m) => input.muscles.includes(m))) &&
-        (!input.equipment.length || (x.exercise.equipment != null && input.equipment.includes(x.exercise.equipment))) &&
-        (!trimmed || x.score !== null),
-    )
-    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.exercise.name.localeCompare(b.exercise.name));
-  for (const x of scored) {
-    if (!hasExactMatch && trimmed && fullMatch.test(x.exercise.name)) {
-      hasExactMatch = true;
-    }
-  }
-  const suggested: ExerciseDescriptor | null =
-    !hasExactMatch && trimmed
-      ? {
-          name: trimmed,
-          category: '',
-          equipment: null,
-          force: null,
-          instructions: '',
-          level: '',
-          mechanic: '',
-          muscles: [...input.muscles],
-        }
-      : null;
-  return { ids: scored.map((x) => x.id), suggested };
-}
 
 /** Equipment values worth a chip — frequent enough to filter by. */
 const EQUIPMENT_CHIP_ORDER = ['barbell', 'dumbbell', 'cable', 'machine', 'kettlebells', 'bands'];
-
-/**
- * The reference frames suggestions as "SUGGESTED FOR PUSH DAY". The route has
- * no plan context, so the day is read off the reference exercise's muscles —
- * push for chest/shoulders/triceps, pull for back/biceps, legs for lower body.
- * In the reference's scenario this yields exactly "SUGGESTED FOR PUSH DAY".
- */
-const PUSH_MUSCLES = new Set(['chest', 'shoulders', 'triceps']);
-const PULL_MUSCLES = new Set(['lats', 'middle_back', 'lower_back', 'biceps', 'traps', 'forearms']);
-const LEG_MUSCLES = new Set(['quadriceps', 'hamstrings', 'glutes', 'calves', 'abductors', 'adductors']);
-
-type SuggestionDay = 'push' | 'pull' | 'legs';
-
-function dayForMuscles(muscles: string[]): SuggestionDay | null {
-  let push = 0;
-  let pull = 0;
-  let legs = 0;
-  for (const m of muscles) {
-    if (PUSH_MUSCLES.has(m)) {
-      push++;
-    } else if (PULL_MUSCLES.has(m)) {
-      pull++;
-    } else if (LEG_MUSCLES.has(m)) {
-      legs++;
-    }
-  }
-  if (push === 0 && pull === 0 && legs === 0) {
-    return null;
-  }
-  if (push >= pull && push >= legs) {
-    return 'push';
-  }
-  return pull >= legs ? 'pull' : 'legs';
-}
 
 const SUGGESTED_HEADER_COPY: Record<SuggestionDay, { key: TranslationKey; fallback: string }> = {
   push: { key: 'exercise.search.suggested_push', fallback: 'SUGGESTED FOR PUSH DAY' },
@@ -373,9 +292,29 @@ export function ExerciseSearch(props: { requestId: string; exerciseName: string 
   );
   const searchInputRef = useRef<TextInput>(null);
 
+  // The exercise catalog loads asynchronously at startup and reloads on
+  // language change. Re-resolve the committed query against the new catalog
+  // so results never go stale (e.g. a cold-start deep link that mounts with
+  // a pre-filled name before the catalog arrives). The mount-time catalog is
+  // already handled by the useState initializer above.
+  const committedInput = useRef<FilterInput | null>(
+    props.exerciseName ? { text: props.exerciseName, muscles: [], equipment: [] } : null,
+  );
+  const catalogSeen = useRef(false);
+  useEffect(() => {
+    if (!catalogSeen.current) {
+      catalogSeen.current = true;
+      return;
+    }
+    if (committedInput.current) {
+      setResult(computeFiltered(exercises, committedInput.current));
+    }
+  }, [exercises]);
+
   const filteringActive = searchText.trim() !== '' || muscleFilters.length > 0 || equipmentFilters.length > 0;
 
   const applyFilters = useDebouncedCallback((input: FilterInput) => {
+    committedInput.current = input;
     setResult(computeFiltered(exercises, input));
   }, 100);
 
