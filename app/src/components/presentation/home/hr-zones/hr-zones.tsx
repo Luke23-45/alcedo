@@ -17,12 +17,16 @@ import * as S from './hr-zones.styles';
  * Reference: 44×58 tracks, fills bottom-aligned with 10pt radii, 9.5/700
  * values 7pt above each bar, uniform 10/600 zone labels, static TODAY chip.
  */
-const ZONE_GRADIENTS: [string, string][] = [
-  ['#5A5A60', '#98989F'],
-  ['#1E7A34', '#4ADE80'],
-  ['#B89400', '#FFE14D'],
-  ['#C25A08', '#FFB84D'],
-  ['#B3123A', '#FF6A88'],
+/**
+ * Reference zone ramps (gZ1–gZ5): dark first, light (deepened for white)
+ * second. Picked per mode below so fills stay luminous on white cards.
+ */
+const ZONE_GRADIENTS: { dark: [string, string]; light: [string, string] }[] = [
+  { dark: ['#5A5A60', '#98989F'], light: ['#8E8E93', '#C7C7CC'] },
+  { dark: ['#1E7A34', '#4ADE80'], light: ['#248A3D', '#5FD97A'] },
+  { dark: ['#B89400', '#FFE14D'], light: ['#C99700', '#FFD84D'] },
+  { dark: ['#C25A08', '#FFB84D'], light: ['#C93400', '#FF9F40'] },
+  { dark: ['#B3123A', '#FF6A88'], light: ['#D70015', '#FF5A6E'] },
 ];
 
 const ZONES = [
@@ -52,15 +56,19 @@ export function HrZones() {
   const subtitleColor = dark ? '#86868B' : '#6E6E73';
 
   return (
-    <HomeCard radius={30} pad={20} style={{ height: 156 }}>
+    <HomeCard radius={30} pad={20} style={{ minHeight: 156 }}>
       <S.HeaderRow>
-        <HomeText
-          weight={fontWeight.semibold}
-          tracking={-0.3}
-          style={{ fontSize: 15.5, lineHeight: 19, color: titleColor }}
-        >
-          {t('home.hr_zones.title') /* en: "Heart Rate Zones" */}
-        </HomeText>
+        <S.TitleGroup>
+          <HomeText
+            weight={fontWeight.semibold}
+            tracking={-0.3}
+            numberOfLines={1}
+            style={{ fontSize: 15.5, lineHeight: 19, color: titleColor, flexShrink: 1 }}
+          >
+            {t('home.hr_zones.title') /* en: "Heart Rate Zones" */}
+          </HomeText>
+          <SampleBadge />
+        </S.TitleGroup>
         <S.TodayChip>
           <HomeText
             weight={fontWeight.bold}
@@ -75,7 +83,6 @@ export function HrZones() {
       <HomeText weight={fontWeight.medium} style={{ fontSize: 11, lineHeight: 14, color: subtitleColor, marginTop: 4 }}>
         {t('home.hr_zones.subtitle', { minutes: aboveMinutes }) /* en: "{minutes} min in Zone 3 and above" */}
       </HomeText>
-      <SampleBadge />
       <S.BarsRow>
         {ZONES.map((z, i) => {
           const h = (z.minutes / MAX_MINUTES) * BAR_MAX_H;
@@ -92,10 +99,10 @@ export function HrZones() {
                   </HomeText>
                 </S.ZoneValue>
                 <HomeGradient
-                  colors={ZONE_GRADIENTS[i]}
+                  colors={dark ? ZONE_GRADIENTS[i]!.dark : ZONE_GRADIENTS[i]!.light}
                   start={{ x: 0, y: 1 }}
                   end={{ x: 0, y: 0 }}
-                  style={{ width: 44, height: h, borderRadius: 10 }}
+                  style={{ width: '100%', height: h, borderRadius: 10 }}
                 />
               </S.ZoneTrack>
               <HomeText

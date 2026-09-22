@@ -1,4 +1,4 @@
-import type { TranslationKey } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 
 /**
  * Keys for the redesigned Settings home / backup / backends / what's-new screens

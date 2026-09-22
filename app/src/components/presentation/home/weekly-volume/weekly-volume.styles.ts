@@ -3,7 +3,7 @@ import { alpha } from '@/styles/theme';
 
 export const HeaderRow = styled.View`
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
 `;
 

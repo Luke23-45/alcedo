@@ -1,20 +1,18 @@
+import Button from '@/components/presentation/foundation/button';
+import ColorPickerDialog from '@/components/presentation/foundation/editors/color-picker-dialog';
 import FocusRing, { ANIMATION_DURATION } from '@/components/presentation/foundation/focus-ring';
-import TouchableRipple from '@/components/presentation/foundation/touchable-ripple';
+import { SegmentedGroup, SegmentListFormElement } from '@/components/presentation/foundation/segmented-list';
+import { SegmentedListSelect } from '@/components/presentation/foundation/segmented-list-select';
+import { SegmentedListSwitch } from '@/components/presentation/foundation/segmented-list-switch';
+import { SelectPickerOption } from '@/components/presentation/foundation/select-picker';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { ColorSchemeSeed, ThemeMode } from '@/store/settings';
 import { hsvToHex, type HexColor } from '@/utils/color';
 import { sleep } from '@/utils/sleep';
 import { T, useTranslate } from '@tolgee/react';
 import { useState } from 'react';
-import { View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
 import Svg, { Path } from 'react-native-svg';
-import Button from '@/components/presentation/foundation/button';
-import ColorPickerDialog from '@/components/presentation/foundation/editors/color-picker-dialog';
-import { SelectPickerOption } from '@/components/presentation/foundation/select-picker';
-import { SegmentedGroup, SegmentListFormElement } from '@/components/presentation/foundation/segmented-list';
-import { SegmentedListSelect } from '@/components/presentation/foundation/segmented-list-select';
-import { SegmentedListSwitch } from '@/components/presentation/foundation/segmented-list-switch';
+import * as S from './theme-chooser.styles';
 
 interface ThemeChooserProps {
   seed: ColorSchemeSeed;
@@ -30,34 +28,20 @@ function ColorBall(props: {
   seed: `#${string}`;
   onUpdateTheme: (seed: ColorSchemeSeed) => void | Promise<void>;
 }) {
-  const theme = useAppTheme();
   const isSelected = props.seed === props.selectedSeed;
 
   return (
     <FocusRing isSelected={isSelected}>
-      <View
-        style={{
-          borderRadius: theme.radius.sheet,
-          overflow: 'hidden',
-          borderColor: theme.color.border.hairline,
-        }}
-      >
-        <TouchableRipple
-          style={{
-            width: theme.space.xxl,
-            height: theme.space.xxl,
-            borderRadius: theme.radius.sheet,
-            backgroundColor: props.seed,
-            borderColor: theme.color.border.hairline,
-            borderWidth: 2,
-          }}
+      <S.BallClip>
+        <S.BallSurface
+          $color={props.seed}
           onPress={() => {
             void props.onUpdateTheme(props.seed);
           }}
         >
           <></>
-        </TouchableRipple>
-      </View>
+        </S.BallSurface>
+      </S.BallClip>
     </FocusRing>
   );
 }
@@ -81,20 +65,10 @@ function CustomBall(props: { active: boolean; color: HexColor | undefined; onPre
 
   return (
     <FocusRing isSelected={props.active}>
-      <View style={{ borderRadius: size, overflow: 'hidden', borderColor: theme.color.border.hairline }}>
-        <TouchableRipple
-          style={{
-            width: size,
-            height: size,
-            borderRadius: size,
-            borderColor: theme.color.border.hairline,
-            borderWidth: 2,
-            overflow: 'hidden',
-          }}
-          onPress={props.onPress}
-        >
+      <S.CustomBallClip>
+        <S.CustomBallSurface onPress={props.onPress}>
           {props.active && props.color ? (
-            <View style={{ flex: 1, backgroundColor: props.color }} />
+            <S.BallFill $color={props.color} />
           ) : (
             <Svg width={size} height={size}>
               {wedges.map((w, i) => (
@@ -102,8 +76,8 @@ function CustomBall(props: { active: boolean; color: HexColor | undefined; onPre
               ))}
             </Svg>
           )}
-        </TouchableRipple>
-      </View>
+        </S.CustomBallSurface>
+      </S.CustomBallClip>
     </FocusRing>
   );
 }
@@ -119,9 +93,8 @@ const PRESET_SEEDS = [
   '#02040A', // trench ink
 ] as const;
 
-export default function ThemeChooser(props: ThemeChooserProps) {
+export function ThemeChooser(props: ThemeChooserProps) {
   const { t } = useTranslate();
-  const theme = useAppTheme();
   const [selectedSeed, setSelectedSeed] = useState(props.seed);
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -133,10 +106,6 @@ export default function ThemeChooser(props: ThemeChooserProps) {
 
   const colorSeeds = PRESET_SEEDS;
   const isCustom = selectedSeed !== 'default' && !colorSeeds.includes(selectedSeed as (typeof PRESET_SEEDS)[number]);
-
-  const renderColorBall = ({ item }: { item: `#${string}` }) => (
-    <ColorBall selectedSeed={selectedSeed} seed={item} onUpdateTheme={updateSeed} />
-  );
 
   const themeModeOptions: SelectPickerOption<ThemeMode>[] = [
     { value: 'system', label: t('settings.theme.mode.system') },
@@ -150,35 +119,23 @@ export default function ThemeChooser(props: ThemeChooserProps) {
         <SegmentListFormElement
           label={t('settings.theme.title')}
           line2={
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: theme.space.base,
-                marginBlockStart: theme.space.sm,
-              }}
-            >
+            <S.SwatchRow>
               <FocusRing isSelected={selectedSeed === 'default'}>
                 <Button style={{ position: 'relative' }} onPress={() => void updateSeed('default')}>
                   <T keyName="generic.default.label" />
                 </Button>
               </FocusRing>
-              <FlatList
-                horizontal
-                data={colorSeeds}
-                renderItem={renderColorBall}
-                keyExtractor={(item) => item}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ gap: theme.space.sm, padding: theme.space.sm, alignItems: 'center' }}
-                ListFooterComponent={
-                  <CustomBall
-                    active={isCustom}
-                    color={isCustom ? selectedSeed : undefined}
-                    onPress={() => setPickerOpen(true)}
-                  />
-                }
-              />
-            </View>
+              <S.SwatchScroller>
+                {colorSeeds.map((seed) => (
+                  <ColorBall key={seed} selectedSeed={selectedSeed} seed={seed} onUpdateTheme={updateSeed} />
+                ))}
+                <CustomBall
+                  active={isCustom}
+                  color={isCustom ? selectedSeed : undefined}
+                  onPress={() => setPickerOpen(true)}
+                />
+              </S.SwatchScroller>
+            </S.SwatchRow>
           }
         />
         <SegmentedListSelect

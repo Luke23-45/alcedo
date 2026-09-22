@@ -73,7 +73,7 @@ export function StatTiles() {
   return (
     <S.TilesRow>
       {TILES.map((tile) => (
-        <HomeCard key={tile.key} elev="tile" pad={10} style={{ flex: 1, height: 82 }}>
+        <HomeCard key={tile.key} elev="tile" pad={10} style={{ flex: 1, minHeight: 82 }}>
           <S.TileBody>
             <S.TileTop>
               <SampleBadge compact />
@@ -92,16 +92,18 @@ export function StatTiles() {
                 weight={fontWeight.bold}
                 micro
                 tracking={0.95}
+                numberOfLines={1}
                 style={{ fontSize: 9, lineHeight: 11, color: labelColor }}
               >
-                {t(tile.labelKey).toUpperCase()}
+                {t(tile.labelKey).toLocaleUpperCase()}
               </HomeText>
               <S.ValueRow>
                 <HomeText
                   weight={fontWeight.bold}
                   tabular
                   tracking={-0.6}
-                  style={{ fontSize: 20, lineHeight: 24, color: valueColor }}
+                  numberOfLines={1}
+                  style={{ fontSize: 20, lineHeight: 24, color: valueColor, flexShrink: 1 }}
                 >
                   {tile.value}
                 </HomeText>

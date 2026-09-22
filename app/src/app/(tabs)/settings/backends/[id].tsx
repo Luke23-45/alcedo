@@ -20,13 +20,14 @@ import {
 } from '@/services/backend-probe';
 import { useAppSelector } from '@/store';
 import { putBackend, removeBackend } from '@/store/backends';
-import { TranslationKey, useTranslate } from '@tolgee/react';
+import { useTranslate } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import ExperimentIcon from '@expo/material-symbols/experiment.xml';
 import { Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
-import * as S from './backend-editor.styles';
+import * as S from '@/components/presentation/backends/backend-editor.styles';
 
 const kindOptions = [
   { value: 'liftlog', label: 'backends.kind.liftlog.label', body: 'backends.kind.liftlog.body' },

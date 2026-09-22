@@ -6,7 +6,8 @@ import * as S from './feed-card.styles';
 import {
   CARD_BODY_DARK,
   CARD_BODY_LIGHT,
-  CARD_BODY_LOCATIONS,
+  CARD_BODY_LOCATIONS_DARK,
+  CARD_BODY_LOCATIONS_LIGHT,
   CARD_EDGE_DARK,
   CARD_EDGE_LIGHT,
   CARD_EDGE_LOCATIONS,
@@ -40,7 +41,7 @@ export function FeedCard({
       >
         <LinearGradient
           colors={[...(dark ? CARD_BODY_DARK : CARD_BODY_LIGHT)]}
-          locations={[...CARD_BODY_LOCATIONS]}
+          locations={[...(dark ? CARD_BODY_LOCATIONS_DARK : CARD_BODY_LOCATIONS_LIGHT)]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0.45, y: 1 }}
           style={{ borderRadius: radius - 1 }}

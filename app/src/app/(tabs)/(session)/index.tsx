@@ -15,6 +15,7 @@ import { WelcomeWizard } from '@/components/smart/welcome-wizard';
 import { WhatsNewBanner } from '@/components/smart/whats-new-banner';
 import { useHomeData } from '@/components/presentation/home/use-home-data';
 import { HomeAuras, HomeScreenBackground } from '@/components/presentation/home/shared/home-auras';
+import { HomeTabFade } from '@/components/presentation/home/shared/home-tab-fade';
 import { HomeDuoCell, HomeDuoRow } from '@/components/presentation/home/shared/home-duo-row';
 import { GreetingHeader } from '@/components/presentation/home/greeting-header/greeting-header';
 import { ActivityRings } from '@/components/presentation/home/activity-rings/activity-rings';
@@ -33,7 +34,8 @@ import { CoachCard } from '@/components/presentation/home/coach-card/coach-card'
 import { LocalDate } from '@js-joda/core';
 import { useTranslate } from '@tolgee/react';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
-import { Pressable } from 'react-native';
+import { useState } from 'react';
+import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
 
@@ -53,16 +55,24 @@ export default function Index() {
   });
 
   return (
-    <FullHeightScrollView
-      screenBackground={<HomeScreenBackground />}
-      scrollStyle={{ paddingHorizontal: theme.layout.screenPadding, paddingTop: insets.top + theme.space.sm }}
-      contentContainerStyle={{ flexGrow: 1, gap: theme.space.md, paddingBottom: theme.space.xxl }}
-    >
-      <Stack.Screen options={{ headerShown: false }} />
-      <HomeAuras />
-      <Remote value={upcomingSessions} success={(upcoming) => <HomeScreen upcoming={upcoming} onStart={start} />} />
-      {confirmationDialog}
-    </FullHeightScrollView>
+    <View style={{ flex: 1 }}>
+      <FullHeightScrollView
+        screenBackground={<HomeScreenBackground />}
+        scrollStyle={{ paddingHorizontal: theme.layout.screenPadding, paddingTop: insets.top + theme.space.sm }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          gap: theme.space.md,
+          // 32pt breathing room + 40pt so the last card clears the tab fade.
+          paddingBottom: theme.space.xxl + theme.space.xxxl,
+        }}
+      >
+        <Stack.Screen options={{ headerShown: false }} />
+        <HomeAuras />
+        <Remote value={upcomingSessions} success={(upcoming) => <HomeScreen upcoming={upcoming} onStart={start} />} />
+        {confirmationDialog}
+      </FullHeightScrollView>
+      <HomeTabFade />
+    </View>
   );
 }
 
@@ -73,6 +83,8 @@ function HomeScreen({ upcoming, onStart }: { upcoming: readonly Session[]; onSta
   const data = useHomeData(upcoming);
   const activeSession = useAppSelectorWhenFocused(selectActiveSession);
   const { choosePlan, editWorkouts } = usePlanNavigation();
+  // Session-local "Not now" — the coach card returns next launch.
+  const [coachHidden, setCoachHidden] = useState(false);
 
   const currentBodyweight = upcoming.at(0)?.bodyweight;
   const createFreeformSession = () => {
@@ -119,7 +131,7 @@ function HomeScreen({ upcoming, onStart }: { upcoming: readonly Session[]; onSta
             trigger={(open) => (
               <Pressable
                 onPress={open}
-                hitSlop={12}
+                hitSlop={8}
                 accessibilityRole="button"
                 accessibilityLabel={t('home.menu.label') /* en: "Workout options" */}
                 style={{
@@ -148,7 +160,12 @@ function HomeScreen({ upcoming, onStart }: { upcoming: readonly Session[]; onSta
       <WeeklyVolume data={data.weeklyVolume} />
       <HrZones />
       <ProgramsSection programs={data.programs} onSeeAll={() => push('/settings/program-list')} />
-      <CoachCard />
+      {coachHidden ? null : (
+        <CoachCard
+          onAdjust={() => push('/settings/ai/planner-chat')}
+          onDismiss={() => setCoachHidden(true)}
+        />
+      )}
       <RecentActivitySection
         items={data.recentActivity}
         onSeeAll={() => push('/(tabs)/history')}

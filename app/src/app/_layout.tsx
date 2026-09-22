@@ -1,3 +1,6 @@
+// Must be first — Hermes has no `document`; styled-components/native touches it at
+// import time. The shim defines a minimal stub before any `import styled` is evaluated.
+import '../../polyfills/styled-shim';
 import { AppThemeProvider } from '@/hooks/useAppTheme';
 import { I18nManager, LogBox, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';

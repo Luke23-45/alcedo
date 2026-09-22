@@ -1,4 +1,4 @@
-import type { TranslationKey } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 import { useTranslate } from '@tolgee/react';
 
 /**

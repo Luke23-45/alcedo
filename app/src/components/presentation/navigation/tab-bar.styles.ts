@@ -1,74 +1,104 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { StyleSheet } from 'react-native';
-import { Animated } from 'react-native';
-import styled from 'styled-components/native';
+import React from 'react';
+import { Animated, Pressable, StyleSheet, Text as RNText, View } from 'react-native';
+import { useAppTheme } from '@/hooks/useAppTheme';
 
 /**
  * Bottom tab bar chrome — the runtime rig from docs/new_design/tab-bar-icons.svg §3.
  * Glass gradient surface, 0.5pt top hairline, 24pt glyphs, 10pt labels.
+ *
+ * NOTE: Previously implemented with styled-components/native, which crashes on
+ * Hermes (ReferenceError: Property 'document' doesn't exist) because the library
+ * touches `document` at import time. Reimplemented with plain RN primitives +
+ * useAppTheme() so the tab bar — on the critical path of every route — never
+ * pulls a web-only dependency. Keep this file free of styled-components.
  */
 
-export const Bar = styled(LinearGradient)``;
+export const Bar = LinearGradient;
 
-export const Hairline = styled.View`
-  height: ${StyleSheet.hairlineWidth}px;
-  background-color: ${({ theme }) => theme.color.tabBar.hairline};
-`;
+export function Hairline() {
+  const theme = useAppTheme();
+  return React.createElement(View, { style: { height: StyleSheet.hairlineWidth, backgroundColor: theme.color.tabBar.hairline } });
+}
 
-export const Row = styled.View<{ $padBottom: number }>`
-  flex-direction: row;
-  padding-bottom: ${({ $padBottom }) => $padBottom}px;
-`;
+export function Row({ $padBottom, children, style, ...rest }: { $padBottom: number; children?: React.ReactNode; style?: any }) {
+  return React.createElement(View, { style: [{ flexDirection: 'row', paddingBottom: $padBottom } as any, style], ...(rest as any) }, children);
+}
 
-export const TabButton = styled.Pressable`
-  flex: 1;
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: 10px;
-  min-height: 56px;
-`;
+export function TabButton({ children, style, ...rest }: any) {
+  return React.createElement(
+    Pressable,
+    { style: [{ flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 10, minHeight: 56 } as any, style as any], ...rest },
+    children,
+  );
+}
 
-export const IconSlot = styled.View`
-  width: 24px;
-  height: 24px;
-`;
+export function IconSlot({ children, style, ...rest }: { children?: React.ReactNode; style?: any }) {
+  return React.createElement(View, { style: [{ width: 24, height: 24 } as any, style], ...(rest as any) }, children);
+}
 
 /** Absolute glyph layer for the selected-state cross-fade; opacity is animated. */
-export const IconLayer = styled(Animated.View)`
-  position: absolute;
-  left: 0;
-  top: 0;
-`;
+export function IconLayer({ children, style, ...rest }: any) {
+  return React.createElement(Animated.View, { style: [{ position: 'absolute', left: 0, top: 0 } as any, style as any], ...rest }, children);
+}
 
-export const Badge = styled.View`
-  position: absolute;
-  top: -5px;
-  right: -9px;
-  min-width: 18px;
-  height: 18px;
-  padding-horizontal: 5px;
-  border-radius: 9px;
-  background-color: ${({ theme }) => theme.color.status.danger.base};
-  align-items: center;
-  justify-content: center;
-`;
+export function Badge({ children, style, ...rest }: { children?: React.ReactNode; style?: any }) {
+  const theme = useAppTheme();
+  return React.createElement(
+    View,
+    {
+      style: [
+        {
+          position: 'absolute',
+          top: -5,
+          right: -9,
+          minWidth: 18,
+          height: 18,
+          paddingHorizontal: 5,
+          borderRadius: 9,
+          backgroundColor: theme.color.status.danger.base,
+          alignItems: 'center',
+          justifyContent: 'center',
+        } as any,
+        style,
+      ],
+      ...(rest as any),
+    },
+    children,
+  );
+}
 
-export const BadgeText = styled.Text`
-  color: #ffffff;
-  font-size: 11px;
-  line-height: 13px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
-`;
+export function BadgeText({ children, style, ...rest }: { children?: React.ReactNode; style?: any }) {
+  const theme = useAppTheme();
+  return React.createElement(
+    RNText,
+    { style: [{ color: '#ffffff', fontSize: 11, lineHeight: 13, fontWeight: theme.weight.semibold } as any, style], ...(rest as any) },
+    children,
+  );
+}
 
 /**
  * Spec §5: 10pt, semibold when selected / medium when resting,
  * −0.1 tracking. No named text style covers 10pt, so this is explicit.
  */
-export const TabLabel = styled.Text<{ selected: boolean }>`
-  margin-top: 4px;
-  font-size: 10px;
-  line-height: 12px;
-  letter-spacing: -0.1px;
-  font-weight: ${({ theme, selected }) => (selected ? theme.weight.semibold : theme.weight.medium)};
-  color: ${({ theme, selected }) => (selected ? theme.color.tabBar.selected : theme.color.tabBar.unselected)};
-`;
+export function TabLabel({ selected, children, style, ...rest }: { selected: boolean; children?: React.ReactNode; style?: any }) {
+  const theme = useAppTheme();
+  return React.createElement(
+    RNText,
+    {
+      style: [
+        {
+          marginTop: 4,
+          fontSize: 10,
+          lineHeight: 12,
+          letterSpacing: -0.1,
+          fontWeight: selected ? theme.weight.semibold : theme.weight.medium,
+          color: selected ? theme.color.tabBar.selected : theme.color.tabBar.unselected,
+        } as any,
+        style,
+      ],
+      ...(rest as any),
+    },
+    children,
+  );
+}

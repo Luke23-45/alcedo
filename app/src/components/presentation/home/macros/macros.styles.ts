@@ -7,7 +7,7 @@ export const HeaderRow = styled.View`
   gap: ${({ theme }) => theme.space.xs}px;
 `;
 
-/** Three rings across the 174pt card. */
+/** Three rings sharing the row (48pt reference). */
 export const RingsRow = styled.View`
   flex-direction: row;
   justify-content: space-between;
@@ -15,8 +15,7 @@ export const RingsRow = styled.View`
 `;
 
 export const RingSlot = styled.View`
-  width: 48px;
-  height: 48px;
+  flex: 1;
   align-items: center;
   justify-content: center;
 `;
@@ -31,7 +30,7 @@ export const BarTrack = styled.View`
   width: 100%;
   height: 5px;
   border-radius: 2.5px;
-  background-color: ${alpha('#FFFFFF', 0.09)};
+  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.09) : alpha('#787880', 0.16))};
   overflow: hidden;
   margin-top: ${({ theme }) => theme.space.md}px;
 `;

@@ -1,8 +1,21 @@
 import { useState } from 'react';
 import { Pressable } from 'react-native';
-import { useVideoPlayer } from 'expo-video';
 import Svg, { Path } from 'react-native-svg';
+import { requireOptionalNativeModule } from 'expo';
 import * as S from './media-hero.styles';
+
+// expo-video native module may be missing from dev APK built before the dep was added.
+// `import { useVideoPlayer } from 'expo-video'` throws at require time, crashing the
+// entire feed even for photo posts. Use optional native check + lazy require.
+let useVideoPlayer: any = () => ({ play: () => {}, pause: () => {}, loop: false });
+const ExpoVideoMod = requireOptionalNativeModule('ExpoVideo');
+if (ExpoVideoMod) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const js = require('expo-video') as any;
+    if (js?.useVideoPlayer) useVideoPlayer = js.useVideoPlayer;
+  } catch {}
+}
 
 function PlayGlyph({ size = 22 }: { size?: number }) {
   return (

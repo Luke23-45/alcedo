@@ -24,7 +24,9 @@ export const TIMELINE_CARD_HEIGHT = 388;
 
 export const CARD_BODY_DARK = ['#1F1F23', '#17171A', '#131316'] as const;
 export const CARD_BODY_LIGHT = ['#FFFFFF', '#FAFAFC'] as const;
-export const CARD_BODY_LOCATIONS = [0, 0.55, 1] as const;
+/** Stop positions match each ramp's colour count — a 3-stop `locations` with a 2-stop ramp is a hard expo-linear-gradient warning. */
+export const CARD_BODY_LOCATIONS_DARK = [0, 0.55, 1] as const;
+export const CARD_BODY_LOCATIONS_LIGHT = [0, 1] as const;
 
 /** 1pt vertical edge gradient — the card's lit-from-above definition. */
 export const CARD_EDGE_DARK = ['rgba(255,255,255,0.17)', 'rgba(255,255,255,0.06)', 'rgba(255,255,255,0.025)'] as const;

@@ -1,6 +1,6 @@
 import { AppIconSource } from '@/components/presentation/foundation/ms-icon-source';
 import type { RootState } from '@/store';
-import { TranslationKey } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 import { Href } from 'expo-router';
 
 export interface WhatsNewEntry {

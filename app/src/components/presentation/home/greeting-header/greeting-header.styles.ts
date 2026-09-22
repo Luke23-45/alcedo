@@ -9,14 +9,14 @@ export const HeaderRow = styled.View`
 `;
 
 export const TextColumn = styled.View`
-  gap: ${({ theme }) => theme.space.xs}px;
+  gap: ${({ theme }) => (theme.space?.xs ?? 4)}px;
   flex-shrink: 1;
 `;
 
 export const TrailingGroup = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: ${({ theme }) => theme.space.sm}px;
+  gap: ${({ theme }) => (theme.space?.sm ?? 8)}px;
 `;
 
 /**

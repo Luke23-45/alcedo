@@ -71,18 +71,24 @@ export function formatRpeValue(value: number, locale?: string): string {
 }
 
 /** Why the NEXT SESSION preview can or cannot render its card. */
-export type NextSessionAvailability = 'ready' | 'planner-off' | 'no-program' | 'no-training-days';
+export type NextSessionAvailability = 'ready' | 'planner-off' | 'no-program' | 'no-sessions' | 'no-training-days';
 
 export function nextSessionAvailability(
   plannerEnabled: boolean,
   hasProgram: boolean,
   trainingDayCount: number,
+  sessionCount: number,
 ): NextSessionAvailability {
   if (!plannerEnabled) {
     return 'planner-off';
   }
   if (!hasProgram) {
     return 'no-program';
+  }
+  // A program can exist without any sessions (all of them deleted): the
+  // rotation lookup below would then dereference `sessions[0]` and crash.
+  if (sessionCount === 0) {
+    return 'no-sessions';
   }
   if (trainingDayCount === 0) {
     return 'no-training-days';

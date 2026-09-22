@@ -1,19 +1,21 @@
 import { useTranslate } from '@tolgee/react';
 import type { ReactNode } from 'react';
 import { G, Path, Rect, Svg } from 'react-native-svg';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { SectionHeader } from '../shared/section-header';
 import * as S from './achievements.styles';
 
 /**
- * Reference badges: six 46pt circles, five unlocked with 2-stop gradients and
- * a top shine, one locked. Glyphs are the reference icons in white.
+ * Reference badges (gBadgeA–E): six 46pt circles, five unlocked with 2-stop
+ * gradients and a top shine, one locked. Light stops are deepened for white.
+ * Glyphs are the reference icons in white.
  */
-const BADGE_GRADIENTS: [string, string][] = [
-  ['#FFC24A', '#FF6A2D'],
-  ['#FF7A96', '#E0083F'],
-  ['#FFF0BE', '#D9A441'],
-  ['#8DF5FF', '#0095FF'],
-  ['#7BE88A', '#1E8E3E'],
+const BADGE_GRADIENTS: { dark: [string, string]; light: [string, string] }[] = [
+  { dark: ['#FFC24A', '#FF6A2D'], light: ['#FFB03A', '#F2662B'] },
+  { dark: ['#FF7A96', '#E0083F'], light: ['#FF5C7A', '#D70015'] },
+  { dark: ['#FFF0BE', '#D9A441'], light: ['#FFF0BE', '#D9A441'] },
+  { dark: ['#8DF5FF', '#0095FF'], light: ['#5AC8FA', '#0071C9'] },
+  { dark: ['#7BE88A', '#1E8E3E'], light: ['#4CD964', '#248A3D'] },
 ];
 
 type Glyph = 'flame' | 'dumbbell' | 'star' | 'bolt' | 'heart';
@@ -89,24 +91,30 @@ const GLYPHS: Glyph[] = ['flame', 'dumbbell', 'star', 'bolt', 'heart'];
 
 export function AchievementsSection() {
   const { t } = useTranslate();
+  const theme = useAppTheme();
+  const dark = theme.isDark;
 
   return (
     <>
       <SectionHeader label={t('home.achievements.label') /* en: "Achievements" */} sample />
-      <S.BadgeRow>
+      <S.BadgeRow
+        accessibilityRole="list"
+        accessibilityLabel={t('home.achievements.label') /* en: "Achievements" */}
+      >
         {GLYPHS.map((glyph, i) => (
           <S.Badge
             key={glyph}
-            colors={BADGE_GRADIENTS[i]}
+            colors={dark ? BADGE_GRADIENTS[i]!.dark : BADGE_GRADIENTS[i]!.light}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ borderCurve: 'continuous' }}
+            accessibilityRole="image"
           >
             <S.Shine />
             <BadgeGlyph glyph={glyph} />
           </S.Badge>
         ))}
-        <S.LockedBadge>
+        <S.LockedBadge accessibilityRole="image">
           <LockGlyph />
         </S.LockedBadge>
       </S.BadgeRow>

@@ -9,11 +9,12 @@ export const CardHeaderRow = styled.View`
 `;
 
 /**
- * Fixed 170pt content height: 212pt card − 2pt edge − 40pt hero padding.
- * Space-between distributes header / rings / footer exactly.
+ * 170pt content budget: 212pt card − 2pt edge − 40pt hero padding.
+ * A minimum, not a lock — space-between distributes header / rings / footer,
+ * and the card grows instead of clipping at large text or long locales.
  */
 export const CardContent = styled.View`
-  height: 170px;
+  min-height: 170px;
   justify-content: space-between;
 `;
 
@@ -55,7 +56,15 @@ export const MetricLabelRow = styled.View`
   flex-direction: row;
   align-items: baseline;
   justify-content: space-between;
-  height: 15px;
+  min-height: 15px;
+`;
+
+/** Value + goal pair pinned right; never wraps under the label. */
+export const MetricValueRow = styled.View`
+  flex-direction: row;
+  align-items: baseline;
+  flex-shrink: 0;
+  margin-left: ${({ theme }) => theme.space.sm}px;
 `;
 
 export const BarTrack = styled.View`

@@ -23,7 +23,7 @@ export function SampleBadge({ compact }: { compact?: boolean }) {
         tone="tertiary"
         weight={fontWeight.semibold}
         micro
-        style={compact ? { fontSize: 8, lineHeight: 10 } : undefined}
+        style={compact ? { fontSize: 8.5, lineHeight: 10 } : undefined}
       >
         Sample
       </HomeText>

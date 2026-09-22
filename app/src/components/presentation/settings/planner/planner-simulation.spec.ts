@@ -96,21 +96,28 @@ describe('planner locale honesty', () => {
 });
 
 describe('next-session availability matrix', () => {
-  it('is ready when the planner is on, a program exists, and days are selected', () => {
-    expect(nextSessionAvailability(true, true, 5)).toBe('ready');
+  it('is ready when the planner is on, a program with sessions exists, and days are selected', () => {
+    expect(nextSessionAvailability(true, true, 5, 3)).toBe('ready');
   });
 
   it('the master switch being off takes precedence over everything else', () => {
-    expect(nextSessionAvailability(false, true, 5)).toBe('planner-off');
-    expect(nextSessionAvailability(false, false, 0)).toBe('planner-off');
+    expect(nextSessionAvailability(false, true, 5, 3)).toBe('planner-off');
+    expect(nextSessionAvailability(false, false, 0, 0)).toBe('planner-off');
   });
 
   it('reports no-program when the active program was deleted', () => {
-    expect(nextSessionAvailability(true, false, 5)).toBe('no-program');
+    expect(nextSessionAvailability(true, false, 5, 0)).toBe('no-program');
+  });
+
+  it('reports no-sessions when every session was removed from the program', () => {
+    // Regression: the rotation lookup dereferenced `sessions[0]` and crashed
+    // with "Cannot read property 'name' of undefined".
+    expect(nextSessionAvailability(true, true, 5, 0)).toBe('no-sessions');
+    expect(nextSessionAvailability(true, true, 0, 0)).toBe('no-sessions');
   });
 
   it('reports no-training-days when every day was deselected', () => {
-    expect(nextSessionAvailability(true, true, 0)).toBe('no-training-days');
+    expect(nextSessionAvailability(true, true, 0, 3)).toBe('no-training-days');
   });
 });
 

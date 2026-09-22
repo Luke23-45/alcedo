@@ -1,6 +1,7 @@
 import { useTranslate } from '@tolgee/react';
 import { Circle, G, Path, Rect, Svg } from 'react-native-svg';
 import { fontWeight } from '@/styles/theme';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { HomeText } from '../shared/home-text';
 import { SectionHeader } from '../shared/section-header';
 import type { ProgramItem } from '../use-home-data';
@@ -8,11 +9,15 @@ import * as S from './programs.styles';
 
 type Accent = ProgramItem['accent'];
 
-/** Reference program gradients, diagonal (0,0)→(1,1). */
-const ACCENT_GRADIENT: Record<Accent, [string, string]> = {
-  strength: ['#7C5CFF', '#241A54'],
-  conditioning: ['#12A6B4', '#07333C'],
-  mobility: ['#FF7A3D', '#4A1520'],
+/**
+ * Reference program gradients (gProgA/B/C), diagonal (0,0)→(1,1).
+ * Light tops are lifted so artwork survives white cards; the scrim keeps
+ * the bottom text legible in both modes.
+ */
+const ACCENT_GRADIENT: Record<Accent, { dark: [string, string]; light: [string, string] }> = {
+  strength: { dark: ['#7C5CFF', '#241A54'], light: ['#6A4BF0', '#2A1B63'] },
+  conditioning: { dark: ['#12A6B4', '#07333C'], light: ['#0E94A2', '#06323A'] },
+  mobility: { dark: ['#FF7A3D', '#4A1520'], light: ['#F2662B', '#4A1520'] },
 };
 
 /** Accent color for the progress ring/bar. */
@@ -76,6 +81,8 @@ function ProgressRing({ pct, color }: { pct: number; color: string }) {
 
 export function ProgramsSection({ programs, onSeeAll }: { programs: ProgramItem[]; onSeeAll: () => void }) {
   const { t } = useTranslate();
+  const theme = useAppTheme();
+  const dark = theme.isDark;
 
   return (
     <>
@@ -99,10 +106,21 @@ export function ProgramsSection({ programs, onSeeAll }: { programs: ProgramItem[
                 : program.accent === 'conditioning'
                   ? t('home.programs.conditioning') /* en: "Conditioning" */
                   : t('home.programs.mobility'); /* en: "Mobility" */
-            const pct = program.progressPct;
+            const pct =
+              program.progressPct == null ? null : Math.min(1, Math.max(0, program.progressPct));
             return (
-              <S.ProgramCard key={program.id} style={{ borderCurve: 'continuous' }}>
-                <S.CardGradient colors={ACCENT_GRADIENT[program.accent]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+              <S.ProgramCard
+                key={program.id}
+                style={{ borderCurve: 'continuous' }}
+                onPress={onSeeAll}
+                accessibilityRole="button"
+                accessibilityLabel={program.name}
+              >
+                <S.CardGradient
+                  colors={dark ? ACCENT_GRADIENT[program.accent].dark : ACCENT_GRADIENT[program.accent].light}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                />
                 <S.Watermark>
                   <WatermarkGlyph accent={program.accent} />
                 </S.Watermark>
@@ -121,7 +139,7 @@ export function ProgramsSection({ programs, onSeeAll }: { programs: ProgramItem[
                         tracking={0.5}
                         style={{ fontSize: 9, lineHeight: 11, color: '#FFFFFF' }}
                       >
-                        {tagLabel.toUpperCase()}
+                        {tagLabel.toLocaleUpperCase()}
                       </HomeText>
                     </S.Tag>
                     {pct != null && <ProgressRing pct={pct} color={ACCENT_SOLID[program.accent]} />}

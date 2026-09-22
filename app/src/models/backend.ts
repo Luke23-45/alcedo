@@ -1,5 +1,5 @@
 import { toBase64, fromBase64 } from '@/utils/base64';
-import { TranslationKey } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 
 export type BackendId = string;
 

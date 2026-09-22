@@ -6,6 +6,7 @@ doc is added, removed, renamed, or repurposed, update this index in the same cha
 
 ## Process
 
+- [merge_ledger.md](merge_ledger.md) — all-branches merge ledger (source of truth): branch inventory, topology proof, hazards, execution plan + log.
 - [new_design/page-verification.md](new_design/page-verification.md) — page-by-page flow simulation protocol: inventory, state matrix, trace, simulate, patch, verify, record; status table and per-page log for all 20 pages.
 - [new_design/offline-first-plan.md](new_design/offline-first-plan.md) — offline-first architecture plan: SQLite hardening, privacy-first backup modes (Off/Automatic/Manual).
 
@@ -32,6 +33,10 @@ doc is added, removed, renamed, or repurposed, update this index in the same cha
 
 - [working/styles_ledger.md](working/styles_ledger.md) — ledger of style decisions.
 - [working/logo_brand_name_ledger.md](working/logo_brand_name_ledger.md) — ledger of logo/brand-name decisions.
+
+## Polish (polish_ui/)
+
+- [polish_ui/homepage/homepage_polish_ledger.md](polish_ui/homepage/homepage_polish_ledger.md) — home page polish ledger (source of truth): per-section responsive/overflow/light-mode punch list + patch order.
 
 ## Generated
 

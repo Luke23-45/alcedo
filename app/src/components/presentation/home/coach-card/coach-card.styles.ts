@@ -10,7 +10,7 @@ export const BorderLayer = styled(HomeGradient)`
 
 export const BodyLayer = styled(HomeGradient)`
   border-radius: 29px;
-  padding: ${({ theme }) => theme.space.lg}px;
+  padding: ${({ theme }) => theme.space.base}px;
   overflow: hidden;
 `;
 
@@ -46,14 +46,14 @@ export const IconGloss = styled(HomeGradient).attrs({ variant: 'gloss' as const 
   opacity: 0.5;
 `;
 
-/** BETA pill: 42×20. */
+/** BETA pill: 42×20, neutral wash per mode. */
 export const BetaChip = styled.View`
   width: 42px;
   height: 20px;
   border-radius: 10px;
-  background-color: ${alpha('#FFFFFF', 0.08)};
+  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.08) : alpha('#787880', 0.12))};
   border-width: 0.7px;
-  border-color: ${alpha('#FFFFFF', 0.09)};
+  border-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.09) : alpha('#787880', 0.2))};
   align-items: center;
   justify-content: center;
   margin-left: auto;
@@ -85,12 +85,14 @@ export const RingCenter = styled.View`
 export const ButtonsRow = styled.View`
   flex-direction: row;
   gap: ${({ theme }) => theme.space.sm}px;
-  margin-top: ${({ theme }) => theme.space.md}px;
+  margin-top: ${({ theme }) => theme.space.sm}px;
 `;
 
+/** 116pt reference width; grows for long locales, never shrinks the label. */
 export const AdjustButton = styled(HomeGradient)`
-  width: 116px;
+  min-width: 116px;
   height: 32px;
+  padding-horizontal: ${({ theme }) => theme.space.base}px;
   border-radius: 16px;
   align-items: center;
   justify-content: center;
@@ -107,12 +109,13 @@ export const AdjustGloss = styled(HomeGradient).attrs({ variant: 'gloss' as cons
 `;
 
 export const DismissButton = styled.View`
-  width: 88px;
+  min-width: 88px;
   height: 32px;
+  padding-horizontal: ${({ theme }) => theme.space.md}px;
   border-radius: 16px;
-  background-color: ${alpha('#FFFFFF', 0.07)};
+  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.07) : alpha('#787880', 0.12))};
   border-width: 0.9px;
-  border-color: ${alpha('#FFFFFF', 0.1)};
+  border-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.1) : alpha('#787880', 0.2))};
   align-items: center;
   justify-content: center;
 `;

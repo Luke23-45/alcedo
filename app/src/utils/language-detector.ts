@@ -1,5 +1,22 @@
 import { PreferenceService } from '@/services/preference-service';
-import { detectLanguage, LanguageDetectorMiddleware, TolgeePlugin } from '@tolgee/react';
+import type { LanguageDetectorMiddleware, TolgeePlugin } from '@tolgee/core';
+
+// Local copy of @tolgee/web's detectLanguage (v7.1.0, verified identical logic).
+// It cannot be imported: the @tolgee/web bundle touches `document.documentElement`
+// at module scope, which crashes on Hermes. @tolgee/core is DOM-free.
+function detectLanguage(language: string, availableLanguages: string[]): string | undefined {
+  const exactMatch = availableLanguages.find((l) => l === language);
+  if (exactMatch) {
+    return exactMatch;
+  }
+  const getTwoLetters = (fullTag: string) => fullTag.replace(/^(.+?)(-.*)?$/, '$1');
+  const preferredTwoLetter = getTwoLetters(language);
+  const twoLetterMatch = availableLanguages.find((l) => getTwoLetters(l) === preferredTwoLetter);
+  if (twoLetterMatch) {
+    return twoLetterMatch;
+  }
+  return undefined;
+}
 
 // Tolgee's types claim `detectLanguage` returns a string, but it returns undefined for a locale with
 // no exact or two-letter match.

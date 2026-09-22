@@ -27,7 +27,7 @@ interface RingDatum {
   goal: number;
   unit: string;
   radius: number;
-  /** 2-stop ring gradient (gMove / gEx / gStand). */
+  /** 2-stop ring gradient (gMove / gEx / gStand), deepened for white in light. */
   ringFrom: string;
   ringTo: string;
   /** Track tint per mode, extracted from the SVGs. */
@@ -36,62 +36,63 @@ interface RingDatum {
   /** Value number color per mode. */
   valueDark: string;
   valueLight: string;
-  /** 6pt bar gradient (gBarMove / gBarEx / gBarStand). */
+  /** 6pt bar gradient (gBarMove / gBarEx / gBarStand), deepened for white in light. */
   barFrom: string;
   barTo: string;
 }
 
 /** Static per-ring geometry and colors; labels resolve through i18n below. */
-const RING_SPECS = [
-  {
-    key: 'move',
-    labelKey: 'home.activity.move',
-    value: 520,
-    goal: 650,
-    unitKey: 'home.activity.kcal',
-    radius: 46,
-    ringFrom: '#FF0A47',
-    ringTo: '#FF7A96',
-    trackDark: alpha('#FF0A47', 0.17),
-    trackLight: alpha('#E00040', 0.14),
-    valueDark: '#FF6A88',
-    valueLight: '#D70015',
-    barFrom: '#FF1F52',
-    barTo: '#FF7A96',
-  },
-  {
-    key: 'exercise',
-    labelKey: 'home.activity.exercise',
-    value: 42,
-    goal: 60,
-    unitKey: 'home.activity.min',
-    radius: 35.5,
-    ringFrom: '#8BE000',
-    ringTo: '#D6FF52',
-    trackDark: alpha('#A6FF00', 0.15),
-    trackLight: alpha('#63C400', 0.16),
-    valueDark: '#C3F53C',
-    valueLight: '#4A9E00',
-    barFrom: '#92E82A',
-    barTo: '#D6FF52',
-  },
-  {
-    key: 'stand',
-    labelKey: 'home.activity.stand',
-    value: 11,
-    goal: 12,
-    unitKey: 'home.activity.hr',
-    radius: 25,
-    ringFrom: '#009DFF',
-    ringTo: '#2CE9F7',
-    trackDark: alpha('#00D9E9', 0.16),
-    trackLight: alpha('#00A6C9', 0.15),
-    valueDark: '#5EDCF0',
-    valueLight: '#0071A8',
-    barFrom: '#17A9FF',
-    barTo: '#2CE9F7',
-  },
-] as const;
+const RING_SPECS = (dark: boolean) =>
+  [
+    {
+      key: 'move',
+      labelKey: 'home.activity.move',
+      value: 520,
+      goal: 650,
+      unitKey: 'home.activity.kcal',
+      radius: 46,
+      ringFrom: dark ? '#FF0A47' : '#E00040',
+      ringTo: dark ? '#FF7A96' : '#FF5C7A',
+      trackDark: alpha('#FF0A47', 0.17),
+      trackLight: alpha('#E00040', 0.14),
+      valueDark: '#FF6A88',
+      valueLight: '#D70015',
+      barFrom: dark ? '#FF1F52' : '#E00040',
+      barTo: dark ? '#FF7A96' : '#FF5C7A',
+    },
+    {
+      key: 'exercise',
+      labelKey: 'home.activity.exercise',
+      value: 42,
+      goal: 60,
+      unitKey: 'home.activity.min',
+      radius: 35.5,
+      ringFrom: dark ? '#8BE000' : '#63C400',
+      ringTo: dark ? '#D6FF52' : '#A9F026',
+      trackDark: alpha('#A6FF00', 0.15),
+      trackLight: alpha('#63C400', 0.16),
+      valueDark: '#C3F53C',
+      valueLight: '#4A9E00',
+      barFrom: dark ? '#92E82A' : '#63C400',
+      barTo: dark ? '#D6FF52' : '#A9F026',
+    },
+    {
+      key: 'stand',
+      labelKey: 'home.activity.stand',
+      value: 11,
+      goal: 12,
+      unitKey: 'home.activity.hr',
+      radius: 25,
+      ringFrom: dark ? '#009DFF' : '#0089CE',
+      ringTo: dark ? '#2CE9F7' : '#17C8E8',
+      trackDark: alpha('#00D9E9', 0.16),
+      trackLight: alpha('#00A6C9', 0.15),
+      valueDark: '#5EDCF0',
+      valueLight: '#0071A8',
+      barFrom: dark ? '#17A9FF' : '#0089CE',
+      barTo: dark ? '#2CE9F7' : '#17C8E8',
+    },
+  ] as const;
 
 /** Reference flame (ic-flame), drawn in the streak chip. */
 function FlameGlyph() {
@@ -129,7 +130,8 @@ export function ActivityRings() {
   const labelColor = theme.isDark ? '#F5F5F7' : '#1C1C1E';
   const restColor = theme.isDark ? '#6C6C70' : '#AEAEB2';
 
-  const rings: RingDatum[] = RING_SPECS.map((spec) => ({
+  const dark = theme.isDark;
+  const rings: RingDatum[] = RING_SPECS(dark).map((spec) => ({
     ...spec,
     label: t(spec.labelKey),
     unit: t(spec.unitKey),
@@ -148,7 +150,7 @@ export function ActivityRings() {
               tracking={1.35}
               style={{ fontSize: 10, lineHeight: 12 }}
             >
-              {t('home.activity.title').toUpperCase() /* en: "TODAY'S ACTIVITY" */}
+              {t('home.activity.title').toLocaleUpperCase() /* en: "TODAY'S ACTIVITY" */}
             </HomeText>
             <SampleBadge />
           </S.LabelGroup>
@@ -213,21 +215,26 @@ export function ActivityRings() {
                     <HomeText
                       weight={fontWeight.semibold}
                       tracking={-0.1}
-                      style={{ fontSize: 12, lineHeight: 15, color: labelColor }}
+                      numberOfLines={1}
+                      style={{ fontSize: 12, lineHeight: 15, color: labelColor, flexShrink: 1 }}
                     >
                       {ring.label}
                     </HomeText>
-                    <HomeText weight={fontWeight.bold} tabular style={{ fontSize: 12, lineHeight: 15 }}>
+                    <S.MetricValueRow>
                       <HomeText
                         weight={fontWeight.bold}
-                        style={{ fontSize: 12, color: theme.isDark ? ring.valueDark : ring.valueLight }}
+                        tabular
+                        style={{ fontSize: 12, lineHeight: 15, color: theme.isDark ? ring.valueDark : ring.valueLight }}
                       >
                         {ring.value}
                       </HomeText>
-                      <HomeText weight={fontWeight.medium} style={{ fontSize: 12, color: restColor }}>
+                      <HomeText
+                        weight={fontWeight.medium}
+                        style={{ fontSize: 12, lineHeight: 15, color: restColor }}
+                      >
                         /{ring.goal} {ring.unit}
                       </HomeText>
-                    </HomeText>
+                    </S.MetricValueRow>
                   </S.MetricLabelRow>
                   <S.BarTrack>
                     <S.BarFill $from={ring.barFrom} $to={ring.barTo} $pct={pct} />

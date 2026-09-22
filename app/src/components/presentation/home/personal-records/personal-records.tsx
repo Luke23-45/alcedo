@@ -21,7 +21,7 @@ export function PersonalRecordsSection({ records }: { records: PersonalRecordIte
   const newColor = dark ? '#FFB84D' : '#C93400';
 
   return (
-    <HomeCard radius={30} pad={20} style={{ height: 140 }}>
+    <HomeCard radius={30} pad={20} style={{ minHeight: 140 }}>
       <S.HeaderRow>
         <HomeText
           weight={fontWeight.semibold}
@@ -35,9 +35,10 @@ export function PersonalRecordsSection({ records }: { records: PersonalRecordIte
             weight={fontWeight.bold}
             micro
             tracking={0.8}
-            style={{ fontSize: 8.5, lineHeight: 11, color: chipColor }}
+            numberOfLines={1}
+            style={{ fontSize: 9, lineHeight: 11, color: chipColor }}
           >
-            {t('home.personal_records.this_month').toUpperCase() /* en: "THIS MONTH" */}
+            {t('home.personal_records.this_month').toLocaleUpperCase() /* en: "THIS MONTH" */}
           </HomeText>
         </S.MonthChip>
       </S.HeaderRow>
@@ -51,15 +52,15 @@ export function PersonalRecordsSection({ records }: { records: PersonalRecordIte
         <S.TilesRow>
           {records.map((record) => (
             <S.Tile key={record.name} style={{ borderCurve: 'continuous' }}>
-              <S.TileInner $highlight={!!record.isNew} pointerEvents="none" />
+              {record.isNew ? <S.TileInner pointerEvents="none" /> : null}
               <HomeText
                 weight={fontWeight.bold}
                 micro
                 tracking={0.8}
                 numberOfLines={1}
-                style={{ fontSize: 8.5, lineHeight: 11, color: nameColor }}
+                style={{ fontSize: 9, lineHeight: 12, color: nameColor }}
               >
-                {record.name.toUpperCase()}
+                {record.name.toLocaleUpperCase()}
               </HomeText>
               <HomeText
                 weight={fontWeight.bold}
@@ -76,9 +77,9 @@ export function PersonalRecordsSection({ records }: { records: PersonalRecordIte
                     weight={fontWeight.bold}
                     micro
                     tracking={0.6}
-                    style={{ fontSize: 8, lineHeight: 10, color: newColor }}
+                    style={{ fontSize: 9, lineHeight: 11, color: newColor }}
                   >
-                    NEW
+                    {t('home.personal_records.new').toLocaleUpperCase() /* en: "NEW" */}
                   </HomeText>
                 </S.NewChip>
               ) : record.delta ? (

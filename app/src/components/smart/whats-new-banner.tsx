@@ -76,7 +76,8 @@ function Feature({ entry, onPress }: { entry: WhatsNewEntry; onPress: (route: Hr
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 20,
+    // Home tile radius (24) so the banner reads as one home card family.
+    borderRadius: 24,
     padding: 16,
     gap: 4,
   },

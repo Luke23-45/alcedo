@@ -55,7 +55,7 @@ export function TodaySession({ title, subtitle, startLabel, difficultyLabel, onS
 
   return (
     <>
-      <HomeCard pad={14} style={{ height: 104 }}>
+      <HomeCard pad={14} style={{ minHeight: 104 }}>
         <S.CardBody>
           <S.IconBadge>
             <S.Gloss />
@@ -68,7 +68,7 @@ export function TodaySession({ title, subtitle, startLabel, difficultyLabel, onS
               tracking={1.25}
               style={{ fontSize: 9, lineHeight: 11, color: labelColor }}
             >
-              {t('home.today_session.label').toUpperCase() /* en: "TODAY'S SESSION" */}
+              {t('home.today_session.label').toLocaleUpperCase() /* en: "TODAY'S SESSION" */}
             </HomeText>
             <HomeText
               weight={fontWeight.semibold}

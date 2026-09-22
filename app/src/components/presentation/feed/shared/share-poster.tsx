@@ -37,6 +37,18 @@ type ThemeSpec = {
   locations: [number, number] | [number, number, number];
 };
 
+/**
+ * Stop positions for a gradient override whose colours arrived without any.
+ * Deriving them from the colour count matters: a hard-coded 2-stop `locations`
+ * under a 3-colour ramp is a mis-placed (and loudly warned-about)
+ * expo-linear-gradient mismatch.
+ */
+function evenLocations(
+  colors: readonly string[],
+): [number, number] | [number, number, number] {
+  return colors.length <= 2 ? [0, 1] : [0, 0.5, 1];
+}
+
 const THEMES: Record<SharePosterTheme, ThemeSpec> = {
   ember: { colors: ['#FFB03A', '#FF5A3C', '#C1143C'], locations: [0, 0.45, 1] },
   aurora: { colors: ['#8E7BFF', '#0E7490'], locations: [0, 1] },
@@ -82,7 +94,7 @@ export function SharePoster({
   const spec = gradient
     ? {
         colors: gradient.colors,
-        locations: gradient.locations ?? ([0, 1] as [number, number]),
+        locations: gradient.locations ?? evenLocations(gradient.colors),
         start: gradient.start ?? { x: 0, y: 0 },
         end: gradient.end ?? { x: 0.7, y: 1 },
       }

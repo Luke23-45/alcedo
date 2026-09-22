@@ -12,12 +12,13 @@ import { Avatar, HeaderRow, TextColumn, TrailingGroup } from './greeting-header.
  */
 function AvatarBadge() {
   const theme = useAppTheme();
+  const dark = theme.isDark;
   return (
-    <Svg width={52} height={52} viewBox="0 0 52 52">
+    <Svg width={44} height={44} viewBox="0 0 52 52">
       <Defs>
         <SvgGradient id="greetAvatar" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor="#5E5CE6" />
-          <Stop offset="1" stopColor="#BF5AF2" />
+          <Stop offset="0" stopColor={dark ? '#5E5CE6' : '#5856D6'} />
+          <Stop offset="1" stopColor={dark ? '#BF5AF2' : '#AF52DE'} />
         </SvgGradient>
       </Defs>
       <Circle cx={26} cy={26} r={22} fill="url(#greetAvatar)" />
@@ -52,6 +53,7 @@ export function GreetingHeader({
           weight={fontWeight.bold}
           micro
           tracking={1.45}
+          numberOfLines={1}
           style={{ fontSize: 10.5, lineHeight: 13, color: dateColor }}
         >
           {dateLabel}
@@ -59,6 +61,7 @@ export function GreetingHeader({
         <HomeText
           weight={fontWeight.bold}
           tracking={-0.55}
+          numberOfLines={2}
           style={{ fontSize: 25, lineHeight: 30, color: greetingColor, marginTop: 2 }}
         >
           {greeting}

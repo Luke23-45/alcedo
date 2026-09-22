@@ -29,7 +29,7 @@ import {
   sanitizeChatInput,
   showsDayDivider,
 } from '@/components/smart/planner-chat-logic';
-import * as S from './planner-chat.styles';
+import * as S from '@/components/presentation/ai-planner/planner-chat.styles';
 
 const COMPOSER_GAP = 8; // theme.space.sm
 

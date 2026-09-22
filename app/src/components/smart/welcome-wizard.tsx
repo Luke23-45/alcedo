@@ -5,7 +5,7 @@ import { SegmentedGroup, SegmentListFormElement } from '@/components/presentatio
 import { SegmentedListSwitch } from '@/components/presentation/foundation/segmented-list-switch';
 import { SegmentedListSelect } from '@/components/presentation/foundation/segmented-list-select';
 import Icon from '@/components/presentation/foundation/icon';
-import ThemeChooser from '@/components/presentation/foundation/editors/theme-chooser';
+import { ThemeChooser } from '@/components/presentation/foundation/editors/theme-chooser';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { supportedLanguages } from '@/services/tolgee';
 import { useAppSelector } from '@/store';
