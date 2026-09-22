@@ -2,13 +2,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useComposerT } from '../composer-i18n';
 import type { ComposerAudience, ComposerStatKey } from '../composer-types';
-import { AUDIENCE_FRIEND_COUNT } from '../composer-types';
 import { countHiddenStats } from '../poster-props';
 import * as S from './composer-cta.styles';
 
 interface ComposerCtaProps {
   canShare: boolean;
   audience: ComposerAudience;
+  /** Mutual friends from the social graph; 0/unknown omits the number. */
+  friendCount: number;
   visible: Record<ComposerStatKey, boolean>;
   onShare: () => void;
 }
@@ -16,9 +17,11 @@ interface ComposerCtaProps {
 /**
  * Sticky share CTA with the live caption: audience + hidden-stat count.
  * Disabled (50% opacity) until a session is attached — a control that cannot
- * act must not look like it can.
+ * act must not look like it can. The friend count is real (mutual friends
+ * from the social graph); when none is known the caption names no number
+ * rather than inventing one.
  */
-export function ComposerCta({ canShare, audience, visible, onShare }: ComposerCtaProps) {
+export function ComposerCta({ canShare, audience, friendCount, visible, onShare }: ComposerCtaProps) {
   const theme = useAppTheme();
   const t = useComposerT();
   const hidden = countHiddenStats(visible);
@@ -26,11 +29,12 @@ export function ComposerCta({ canShare, audience, visible, onShare }: ComposerCt
   const caption = !canShare
     ? t('feed.composer.cta.caption.none', 'Attach a session to share')
     : audience === 'friends'
-      ? t(
-          'feed.composer.cta.caption.friends',
-          `Sharing with ${AUDIENCE_FRIEND_COUNT} friends · {hidden} stats hidden`,
-          { hidden },
-        )
+      ? friendCount > 0
+        ? t('feed.composer.cta.caption.friends', 'Sharing with {count} friends · {hidden} stats hidden', {
+            count: friendCount,
+            hidden,
+          })
+        : t('feed.composer.cta.caption.friends.unknown', 'Sharing with friends · {hidden} stats hidden', { hidden })
       : audience === 'public'
         ? t('feed.composer.cta.caption.public', 'Sharing publicly · {hidden} stats hidden', {
             hidden,

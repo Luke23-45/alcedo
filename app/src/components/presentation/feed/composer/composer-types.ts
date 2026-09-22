@@ -40,6 +40,4 @@ export const DEFAULT_VISIBLE_STATS: ComposerStatKey[] = ['volume', 'duration', '
 
 export const AUDIENCES: ComposerAudience[] = ['friends', 'public', 'private'];
 
-export const AUDIENCE_FRIEND_COUNT = 84;
-
 export const CAPTION_MAX_LENGTH = 280;

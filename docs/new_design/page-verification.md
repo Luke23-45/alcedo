@@ -186,7 +186,7 @@ confirmation on device — no device used.
 | 7 | Trends | docs/new_design | done 2026-09-22 |
 | 8 | Feed timeline | docs/new_design/social-dark.md | done 2026-09-22 |
 | 9 | Feed post detail | docs/new_design/social-dark.md | pending |
-| 10 | Feed share composer | docs/new_design/social-dark.md | pending |
+| 10 | Feed share composer | docs/new_design/social-dark.md | done 2026-09-22 |
 | 11 | Feed profile editor | docs/new_design/social-dark.md | pending |
 | 12 | Feed shared-item | (thin wrapper) | pending |
 | 13 | Settings home | docs/new_design/settings-dark.md | pending |
@@ -636,6 +636,7 @@ formatting to avoid diff noise — no new format issues introduced).
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.
 
+
 ### 8. Feed timeline
 - Verified 2026-09-22 against `docs/new_design/social-dark.md` Screen 1.
   Route: `app/src/app/(tabs)/feed/index.tsx`; container
@@ -803,3 +804,99 @@ files.
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.
 
+### 10. Feed share composer
+- Verified 2026-09-22 against `docs/new_design/social-dark.md` Screen 3
+  (Share Composer, 393 × 1112). Route: `app/src/app/(tabs)/feed/share.tsx`;
+  container `components/smart/feed-share-composer.tsx`; screen
+  `components/presentation/feed/composer/share-composer/share-composer.tsx`;
+  session model in `composer/composer-data.ts`; draft persistence in
+  `shared/composer-draft.ts`; published posts in
+  `store/feed/composer-posts.ts`.
+- Sections inventoried (render order): nav row (back, "Share Workout",
+  Share CTA), session-attached poster card (theme swatches Ember/Aurora/
+  Slate, stat tiles volume/duration/sets/PRs/reps/heart-rate/notes/RPE with
+  toggle chips), caption field, tagged-friends chips, tag action, audience
+  row with sheet (Friends/Public/Private), sticky bottom CTA. No-session
+  state shows "No recorded sessions yet" and disables Share; detach/
+  reattach keeps the theme/stat/caption state.
+- State matrix simulated: populated (latest recorded session), empty
+  caption, 280-char boundary, restored draft, typing-before-restore race
+  (user keystrokes win), cancel preserves draft, publish clears draft,
+  duplicate share guard (one-shot ref: rapid double share dispatches one
+  post), detached/reattached session, all three themes, every stat
+  combination incl. no hero-eligible statistic, all audiences, empty and
+  populated real tag results, publish persistence hydration (newest first,
+  corrupt entries skipped), locale-aware volume grouping (en-US /
+  de-DE), mutual-friend counts and tag eligibility.
+- Data honesty: composer opens with empty caption and no pre-tagged
+  people (the mockup's filled state is the focused/typed state, never
+  shipped as the user's content); "Sharing with N friends" uses the real
+  mutual-friend count (followers ∩ following) with a count-free fallback;
+  tag picker lists real named mutual friends with an honest empty state
+  (unnamed users count toward the audience but are excluded from rows);
+  stale tag ids that no longer resolve are omitted; volume/age dates honor
+  `preferredLanguage` (no hard-coded `en-US`); `latestSession` returns
+  only sessions with a started exercise, never a planned/unstarted one.
+
+**Bugs found and fixed:**
+1. Fictional defaults — the composer opened with the mockup's example
+   caption ("Volume up 18%…") and two example tags (mia/jon) as real
+   state, ready to publish as the user's own. Removed: empty caption,
+   no tags by default.
+2. Hard-coded "84 friends" audience — replaced with
+   `selectMutualFriendCount`/`selectMutualFriends` derived from the real
+   followers/following intersection.
+3. Fictional `FEED_PEOPLE` tag list — tag picker now receives real mutual
+   contacts; added `shared/tag-person.ts` deriving a neutral initial
+   avatar without inventing a handle or gradient.
+4. `latestSession` fell back to planned/unstarted sessions — a user with
+   no recorded session was offered a plan card to "share". Now returns
+   undefined and the composer renders the honest no-session state.
+5. Draft restore/write race — the debounced write could fire before the
+   async restore read, erasing an unread draft on mount. Writes now wait
+   for the restore to settle; restore skips when the user already typed.
+6. Drafts leaked across sessions — `ComposerDraft` now carries
+   `sessionId`; reads are session-scoped and legacy/corrupt/empty drafts
+   are rejected. Timeline/detail draft reads are scoped to the same
+   session id.
+7. Duplicate publish — rapid double taps on Share dispatched two posts
+   before navigation unmounted the composer. A one-shot `useRef` guard
+   makes share idempotent.
+8. Locale hard-codes — `deriveComposerSessionData` took no formatter and
+   used `.toLocaleString('en-US')`; `formatPostAge` hard-coded the
+   seven-day fallback date. Both now take a `ComposerFormatNumber` /
+   locale from `useFormatNumber` / `preferredLanguage`.
+9. Published posts resolved tagged names from sample people — now resolve
+   from real mutual contacts via the new `people` prop.
+
+**Tests (23 new + composer-data updates, all green):**
+- `composer/share-composer-simulation.spec.ts` (new, 23 tests): no
+  sessions / planned-only / mixed pools (planned-only can never attach),
+  newest-recorded selection, session-scoped draft round-trip,
+  cross-session isolation, empty/corrupt/legacy draft rejection, clear,
+  publish persistence (newest first, theme/stat/tag/audience captured),
+  hydration with corrupt-entry skipping, mutual counts/eligibility
+  (one-way follow excluded, unnamed excluded from picker), locale volume
+  grouping, neutral real-contact tag identities. Pattern note: the draft
+  module pulls `expo-router` (no vitest shim, unparseable import chain),
+  so the suite stubs it with a hoisted `vi.mock('expo-router')` for
+  `useFocusEffect` — established-repo-shim-free pattern, same idea as
+  the `@/store` mock in `composer-data.spec.ts`.
+
+**Deliberate non-changes:**
+- Photo and Location from the mockup are not exposed: no photo/location
+  fields exist in the composer/feed models and neither `expo-image-picker`
+  nor `expo-location` is a dependency. No dead controls were added; the
+  omission is honest and documented here.
+- The CTA has no visual in-flight state yet — the handler is guarded, and
+  navigation unmounts the composer immediately after share.
+- The `?id=` share-request branch in `share.tsx` is structurally
+  unchanged; a dedicated regression test for it is still open.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 118 files /
+1,760 tests green; oxlint 0 errors on touched files; eslint (react
+compiler) clean on touched files; `oxfmt --check` clean on touched
+files.
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.

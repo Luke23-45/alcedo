@@ -6,7 +6,7 @@ import { LocalDate } from '@js-joda/core';
 import { useAppSelector } from '@/store';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { makeSession } from '@/models/session-models/__test__/helpers';
-import { deriveComposerSessionData, type ComposerFormatDate } from './composer-data';
+import { deriveComposerSessionData, type ComposerFormatDate, type ComposerFormatNumber } from './composer-data';
 
 vi.mock('@/store', () => ({ useAppSelector: vi.fn() }));
 
@@ -16,6 +16,8 @@ vi.mock('@/store', () => ({ useAppSelector: vi.fn() }));
  */
 const enUsFormatDate: ComposerFormatDate = (date, opts) =>
   new Intl.DateTimeFormat('en-US', opts).format(new Date(date.year(), date.month().ordinal(), date.dayOfMonth()));
+
+const enUsFormatNumber: ComposerFormatNumber = (value) => new Intl.NumberFormat('en-US').format(value);
 
 /** Files that carried the crashing js-joda text patterns, relative to the app dir. */
 const FIXED_FILES = [
@@ -39,7 +41,7 @@ describe('deriveComposerSessionData kicker', () => {
     // A session with no recorded exercises is enough: the reference-time
     // fallback is session.date itself, so the date is deterministic in any TZ.
     const session = makeSession([], LocalDate.of(2026, 9, 9));
-    const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate);
+    const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate, enUsFormatNumber);
     expect(data.kicker).toBe('KINETIC · WEDNESDAY, SEPTEMBER 9');
   });
 });

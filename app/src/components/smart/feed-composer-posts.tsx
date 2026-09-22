@@ -5,7 +5,9 @@ import type { ComposerStatKey } from '@/components/presentation/feed/composer/co
 import { buildPosterProps } from '@/components/presentation/feed/composer/poster-props';
 import { useAppSelector } from '@/store';
 import { useFormatDate } from '@/hooks/useFormatDate';
+import { useFormatNumber } from '@/hooks/useFormatNumber';
 import { selectComposerPosts, type ComposerPost } from '@/store/feed/composer-posts';
+import { selectMutualFriends } from '@/store/feed';
 import { selectHistoryPersonalRecords, selectSessions } from '@/store/stored-sessions';
 
 function visibleRecord(keys: ComposerPost['visibleStats']): Record<ComposerStatKey, boolean> {
@@ -32,7 +34,10 @@ export function FeedComposerPosts() {
   const posts = useAppSelector(selectComposerPosts);
   const sessions = useAppSelector(selectSessions);
   const recordsBySession = useAppSelector(selectHistoryPersonalRecords);
+  const people = useAppSelector(selectMutualFriends);
+  const locale = useAppSelector((x) => x.settings.preferredLanguage);
   const formatDate = useFormatDate();
+  const formatNumber = useFormatNumber();
 
   if (posts.length === 0) {
     return null;
@@ -43,9 +48,21 @@ export function FeedComposerPosts() {
     <View style={{ gap: 12, marginBottom: 12 }}>
       {posts.map((post) => {
         const session = sessions.find((s) => s.id === post.sessionId);
-        const data = session ? deriveComposerSessionData(session, sessions, recordsBySession, formatDate) : null;
+        const data = session
+          ? deriveComposerSessionData(session, sessions, recordsBySession, formatDate, formatNumber)
+          : null;
         const poster = data ? buildPosterProps(data, post.theme, visibleRecord(post.visibleStats)) : null;
-        return <ComposerPostCard key={post.id} post={post} data={data} poster={poster} now={now} />;
+        return (
+          <ComposerPostCard
+            key={post.id}
+            post={post}
+            data={data}
+            poster={poster}
+            now={now}
+            people={people}
+            locale={locale}
+          />
+        );
       })}
     </View>
   );

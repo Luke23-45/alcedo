@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'expo-router';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useFormatDate } from '@/hooks/useFormatDate';
+import { useFormatNumber } from '@/hooks/useFormatNumber';
 import { useScroll } from '@/hooks/useScrollListener';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { shareString } from '@/store/app';
@@ -147,8 +148,11 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
   const recordsBySession = useAppSelector(selectHistoryPersonalRecords);
   const latest = latestSession(sessions);
   const formatDate = useFormatDate();
-  const composerData = latest ? deriveComposerSessionData(latest, sessions, recordsBySession, formatDate) : undefined;
-  const draftCaption = useComposerDraftCaption(keyValueStore);
+  const formatNumber = useFormatNumber();
+  const composerData = latest
+    ? deriveComposerSessionData(latest, sessions, recordsBySession, formatDate, formatNumber)
+    : undefined;
+  const draftCaption = useComposerDraftCaption(keyValueStore, latest?.id);
   const hidden = useHiddenPosts(keyValueStore);
   const bookmarks = useBookmarks(keyValueStore);
 

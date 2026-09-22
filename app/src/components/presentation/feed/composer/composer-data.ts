@@ -68,9 +68,8 @@ function sessionKindLabel(session: Session): string {
 /** The user's latest *recorded* session — started exercises only, newest first. */
 export function latestSession(sessions: readonly Session[]): Session | undefined {
   const recorded = sessions.filter((s) => s.recordedExercises.some((x) => x.isStarted));
-  const pool = recorded.length > 0 ? recorded : sessions;
   let best: Session | undefined;
-  for (const session of pool) {
+  for (const session of recorded) {
     if (!best || getSessionReferenceTime(session).isAfter(getSessionReferenceTime(best))) {
       best = session;
     }
@@ -108,14 +107,21 @@ function trainingStreakDays(sessions: readonly Session[]): number {
  */
 export type ComposerFormatDate = (date: LocalDate, opts: Intl.DateTimeFormatOptions) => string;
 
+/**
+ * A cached `Intl.NumberFormat`-backed formatter (see `useFormatNumber`),
+ * passed in by components so grouped figures honor preferredLanguage.
+ */
+export type ComposerFormatNumber = (value: number) => string;
+
 export function deriveComposerSessionData(
   session: Session,
   sessions: readonly Session[],
   recordsBySession: Map<string, PersonalRecord[]>,
   formatDate: ComposerFormatDate,
+  formatNumber: ComposerFormatNumber,
 ): ComposerSessionData {
   const volumeKg = sessionVolumeKg(session);
-  const volumeLabel = Math.round(volumeKg).toLocaleString('en-US');
+  const volumeLabel = formatNumber(Math.round(volumeKg));
   const sets = completedSetCount(session);
 
   const prPills: string[] = [];
@@ -157,12 +163,15 @@ export function deriveComposerSessionData(
 
 /**
  * Real relative age for a composer post: "now" / "21m" / "2h" / "1d", then a
- * short date. Never negative — a future-dated post reads as "now".
+ * short date. Never negative — a future-dated post reads as "now". The
+ * fallback date honors the caller's locale (preferredLanguage); undefined
+ * means the system locale.
  */
 export function formatPostAge(
   postedAt: number,
   now: number,
   t: (key: string, fallback: string, params?: Record<string, string | number>) => string,
+  locale?: string,
 ): string {
   const diffSeconds = Math.max(0, Math.floor((now - postedAt) / 1000));
   if (diffSeconds < 60) {
@@ -180,5 +189,5 @@ export function formatPostAge(
   if (days < 7) {
     return t('feed.composer.post.age.days', '{count}d', { count: days });
   }
-  return new Date(postedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return new Date(postedAt).toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 }

@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useAppSelector } from '@/store';
 import { formatPostAge } from '../composer/composer-data';
 import { FeedActionBar } from '../shared/feed-action-bar';
 import { FeedAvatar } from '../shared/feed-avatar';
@@ -45,7 +46,8 @@ export function PostFrame({
   const theme = useAppTheme();
   const dark = theme.isDark;
   const t = useTimelineT();
-  const age = formatPostAge(post.postedAt, Date.now(), t);
+  const locale = useAppSelector((x) => x.settings.preferredLanguage);
+  const age = formatPostAge(post.postedAt, Date.now(), t, locale);
   const audience =
     post.audience === 'friends'
       ? t('feed.timeline.audience.friends', 'Friends')

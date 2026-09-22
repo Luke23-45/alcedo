@@ -18,6 +18,7 @@ import { TaggedChips } from '../tagged-chips/tagged-chips';
 import { TagSheet } from '../tag-sheet/tag-sheet';
 import { ThemeSwatches } from '../theme-swatches/theme-swatches';
 import type { ComposerAudience, ComposerStatKey, ComposerTheme } from '../composer-types';
+import type { TagPerson } from '../../shared/tag-person';
 import { buildPosterProps } from '../poster-props';
 import * as S from './share-composer.styles';
 
@@ -37,7 +38,11 @@ export interface ShareComposerProps {
   onCaptionChange: (value: string) => void;
   taggedIds: string[];
   onUntag: (id: string) => void;
+  /** Real mutual friends eligible for tagging; empty renders the empty state. */
+  taggablePeople: TagPerson[];
   audience: ComposerAudience;
+  /** Mutual friends from the social graph; 0/unknown omits the number. */
+  friendCount: number;
   audienceSheetVisible: boolean;
   onOpenAudienceSheet: () => void;
   onCloseAudienceSheet: () => void;
@@ -99,7 +104,9 @@ export function ShareComposer(props: ShareComposerProps) {
     onCaptionChange,
     taggedIds,
     onUntag,
+    taggablePeople,
     audience,
+    friendCount,
     audienceSheetVisible,
     onOpenAudienceSheet,
     onCloseAudienceSheet,
@@ -121,7 +128,15 @@ export function ShareComposer(props: ShareComposerProps) {
       <FullHeightScrollView
         avoidKeyboard
         screenBackground={<ScreenBackground />}
-        floatingChildren={<ComposerCta canShare={canShare} audience={audience} visible={visible} onShare={onShare} />}
+        floatingChildren={
+          <ComposerCta
+            canShare={canShare}
+            audience={audience}
+            friendCount={friendCount}
+            visible={visible}
+            onShare={onShare}
+          />
+        }
       >
         <S.TopInset $top={insets.top}>
           <ComposerNav onCancel={onCancel} onShare={onShare} canShare={canShare} />
@@ -137,17 +152,24 @@ export function ShareComposer(props: ShareComposerProps) {
           {poster ? <LivePreview poster={poster} /> : null}
           <CaptionInput value={caption} onChange={onCaptionChange} />
           <AttachRow onTagPress={onOpenTagSheet} />
-          <TaggedChips taggedIds={taggedIds} onRemove={onUntag} onAdd={onOpenTagSheet} />
+          <TaggedChips taggedIds={taggedIds} people={taggablePeople} onRemove={onUntag} onAdd={onOpenTagSheet} />
           <S.BottomPad />
         </S.TopInset>
       </FullHeightScrollView>
       <AudienceSheet
         visible={audienceSheetVisible}
         audience={audience}
+        friendCount={friendCount}
         onSelect={onSelectAudience}
         onClose={onCloseAudienceSheet}
       />
-      <TagSheet visible={tagSheetVisible} taggedIds={taggedIds} onApply={onApplyTags} onClose={onCloseTagSheet} />
+      <TagSheet
+        visible={tagSheetVisible}
+        taggedIds={taggedIds}
+        people={taggablePeople}
+        onApply={onApplyTags}
+        onClose={onCloseTagSheet}
+      />
     </>
   );
 }

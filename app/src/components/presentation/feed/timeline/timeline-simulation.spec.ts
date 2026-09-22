@@ -33,7 +33,7 @@ import {
   type TimelinePost,
   type TimelineWorkoutPost,
 } from './timeline-data';
-import { deriveComposerSessionData, formatPostAge, type ComposerFormatDate } from '../composer/composer-data';
+import { deriveComposerSessionData, formatPostAge, type ComposerFormatDate, type ComposerFormatNumber } from '../composer/composer-data';
 import { useBookmarks, useHiddenPosts } from './timeline-state';
 import { PEOPLE } from '../shared/people';
 
@@ -46,6 +46,8 @@ const t = (key: string, fallback: string, params?: Record<string, string | numbe
 
 const enUsFormatDate: ComposerFormatDate = (date, opts) =>
   new Intl.DateTimeFormat('en-US', opts).format(new Date(date.year(), date.month().ordinal(), date.dayOfMonth()));
+
+const enUsFormatNumber: ComposerFormatNumber = (value) => new Intl.NumberFormat('en-US').format(value);
 
 function ownPostWith(prPills: string[]): TimelineWorkoutPost {
   return {
@@ -234,7 +236,7 @@ describe('deriveComposerSessionData feeding the timeline card', () => {
 
   it('computes volume, sets, and duration from real completed sets', () => {
     const session = sessionWithSets('Push Day', LocalDate.of(2026, 9, 22), [10, 8]);
-    const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate);
+    const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate, enUsFormatNumber);
     // 60kg x 10 + 60kg x 8 = 1,080 kg
     expect(data.volumeLabel).toBe('1,080');
     expect(data.volumeUnit).toBe('kg');
@@ -246,7 +248,7 @@ describe('deriveComposerSessionData feeding the timeline card', () => {
 
   it('ignores unlogged sets in volume and the set count', () => {
     const session = sessionWithSets('Push Day', LocalDate.of(2026, 9, 22), [10, undefined]);
-    const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate);
+    const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate, enUsFormatNumber);
     expect(data.volumeLabel).toBe('600');
     expect(data.setsLabel).toBe('1');
   });
@@ -255,7 +257,7 @@ describe('deriveComposerSessionData feeding the timeline card', () => {
     const big = sessionWithSets('Push Day', LocalDate.of(2026, 9, 22), [10, 8]);
     const small = sessionWithSets('Push Day', LocalDate.of(2026, 9, 15), [10]);
     const records = new Map([[big.id, [{ exerciseName: 'bench press', oneRepMax: new Weight(80, 'kilograms') }]]]);
-    const data = deriveComposerSessionData(big, [big, small], records, enUsFormatDate);
+    const data = deriveComposerSessionData(big, [big, small], records, enUsFormatDate, enUsFormatNumber);
     expect(data.prPills).toContain('BENCH PRESS PR');
     expect(data.prPills).toContain('VOLUME PR');
   });
@@ -263,13 +265,13 @@ describe('deriveComposerSessionData feeding the timeline card', () => {
   it('does not claim a VOLUME PR when another session lifted more', () => {
     const small = sessionWithSets('Push Day', LocalDate.of(2026, 9, 22), [10]);
     const big = sessionWithSets('Push Day', LocalDate.of(2026, 9, 15), [10, 8]);
-    const data = deriveComposerSessionData(small, [small, big], new Map(), enUsFormatDate);
+    const data = deriveComposerSessionData(small, [small, big], new Map(), enUsFormatDate, enUsFormatNumber);
     expect(data.prPills).not.toContain('VOLUME PR');
   });
 
   it('formats the kicker through the cached Intl path (no js-joda text patterns)', () => {
     const session = sessionWithSets('Push Day', LocalDate.of(2026, 9, 22), [10, 8]);
-    const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate);
+    const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate, enUsFormatNumber);
     expect(data.kicker).toBe('KINETIC · TUESDAY, SEPTEMBER 22');
   });
 });

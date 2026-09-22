@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { FeedAvatar } from '../../shared/feed-avatar';
-import { PEOPLE, personById } from '../../shared/people';
+import { PEOPLE } from '../../shared/people';
+import type { TagPerson } from '../../shared/tag-person';
 import { SharePoster } from '../../shared/share-poster';
 import type { ComposerPost } from '@/store/feed/composer-posts';
 import type { ComposerSessionData } from '../composer-data';
@@ -16,14 +17,20 @@ interface ComposerPostCardProps {
   data: ComposerSessionData | null;
   poster: PosterProps | null;
   now: number;
+  /** Real mutual friends, to resolve tagged ids to names. */
+  people: TagPerson[];
+  /** preferredLanguage; undefined means the system locale for the age date. */
+  locale?: string;
 }
 
 /**
  * A published composer post in the timeline. The poster goes through the same
  * toggle rule as the composer preview, so what the user saw is what the feed
  * shows. Posts whose session was deleted render nothing — never a fake card.
+ * Tagged ids that no longer resolve to a mutual friend are dropped, not
+ * invented.
  */
-export function ComposerPostCard({ post, data, poster, now }: ComposerPostCardProps) {
+export function ComposerPostCard({ post, data, poster, now, people, locale }: ComposerPostCardProps) {
   const theme = useAppTheme();
   const t = useComposerT();
 
@@ -32,7 +39,9 @@ export function ComposerPostCard({ post, data, poster, now }: ComposerPostCardPr
   }
 
   const person = PEOPLE.alex!;
-  const taggedNames = post.taggedIds.map((id) => personById(id)?.name).filter((name): name is string => !!name);
+  const taggedNames = post.taggedIds
+    .map((id) => people.find((p) => p.id === id)?.name)
+    .filter((name): name is string => !!name);
 
   return (
     <S.CardShadow>
@@ -47,7 +56,7 @@ export function ComposerPostCard({ post, data, poster, now }: ComposerPostCardPr
           <FeedAvatar person={person} size={36} ringColor={theme.isDark ? '#17171A' : '#FFFFFF'} />
           <S.HeaderText>
             <S.AuthorName>{person.name}</S.AuthorName>
-            <S.Age>· {formatPostAge(post.postedAt, now, t)}</S.Age>
+            <S.Age>· {formatPostAge(post.postedAt, now, t, locale)}</S.Age>
           </S.HeaderText>
         </S.HeaderRow>
         {post.caption.length > 0 ? <S.Caption>{post.caption}</S.Caption> : null}

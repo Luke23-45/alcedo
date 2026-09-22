@@ -3,6 +3,7 @@ import LimitedHtml from '@/components/presentation/foundation/limited-html';
 import { Remote } from '@/components/presentation/foundation/remote';
 import { SurfaceText } from '@/components/presentation/foundation/surface-text';
 import { FeedShareComposer } from '@/components/smart/feed-share-composer';
+import { useServices } from '@/components/smart/services-provider';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { PendingFeedUser } from '@/models/feed-models';
 import { useAppSelector } from '@/store';
@@ -23,9 +24,10 @@ import { useDispatch } from 'react-redux';
  */
 export default function FeedSharePage() {
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const { keyValueStore } = useServices();
 
   if (!id) {
-    return <FeedShareComposer />;
+    return <FeedShareComposer keyValueStore={keyValueStore} />;
   }
   return <FeedShareRequest id={id} />;
 }

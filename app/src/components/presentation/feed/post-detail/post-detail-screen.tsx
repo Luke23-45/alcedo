@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useFormatDate } from '@/hooks/useFormatDate';
+import { useFormatNumber } from '@/hooks/useFormatNumber';
 import { shareString, showSnackbar } from '@/store/app';
 import { removeFeedItems, upsertReceivedReactions } from '@/store/feed';
 import {
@@ -79,11 +80,12 @@ export function PostDetailScreen({ postId, keyValueStore }: { postId: string; ke
   const use24HourTime = useAppSelector((s) => s.settings.use24HourTime);
 
   const hidden = useHiddenPosts(keyValueStore);
-  const draftCaption = useComposerDraftCaption(keyValueStore);
+  const draftCaption = useComposerDraftCaption(keyValueStore, model?.session?.id);
 
   const sessions = useAppSelector(selectSessions);
   const recordsBySession = useAppSelector(selectHistoryPersonalRecords);
   const formatDate = useFormatDate();
+  const formatNumber = useFormatNumber();
 
   const ownKudos = useOwnPostKudos(model?.session?.id);
   const storedKudos = useAppSelectorWithArg(selectPostKudos, threadId ?? '');
@@ -152,7 +154,7 @@ export function PostDetailScreen({ postId, keyValueStore }: { postId: string; ke
   // The timeline shows the composer draft caption on Alex's card; the detail
   // screen shows it too.
   const composerData = model.session
-    ? deriveComposerSessionData(model.session, sessions, recordsBySession, formatDate)
+    ? deriveComposerSessionData(model.session, sessions, recordsBySession, formatDate, formatNumber)
     : undefined;
   const poster: PostPosterData = composerData
     ? {

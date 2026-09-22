@@ -147,6 +147,16 @@ const feedSlice = createSlice({
       (state: FeedState) => state.followers,
       (x) => Object.values(x),
     ),
+    /**
+     * Mutual friends: followers the user also follows back. The composer's
+     * "Sharing with N friends" caption reads this — a real count from the
+     * social graph, never an invented figure.
+     */
+    selectMutualFriendCount: createSelector(
+      (state: FeedState) => state.followers,
+      (state: FeedState) => state.followedUsers,
+      (followers, followedUsers) => Object.keys(followers).filter((id) => id in followedUsers).length,
+    ),
     selectFeedFollowing: createSelector(
       (state: FeedState) => state.followedUsers,
       (x) =>
@@ -222,6 +232,7 @@ export const {
   selectFeedSessionItems,
   selectFeedFollowing,
   selectFeedFollowers,
+  selectMutualFriendCount,
   selectFeedFollowRequests,
   selectFeedIdentityRemote,
   selectOwnFeedUserId,
@@ -230,6 +241,24 @@ export const {
 } = feedSlice.selectors;
 
 export const initializeFeedStateSlice = createAction('initializeFeedStateSlice');
+
+/**
+ * Mutual friends with a display name — the real taggable contacts for the
+ * share composer (followers the user also follows back). Unnamed users are
+ * excluded: a tag row needs a name to be meaningful. Never falls back to
+ * sample people.
+ */
+export const selectMutualFriends = createSelector(
+  [selectFeedFollowers, selectFeedFollowing],
+  (followers, following): { id: string; name: string }[] => {
+    const followingIds = new Set(following.map((entry) => entry.user.id));
+    return followers
+      .filter(
+        (follower) => followingIds.has(follower.id) && typeof follower.name === 'string' && follower.name.length > 0,
+      )
+      .map((follower) => ({ id: follower.id, name: follower.name as string }));
+  },
+);
 
 export function getFeedShareUrl(identity: FeedIdentity) {
   return `https://app.liftlog.online/feed/share?id=${identity.lookup}${

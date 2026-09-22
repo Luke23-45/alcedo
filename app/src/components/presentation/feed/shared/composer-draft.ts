@@ -21,15 +21,27 @@ export const COMPOSER_DRAFT_STORAGE_KEY = 'feed.composer.draft.v1';
 export interface ComposerDraft {
   caption: string;
   updatedAt: number;
+  /**
+   * The session the caption was drafted for. Drafts never carry across
+   * sessions: a caption drafted for last week's workout must not surface on
+   * this week's card.
+   */
+  sessionId: string;
 }
 
-export async function readComposerDraft(store: KeyValueStore): Promise<ComposerDraft | null> {
+export async function readComposerDraft(store: KeyValueStore, sessionId?: string): Promise<ComposerDraft | null> {
   try {
     const raw = await store.getItem(COMPOSER_DRAFT_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<ComposerDraft>;
     if (typeof parsed.caption !== 'string' || parsed.caption.trim().length === 0) return null;
-    return { caption: parsed.caption, updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : 0 };
+    if (typeof parsed.sessionId !== 'string') return null;
+    if (sessionId !== undefined && parsed.sessionId !== sessionId) return null;
+    return {
+      caption: parsed.caption,
+      updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : 0,
+      sessionId: parsed.sessionId,
+    };
   } catch {
     return null;
   }
@@ -47,20 +59,20 @@ export async function clearComposerDraft(store: KeyValueStore): Promise<void> {
  * Reads the composer caption, re-reading every time the host screen regains
  * focus (the timeline stays mounted under the composer, so a mount-only read
  * would miss a caption drafted after first paint). Returns undefined while
- * loading or when there is no draft — the caller renders the no-caption
- * state.
+ * loading, when there is no draft, or when the draft belongs to a different
+ * session — the caller renders the no-caption state.
  */
-export function useComposerDraftCaption(store: KeyValueStore): string | undefined {
+export function useComposerDraftCaption(store: KeyValueStore, sessionId?: string): string | undefined {
   const [caption, setCaption] = useState<string | undefined>(undefined);
   const refresh = useCallback(() => {
     let live = true;
-    void readComposerDraft(store).then((draft) => {
+    void readComposerDraft(store, sessionId).then((draft) => {
       if (live) setCaption(draft?.caption ?? undefined);
     });
     return () => {
       live = false;
     };
-  }, [store]);
+  }, [store, sessionId]);
   useEffect(refresh, [refresh]);
   useFocusEffect(refresh);
   return caption;

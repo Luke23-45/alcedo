@@ -1,5 +1,5 @@
 import { FeedAvatar } from '../../shared/feed-avatar';
-import { personById } from '../../shared/people';
+import { tagFeedPerson, type TagPerson } from '../../shared/tag-person';
 import { CloseGlyph, PlusGlyph } from '../composer-glyphs';
 import { useComposerT } from '../composer-i18n';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -7,6 +7,8 @@ import * as S from './tagged-chips.styles';
 
 interface TaggedChipsProps {
   taggedIds: string[];
+  /** Real mutual friends, to resolve tagged ids to names. */
+  people: TagPerson[];
   onRemove: (id: string) => void;
   onAdd: () => void;
 }
@@ -14,14 +16,16 @@ interface TaggedChipsProps {
 /**
  * TAGGED section — rendered only when at least one friend is tagged.
  * Tapping a chip removes the tag; "+ Add" reopens the friend picker.
+ * Ids that no longer resolve to a mutual friend are dropped, not invented.
  */
-export function TaggedChips({ taggedIds, onRemove, onAdd }: TaggedChipsProps) {
+export function TaggedChips({ taggedIds, people, onRemove, onAdd }: TaggedChipsProps) {
   const theme = useAppTheme();
   const t = useComposerT();
 
   const tagged = taggedIds
-    .map((id) => personById(id))
-    .filter((person): person is NonNullable<typeof person> => !!person);
+    .map((id) => people.find((person) => person.id === id))
+    .filter((person): person is TagPerson => !!person)
+    .map(tagFeedPerson);
 
   if (tagged.length === 0) {
     return null;

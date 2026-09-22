@@ -1,5 +1,6 @@
 import type { StyleProp, ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
+import { type } from '@/styles/theme';
 
 export const Rows = styled.View`
   padding-left: 16px;
@@ -38,12 +39,22 @@ export const RowLabel = styled.Text`
   color: ${({ theme }) => (theme.isDark ? '#FFFFFF' : '#1C1C1E')};
 `;
 
-export const RowDetail = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 12px;
-  font-weight: ${({ theme }) => theme.weight.regular};
-  letter-spacing: -0.1px;
-  color: ${({ theme }) => (theme.isDark ? '#86868B' : '#8E8E93')};
+export const EmptyWrap = styled.View`
+  padding: 32px 24px 40px;
+  gap: 8px;
+  align-items: center;
+`;
+
+export const EmptyTitle = styled.Text`
+  ${({ theme }) => type(theme, 'headline')}
+  color: ${({ theme }) => theme.color.content.primary};
+  text-align: center;
+`;
+
+export const EmptyDetail = styled.Text`
+  ${({ theme }) => type(theme, 'subheadline')}
+  color: ${({ theme }) => theme.color.content.secondary};
+  text-align: center;
 `;
 
 export const SelectBadge = styled.View<{ $selected: boolean }>`
