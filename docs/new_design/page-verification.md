@@ -196,7 +196,7 @@ confirmation on device — no device used.
 | 14 | Settings preferences | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 15 | Settings notifications | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 16 | Settings AI planner | docs/new_design/settings-dark.md | done 2026-09-22 |
-| 17 | Settings programs & import | docs/new_design/settings-dark.md | pending |
+| 17 | Settings programs & import | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 18 | Backup hub + remote/export/import | docs/new_design/backup-redesign.md | pending |
 | 19 | What's New | (settings spec) | pending |
 | 20 | Backends [id] | — | deferred (no design yet) |
@@ -1504,6 +1504,78 @@ route files, locale honesty incl. German decimal-separator tolerance,
 availability matrix, registry codec/persistence contract) plus 5 new
 `planner-data.spec.ts` contract tests (English contract, locale
 fallback, availability matrix).
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.
+
+### 17. Settings programs & import
+- Verified 2026-09-22 against `docs/new_design/settings-dark.md` Screen 5
+  (Programs & Import Plan, 393 × 1134). Routes
+  `app/src/app/(tabs)/settings/{program-list,import-plan,import-plan-info}.tsx`
+  (thin wrappers); screens
+  `components/presentation/settings/programs/{program-list-screen,import-plan-screen,import-review-screen}.tsx`
+  plus `program-hero-card`, `program-row`, the pure `plan-parser.ts`, the
+  manage-workouts/session editors, and the smart `program-list-item.tsx`
+  overflow menu.
+- Sections inventoried (render order): YOUR PROGRAMS (active program hero
+  card with brand-edge stroke, ACTIVE badge, honest "N of M sessions
+  trained this week" coverage + real progress bar; other programs as
+  tinted-well rows with session counts; name/recent sort picker appears
+  with 2+ other programs; New Program + Import Plan 48pt buttons),
+  IMPORT PLAN parser (PASTED TEXT card, monospace paste box, paste-from-
+  clipboard, "Kinetic recognized N of M exercises" status, per-exercise
+  matched / "matched ✓ · was …" / "not recognized" notes with sets ×
+  reps · rest, Import to Programs submit gated on ≥1 parsed exercise),
+  REVIEW IMPORT (parsed days as real session summaries, Save → library
+  with focus highlight; empty state keeps the file-picker path +
+  format docs).
+- State matrix simulated: no programs at all (no hero, buttons only),
+  active program with/without sessions, 0/1/2+ other programs (sort
+  picker visibility), program deleted while menu open, stale
+  manage-workouts deep link, empty/whitespace/CRLF/garbage paste input,
+  unmatched exercise names kept verbatim, AMRAP → open-ended 1–30 rep
+  range, rest seconds → planner presets, activate-with-undo snackbar,
+  delete-with-undo (disabled for the active program), duplicate/share/
+  export menu actions, pending import cleared on dismiss without saving.
+- Data honesty: no invented "Week 3 of 6" or "Paused · Week 1 of 8" —
+  the hero shows this week's real session coverage and rows show real
+  session counts (no start-date/duration/status model exists to support
+  the spec's captions). The paste caption no longer claims "1 lines" for
+  an empty box and uses a proper ICU plural ("1 line" / "N lines").
+  Fuzzy matching annotates renames exactly as the spec requires.
+
+**Bugs found and fixed:**
+1. `manage-workouts-screen.tsx` — dereferenced `program.name` /
+   `program.sessions` unconditionally; `selectProgram` lies with `!`, so
+   a stale deep link or deleted program crashed the editor. Now
+   redirects to `/settings/program-list`, mirroring the session
+   editor's missing-session handling.
+2. `program-list-item.tsx` `ItemMenu` — delete/duplicate/share handlers
+   ran against a possibly-undefined blueprint (deleted-while-open race).
+   Now returns null when the program is gone.
+3. `import-plan-screen.tsx` — empty paste box reported "From clipboard ·
+   1 lines". Now 0 lines for empty text, and `source_lines` is a real
+   ICU plural in en.json.
+4. `next-session.tsx` (page-16 follow-up) — the honest
+   `ProgramBlueprint | undefined` typing needed narrowing in the ready
+   branch; restructured the early return so the type flows through.
+
+**Deliberate non-changes:**
+- The legacy default-export `ProgramListItem` is unused but kept (never
+  remove legacy); its 4 pre-existing oxlint `any` errors are untouched.
+- No program start-date/duration/status model was invented to render the
+  spec's "Week 3 of 6" captions; coverage/counts are the honest
+  substitutes.
+- Manage-workouts/session/exercise editors keep their existing wiring;
+  only the crash guard was added.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 126 files /
+1,970 tests all green; oxlint clean on touched files (the 4 errors in
+`program-list-item.tsx` predate this change — verified via stash);
+`oxfmt --check` clean; `programs-simulation.spec.ts` (new, 8 tests:
+i18n key coverage over the whole programs surface incl. the smart
+menu, push/Redirect targets resolving to real routes, parser edge
+cases, missing-program guards).
 
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.

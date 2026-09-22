@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { Redirect } from 'expo-router';
 import { useDispatch } from 'react-redux';
 import { useTranslate } from '@tolgee/react';
 import { useAppSelectorWithArg } from '@/store';
@@ -28,6 +29,13 @@ export function ManageWorkoutsScreen({ programId }: { programId: string }) {
   const { push } = useRouter();
   const dispatch = useDispatch();
   const program = useAppSelectorWithArg(selectProgram, programId);
+
+  // A stale deep link (or a program deleted on another pass through the
+  // list) must not crash on program.name below — send it back to the
+  // library, the same honest-missing handling the session editor uses.
+  if (!program) {
+    return <Redirect href="/settings/program-list" />;
+  }
 
   const selectSession = (index: number) => {
     push(`/settings/manage-workouts/${programId}/manage-session/${index}`);

@@ -1604,7 +1604,7 @@
   "settings.programs.import.pasted": "PASTED TEXT",
   "settings.programs.import.placeholder": "Paste your plan here…\n\nDay 1 · Push\nBench Press 4x5 90s\nIncline DB Press 3x8 90s",
   "settings.programs.import.recognized": "Kinetic recognized {recognized} of {total} exercises",
-  "settings.programs.import.source_lines": "From clipboard · {count} lines",
+  "settings.programs.import.source_lines": "{count, plural, =0 {Paste your plan to preview it} =1 {From clipboard · 1 line} other {From clipboard · # lines}}",
   "settings.programs.import.submit": "Import to Programs",
   "settings.programs.import.unmatched": "not recognized",
   "settings.programs.manage.session": "SESSION",

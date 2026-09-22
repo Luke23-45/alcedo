@@ -30,6 +30,14 @@ export function ItemMenu({ id, mode }: ItemProps) {
   const dispatch = useDispatch();
   const { push } = useRouter();
   const { t } = useTranslate();
+
+  // The hero card and rows already hide for a missing program; this only
+  // covers the race where a program is deleted while its menu is open —
+  // the handlers below must never run against an undefined blueprint.
+  if (!thisProgram) {
+    return null;
+  }
+
   return (
     <Menu
       trigger={(open) => <IconButton testID="more-program-btn" mode={mode} onPress={open} icon={'moreHoriz'} />}

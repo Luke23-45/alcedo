@@ -75,7 +75,8 @@ export function ImportPlanScreen() {
   const [text, setText] = useState('');
 
   const plan = parsePlanText(text, descriptors);
-  const lineCount = text.split(/\r?\n/).length;
+  // An untouched paste box is zero lines, not one.
+  const lineCount = text.length === 0 ? 0 : text.split(/\r?\n/).length;
   const hasExercises = plan.total > 0;
   const allRecognized = hasExercises && plan.recognized === plan.total;
 

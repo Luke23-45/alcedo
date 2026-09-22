@@ -111,7 +111,7 @@ export function NextSession() {
 
   const availability = nextSessionAvailability(enabled, program !== undefined, trainingDays.length);
 
-  if (availability !== 'ready') {
+  if (availability !== 'ready' || !program) {
     const copy =
       availability === 'planner-off'
         ? {
@@ -151,7 +151,7 @@ export function NextSession() {
     );
   }
 
-  const sessionName = nextSessionName(program!.sessions, recentNames) ?? program!.sessions[0]!.name;
+  const sessionName = nextSessionName(program.sessions, recentNames) ?? program.sessions[0]!.name;
   const session = program.sessions.find((s) => s.name === sessionName);
   const exerciseCount = session?.exercises.length ?? 0;
   const nextDate = nextTrainingDay(today, trainingDays);
