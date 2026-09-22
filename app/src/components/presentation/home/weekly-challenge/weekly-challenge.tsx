@@ -134,7 +134,7 @@ export function WeeklyChallengeSection() {
               </HomeText>
               </S.Row>
               {index < challengers.length - 1 && <S.Divider />}
-            </>
+            </Fragment>
           );
         })}
       </S.Rows>
