@@ -7,7 +7,13 @@
  * Japanese ships disabled: the app has no `ja` translation bundle, so
  * selecting it would leave every string untranslated. It is shown (not
  * hidden) with a "soon" marker rather than pretending to work.
+ *
+ * Note: the app ships more translation bundles than these six (see
+ * services/tolgee). The six stay the picker's curated, spec-exact list;
+ * `activeLanguageFor` keeps the Language row honest for the rest.
  */
+
+import { supportedLanguages } from '@/services/tolgee';
 
 export interface PickerLanguage {
   code: string;
@@ -42,7 +48,55 @@ export const PICKER_LANGUAGES: PickerLanguage[] = [
   { code: 'ja', nativeName: '日本語', regionCode: 'JP', regionName: '日本', listRegion: '日本', enabled: false },
 ];
 
-/** Resolves any stored/detected code to a picker entry; unknown → English. */
-export function languageFor(code: string | undefined): PickerLanguage {
-  return PICKER_LANGUAGES.find((l) => l.code === code) ?? PICKER_LANGUAGES[0]!;
+/** The checkmark rule: an exact code match on an enabled row. A supported
+ * but non-curated language (e.g. device-detected Russian) checks nothing
+ * rather than claiming English is selected. */
+export function pickerRowSelected(row: PickerLanguage, effectiveCode: string | undefined): boolean {
+  return row.enabled && row.code === effectiveCode;
+}
+
+/** The Language row value: "English (US)" for curated languages, the real
+ * native label (no invented region) for the rest. */
+export function languageRowValue(active: ActiveLanguage): string {
+  return active.curated ? `${active.nativeName} (${active.regionCode})` : active.nativeName;
+}
+
+export interface ActiveLanguage {
+  /** Native name of the actually-active language — never a stand-in. */
+  nativeName: string;
+  /** Curated region info; only defined for the six picker languages. */
+  regionCode?: string;
+  regionName?: string;
+  /** True when the language has a row in the six-language picker. */
+  curated: boolean;
+}
+
+/**
+ * Resolves the actually-active language code (stored preference, else
+ * device detection) to display data. A code outside the curated six
+ * (e.g. 'ru') resolves to its real native label rather than silently
+ * claiming English; a code the app doesn't support at all falls back
+ * to English.
+ */
+export function activeLanguageFor(code: string | undefined): ActiveLanguage {
+  const curated = PICKER_LANGUAGES.find((l) => l.code === code);
+  if (curated) {
+    return {
+      nativeName: curated.nativeName,
+      regionCode: curated.regionCode,
+      regionName: curated.regionName,
+      curated: true,
+    };
+  }
+  const supported = supportedLanguages.find((x) => x.code === code);
+  if (supported) {
+    return { nativeName: supported.label, curated: false };
+  }
+  const fallback = PICKER_LANGUAGES[0]!;
+  return {
+    nativeName: fallback.nativeName,
+    regionCode: fallback.regionCode,
+    regionName: fallback.regionName,
+    curated: true,
+  };
 }

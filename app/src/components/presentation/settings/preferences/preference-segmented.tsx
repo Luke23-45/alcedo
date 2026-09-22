@@ -1,6 +1,7 @@
 import { useAppReducedMotion } from '@/hooks/useMotionSettings';
 import { useEffect, useState } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { segmentedIndex, segmentedThumb } from './preference-segmented-math';
 import * as S from './preference-segmented.styles';
 
 const AnimatedThumb = Animated.createAnimatedComponent(S.Thumb);
@@ -35,25 +36,18 @@ export function PreferenceSegmented<T extends string>({
 }: PreferenceSegmentedProps<T>) {
   const reduceMotion = useAppReducedMotion();
   const [trackWidth, setTrackWidth] = useState(0);
-  const index = Math.max(
-    0,
-    options.findIndex((o) => o.value === value),
-  );
+  const index = segmentedIndex(options, value);
   const height = size === 'large' ? 44 : 30;
   const segmentWidth = trackWidth > 0 ? trackWidth / options.length : 0;
-  // Spec-measured thumb fit: the large thumb overshoots its segment by 2pt
-  // per side (111 in a 107 segment); the small thumb insets by 2pt (56 in
-  // a 60 segment).
-  const thumbDelta = size === 'large' ? 4 : -4;
+  const thumb = segmentedThumb(index, segmentWidth, size);
 
-  const offset = useSharedValue(index * segmentWidth - thumbDelta / 2);
+  const offset = useSharedValue(thumb.offset);
   useEffect(() => {
-    const target = index * segmentWidth - thumbDelta / 2;
-    offset.value = reduceMotion || segmentWidth === 0 ? target : withTiming(target, { duration: 220 });
-  }, [index, segmentWidth, reduceMotion, offset, thumbDelta]);
+    offset.value = reduceMotion || segmentWidth === 0 ? thumb.offset : withTiming(thumb.offset, { duration: 220 });
+  }, [thumb.offset, segmentWidth, reduceMotion, offset]);
 
   const thumbStyle = useAnimatedStyle(() => ({
-    width: segmentWidth + thumbDelta,
+    width: thumb.width,
     transform: [{ translateX: offset.value }],
   }));
 

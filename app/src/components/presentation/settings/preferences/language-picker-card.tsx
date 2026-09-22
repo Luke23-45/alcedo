@@ -10,7 +10,7 @@ import { forwardRef } from 'react';
 import { View } from 'react-native';
 import { useTranslate } from '@tolgee/react';
 import { useDispatch } from 'react-redux';
-import { languageFor, PICKER_LANGUAGES } from './language-data';
+import { PICKER_LANGUAGES, pickerRowSelected } from './language-data';
 import { RowSeparator } from './preference-row.styles';
 import * as S from './language-picker-card.styles';
 
@@ -26,14 +26,16 @@ export const LanguagePickerCard = forwardRef<View>(function LanguagePickerCard(_
   const preferredLanguage = useAppSelector((s) => s.settings.preferredLanguage);
   const effectiveCode =
     preferredLanguage ?? detectLanguageFromDateLocale(supportedLanguages.map((x) => x.code)) ?? 'en';
-  const current = languageFor(effectiveCode);
 
   return (
     <View ref={ref} collapsable={false}>
       <SettingsGroup label={t(settingsKey('settings.preferences.choose_language.header'), 'CHOOSE LANGUAGE')}>
         <S.Block>
           {PICKER_LANGUAGES.map((language, i) => {
-            const selected = language.code === current.code && language.enabled;
+            // The checkmark follows the actual code — a supported but
+            // non-curated language (e.g. device-detected Russian) checks
+            // nothing rather than claiming English is selected.
+            const selected = pickerRowSelected(language, effectiveCode);
             return (
               <View key={language.code}>
                 <S.LanguageRow

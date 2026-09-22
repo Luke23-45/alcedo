@@ -64,9 +64,6 @@ export const SwatchCircle = styled.View<{ $color: string }>`
   background-color: ${({ $color }) => $color};
 `;
 
-/** Spec-exact brand gradient for the Ember swatch. */
-export const EMBER_GRADIENT_COLORS = ['#FFB03A', '#FF6A3D', '#FF2D55'] as const;
-
 export const SwatchGradient = styled(LinearGradient).attrs({
   start: { x: 0, y: 0 },
   end: { x: 1, y: 1 },

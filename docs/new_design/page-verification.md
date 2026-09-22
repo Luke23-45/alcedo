@@ -193,7 +193,7 @@ confirmation on device — no device used.
 | 11 | Feed profile editor | docs/new_design/social-dark.md | done 2026-09-22 |
 | 12 | Feed shared-item | (thin wrapper) | done 2026-09-22 |
 | 13 | Settings home | docs/new_design/settings-dark.md | done 2026-09-22 |
-| 14 | Settings preferences | docs/new_design/settings-dark.md | pending |
+| 14 | Settings preferences | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 15 | Settings notifications | docs/new_design/settings-dark.md | pending |
 | 16 | Settings AI planner | docs/new_design/settings-dark.md | pending |
 | 17 | Settings programs & import | docs/new_design/settings-dark.md | pending |
@@ -1183,6 +1183,117 @@ earlier today", unrelated — it fails only in runs near local midnight);
 oxlint 0 errors on touched/new files; eslint (react-compiler) clean on the
 home folder; `oxfmt --check` clean on touched/new files (one formatting
 fix applied to the new spec).
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.
+
+### 14. Settings preferences
+- Verified 2026-09-22 against `docs/new_design/settings-dark.md` Screen 2
+  (Preferences, 393 × 1380). Routes:
+  `app/src/app/(tabs)/settings/app-configuration.tsx` and
+  `app/src/app/(tabs)/settings/localization.tsx` (both thin wrappers
+  rendering `PreferencesScreen`); screen
+  `components/presentation/settings/preferences/preferences-screen.tsx`
+  plus the section cards (appearance, units, language-region,
+  language-picker, display) and the shared preference primitives
+  (`preference-row`, `preference-segmented`, `select-picker`).
+- Sections inventoried (render order): APPEARANCE (Theme segmented
+  Light/Dark/Auto, five accent swatches incl. the Ember brand gradient,
+  Celebration animations, Reduce motion, True black dark theme),
+  UNITS & MEASUREMENT (Weight kg/lb, Distance km/mi, Height cm/ft +
+  bodyweight caption), LANGUAGE & REGION (Language, Region,
+  First day of week via native menu, 24-Hour Time), CHOOSE LANGUAGE
+  (six curated rows, Ember checkmark, Japanese disabled with a "Soon"
+  marker), DISPLAY (the old app-configuration toggles: show bodyweight,
+  show feed, post-workout summary, notes expanded, keep screen awake +
+  Restart setup wizard), screen footer.
+- State matrix simulated: theme light/dark/system selection, all five
+  accent seeds (ember/crimson/blue/green/purple), unit selection driving
+  the legacy `useImperialUnits` boolean through the settings effect,
+  stored vs device-detected vs unknown language codes (incl. a
+  supported-but-non-curated language such as Russian), all seven
+  first-day options, 24h on/off caption, bodyweight present (real latest
+  session bodyweight, converted into the selected unit) vs absent
+  (unit-neutral caption; stats loading/error/notAsked all degrade to it),
+  display toggles, restart wizard re-opens the welcome wizard
+  (`welcomeWizardCompleted=false` un-gates the Portal on the home tab).
+- Data honesty: no haptics row exists because no haptic preference is
+  stored anywhere in the settings model (page 13 confirmed the same for
+  Settings home); the bodyweight caption shows the real latest recorded
+  bodyweight or an honest unit-neutral caption — never an invented one;
+  the Region row renders only for the curated six (no region data exists
+  for the other shipped languages); `firstDayOfWeek` defaults to Monday
+  (registry + preference-service tests).
+- 44×44 audit: theme segments (44pt), unit segments (30pt visual + 7pt
+  hitSlop = 44 effective), accent swatches (52×44 targets, 32pt visual),
+  language rows (52pt), toggles (hitSlop), preference rows (58pt) — all
+  pass. No `en-US` hard-codes in the folder.
+
+**Bugs found and fixed:**
+1. `language-region-card.tsx` — the app ships 19 translation bundles but
+   the picker curates six; on a device set to any of the other 13 (e.g.
+   Russian) the Language row resolved through `languageFor` and displayed
+   the fictional "English (US)". New `activeLanguageFor` helper
+   (`language-data.ts`) resolves the real active language: curated six
+   keep native name + region, supported-but-non-curated languages show
+   their real native label with no invented region, unknown codes fall
+   back to English. The Region row now renders only for curated
+   languages (no region data exists otherwise).
+2. `language-picker-card.tsx` — the checkmark compared against the
+   fallback `languageFor` result, so a Russian device showed the
+   checkmark on English. New `pickerRowSelected` checks the exact code
+   on an enabled row; a non-curated active language checks nothing.
+3. `language-region-card.tsx` — stale comment claimed the stored
+   first-day default was Sunday; the registry default and
+   preference-service tests pin Monday. Comment corrected, plus the
+   "Region row is static" comment (it has always been pressable and
+   scrolls to the picker).
+4. `appearance-card.tsx` — the Ember gradient swatch used a hard-coded
+   `EMBER_GRADIENT_COLORS` constant in the styles file, duplicating
+   `ACCENT_SEEDS.ember.gradient`. It now renders `seed.gradient`; the
+   dead constant is removed.
+5. `preference-segmented.tsx` — thumb index/offset math extracted to the
+   pure, tested `preference-segmented-math.ts` (`segmentedIndex`,
+   `segmentedThumb`); behavior unchanged.
+6. `units-card.tsx` — bodyweight caption formatting extracted to the
+   pure, tested `units-bodyweight.ts` (`formatUnitsBodyweight`);
+   behavior unchanged.
+
+**Tests (23 new, all green):**
+- `preferences/preferences-simulation.spec.ts` (new, 23 tests):
+  `activeLanguageFor` (curated six + disabled Japanese, Russian →
+  real "Русский" label with no region, unknown/undefined → English),
+  `languageRowValue` ("English (US)" vs bare "Русский"),
+  `pickerRowSelected` (exact enabled match, nothing checked for
+  non-curated, Japanese never checked), `accentSeedFor`
+  (default→ember, all five round-trip, case-insensitive, unknown→ember,
+  gradient only on ember, gradient-from-seed source guard),
+  `segmentedIndex`/`segmentedThumb` (match, unknown→0 clamp, the
+  spec-measured 111-in-107 / 56-in-60 thumb geometry),
+  `formatUnitsBodyweight` (absent→undefined, kg→"80.6kg",
+  lb→"177.7lbs"), an i18n scan asserting every `settingsKey` used in
+  the preferences folder (incl. the dynamic accent keys) resolves in
+  `en.json`, an icon scan asserting every `source="…"` is a registered
+  Material Symbols key, and a route-wiring check asserting both legacy
+  routes render `PreferencesScreen`.
+
+**Deliberate non-changes:**
+- No Haptic Feedback row: no haptic preference exists in the settings
+  model (same finding as page 13); adding one would be a dead control.
+- The picker keeps its spec-exact six curated rows even though the app
+  ships 19 translation bundles — the user's design is exact; the new
+  helpers keep the rows honest for the other 13 instead of redesigning
+  the list.
+- The legacy `theme.font.*` / `theme.weight.*` shims in these style
+  files are left as-is (pervasive tech debt, not a functional defect).
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 122 files /
+1,915 tests (1,914 green; the single failure is the pre-existing
+midnight-boundary flake in `backup-status.spec.ts` "labels a backup from
+earlier today" — the run crossed local midnight, unrelated to this
+change); oxlint 0 errors on touched/new files; eslint (react-compiler)
+clean on the preferences folder; `oxfmt --check` clean (three
+formatting fixes applied to new/touched files).
 
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.

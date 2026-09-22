@@ -10,7 +10,7 @@ import { supportedLanguages } from '@/services/tolgee';
 import { DayOfWeek } from '@js-joda/core';
 import { useTranslate } from '@tolgee/react';
 import { useDispatch } from 'react-redux';
-import { languageFor } from './language-data';
+import { activeLanguageFor, languageRowValue } from './language-data';
 import { PreferenceRow } from './preference-row';
 import { RowSeparator } from './preference-row.styles';
 import * as S from './language-region-card.styles';
@@ -42,10 +42,15 @@ function dayName(day: DayOfWeek, locale: string | undefined): string {
  * LANGUAGE & REGION card (settings-dark.md Screen 2).
  *
  * - Language opens the picker below (same screen, so the row scrolls to it).
- * - Region follows the language — no independent region setting exists, so
- *   the row is static rather than a fake affordance.
+ * - Region follows the language — no independent region setting exists, and
+ *   region data only exists for the curated six, so the row renders only
+ *   for those (scrolling to the picker is still honest: it switches to a
+ *   curated language).
+ * - The app ships more translation bundles than the curated six; when one
+ *   of those is active (e.g. device-detected Russian) the Language row
+ *   shows its real native label instead of claiming English.
  * - First day of week is the real stored setting, edited through a native
- *   menu. The stored default stays Sunday (pinned by preference-service
+ *   menu. The stored default stays Monday (pinned by preference-service
  *   tests); the row always shows the actual value.
  * - 24-Hour Time is a real app-wide clock preference.
  */
@@ -58,7 +63,7 @@ export function LanguageRegionCard({ onSelectLanguage }: { onSelectLanguage: () 
 
   const effectiveCode =
     preferredLanguage ?? detectLanguageFromDateLocale(supportedLanguages.map((x) => x.code)) ?? 'en';
-  const language = languageFor(effectiveCode);
+  const active = activeLanguageFor(effectiveCode);
 
   const dayOptions: SelectPickerOption<DayOfWeek>[] = WEEK_DAYS.map((day) => ({
     value: day,
@@ -72,27 +77,29 @@ export function LanguageRegionCard({ onSelectLanguage }: { onSelectLanguage: () 
           title={t(settingsKey('settings.preferences.language.label'), 'Language')}
           trailing={
             <S.ValueRow>
-              <S.RowValue numberOfLines={1}>
-                {language.nativeName} ({language.regionCode})
-              </S.RowValue>
+              <S.RowValue numberOfLines={1}>{languageRowValue(active)}</S.RowValue>
               <Chevron />
             </S.ValueRow>
           }
           onPress={onSelectLanguage}
           accessibilityLabel={t(settingsKey('settings.preferences.language.label'), 'Language')}
         />
-        <RowSeparator />
-        <PreferenceRow
-          title={t(settingsKey('settings.preferences.region.label'), 'Region')}
-          trailing={
-            <S.ValueRow>
-              <S.RowValue numberOfLines={1}>{language.regionName}</S.RowValue>
-              <Chevron />
-            </S.ValueRow>
-          }
-          onPress={onSelectLanguage}
-          accessibilityLabel={t(settingsKey('settings.preferences.region.label'), 'Region')}
-        />
+        {active.curated ? (
+          <>
+            <RowSeparator />
+            <PreferenceRow
+              title={t(settingsKey('settings.preferences.region.label'), 'Region')}
+              trailing={
+                <S.ValueRow>
+                  <S.RowValue numberOfLines={1}>{active.regionName}</S.RowValue>
+                  <Chevron />
+                </S.ValueRow>
+              }
+              onPress={onSelectLanguage}
+              accessibilityLabel={t(settingsKey('settings.preferences.region.label'), 'Region')}
+            />
+          </>
+        ) : undefined}
         <RowSeparator />
         <PreferenceRow
           title={t(settingsKey('settings.preferences.first_day.label'), 'First day of week')}

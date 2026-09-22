@@ -6,6 +6,7 @@ import { useTranslate } from '@tolgee/react';
 import { useDispatch } from 'react-redux';
 import { CardCaption, RowSeparator } from './preference-row.styles';
 import { PreferenceSegmented } from './preference-segmented';
+import { formatUnitsBodyweight } from './units-bodyweight';
 import * as S from './units-card.styles';
 
 /**
@@ -27,13 +28,13 @@ export function UnitsCard() {
     }),
   );
 
-  const weightUnit = settings.unitWeight === 'lb' ? 'pounds' : 'kilograms';
-  const caption = bodyweight
+  const formattedBodyweight = formatUnitsBodyweight(bodyweight, settings.unitWeight);
+  const caption = formattedBodyweight
     ? t(
         settingsKey('settings.preferences.units.bodyweight_caption'),
         'Bodyweight {bodyweight} · feeds every strength ratio',
         {
-          bodyweight: bodyweight.convertTo(weightUnit).shortLocaleFormat(1),
+          bodyweight: formattedBodyweight,
         },
       )
     : t(

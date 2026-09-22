@@ -76,7 +76,7 @@ export function AppearanceCard() {
                 <S.SwatchVisual>
                   {selected ? <S.SwatchRing /> : undefined}
                   {seed.gradient ? (
-                    <S.SwatchGradient colors={[...S.EMBER_GRADIENT_COLORS]} />
+                    <S.SwatchGradient colors={[...seed.gradient]} />
                   ) : (
                     <S.SwatchCircle $color={seed.swatch} />
                   )}
