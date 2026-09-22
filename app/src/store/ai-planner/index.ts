@@ -57,7 +57,7 @@ const aiPlannerSlice = createSlice({
 
 export const initializeAiPlannerStateSlice = createAction('initializeAiPlannerStateSlice');
 
-export const { setIsHydrated, addMessage, restartChat, updateMessage, setChat } = aiPlannerSlice.actions;
+export const { setIsHydrated, addMessage, restartChat, updateMessage, removeMessage, setChat } = aiPlannerSlice.actions;
 
 export const { selectIsLoadingAiPlannerMessage } = aiPlannerSlice.selectors;
 

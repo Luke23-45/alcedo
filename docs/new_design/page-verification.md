@@ -203,7 +203,7 @@ confirmation on device — no device used.
 | 21 | Exercise search | — | done 2026-09-22 |
 | 22 | Exercise history | — | done 2026-09-22 |
 | 23 | Manage exercises | — | done 2026-09-22 |
-| 24 | AI planner chat | — | pending |
+| 24 | AI planner chat | — | done 2026-09-22 |
 
 Route-tree sweep 2026-09-22: every user-facing route is now covered.
 `/(tabs)/(session)/screenshot-collection.tsx` is dev-only (`__DEV__`
@@ -1745,7 +1745,7 @@ device used.
 
 **Verification:** typecheck 0 errors (5 consecutive clean runs; two
 earlier "1 error" lines were `tail`-interleaved oxlint output, proven by
-immediate clean re-runs); full vitest pending page 22–24; oxlint 0
+immediate clean re-runs); full vitest 133 files / 2,052 tests green (2026-09-22, after page 24); oxlint 0
 errors on touched files; `oxfmt --check` clean on touched files;
 `exercise-search-simulation.spec.ts` (new, 13 tests: filter engine,
 day bucketing, recents dedup/cap/clear, request/result flow, staleness
@@ -1808,7 +1808,7 @@ device used.
 - `INITIAL_VISIBLE_ROWS = 4` unchanged; nav-bar expand menu still the
   discoverability path for See All.
 
-**Verification:** typecheck 0 errors; full vitest pending page 23–24;
+**Verification:** typecheck 0 errors; full vitest 133 files / 2,052 tests green (2026-09-22, after page 24);
 oxlint 0 errors on touched files; `oxfmt --check` clean on touched files;
 `exercise-history-simulation.spec.ts` (new, 15 tests: PR heaviest/tie/
 exclusion, chart windowing/order/unit rule, subtitle range + signed
@@ -1872,7 +1872,7 @@ device used.
   shim) via stash — no new issues added (the new `space.xl` padding
   uses the typed theme).
 
-**Verification:** typecheck 0 errors; full vitest pending page 24;
+**Verification:** typecheck 0 errors; full vitest 133 files / 2,052 tests green (2026-09-22);
 oxlint 0 new errors (9 pre-existing baseline, unchanged); `oxfmt
 --check` clean on touched files;
 `exercise-manager-simulation.spec.ts` (new, 12 tests: descriptor
@@ -1883,3 +1883,77 @@ distinction + unique testIDs, i18n key coverage); adjacent
 
 **Not claimed:** pixel/animation feel, real-device performance — no
 device used.
+
+### 24. AI planner chat (`/settings/ai/planner-chat`)
+- Verified 2026-09-22. Route `app/src/app/(tabs)/settings/ai/
+  planner-chat.tsx` owns the whole chat UI (~200 lines, no separate
+  screen file); reached from both AI Planner CTAs
+  (`planner-screen.tsx` hero card, `next-session.tsx`).
+- Sections inventoried (render order): `Stack.Screen` (title
+  `ai.planner.title`, restart-chat header action), inverted `FlatList`
+  of `ChatBubble`s (grouping via same-sender above/below, newest at
+  index 0), keyboard-aware composer (`useReanimatedKeyboardAnimation`
+  sliding the chat by `keyboardHeight - restGap`; `restGap` measured
+  once at rest so multiline growth and keyboard translation never
+  corrupt it), `ShareProgramButton`, multiline `TextInput`, stop
+  button while loading, send button.
+- State matrix simulated: empty/first-run (mount → `initChat` →
+  empty transcript → `restartChat` → server `introduce()` streams the
+  greeting), existing transcript (init keeps it, no re-introduce),
+  send → Agent placeholder (`isLoading`) → streamed chunks →
+  settled answer, stop in flight, restart mid-stream (stale
+  `updateMessage` is a reducer no-op by id), server `updateRequired`
+  (input + share blocked until restart), `purchasePro` prompt,
+  `chatPlan` rendering, no-backend and connect-failure honest error
+  bubbles from the service, backend reassignment restarts the chat
+  (existing `backend-switch-effects.spec.ts`), offline (service
+  yields the failure message and ends the stream; `isLoading`
+  clears — no permanent wedge), transcript not persisted (in-memory
+  only; `setChat` is used solely by the dev screenshot screen).
+- `ChatBubble` is exhaustive over all five message types
+  (`messageResponse`, `chatPlan`, `sharedProgram`, `purchasePro`,
+  `updateRequired`).
+
+**Bugs found and fixed:**
+1. Whitespace-only messages were sendable: the guard tested the raw
+   string's truthiness, so `"   "` went to the AI. Input is now
+   trimmed; the dispatched message carries the trimmed text.
+2. The send button's disabled state did not match its guard: it was
+   only disabled when out of date, so taps while loading or with an
+   empty composer silently did nothing. It is now
+   `disabled={!canSendChatMessage(sendGate, messageText)}` — the
+   exact dispatch condition (the custom `IconButton` suppresses
+   `onPress` when disabled).
+3. Double-send window: the AI placeholder is added by an async
+   effect, so between dispatch and the placeholder arriving the
+   store still looked idle. The gate now also blocks while the
+   newest message is our own unanswered send (`awaitingAiReply`),
+   derived from state — no refs, no wedge risk.
+4. Extracted `isChatOutOfDate` / `sanitizeChatInput` /
+   `canSendChatMessage` into RN-free
+   `components/smart/planner-chat-logic.ts` (house rule:
+   non-visual modules stay flat).
+5. `removeMessage` existed in the ai-planner slice but was never
+   exported — dead action. Exported (zero behavior change).
+
+**Deliberate non-changes:**
+- No backend changes: the .NET AI API is untouched; all failure
+  paths are handled app-side by the existing service messages.
+- The transcript stays in-memory (not persisted) — existing
+  product behavior; a cold start re-introduces via the server.
+- The keyboard/rest-gap measurement and inverted-list geometry are
+  unchanged — device-only behavior, not verifiable here.
+
+**Verification:** typecheck 0 errors; full vitest 133 files / 2,052
+tests green (2026-09-22); oxlint 0 errors on touched
+files; `oxfmt --check` clean on touched files;
+`planner-chat-simulation.spec.ts` (new, 16 tests: out-of-date
+detection, input sanitization, 7-case send-gate matrix + source
+sweep pinning the trimmed send and the disabled wiring, reducer
+prepend/restart/update/remove/loading-selector, effect init-keep /
+init-introduce / user-stream / agent-ignore / stop-forwarding,
+i18n key coverage); adjacent `backend-switch-effects.spec.ts`
+(5 tests) green.
+
+**Not claimed:** pixel/animation/keyboard feel, real-device
+performance — no device used.

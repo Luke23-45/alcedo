@@ -24,6 +24,7 @@ import { useMountEffect } from '@/hooks/useMountEffect';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChatBubble } from '@/components/presentation/ai-planner/chat-bubble';
 import { ShareProgramButton } from '@/components/presentation/ai-planner/share-program-button';
+import { canSendChatMessage, isChatOutOfDate, sanitizeChatInput } from '@/components/smart/planner-chat-logic';
 
 const COMPOSER_GAP = 8; // theme.space.sm
 
@@ -36,7 +37,7 @@ export default function AiPlannerChat() {
   const { handleScroll } = useScroll(true);
   const isLoadingResponse = useAppSelector(selectIsLoadingAiPlannerMessage);
   // The server told us this app is out of date; block further input until updated.
-  const isOutOfDate = messages.some((x) => x.type === 'updateRequired');
+  const isOutOfDate = isChatOutOfDate(messages);
   const baseInsets = useSafeAreaInsets();
   const insets = { ...baseInsets, bottom: Platform.select({ ios: baseInsets.bottom }) ?? 0 };
   const keyboard = useReanimatedKeyboardAnimation();
@@ -73,13 +74,19 @@ export default function AiPlannerChat() {
   });
 
   const [messageText, setMessageText] = useState('');
+  // The AI placeholder is added by an async effect after dispatch; until it
+  // arrives the newest message is our own unanswered send. Blocking on that
+  // closes the double-send window the store flag cannot see yet.
+  const awaitingAiReply = messages[0]?.from === 'User';
+  const sendGate = { isLoadingResponse, isOutOfDate, awaitingAiReply };
   const sendMessage = (message: string) => {
-    if (!isLoadingResponse && !isOutOfDate && message) {
+    const trimmed = sanitizeChatInput(message);
+    if (canSendChatMessage(sendGate, message)) {
       setMessageText('');
       dispatch(
         addMessage({
           from: 'User',
-          message,
+          message: trimmed,
           id: uuid(),
           type: 'messageResponse',
         }),
@@ -175,7 +182,7 @@ export default function AiPlannerChat() {
             mode="contained"
             icon={'send'}
             size={35}
-            disabled={isOutOfDate}
+            disabled={!canSendChatMessage(sendGate, messageText)}
             mirrored={I18nManager.isRTL}
             onPress={() => sendMessage(messageText)}
           />
