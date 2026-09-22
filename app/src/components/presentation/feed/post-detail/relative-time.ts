@@ -19,7 +19,7 @@ export function relativeAge(fromMs: number, nowMs: number = Date.now()): string 
   return `${Math.floor(hours / 24)}d`;
 }
 
-/** The author subline's spelled-out form: "@alexr · 21 minutes ago". */
+/** The author subline's spelled-out form, e.g. "@luke · 21 minutes ago". */
 export function relativeAgeLong(fromMs: number, nowMs: number = Date.now()): string {
   const diffSeconds = Math.max(0, Math.floor((nowMs - fromMs) / 1000));
   const minutes = Math.floor(diffSeconds / 60);

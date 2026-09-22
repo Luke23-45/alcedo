@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { ReactNode, useState } from 'react';
 import { chevronColor } from '../shared/grouped-settings-list.styles';
 import { PressHighlight } from '../shared/grouped-settings-list.styles';
+import { ownPersonInitial } from '@/components/presentation/feed/shared/own-person';
 import * as S from './profile-header.styles';
 
 function HeaderEdge({ children }: { children: ReactNode }) {
@@ -53,10 +54,13 @@ export function ProfileHeader() {
   const { push } = useRouter();
   const [pressed, setPressed] = useState(false);
   const identityName = useAppSelector((s) => s.feed.identity.map((identity) => identity.name ?? '').unwrapOr(''));
-  const username = useAppSelector((s) => s.settings.profileUsername) ?? 'alexr';
+  const username = useAppSelector((s) => s.settings.profileUsername);
 
-  const title = identityName.trim() || `@${username}`;
-  const handle = `@${username}`;
+  // No fictional fallback: before the user sets a name or username the
+  // header shows whatever real identity exists (possibly nothing yet).
+  const cleanUsername = (username ?? '').trim().replace(/^@+/, '');
+  const title = identityName.trim() || (cleanUsername ? `@${cleanUsername}` : '');
+  const handle = cleanUsername ? `@${cleanUsername}` : '';
 
   return (
     <HeaderEdge>
@@ -70,7 +74,7 @@ export function ProfileHeader() {
         >
           <PressHighlight $pressed={pressed} />
           <Avatar>
-            <S.AvatarInitial>{title.charAt(0).toUpperCase()}</S.AvatarInitial>
+            <S.AvatarInitial>{ownPersonInitial(identityName, username)}</S.AvatarInitial>
           </Avatar>
           <S.HeaderText>
             <S.HeaderName numberOfLines={1}>{title}</S.HeaderName>

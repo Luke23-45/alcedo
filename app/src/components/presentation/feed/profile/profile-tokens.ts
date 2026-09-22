@@ -39,8 +39,6 @@ export const PROFILE = {
     exercise: ["#8BE000", "#D6FF52"] as const,
     stand: ["#009DFF", "#2CE9F7"] as const,
   },
-  /** Contract bodyweight shown under the Weight row. */
-  bodyweightKg: 80.6,
   /** Slider geometry, measured off the reference (verification log ✓). */
   slider: {
     trackX: 36,

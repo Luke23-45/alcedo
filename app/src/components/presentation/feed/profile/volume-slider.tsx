@@ -33,6 +33,10 @@ export function VolumeSlider({
   const { t } = useTranslate();
   const [dragX, setDragX] = useState<number | undefined>(undefined);
   const areaPageX = useRef(0);
+  // The release handler must not commit inside the setState updater —
+  // updaters must stay pure (React may invoke them twice). The ref carries
+  // the latest drag position outside the render cycle.
+  const dragXRef = useRef<number | undefined>(undefined);
 
   const thumbX = dragX ?? sliderXForValue(goalKg);
   const nowX = sliderXForNow(thisWeekKg);
@@ -41,26 +45,35 @@ export function VolumeSlider({
 
   const commitX = (x: number) => onGoalChange(sliderValueForX(x));
 
+  const trackDrag = (pageX: number) => {
+    const x = clampToTrack(pageX - areaPageX.current);
+    dragXRef.current = x;
+    setDragX(x);
+  };
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: (_event, gesture) =>
         Math.abs(gesture.dx) > 6 && Math.abs(gesture.dx) > Math.abs(gesture.dy),
       onPanResponderGrant: (event) => {
-        setDragX(clampToTrack(event.nativeEvent.pageX - areaPageX.current));
+        trackDrag(event.nativeEvent.pageX);
       },
       onPanResponderMove: (event) => {
-        setDragX(clampToTrack(event.nativeEvent.pageX - areaPageX.current));
+        trackDrag(event.nativeEvent.pageX);
       },
       onPanResponderRelease: () => {
-        setDragX((current) => {
-          if (current !== undefined) {
-            commitX(current);
-          }
-          return undefined;
-        });
+        const released = dragXRef.current;
+        dragXRef.current = undefined;
+        setDragX(undefined);
+        if (released !== undefined) {
+          commitX(released);
+        }
       },
-      onPanResponderTerminate: () => setDragX(undefined),
+      onPanResponderTerminate: () => {
+        dragXRef.current = undefined;
+        setDragX(undefined);
+      },
     }),
   ).current;
 

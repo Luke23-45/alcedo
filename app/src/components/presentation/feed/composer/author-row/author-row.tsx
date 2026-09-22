@@ -1,5 +1,5 @@
 import { FeedAvatar } from '../../shared/feed-avatar';
-import { PEOPLE } from '../../shared/people';
+import { useOwnPerson } from '../../shared/use-own-person';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useComposerT } from '../composer-i18n';
 import type { ComposerAudience } from '../composer-types';
@@ -20,7 +20,7 @@ const AUDIENCE_KEY: Record<ComposerAudience, { key: string; fallback: string }> 
 export function AuthorRow({ audience, onAudiencePress }: AuthorRowProps) {
   const theme = useAppTheme();
   const t = useComposerT();
-  const person = PEOPLE.alex!;
+  const person = useOwnPerson();
   const { key, fallback } = AUDIENCE_KEY[audience];
 
   return (

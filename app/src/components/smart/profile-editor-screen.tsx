@@ -1,6 +1,7 @@
 import { ProfileScreen, type ProfileEditorDraft } from '@/components/presentation/feed/profile/profile-screen';
+import { identityNameChanged, normalizeIdentityName } from '@/components/presentation/feed/shared/own-person';
 import { useAppSelector } from '@/store';
-import { resetFeedAccount, selectFeedIdentityRemote, updateFeedIdentity } from '@/store/feed';
+import { resetFeedAccount, selectFeedFollowers, selectFeedIdentityRemote, updateFeedIdentity } from '@/store/feed';
 import {
   setBlockedAccounts,
   setPrivacyAllowComments,
@@ -20,7 +21,6 @@ import {
   setUseImperialUnits,
   setWeeklyVolumeGoalKg,
 } from '@/store/settings';
-import { DEFAULT_PROFILE_BIO } from '@/store/settings/registry';
 import { selectProfileStats } from '@/components/presentation/feed/profile/profile-stats';
 import { useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
@@ -43,13 +43,14 @@ export function ProfileEditorScreen({ focusPublish }: { focusPublish: boolean })
       .unwrapOr(''),
   );
   const stats = useAppSelector(selectProfileStats);
+  const followersCount = useAppSelector(selectFeedFollowers).length;
 
   const goBack = () => router.back();
 
   const initial: ProfileEditorDraft = {
     name: identityName,
-    username: settings.profileUsername ?? 'alexr',
-    bio: settings.profileBio ?? DEFAULT_PROFILE_BIO,
+    username: settings.profileUsername ?? '',
+    bio: settings.profileBio ?? '',
     ringGoals: {
       move: settings.ringGoalMove,
       exercise: settings.ringGoalExercise,
@@ -90,7 +91,17 @@ export function ProfileEditorScreen({ focusPublish }: { focusPublish: boolean })
     dispatch(setPrivacyAllowComments(draft.privacy.allowComments));
     dispatch(setPrivacyShowHeartRate(draft.privacy.showHeartRate));
     dispatch(setBlockedAccounts(draft.privacy.blocked));
-    dispatch(updateFeedIdentity({ updates: { name: draft.name }, fromUserAction: true }));
+    // Only touch the feed identity when the display name actually changed —
+    // otherwise every Save would fire a remote update, a rollback on failure,
+    // and an outbox entry for a no-op edit.
+    if (identityNameChanged(draft.name, identityName)) {
+      dispatch(
+        updateFeedIdentity({
+          updates: { name: normalizeIdentityName(draft.name) },
+          fromUserAction: true,
+        }),
+      );
+    }
     goBack();
   };
 
@@ -108,6 +119,7 @@ export function ProfileEditorScreen({ focusPublish }: { focusPublish: boolean })
         lifetimeKg: stats.lifetimeKg,
       }}
       thisWeekKg={stats.thisWeekKg}
+      followersCount={followersCount}
       healthConnected={settings.exportToHealthAggregator}
       focusPrivacy={focusPublish}
       onCancel={goBack}

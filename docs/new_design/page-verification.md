@@ -38,6 +38,8 @@ timing, real-device performance. Device checklist comes later with a dev build.
 | 7 | Trends (overview, exercise picker, exercise detail) | docs/new_design/trends-dark.md | done 2026-09-22 |
 | 8 | Feed timeline | docs/new_design/social-dark.md Screen 1 | done 2026-09-22 |
 | 9 | Feed post detail | docs/new_design/social-dark.md Screen 2 | done 2026-09-22 |
+| 10 | Feed share composer | docs/new_design/social-dark.md Screen 3 | done 2026-09-22 |
+| 11 | Feed profile editor | docs/new_design/social-dark.md Screen 4 | done 2026-09-22 |
 
 ## Per-page log
 ### 1. Home
@@ -185,9 +187,9 @@ confirmation on device — no device used.
 | 6 | History | docs/new_design/history-dark.md | done 2026-09-22 |
 | 7 | Trends | docs/new_design | done 2026-09-22 |
 | 8 | Feed timeline | docs/new_design/social-dark.md | done 2026-09-22 |
-| 9 | Feed post detail | docs/new_design/social-dark.md | pending |
+| 9 | Feed post detail | docs/new_design/social-dark.md | done 2026-09-22 |
 | 10 | Feed share composer | docs/new_design/social-dark.md | done 2026-09-22 |
-| 11 | Feed profile editor | docs/new_design/social-dark.md | pending |
+| 11 | Feed profile editor | docs/new_design/social-dark.md | done 2026-09-22 |
 | 12 | Feed shared-item | (thin wrapper) | pending |
 | 13 | Settings home | docs/new_design/settings-dark.md | pending |
 | 14 | Settings preferences | docs/new_design/settings-dark.md | pending |
@@ -900,3 +902,114 @@ files.
 
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.
+
+### 11. Feed profile editor
+- Verified 2026-09-22 against `docs/new_design/social-dark.md` Screen 4
+  (Profile Editor, 393 × 1712). Route:
+  `app/src/app/(tabs)/feed/profile-editor.tsx`; container
+  `components/smart/profile-editor-screen.tsx`; screen
+  `components/presentation/feed/profile/profile-screen.tsx` plus the
+  profile-* section components (avatar, stats strip, identity, goals,
+  units, privacy, connected, footer, ring-goal sheet, blocked-accounts
+  sheet, volume slider, segmented control, toggle).
+- Sections inventoried (render order): nav row (Cancel / Edit Profile /
+  Save), avatar with Change Photo affordance, public stats strip
+  (Sessions · Day Streak · Kg Lifted · Followers), identity editor
+  (Name / Username / Bio, 160-char counter), goals card (Move/Exercise/
+  Stand ring rows opening a stepper sheet, weekly-volume slider with
+  "now" tick), units card (Weight/Distance/Height segmented controls),
+  privacy card (visibility + five switches + blocked accounts sheet),
+  connected card (Health, Watch), footer (Delete Account confirm sheet,
+  version/build).
+- State matrix simulated: populated real identity, empty/whitespace
+  identity, identity loading/error (editor gates on loaded identity),
+  update failure + rollback path (optimistic name write restores on
+  remote failure), offline save (settings persist locally; feed update
+  queues through the existing outbox/rollback path), first-run (zero
+  sessions, zero followers, empty stats), save vs cancel draft
+  semantics, ring-goal min/max stepping, slider min/max/500-step/drag
+  commit/accessible steppers, unit changes incl. legacy imperial sync,
+  every visibility option and privacy switch, block/unblock/duplicate/
+  empty/corrupt input, health connected/disconnected, watch unpaired,
+  delete confirmation, locale-aware number rendering (en-US/de-DE),
+  avatar initial derivation incl. unicode and empty identity.
+- Data honesty: the profile no longer ships fictional identity. Username
+  and bio now default to empty (registry `profileUsername`/`profileBio`
+  default `''`; the contract sample bio constant is deleted); the
+  followers cell renders the real `selectFeedFollowers` count (0 on
+  first run) instead of the hard-coded "128"; the invented
+  "Bodyweight 80.6 kg · used in every strength ratio" line is removed
+  (no bodyweight model exists); own posts everywhere (timeline own
+  card, composer author row, composer post card, post-detail author +
+  share text) resolve through the new `buildOwnPerson`/`useOwnPerson`
+  (real feed-identity name + profile username, contract violet visual
+  identity retained) instead of the fictional "Alex Rivera / @alexr";
+  Settings home profile header drops its `?? 'alexr'` fallback.
+
+**Bugs found and fixed:**
+1. Seven missing i18n keys — Name/Username row labels and all five
+   privacy toggle labels had no entry in `en.json` or the profile
+   fragment, so Tolgee rendered raw key strings. Added
+   `feed.profile.identity.name/username` and the five
+   `feed.profile.privacy.*` keys to `i18n/en.json` and
+   `i18n/fragments/feed.profile.json`; a new simulation test scans
+   every `feedKey("…")` used by the profile components and asserts it
+   resolves in `en.json`.
+2. `updateFeedIdentity` fired on every Save even when the display name
+   was untouched — each no-op save queued a remote update and risked a
+   rollback snackbar. Now gated on `identityNameChanged` (trimmed
+   compare); clearing the field clears it remotely via
+   `normalizeIdentityName`.
+3. `formatGrouped` / `formatCompactVolume` hard-coded `en-US`
+   (`toLocaleString("en-US")`, `toFixed`). Both now take the
+   `preferredLanguage` locale through cached `Intl.NumberFormat`
+   instances (same pattern as `useFormatNumber`); contract thresholds
+   (1.28M / 8.4K) are preserved with locale-localized digits.
+4. Slider release committed inside a `setState` updater (side effect
+   in an updater React may invoke twice). Release now commits from a
+   `dragXRef` outside the updater; terminate clears without commit.
+5. Avatar initial fell back to the fictional "A" when the name was
+   empty — now `ownPersonInitial` derives from name, then username
+   (Unicode-aware), else a neutral "•".
+6. Blocked-username cleaning stripped `@` before trimming, so
+   `"  @spam"` kept a literal `@` in the stored entry. Now trims
+   first; helper extracted to `blocked-accounts.ts` for testability.
+7. Settings home profile header showed `@` for a bare empty username
+   and fell back to the fictional `@alexr`. Now renders only real
+   identity (possibly empty) with the shared initial derivation.
+
+**Tests (14 new + formatters/prefs updates, all green):**
+- `profile/profile-editor-simulation.spec.ts` (new, 14 tests): own-person
+  derivation (real name/username, username fallback, @-stripping,
+  trimming, empty identity, violet visual identity retained),
+  `ownPersonInitial` (name/username preference, unicode/digit first
+  chars, no invented letters), identity sync gating
+  (changed/unchanged/whitespace, normalize-to-undefined on clear),
+  blocked-username normalization (strip/lowercase/empty/duplicate),
+  i18n completeness scan over all profile `feedKey` usages.
+- `profile-formatters.spec.ts`: locale grouping assertions
+  (en-US/de-DE), bodyweight tests removed with the row.
+- `store/settings/profile-prefs.spec.ts`: registry defaults now assert
+  empty username/bio instead of the contract fiction.
+
+**Deliberate non-changes:**
+- Photo editing stays omitted: `expo-image-picker` is not a dependency
+  and no photo model exists; "Change Photo" affordance renders the
+  documented non-functional state, unchanged.
+- Log Out stays omitted: the app has no auth/logout implementation.
+- Delete Account keeps the existing `resetFeedAccount` semantics
+  (remote delete + new identity); flagged as a product decision, not
+  patched.
+- Save still navigates back immediately while the async identity
+  update runs: the existing optimistic-update + rollback + snackbar
+  path is the established architecture; no fake loading state added.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 119 files /
+1,775 tests (1,774 green; the single failure is the pre-existing
+midnight-boundary flake in `backup-status.spec.ts` "labels a backup
+from earlier today", unrelated — it fails only in runs crossing
+midnight); oxlint 0 errors on touched/new files; `oxfmt --check` back
+at the 118 pre-existing repo-wide issues, 0 new.
+
+**Not claimed:** pixel/animation feel, real-device performance,
+haptics — no device used.

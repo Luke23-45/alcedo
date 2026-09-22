@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PROFILE_BIO, preferenceRegistry } from "./registry";
+import { preferenceRegistry } from "./registry";
 import { stringListCodec, stringUnionCodec } from "./codecs";
 import { settingsReducer } from "./index";
 import {
@@ -20,16 +20,16 @@ describe("profile editor preferences - registry defaults", () => {
     expect(state.weeklyVolumeGoalKg).toBe(35000);
   });
 
-  it("seeds metric units, friends visibility, and the contract bio", () => {
+  it("seeds metric units, friends visibility, and empty identity fields", () => {
     const state = settingsReducer(undefined, { type: "@@init" });
     expect(state.unitWeight).toBe("kg");
     expect(state.unitDistance).toBe("km");
     expect(state.unitHeight).toBe("cm");
     expect(state.profileVisibility).toBe("friends");
-    expect(state.profileUsername).toBe("alexr");
-    expect(state.profileBio).toBe(DEFAULT_PROFILE_BIO);
-    // Contract: 37 + 1 + 30 = 68 chars.
-    expect(DEFAULT_PROFILE_BIO.length).toBe(68);
+    // No fictional identity: username and bio start empty until the user
+    // writes them in the profile editor.
+    expect(state.profileUsername).toBe("");
+    expect(state.profileBio).toBe("");
   });
 
   it("seeds four privacy toggles on and heart-rate off (matches the share-card contract)", () => {

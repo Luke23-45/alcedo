@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { FeedAvatar } from '../../shared/feed-avatar';
-import { PEOPLE } from '../../shared/people';
+import { useOwnPerson } from '../../shared/use-own-person';
 import type { TagPerson } from '../../shared/tag-person';
 import { SharePoster } from '../../shared/share-poster';
 import type { ComposerPost } from '@/store/feed/composer-posts';
@@ -33,12 +33,12 @@ interface ComposerPostCardProps {
 export function ComposerPostCard({ post, data, poster, now, people, locale }: ComposerPostCardProps) {
   const theme = useAppTheme();
   const t = useComposerT();
+  const person = useOwnPerson();
 
   if (!data || !poster) {
     return null;
   }
 
-  const person = PEOPLE.alex!;
   const taggedNames = post.taggedIds
     .map((id) => people.find((p) => p.id === id)?.name)
     .filter((name): name is string => !!name);

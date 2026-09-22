@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Modal, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as S from "./blocked-accounts-sheet.styles";
+import { cleanBlockedUsername } from "./blocked-accounts";
 import { feedKey } from "../shared/feed-i18n";
 import { PROFILE, profilePalette } from "./profile-tokens";
 
@@ -28,8 +29,7 @@ export function BlockedAccountsSheet({
   const insets = useSafeAreaInsets();
   const [input, setInput] = useState("");
 
-  const clean = (raw: string) => raw.replace(/^@+/, "").replace(/\s+/g, "").toLowerCase();
-  const candidate = clean(input);
+  const candidate = cleanBlockedUsername(input);
   const canBlock = candidate.length > 0 && !blocked.includes(candidate);
 
   const commit = () => {

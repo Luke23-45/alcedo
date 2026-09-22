@@ -3,8 +3,7 @@ import { useAppTheme } from "@/hooks/useAppTheme";
 import { useTranslate } from "@tolgee/react";
 import type { ReactNode } from "react";
 import { feedKey } from "../shared/feed-i18n";
-import { formatBodyweightValue } from "./profile-formatters";
-import { PROFILE, profilePalette } from "./profile-tokens";
+import { profilePalette } from "./profile-tokens";
 import * as S from "./profile-units.styles";
 import { SegmentedControl, type SegmentedOption } from "./segmented-control";
 
@@ -15,8 +14,11 @@ export type HeightUnitValue = "cm" | "ft";
 /**
  * Reference: three 56 rows (label baseline at rowTop+40, segmented at
  * rowTop+20), hairlines drawn 6pt below rows 1–2 (they overlap the next row's
- * top padding, exactly as the reference draws them), then the 18pt
- * bodyweight line. 168 + 18 = 186.
+ * top padding, exactly as the reference draws them). 168 total.
+ *
+ * The reference's "Bodyweight" footnote is intentionally omitted: there is no
+ * bodyweight model in the app, and a hard-coded figure presented as the
+ * user's would be invented data.
  */
 
 /**
@@ -104,14 +106,6 @@ export function ProfileUnits({
       )}
       <S.Divider $color={palette.divider} $top={62} />
       <S.Divider $color={palette.divider} $top={118} />
-      <S.BodyweightRow>
-        <S.Bodyweight $color={palette.faint}>
-          {t(feedKey("feed.profile.units.bodyweight"), {
-            value: formatBodyweightValue(PROFILE.bodyweightKg, weight),
-            unit: t(feedKey(weight === "kg" ? "feed.profile.units.kg" : "feed.profile.units.lb")),
-          })}
-        </S.Bodyweight>
-      </S.BodyweightRow>
     </HomeCard>
   );
 }

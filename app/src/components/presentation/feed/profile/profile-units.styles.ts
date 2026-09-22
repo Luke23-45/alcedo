@@ -27,17 +27,3 @@ export const Divider = styled.View<{ $color: string; $top: number }>`
   height: 1px;
   background-color: ${({ $color }) => $color};
 `;
-
-export const BodyweightRow = styled.View`
-  height: 18px;
-  padding-left: ${PROFILE.inset}px;
-  padding-right: ${PROFILE.inset}px;
-`;
-
-export const Bodyweight = styled.Text<{ $color: string }>`
-  font-family: ${({ theme }) => profileFontFamily(theme)};
-  font-size: 10px;
-  font-weight: 500;
-  color: ${({ $color }) => $color};
-  margin-top: -3px;
-`;

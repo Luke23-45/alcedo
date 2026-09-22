@@ -29,9 +29,6 @@ export type ProfileVisibility = 'public' | 'friends' | 'private';
 /** AI Planner training focus (Phase 6, Screen 4). */
 export type PlannerFocus = 'strength' | 'hypertrophy' | 'conditioning';
 
-/** Contract bio: "Push / Pull / Legs, five days a week.\nChasing a 2× bodyweight bench." (68 chars). */
-export const DEFAULT_PROFILE_BIO = 'Push / Pull / Legs, five days a week.\nChasing a 2× bodyweight bench.';
-
 /** Legacy shape, read once by the `IMPORT_BACKENDS` data migration and never written again. */
 export interface RemoteBackupSettings {
   endpoint: string;
@@ -250,8 +247,8 @@ export const preferenceRegistry = {
   unitWeight: pref<WeightUnitPref>({ default: 'kg', codec: stringUnionCodec(['kg', 'lb']) }),
   unitDistance: pref<DistanceUnitPref>({ default: 'km', codec: stringUnionCodec(['km', 'mi']) }),
   unitHeight: pref<HeightUnitPref>({ default: 'cm', codec: stringUnionCodec(['cm', 'ft']) }),
-  profileUsername: pref({ default: 'alexr', codec: stringCodec }),
-  profileBio: pref({ default: DEFAULT_PROFILE_BIO, codec: stringCodec }),
+  profileUsername: pref({ default: '', codec: stringCodec }),
+  profileBio: pref({ default: '', codec: stringCodec }),
   profileVisibility: pref<ProfileVisibility>({
     default: 'friends',
     codec: stringUnionCodec(['public', 'friends', 'private']),

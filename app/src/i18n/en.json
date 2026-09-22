@@ -1286,7 +1286,6 @@
   "feed.profile.stats.sessions": "SESSIONS",
   "feed.profile.stats.streak": "DAY STREAK",
   "feed.profile.stats.volume": "KG LIFTED",
-  "feed.profile.units.bodyweight": "Bodyweight {value} {unit} · used in every strength ratio",
   "feed.profile.units.cm": "cm",
   "feed.profile.units.distance": "Distance",
   "feed.profile.units.ft": "ft",
@@ -1815,5 +1814,12 @@
   "backup.plaintext_export.privacy.body_rest": "OS share sheet. Any receiving app can read it.",
   "exercise.editor.rest.decrease": "Decrease rest",
   "exercise.editor.rest.increase": "Increase rest",
-  "backup.plaintext_export.whats_in_file.title": "CSV · what's in the file"
+  "backup.plaintext_export.whats_in_file.title": "CSV · what's in the file",
+  "feed.profile.identity.name": "Name",
+  "feed.profile.identity.username": "Username",
+  "feed.profile.privacy.share_sessions": "Share sessions to feed",
+  "feed.profile.privacy.leaderboards": "Appear on leaderboards",
+  "feed.profile.privacy.show_prs": "Show personal records",
+  "feed.profile.privacy.allow_comments": "Allow comments",
+  "feed.profile.privacy.show_heart_rate": "Show heart-rate data"
 }

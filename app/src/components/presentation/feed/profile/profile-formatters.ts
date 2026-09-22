@@ -1,30 +1,55 @@
 import { PROFILE } from "./profile-tokens";
 
 /**
- * Compact volume for the stats strip: 1,284,600 → "1.28M" (contract ✓),
- * 8,420 → "8.4K", anything smaller renders whole.
+ * Locale-aware number formatters, cached per locale exactly like
+ * useFormatNumber's formatterFor. Page 10 removed the last `en-US`
+ * hard-codes from the composer; the profile follows the same rule —
+ * preferredLanguage drives every rendered number.
  */
-export function formatCompactVolume(kg: number): string {
-  if (kg >= 1_000_000) return `${(kg / 1_000_000).toFixed(2)}M`;
-  if (kg >= 1_000) return `${(kg / 1_000).toFixed(1)}K`;
-  return `${Math.round(kg)}`;
+const groupedFormatters = new Map<string | undefined, Intl.NumberFormat>();
+function groupedFormatter(locale: string | undefined): Intl.NumberFormat {
+  let cached = groupedFormatters.get(locale);
+  if (!cached) {
+    cached = new Intl.NumberFormat(locale);
+    groupedFormatters.set(locale, cached);
+  }
+  return cached;
+}
+
+const compactPartsFormatters = new Map<string, { m: Intl.NumberFormat; k: Intl.NumberFormat }>();
+function compactPartsFor(locale: string | undefined): { m: Intl.NumberFormat; k: Intl.NumberFormat } {
+  const key = locale ?? "system";
+  let cached = compactPartsFormatters.get(key);
+  if (!cached) {
+    cached = {
+      m: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      k: new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+    };
+    compactPartsFormatters.set(key, cached);
+  }
+  return cached;
+}
+
+/**
+ * Compact volume for the stats strip: 1,284,600 → "1.28M" (contract ✓),
+ * 8,420 → "8.4K", anything smaller renders whole. The design's M/K
+ * thresholds stay fixed; the digits follow the user's locale.
+ */
+export function formatCompactVolume(kg: number, locale?: string): string {
+  if (kg >= 1_000_000) return `${compactPartsFor(locale).m.format(kg / 1_000_000)}M`;
+  if (kg >= 1_000) return `${compactPartsFor(locale).k.format(kg / 1_000)}K`;
+  return groupedFormatter(locale).format(Math.round(kg));
 }
 
 /** Grouped thousands for the slider caption and goal label: 34,340. */
-export function formatGrouped(value: number): string {
-  return Math.round(value).toLocaleString("en-US");
+export function formatGrouped(value: number, locale?: string): string {
+  return groupedFormatter(locale).format(Math.round(value));
 }
 
 /** Whole percent for the slider caption: 34,340 / 35,000 → 98. */
 export function formatGoalPercent(thisWeekKg: number, goalKg: number): number {
   if (goalKg <= 0) return 0;
   return Math.round((thisWeekKg / goalKg) * 100);
-}
-
-/** kg → lb is ×2.20462 (same factor as the Weight model). Renders with one decimal. */
-export function formatBodyweightValue(kg: number, unit: "kg" | "lb"): string {
-  const value = unit === "kg" ? kg : kg * 2.20462;
-  return value.toFixed(1);
 }
 
 const { trackX, trackWidth, min, max, step } = PROFILE.slider;

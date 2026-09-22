@@ -1,5 +1,6 @@
 import { HomeCard } from "@/components/presentation/home/shared/home-card";
 import { useAppTheme } from "@/hooks/useAppTheme";
+import { useAppSelector } from "@/store";
 import { useTranslate } from "@tolgee/react";
 import { useState } from "react";
 import { feedKey } from "../shared/feed-i18n";
@@ -47,6 +48,7 @@ export function ProfileGoals({
   const palette = profilePalette(theme.isDark);
   const { t } = useTranslate();
   const [editing, setEditing] = useState<RingGoalKey | null>(null);
+  const locale = useAppSelector((x) => x.settings.preferredLanguage);
 
   const rows: { key: RingGoalKey; label: string; value: string }[] = [
     {
@@ -108,7 +110,7 @@ export function ProfileGoals({
         </S.VolumeLabel>
         <S.VolumeValue $color={palette.value} style={{ fontVariant: ["tabular-nums"] }}>
           {t(feedKey("feed.profile.goals.weekly_volume_value"), {
-            value: formatGrouped(volumeGoalKg),
+            value: formatGrouped(volumeGoalKg, locale),
           })}
         </S.VolumeValue>
       </S.VolumeHeader>
@@ -121,7 +123,7 @@ export function ProfileGoals({
       <S.CaptionWrap>
         <S.Caption $color={palette.tertiary}>
           {t(feedKey("feed.profile.goals.this_week"), {
-            kg: formatGrouped(thisWeekKg),
+            kg: formatGrouped(thisWeekKg, locale),
             percent: `${formatGoalPercent(thisWeekKg, volumeGoalKg)}`,
           })}
         </S.Caption>

@@ -27,6 +27,7 @@ import EmptyInfo from '@/components/presentation/foundation/empty-info';
 import { GlassBackground } from '@/components/presentation/foundation/glass-background';
 import { feedKey } from '../shared/feed-i18n';
 import { personById, type FeedPerson } from '../shared/people';
+import { useOwnPerson } from '../shared/use-own-person';
 import { useComposerDraftCaption } from '../shared/composer-draft';
 import { buildAlexKudosSeed, useOwnPostKudos, type OwnPostKudos } from '../shared/own-post-kudos';
 import { useHiddenPosts } from '../timeline/timeline-state';
@@ -89,6 +90,8 @@ export function PostDetailScreen({ postId, keyValueStore }: { postId: string; ke
 
   const ownKudos = useOwnPostKudos(model?.session?.id);
   const storedKudos = useAppSelectorWithArg(selectPostKudos, threadId ?? '');
+  // Own post author is the user's real identity, for share text too.
+  const ownPerson = useOwnPerson();
 
   const inputRef = useRef<TextInput | null>(null);
   const [replyTarget, setReplyTarget] = useState<ReplyTarget | null>(null);
@@ -198,7 +201,7 @@ export function PostDetailScreen({ postId, keyValueStore }: { postId: string; ke
   const focusComment = () => inputRef.current?.focus();
 
   const sharePost = () => {
-    const author = personById(model.authorId);
+    const author = model.isOwn ? ownPerson : personById(model.authorId);
     const authorName = author?.name ?? '';
     const value =
       caption != null

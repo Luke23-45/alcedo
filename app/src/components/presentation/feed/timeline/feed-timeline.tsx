@@ -18,7 +18,8 @@ import {
 } from '@/store/feed/comments';
 import { getSessionReferenceTime, selectHistoryPersonalRecords, selectSessions } from '@/store/stored-sessions';
 import type { KeyValueStore } from '@/services/key-value-store';
-import { PEOPLE, personById, type FeedPerson } from '../shared/people';
+import { personById, type FeedPerson } from '../shared/people';
+import { useOwnPerson } from '../shared/use-own-person';
 import { deriveComposerSessionData, latestSession } from '../composer/composer-data';
 import { useComposerDraftCaption } from '../shared/composer-draft';
 import { buildAlexKudosSeed, useOwnPostKudos } from '../shared/own-post-kudos';
@@ -164,6 +165,10 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
   const ownPostKudos = useOwnPostKudos(sessionId);
   const alexKudos: PostKudos | undefined = ownPostKudos.kudos;
 
+  // Own post author is the user's real identity (feed identity name /
+  // profile username), not the contract's fictional "Alex Rivera".
+  const ownPerson = useOwnPerson();
+
   const referencePosts = buildReferencePosts(Date.now());
 
   const ownPost: TimelineWorkoutPost | undefined =
@@ -171,7 +176,7 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
       ? {
           kind: 'workout',
           id: 'alex',
-          person: PEOPLE.alex!,
+          person: ownPerson,
           isOwn: true,
           badge: 'you',
           audience: 'friends',

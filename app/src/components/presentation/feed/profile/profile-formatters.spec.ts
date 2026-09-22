@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  formatBodyweightValue,
   formatCompactVolume,
   formatGoalPercent,
   formatGrouped,
@@ -53,17 +52,18 @@ describe("formatGoalPercent", () => {
   });
 });
 
-describe("formatBodyweightValue", () => {
-  it("renders the contract 80.6 kg and converts honestly to lb", () => {
-    expect(formatBodyweightValue(80.6, "kg")).toBe("80.6");
-    // 80.6 × 2.20462 = 177.69 → 177.7.
-    expect(formatBodyweightValue(80.6, "lb")).toBe("177.7");
-  });
-});
-
 describe("formatGrouped", () => {
-  it("groups thousands", () => {
-    expect(formatGrouped(34_340)).toBe("34,340");
-    expect(formatGrouped(35_000)).toBe("35,000");
+  it("groups thousands in the default locale", () => {
+    expect(formatGrouped(34_340, "en-US")).toBe("34,340");
+    expect(formatGrouped(35_000, "en-US")).toBe("35,000");
+  });
+
+  it("follows the user's locale instead of a hard-coded en-US", () => {
+    expect(formatGrouped(34_340, "de-DE")).toBe("34.340");
+  });
+
+  it("compacts with locale-aware digits", () => {
+    expect(formatCompactVolume(1_284_600, "de-DE")).toBe("1,28M");
+    expect(formatCompactVolume(8_420, "de-DE")).toBe("8,4K");
   });
 });

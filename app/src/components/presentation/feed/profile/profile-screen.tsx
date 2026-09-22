@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { feedKey } from "../shared/feed-i18n";
+import { ownPersonInitial } from "../shared/own-person";
 import { ProfileAvatar } from "./profile-avatar";
 import { ProfileBackground } from "./profile-background";
 import { ProfileConnected } from "./profile-connected";
@@ -39,6 +40,8 @@ export interface ProfileEditorDraft {
 interface ProfileScreenProps {
   initial: ProfileEditorDraft;
   stats: { sessionCount: number; streakDays: number; lifetimeKg: number };
+  /** Real follower count from the feed store; 0 before anyone follows. */
+  followersCount: number;
   thisWeekKg: number;
   healthConnected: boolean;
   /** Scrolls to the privacy card on mount (replaces the old focusPublish). */
@@ -55,6 +58,7 @@ interface ProfileScreenProps {
 export function ProfileScreen({
   initial,
   stats,
+  followersCount,
   thisWeekKg,
   healthConnected,
   focusPrivacy,
@@ -104,13 +108,14 @@ export function ProfileScreen({
       >
         <S.Content>
           <S.AvatarBlock>
-            <ProfileAvatar initial={(draft.name.trim().charAt(0) || "A").toUpperCase()} />
+            <ProfileAvatar initial={ownPersonInitial(draft.name, draft.username)} />
           </S.AvatarBlock>
           <S.StatsWrap>
             <ProfileStatsStrip
               sessionCount={stats.sessionCount}
               streakDays={stats.streakDays}
               lifetimeKg={stats.lifetimeKg}
+              followersCount={followersCount}
             />
           </S.StatsWrap>
           <S.IdentityWrap>

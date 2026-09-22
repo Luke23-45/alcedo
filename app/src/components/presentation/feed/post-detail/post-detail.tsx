@@ -8,6 +8,7 @@ import { SharePoster } from '../shared/share-poster';
 import { FeedActionBar } from '../shared/feed-action-bar';
 import { feedKey } from '../shared/feed-i18n';
 import { personById } from '../shared/people';
+import { useOwnPerson } from '../shared/use-own-person';
 import { SampleBadge } from '@/components/presentation/home/shared/sample-badge';
 import type { OwnPostKudos } from '../shared/own-post-kudos';
 import * as KS from '../shared/kudos-stack.styles';
@@ -58,7 +59,10 @@ export function PostDetail({
   const theme = useAppTheme();
   const { t } = useTranslate();
 
-  const author = personById(model.authorId);
+  const ownPerson = useOwnPerson();
+  // The own post resolves through the user's real identity, not the
+  // contract's fictional author; sample posts keep their reference people.
+  const author = model.isOwn ? ownPerson : personById(model.authorId);
   const topLevel = useAppSelectorWithArg(selectTopLevelComments, threadId);
   const commentCount = model.commentCountBase + topLevel.length;
 
