@@ -1,6 +1,15 @@
+import { requireOptionalNativeModule } from 'expo';
+import { View } from 'react-native';
 import styled from 'styled-components/native';
-import { VideoView } from 'expo-video';
 import { POSTER_HEIGHT, POSTER_RADIUS, ShadowWrap } from './share-poster.styles';
+
+// expo-video may be missing from the dev APK if it was built before the dependency
+// was added. Don't crash the entire feed on import — fall back to a plain View.
+// `require('expo-video')` itself throws when the native module is missing, so
+// don't touch the JS entry at all — only use the optional native view if present.
+let VideoView: any = View;
+const mod = requireOptionalNativeModule('ExpoVideo');
+if (mod?.VideoView) VideoView = mod.VideoView;
 
 /**
  * Shared media-hero chrome: the photo/video heroes reuse the share poster's

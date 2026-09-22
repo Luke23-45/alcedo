@@ -86,8 +86,13 @@ export function applyStoredSessionsEffects(addEffect: AddEffectFn) {
 
       await migrateLegacyCurrentSession(dispatch, getState, keyValueStore, logger);
 
-      const builtInExercises = await loadBuiltInExercises(getState().settings.preferredLanguage);
-      dispatch(setBuiltInExercises(builtInExercises));
+      try {
+        const builtInExercises = await loadBuiltInExercises(getState().settings.preferredLanguage);
+        dispatch(setBuiltInExercises(builtInExercises));
+      } catch (e) {
+        logger.error('Failed to load built-in exercises, using empty catalog', e);
+        dispatch(setBuiltInExercises({}));
+      }
 
       const hiddenBuiltInIds = JSON.parse(
         (await keyValueStore.getItem(hiddenBuiltInExerciseIdsStorageKey)) ?? '[]',

@@ -20,7 +20,7 @@ import tr from '../i18n/tr.json';
 import uk from '../i18n/uk.json';
 import zh_Hans from '../i18n/zh-hans.json';
 
-import { FormatSimple, Tolgee } from '@tolgee/react';
+import { FormatSimple, TolgeeCore as Tolgee } from '@tolgee/core';
 import { PreferenceService } from '@/services/preference-service';
 
 export const supportedLanguages = [

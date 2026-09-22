@@ -19,7 +19,8 @@ import {
 } from '@/models/blueprint-models';
 import { useAppSelector } from '@/store';
 import { ExtractType } from '@/utils/extract-type';
-import { TranslationKey, useTranslate } from '@tolgee/react';
+import { useTranslate } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 import { useState } from 'react';
 import { View } from 'react-native';
 

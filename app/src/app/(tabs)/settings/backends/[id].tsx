@@ -20,7 +20,8 @@ import {
 } from '@/services/backend-probe';
 import { useAppSelector } from '@/store';
 import { putBackend, removeBackend } from '@/store/backends';
-import { TranslationKey, useTranslate } from '@tolgee/react';
+import { useTranslate } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import ExperimentIcon from '@expo/material-symbols/experiment.xml';

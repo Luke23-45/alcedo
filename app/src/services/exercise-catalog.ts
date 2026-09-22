@@ -76,12 +76,20 @@ const localeLoaders: Record<string, () => Promise<{ default: ExerciseTranslation
 };
 
 async function loadBaseCatalog(): Promise<BuiltInExerciseJSON[]> {
-  const { exercises } = await import('../../assets/exercises.json');
-  return exercises as BuiltInExerciseJSON[];
+  try {
+    const { exercises } = await import('../../assets/exercises.json');
+    return exercises as BuiltInExerciseJSON[];
+  } catch {
+    return [];
+  }
 }
 
 async function loadEnglishOverlay(): Promise<ExerciseTranslationMap> {
-  return (await englishLoader()).default;
+  try {
+    return (await englishLoader()).default;
+  } catch {
+    return {};
+  }
 }
 
 const baseLanguage = (locale: string) => locale.toLowerCase().split('-')[0]!;
@@ -108,7 +116,9 @@ function resolveLocale(preferredLanguage: string | undefined): string | undefine
 async function loadTranslations(preferredLanguage: string | undefined): Promise<ExerciseTranslationMap> {
   const code = matchLoader(resolveLocale(preferredLanguage));
   const localePromise: Promise<ExerciseTranslationMap> = code
-    ? localeLoaders[code]!().then((m) => m.default)
+    ? localeLoaders[code]!()
+        .then((m) => m.default)
+        .catch(() => ({} as ExerciseTranslationMap))
     : Promise.resolve({});
   const [english, locale] = await Promise.all([loadEnglishOverlay(), localePromise]);
   const merged: ExerciseTranslationMap = { ...english };

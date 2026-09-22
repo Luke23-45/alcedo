@@ -1,5 +1,5 @@
 import { registerTranslation } from 'react-native-paper-dates';
-import { TolgeeInstance } from '@tolgee/react';
+import type { TolgeeInstance } from '@tolgee/core';
 
 export function registerDateTranslations(tolgee: TolgeeInstance) {
   const t = tolgee.t;

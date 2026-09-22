@@ -9,7 +9,8 @@ import {
 } from '@/models/blueprint-diff';
 import { ExerciseBlueprint, WeightedExerciseBlueprint, formatPlannedSets, Rest } from '@/models/blueprint-models';
 import { EmptySession } from '@/models/session-models';
-import type { TranslationKey, UseTranslateResult } from '@tolgee/react';
+import type { UseTranslateResult } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 
 type T = UseTranslateResult['t'];
 

@@ -3,7 +3,8 @@ import WorkoutWorkerModule from '~/modules/workout-worker/src/WorkoutWorkerModul
 import { RootState } from '@/store';
 import { selectActiveSessionId, sessionFinished } from '@/store/stored-sessions';
 import { Dispatch } from '@reduxjs/toolkit';
-import { TolgeeInstance, TranslationKey } from '@tolgee/react';
+import type { TolgeeInstance } from '@tolgee/core';
+import type { TranslationKey } from '@tolgee/web';
 
 export class WorkoutWorker {
   private readonly listeners = new Map<WorkoutMessage['payload']['type'], ((e: WorkoutMessage['payload']) => void)[]>();

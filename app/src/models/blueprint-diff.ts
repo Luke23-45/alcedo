@@ -16,7 +16,8 @@ import {
   SessionBlueprint,
   WeightedExerciseBlueprint,
 } from './blueprint-models';
-import { TranslationKey, UseTranslateResult } from '@tolgee/react';
+import type { UseTranslateResult } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 import { uuid } from '@/utils/uuid';
 import { EmptySession } from '@/models/session-models';
 import { localeFormatBigNumber } from '@/utils/locale-bignumber';
