@@ -201,7 +201,7 @@ confirmation on device — no device used.
 | 19 | What's New | (settings spec) | done 2026-09-22 |
 | 20 | Backends [id] | — | done 2026-09-22 (contract only, design-first) |
 | 21 | Exercise search | — | done 2026-09-22 |
-| 22 | Exercise history | — | pending |
+| 22 | Exercise history | — | done 2026-09-22 |
 | 23 | Manage exercises | — | pending |
 | 24 | AI planner chat | — | pending |
 
@@ -1750,6 +1750,72 @@ errors on touched files; `oxfmt --check` clean on touched files;
 `exercise-search-simulation.spec.ts` (new, 13 tests: filter engine,
 day bucketing, recents dedup/cap/clear, request/result flow, staleness
 guard, i18n key coverage).
+
+**Not claimed:** pixel/animation feel, real-device performance — no
+device used.
+
+### 22. Exercise history (`/exercise-history`)
+- Verified 2026-09-22. Route `app/src/app/exercise-history.tsx` (thin
+  wrapper: `name` + `type` params, unknown type → redirect to
+  `/(tabs)/(session)`); screen `components/smart/exercise-history.tsx`;
+  presentation `components/presentation/workout/exercise-history-list.tsx`
+  (+ styles); reached from workout editor/view "view all", Trends
+  exercise-detail, and the history comparison table via
+  `getExerciseHistoryHref` (name is `encodeURIComponent`-ed; the type
+  segment is the blueprint class name — verified against the stored
+  movement key, not `weighted`).
+- Sections inventoried (render order): custom nav bar (back + expand/
+  collapse menu via `page-actions`), PR banner (heaviest completed
+  resistance set ever, ties → more reps; value line "weight × reps",
+  e1RM, date), top-set weight chart (last 8 qualifying weighted sessions,
+  oldest→newest; newest session's unit wins — kg and lb never mix;
+  subtitle "first → last · ±x.x%" with a zero-first guard; honest
+  one-point/no-point states), past-session rows (first 4, See All / Show
+  Less; row press → `/history/edit?sessionId=…`), weighted / bodyweight /
+  cardio summaries (incomplete sets excluded everywhere), empty state
+  (`exercise.never_done_before.message`).
+- State matrix simulated: empty history (banner + chart hidden, empty
+  state shown), one/many rows with expand/collapse, weighted/
+  bodyweight/cardio entries, incomplete sets, PR tie-breaking, mixed-unit
+  chart conversion (newest unit wins), zero-baseline subtitle, row
+  navigation encoding, href encoding.
+
+**Bugs found and fixed:**
+1. Month badge was hard-coded English: `session.date.month().name()
+   .slice(0, 3)`. Every other date badge (session-comparison-table,
+   calendar) goes through `useFormatDate`; the tile now formats
+   `{ month: 'short' }` locale-aware and keeps the badge's uppercase
+   styling via `.toUpperCase()` (badge convention, matches
+   session-comparison-table).
+2. Extracted the PR/chart/row/subtitle engine into RN-free
+   `exercise-history-logic.ts` (house rule: non-visual modules stay flat)
+   so the simulation can import it without the RN chain.
+   `getExerciseHistoryHref` moved there too; the screen re-exports it so
+   `exercise-section.tsx` keeps working unchanged.
+3. Trends exercise-detail "view all" linked to a movement key that can
+   never exist: `expanded-weighted-exercise.tsx` hand-built
+   `…&type=weighted`, but stored movement keys use the blueprint class
+   name (`movementKeyFor(name, 'WeightedExerciseBlueprint')`), so the
+   history screen opened empty for every exercise. It now pushes
+   `getExerciseHistoryHref(detail.logBlueprint)` — the same builder the
+   workout editor uses. A round-trip test pins the contract: the href's
+   name/type segments must decode back to `blueprint.movementKey()`.
+
+**Deliberate non-changes:**
+- Weighted chart still requires ≥ 1 completed resistance set per session;
+  bodyweight/non-resistance work never enters the PR or the chart
+  (existing, honest contract).
+- `INITIAL_VISIBLE_ROWS = 4` unchanged; nav-bar expand menu still the
+  discoverability path for See All.
+
+**Verification:** typecheck 0 errors; full vitest pending page 23–24;
+oxlint 0 errors on touched files; `oxfmt --check` clean on touched files;
+`exercise-history-simulation.spec.ts` (new, 15 tests: PR heaviest/tie/
+exclusion, chart windowing/order/unit rule, subtitle range + signed
+percent + zero guard, weighted row headline/subline/PR chip, PR-chip
+exclusivity, locale-aware month badge source sweep, 4-row collapse,
+weight formatting, href encoding + movement-key round-trip, i18n key
+coverage).
 
 **Not claimed:** pixel/animation feel, real-device performance — no
 device used.

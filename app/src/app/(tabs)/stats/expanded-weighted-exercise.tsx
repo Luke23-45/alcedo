@@ -24,6 +24,7 @@ import { T, useTranslate } from '@tolgee/react';
 import { Href, Stack } from 'expo-router';
 import { useLocalSearchParams, useRouter } from 'expo-router/build/hooks';
 import { useEffect } from 'react';
+import { getExerciseHistoryHref } from '@/components/smart/exercise-history-logic';
 
 /**
  * Exercise Progress Detail (trends-dark Screen 2): all-time detail for one
@@ -63,10 +64,15 @@ export default function ExerciseDetailPage() {
     }
   };
   const editDetails = () => push('/(tabs)/settings/manage-exercises' as Href);
-  const openSession = (sessionId: string) =>
-    push(`/history/edit?sessionId=${encodeURIComponent(sessionId)}` as Href);
-  const openFullHistory = () =>
-    push(`/exercise-history?name=${encodeURIComponent(exerciseName)}&type=weighted` as Href);
+  const openSession = (sessionId: string) => push(`/history/edit?sessionId=${encodeURIComponent(sessionId)}` as Href);
+  const openFullHistory = () => {
+    // The type segment must be the blueprint class name — that is what
+    // movementKeyFor() uses for stored sessions; a hand-written
+    // "type=weighted" would key into a movement that never exists.
+    if (detail?.logBlueprint) {
+      push(getExerciseHistoryHref(detail.logBlueprint), { withAnchor: true });
+    }
+  };
 
   const shortName = detail?.shortName ?? exerciseName;
   const menuItems = [
@@ -125,9 +131,7 @@ function LoadedDetail({
   ]
     .filter(Boolean)
     .join(' · ');
-  const typeChip = detail.mechanic
-    ? translateExerciseMeta(t, 'mechanic', detail.mechanic).toUpperCase()
-    : null;
+  const typeChip = detail.mechanic ? translateExerciseMeta(t, 'mechanic', detail.mechanic).toUpperCase() : null;
   const latest = detail.sessions[0]!;
 
   return (
@@ -162,12 +166,7 @@ function LoadedDetail({
         onSessionPress={onSessionPress}
         onViewAll={onViewAll}
       />
-      <ExerciseDetailActions
-        shortName={detail.shortName}
-        onLogSession={onLogSession}
-        onEditDetails={onEditDetails}
-      />
+      <ExerciseDetailActions shortName={detail.shortName} onLogSession={onLogSession} onEditDetails={onEditDetails} />
     </Body>
   );
 }
-
