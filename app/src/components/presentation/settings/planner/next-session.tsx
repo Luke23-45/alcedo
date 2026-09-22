@@ -109,7 +109,12 @@ export function NextSession() {
   const recentNames = useAppSelectorWithArg(selectCompletedDistinctSessionNames, today.minusDays(7));
   const allSessions = Object.values(useAppSelector(selectSessions));
 
-  const availability = nextSessionAvailability(enabled, program !== undefined, trainingDays.length);
+  const availability = nextSessionAvailability(
+    enabled,
+    program !== undefined,
+    trainingDays.length,
+    program?.sessions.length ?? 0,
+  );
 
   if (availability !== 'ready' || !program) {
     const copy =
@@ -125,11 +130,17 @@ export function NextSession() {
               caption: t(settingsKey('settings.planner.next_session.empty_program.caption')),
               cta: t(settingsKey('settings.planner.next_session.empty_program.cta')),
             }
-          : {
-              title: t(settingsKey('settings.planner.next_session.empty_days.title')),
-              caption: t(settingsKey('settings.planner.next_session.empty_days.caption')),
-              cta: undefined as string | undefined,
-            };
+          : availability === 'no-sessions'
+            ? {
+                title: t(settingsKey('settings.planner.next_session.no_sessions.title')),
+                caption: t(settingsKey('settings.planner.next_session.no_sessions.caption')),
+                cta: undefined as string | undefined,
+              }
+            : {
+                title: t(settingsKey('settings.planner.next_session.empty_days.title')),
+                caption: t(settingsKey('settings.planner.next_session.empty_days.caption')),
+                cta: undefined as string | undefined,
+              };
     return (
       <NextCard>
         <EmptyWrap>

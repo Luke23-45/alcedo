@@ -38,7 +38,7 @@ export function HomeAuras() {
 
   return (
     <AuraLayer pointerEvents="none">
-      <Svg width="100%" height="100%" viewBox="0 0 400 2300" preserveAspectRatio="none">
+      <Svg width="100%" height="100%" viewBox="0 0 400 2300" preserveAspectRatio="xMidYMid slice">
         <Defs>
           {auras.map((a) => (
             <RadialGradient key={a.id} id={a.id} cx="50%" cy="50%" r="50%">

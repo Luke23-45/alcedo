@@ -5,18 +5,23 @@ export const TilesRow = styled.View`
   gap: ${({ theme }) => theme.space.md}px;
 `;
 
-/** 60pt = 82pt tile − 2pt edge − 20pt padding. Content pins to top and bottom. */
+/** 60pt budget = 82pt tile − 2pt edge − 20pt padding. Content pins to top and bottom. */
 export const TileBody = styled.View`
-  height: 60px;
+  min-height: 60px;
   justify-content: space-between;
 `;
 
-/** Glyphs / chips ride top-right; the SampleBadge sits top-left. */
+/**
+ * Glyphs / chips ride top-right; the SampleBadge sits top-left. Wraps instead
+ * of colliding on 320pt screens — the tile grows via its min-height.
+ */
 export const TileTop = styled.View`
   flex-direction: row;
   align-items: flex-start;
   justify-content: space-between;
-  height: 20px;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  min-height: 20px;
 `;
 
 export const TileBottom = styled.View``;

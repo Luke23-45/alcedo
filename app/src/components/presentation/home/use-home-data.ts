@@ -5,6 +5,7 @@ import { Session } from '@/models/session-models';
 import { RecordedWeightedExercise } from '@/models/session-models/recorded-weighted-exercise';
 import { Weight } from '@/models/weight';
 import { formatSessionClock } from '@/components/presentation/summary/post-workout-format';
+import { formatGrouped } from '@/components/presentation/home/shared/home-format';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { LocalDate } from '@js-joda/core';
 import { useTranslate } from '@tolgee/react';
@@ -85,7 +86,7 @@ function sessionVolumeKg(session: Session): number {
 }
 
 function formatKg(valueKg: number): string {
-  return Math.round(valueKg).toLocaleString('en-US');
+  return formatGrouped(Math.round(valueKg));
 }
 
 /**
@@ -122,7 +123,7 @@ export function useHomeData(upcoming: readonly Session[] | undefined): HomeData 
         : t('home.greeting.evening'); // en: "Good evening"
   // js-joda text patterns (EEEE/MMMM) throw without the locale plugin, which we
   // don't ship — weekday/month names go through the cached Intl formatters instead.
-  const dateLabel = formatDate(today, { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+  const dateLabel = formatDate(today, { weekday: 'long', month: 'long', day: 'numeric' }).toLocaleUpperCase();
 
   const todaySession = upcoming?.[0];
   const todayExerciseCount = todaySession?.recordedExercises.length ?? 0;

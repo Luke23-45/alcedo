@@ -1,4 +1,5 @@
 import { useTranslate } from '@tolgee/react';
+import { Fragment } from 'react';
 import { fontWeight } from '@/styles/theme';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { HomeCard } from '../shared/home-card';
@@ -55,33 +56,37 @@ export function WeeklyChallengeSection() {
   ];
 
   return (
-    <HomeCard radius={30} pad={20} style={{ height: 140 }}>
+    <HomeCard radius={30} pad={20} style={{ minHeight: 140 }}>
       <S.HeaderRow>
         <HomeText
           weight={fontWeight.semibold}
           tracking={-0.3}
-          style={{ fontSize: 15.5, lineHeight: 19, color: titleColor }}
+          numberOfLines={1}
+          style={{ fontSize: 15.5, lineHeight: 19, color: titleColor, flexShrink: 1 }}
         >
           {t('home.weekly_challenge.title') /* en: "Weekly Challenge" */}
         </HomeText>
-        <S.DaysChip>
-          <HomeText
-            weight={fontWeight.bold}
-            micro
-            tracking={0.7}
-            style={{ fontSize: 8.5, lineHeight: 11, color: chipColor }}
-          >
-            {t('home.weekly_challenge.days_left').toUpperCase() /* en: "3 DAYS LEFT" */}
-          </HomeText>
-        </S.DaysChip>
-        <SampleBadge />
+        <S.RightGroup>
+          <S.DaysChip>
+            <HomeText
+              weight={fontWeight.bold}
+              micro
+              tracking={0.7}
+              style={{ fontSize: 9, lineHeight: 11, color: chipColor }}
+            >
+              {t('home.weekly_challenge.days_left').toLocaleUpperCase() /* en: "3 DAYS LEFT" */}
+            </HomeText>
+          </S.DaysChip>
+          <SampleBadge />
+        </S.RightGroup>
       </S.HeaderRow>
       <S.Rows>
         {challengers.map((challenger, index) => {
           const scoreColor = challenger.you ? youAccent : challenger.leader ? leaderColor : nameColor;
           return (
-            <S.Row key={challenger.name}>
-              {challenger.you && <S.YouHighlight pointerEvents="none" />}
+            <Fragment key={challenger.name}>
+              <S.Row>
+                {challenger.you && <S.YouHighlight pointerEvents="none" />}
               <S.RankBox>
                 <HomeText
                   weight={fontWeight.bold}
@@ -127,8 +132,9 @@ export function WeeklyChallengeSection() {
               >
                 {challenger.score}
               </HomeText>
+              </S.Row>
               {index < challengers.length - 1 && <S.Divider />}
-            </S.Row>
+            </>
           );
         })}
       </S.Rows>

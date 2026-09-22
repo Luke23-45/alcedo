@@ -14,9 +14,9 @@ export const Cards = styled(ScrollView).attrs(({ theme }) => ({
   margin-horizontal: ${({ theme }) => -theme.layout.screenPadding}px;
 `;
 
-export const ProgramCard = styled.View`
+export const ProgramCard = styled.Pressable`
   width: 160px;
-  height: 190px;
+  min-height: 190px;
   border-radius: ${({ theme }) => theme.home.radius.program}px;
   overflow: hidden;
   border-width: 1px;

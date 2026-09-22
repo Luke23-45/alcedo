@@ -36,7 +36,7 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
 import { Defs, RadialGradient, Rect, Stop, Svg } from 'react-native-svg';
-import { CalendarSection, EmptyDayWrap, Page, ScreenRoot, Section } from './history-screen.styles';
+import { CalendarSection, EmptyDayWrap, Page, ScreenRoot, Section } from '@/components/presentation/history/history-screen.styles';
 
 /** Ambient color fields behind the screen gradient — amber upper right, green lower left. */
 function Aurora() {

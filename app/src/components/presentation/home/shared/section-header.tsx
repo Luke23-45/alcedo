@@ -11,16 +11,19 @@ const Row = styled.View`
   align-items: center;
   justify-content: space-between;
   padding-horizontal: ${({ theme }) => theme.space.sm}px;
-  /* 12pt parent gap + 8pt = 30pt from card bottom to label baseline. */
+  /* 12pt parent gap + 8pt = 20pt rhythm above; the 12pt gap below comes from
+     the parent stack — no negative pull so large text never collides. */
   margin-top: 8px;
-  /* Pull the following content up so it sits 12pt below the baseline. */
-  margin-bottom: -2px;
+  margin-bottom: 0px;
 `;
 
 const LabelGroup = styled.View`
+  flex: 1;
   flex-direction: row;
   align-items: center;
   gap: ${({ theme }) => theme.space.sm}px;
+  min-width: 0;
+  margin-right: ${({ theme }) => theme.space.sm}px;
 `;
 
 const ActionRow = styled.View`
@@ -56,14 +59,20 @@ export function SectionHeader({
           weight={fontWeight.bold}
           micro
           tracking={1.35}
-          style={{ fontSize: 10, lineHeight: 12, color: labelColor }}
+          numberOfLines={1}
+          style={{ fontSize: 10, lineHeight: 12, color: labelColor, flexShrink: 1 }}
         >
-          {label.toUpperCase()}
+          {label.toLocaleUpperCase()}
         </HomeText>
         {sample ? <SampleBadge /> : null}
       </LabelGroup>
       {actionLabel && onAction ? (
-        <Pressable onPress={onAction} hitSlop={12} accessibilityRole="button">
+        <Pressable
+          onPress={onAction}
+          hitSlop={16}
+          accessibilityRole="button"
+          accessibilityLabel={actionLabel}
+        >
           <ActionRow>
             <HomeText
               weight={fontWeight.semibold}

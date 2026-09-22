@@ -11,7 +11,7 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
 import { Card } from 'react-native-paper';
 import Button from '@/components/presentation/foundation/button';
-import { shareRequestDisplayName, useShareRequestFlow } from './share-request-flow';
+import { shareRequestDisplayName, useShareRequestFlow } from '@/components/smart/share-request-flow';
 
 /**
  * /feed/share serves two flows:

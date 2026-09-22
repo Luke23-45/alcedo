@@ -1026,9 +1026,9 @@ haptics — no device used.
 ### 12. Feed shared-item (`/feed/share?id=` share-request branch)
 - Verified 2026-09-22. Route: `app/src/app/(tabs)/feed/share.tsx`; the
   `?id=` share-request deep link is a thin wrapper over the flow module
-  `app/src/app/(tabs)/feed/share-request-flow.ts` (new): `FeedSharePage`
-  renders `FeedShareRequest` when `?id=` is present, otherwise the
-  Share Composer. The social-dark spec does not cover this screen, so
+  `app/src/components/smart/share-request-flow.ts` (new; moved out of the
+  route tree): `FeedSharePage` renders `FeedShareRequest` when `?id=` is
+  present, otherwise the Share Composer. The social-dark spec does not cover this screen, so
   there is no new-design reference to match — it stays legacy Paper
   chrome; the audit focused on functional/honesty defects.
 - Sections inventoried (render order): stack title (`feed.feed.title`),
@@ -1070,12 +1070,14 @@ haptics — no device used.
    an `acceptedRef` guard (same pattern as the composer's double-Share
    fix).
 4. `share.tsx` — branch logic was inline and untestable. Extracted to
-   `share-request-flow.ts` (`useShareRequestFlow` + pure
+   `components/smart/share-request-flow.ts` (`useShareRequestFlow` + pure
    `shareRequestDisplayName`) so the fetch-on-mount contract, retry,
-   and the one-shot guard are unit-testable without a device.
+   and the one-shot guard are unit-testable without a device. Moved out
+   of `app/(tabs)/feed/` (a non-route module inside the route tree made
+   expo-router warn about a missing default export).
 
 **Tests (11 new, all green):**
-- `app/(tabs)/feed/share-request-simulation.spec.ts` (new, 11 tests):
+- `src/components/smart/share-request-simulation.spec.ts` (new, 11 tests):
   mount dispatches `fetchAndSetSharedFeedUser` with the exact
   `{ idOrLookup, name, fromUserAction }` payload; success stores a
   `PendingFeedUser` carrying the link name; empty `?name=` carries

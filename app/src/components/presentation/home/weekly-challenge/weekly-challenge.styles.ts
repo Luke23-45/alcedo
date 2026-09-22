@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { StyleSheet } from 'react-native';
 import { alpha } from '@/styles/theme';
 import { HomeGradient } from '../shared/home-gradient';
 
@@ -6,6 +7,15 @@ export const HeaderRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+`;
+
+/** Days chip + SAMPLE marker pinned right; the title takes the slack. */
+export const RightGroup = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${({ theme }) => theme.space.sm}px;
+  flex-shrink: 0;
+  margin-left: ${({ theme }) => theme.space.sm}px;
 `;
 
 /** 76×21 "3 DAYS LEFT" chip, amber wash. */
@@ -22,9 +32,9 @@ export const Rows = styled.View`
   margin-top: ${({ theme }) => theme.space.sm}px;
 `;
 
-/** 28pt leaderboard row. */
+/** 28pt leaderboard row budget. Grows instead of clipping long names. */
 export const Row = styled.View`
-  height: 28px;
+  min-height: 28px;
   flex-direction: row;
   align-items: center;
 `;
@@ -78,8 +88,12 @@ export const NameWrap = styled.View`
   margin-left: 10px;
 `;
 
+/**
+ * Hairline between leaderboard rows, inset to the avatar column
+ * (rank 16 + 12 gap + 26 avatar = 54) so it never crosses the glyphs.
+ */
 export const Divider = styled.View`
-  height: 1px;
-  background-color: ${alpha('#FFFFFF', 0.06)};
-  margin-left: 20px;
+  height: ${StyleSheet.hairlineWidth}px;
+  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.06) : alpha('#787880', 0.18))};
+  margin-left: 54px;
 `;

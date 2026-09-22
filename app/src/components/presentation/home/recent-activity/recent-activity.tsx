@@ -49,13 +49,13 @@ function KindGlyph({ kind }: { kind: RecentActivityItem['kind'] }) {
   );
 }
 
-function ChevronGlyph() {
+function ChevronGlyph({ color }: { color: string }) {
   return (
     <Svg width={8} height={12} viewBox="354 1446 10 12">
       <Path
         d="M357 1448 L361 1452 L357 1456"
         fill="none"
-        stroke="#48484A"
+        stroke={color}
         strokeWidth={1.9}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -80,6 +80,7 @@ export function RecentActivitySection({
   const titleColor = dark ? '#FFFFFF' : '#1C1C1E';
   const subtitleColor = dark ? '#86868B' : '#8E8E93';
   const unitColor = dark ? '#6C6C70' : '#AEAEB2';
+  const chevronColor = dark ? '#48484A' : '#C7C7CC';
 
   return (
     <>
@@ -103,7 +104,7 @@ export function RecentActivitySection({
               accessibilityRole="button"
               accessibilityLabel={item.title}
             >
-              <HomeCard radius={22} pad={14} style={{ height: 68 }}>
+              <HomeCard radius={22} pad={14} style={{ minHeight: 68 }}>
                 <S.RowInner>
                   <S.Tile $kind={item.kind}>
                     <KindGlyph kind={item.kind} />
@@ -143,7 +144,7 @@ export function RecentActivitySection({
                       {item.unit}
                     </HomeText>
                   </S.ValueBlock>
-                  <ChevronGlyph />
+                  <ChevronGlyph color={chevronColor} />
                 </S.RowInner>
               </HomeCard>
             </S.RowPressable>

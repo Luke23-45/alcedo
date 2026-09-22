@@ -2,9 +2,9 @@ import styled from 'styled-components/native';
 import { alpha } from '@/styles/theme';
 import { HomeGradient } from '../shared/home-gradient';
 
-/** 74pt = 104pt card − 2pt edge − 28pt padding. */
+/** 74pt budget = 104pt card − 2pt edge − 28pt padding. Grows for the difficulty chip. */
 export const CardBody = styled.View`
-  height: 74px;
+  min-height: 74px;
   flex-direction: row;
   align-items: center;
 `;
@@ -36,23 +36,23 @@ export const TextColumn = styled.View`
   margin-right: ${({ theme }) => theme.space.md}px;
 `;
 
-/** Difficulty pill: 86×19, translucent white with a hairline edge. */
+/** Difficulty pill: 86×19, neutral wash with a hairline edge per mode. */
 export const DifficultyChip = styled.View`
   align-self: flex-start;
   height: 19px;
   padding-horizontal: ${({ theme }) => theme.space.md}px;
   border-radius: ${({ theme }) => theme.radius.full}px;
-  background-color: ${alpha('#FFFFFF', 0.08)};
+  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.08) : alpha('#787880', 0.12))};
   border-width: 0.7px;
-  border-color: ${alpha('#FFFFFF', 0.07)};
+  border-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.07) : alpha('#787880', 0.2))};
   align-items: center;
   justify-content: center;
   margin-top: 6px;
 `;
 
 export const PlayPressable = styled.Pressable`
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: ${({ theme }) => theme.radius.full}px;
   align-items: center;
   justify-content: center;
@@ -90,7 +90,7 @@ export const ActionTile = styled.View`
 
 export const StartTilePressable = styled.Pressable`
   flex: 1;
-  height: 76px;
+  min-height: 76px;
   border-radius: ${({ theme }) => theme.home.radius.tile}px;
   overflow: hidden;
   border-width: 1px;

@@ -22,17 +22,19 @@ function SparkleGlyph() {
   );
 }
 
-function MeshGlyph() {
+function MeshGlyph({ dark }: { dark: boolean }) {
+  const violet = dark ? '#8E7BFF' : '#8944AB';
+  const cyan = dark ? '#2CE9F7' : '#00A6C9';
   return (
-    <Svg width="100%" height="100%" viewBox="0 0 361 156">
+    <Svg width="100%" height="100%" viewBox="0 0 361 156" preserveAspectRatio="xMidYMid slice">
       <Defs>
         <RadialGradient id="coachMeshV" cx="320" cy="25" r="150" gradientUnits="userSpaceOnUse">
-          <Stop offset="0" stopColor="#8E7BFF" stopOpacity={0.3} />
-          <Stop offset="1" stopColor="#8E7BFF" stopOpacity={0} />
+          <Stop offset="0" stopColor={violet} stopOpacity={dark ? 0.3 : 0.16} />
+          <Stop offset="1" stopColor={violet} stopOpacity={0} />
         </RadialGradient>
         <RadialGradient id="coachMeshC" cx="50" cy="150" r="130" gradientUnits="userSpaceOnUse">
-          <Stop offset="0" stopColor="#2CE9F7" stopOpacity={0.16} />
-          <Stop offset="1" stopColor="#2CE9F7" stopOpacity={0} />
+          <Stop offset="0" stopColor={cyan} stopOpacity={dark ? 0.16 : 0.11} />
+          <Stop offset="1" stopColor={cyan} stopOpacity={0} />
         </RadialGradient>
       </Defs>
       <Path d="M0 0 H361 V156 H0 Z" fill="url(#coachMeshV)" />
@@ -71,10 +73,18 @@ function RecoveryRing() {
  * A button slot that is only pressable when a handler is provided — no dead
  * pressables. The visual button stays identical either way.
  */
-function ActionSlot({ onPress, children }: { onPress?: () => void; children: ReactNode }) {
+function ActionSlot({
+  onPress,
+  label,
+  children,
+}: {
+  onPress?: () => void;
+  label: string;
+  children: ReactNode;
+}) {
   if (onPress) {
     return (
-      <S.SlotPressable onPress={onPress} accessibilityRole="button">
+      <S.SlotPressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
         {children}
       </S.SlotPressable>
     );
@@ -95,18 +105,26 @@ export function CoachCard({ onAdjust, onDismiss }: { onAdjust?: () => void; onDi
 
   return (
     <S.BorderLayer
-      colors={['rgba(167,139,250,0.55)', 'rgba(44,233,247,0.22)', 'rgba(255,90,200,0.10)']}
+      colors={
+        dark
+          ? (['rgba(167,139,250,0.55)', 'rgba(44,233,247,0.22)', 'rgba(255,90,200,0.10)'] as const)
+          : (['rgba(137,68,171,0.45)', 'rgba(0,166,201,0.22)', 'rgba(255,45,85,0.10)'] as const)
+      }
       locations={[0, 0.5, 1]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={[{ borderCurve: 'continuous' }, { height: 156 }]}
+      style={[{ borderCurve: 'continuous' }, { minHeight: 156 }]}
     >
       <S.BodyLayer variant="cardBody" style={{ borderCurve: 'continuous' }}>
         <S.MeshLayer pointerEvents="none">
-          <MeshGlyph />
+          <MeshGlyph dark={dark} />
         </S.MeshLayer>
         <S.HeaderRow>
-          <S.IconBadge colors={['#8E7BFF', '#FF5AC8']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+          <S.IconBadge
+            colors={dark ? (['#8E7BFF', '#FF5AC8'] as const) : (['#7B61FF', '#FF4FB8'] as const)}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
             <S.IconGloss />
             <SparkleGlyph />
           </S.IconBadge>
@@ -116,7 +134,7 @@ export function CoachCard({ onAdjust, onDismiss }: { onAdjust?: () => void; onDi
             tracking={1.3}
             style={{ fontSize: 9, lineHeight: 11, color: labelColor, marginLeft: 10 }}
           >
-            {t('home.coach.label').toUpperCase() /* en: "KINETIC COACH" */}
+            {t('home.coach.label').toLocaleUpperCase() /* en: "KINETIC COACH" */}
           </HomeText>
           <SampleBadge />
           <S.BetaChip>
@@ -124,9 +142,9 @@ export function CoachCard({ onAdjust, onDismiss }: { onAdjust?: () => void; onDi
               weight={fontWeight.bold}
               micro
               tracking={0.8}
-              style={{ fontSize: 8.5, lineHeight: 11, color: betaColor }}
+              style={{ fontSize: 9, lineHeight: 11, color: betaColor }}
             >
-              {t('home.coach.beta').toUpperCase() /* en: "BETA" */}
+              {t('home.coach.beta').toLocaleUpperCase() /* en: "BETA" */}
             </HomeText>
           </S.BetaChip>
         </S.HeaderRow>
@@ -167,16 +185,16 @@ export function CoachCard({ onAdjust, onDismiss }: { onAdjust?: () => void; onDi
                 weight={fontWeight.bold}
                 micro
                 tracking={0.6}
-                style={{ fontSize: 6.5, lineHeight: 8, color: recLabelColor }}
+                style={{ fontSize: 8, lineHeight: 10, color: recLabelColor }}
               >
-                {t('home.coach.unit').toUpperCase() /* en: "REC" */}
+                {t('home.coach.unit').toLocaleUpperCase() /* en: "REC" */}
               </HomeText>
             </S.RingCenter>
           </S.RingWrap>
         </S.BodyRow>
 
         <S.ButtonsRow>
-          <ActionSlot onPress={onAdjust}>
+          <ActionSlot onPress={onAdjust} label={t('home.coach.adjust') /* en: "Adjust Plan" */}>
             <S.AdjustButton variant="brand" style={{ borderCurve: 'continuous' }}>
               <S.AdjustGloss />
               <HomeText
@@ -188,7 +206,7 @@ export function CoachCard({ onAdjust, onDismiss }: { onAdjust?: () => void; onDi
               </HomeText>
             </S.AdjustButton>
           </ActionSlot>
-          <ActionSlot onPress={onDismiss}>
+          <ActionSlot onPress={onDismiss} label={t('home.coach.dismiss') /* en: "Not now" */}>
             <S.DismissButton>
               <HomeText
                 weight={fontWeight.semibold}

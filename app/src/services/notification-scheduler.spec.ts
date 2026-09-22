@@ -26,7 +26,9 @@ vi.mock('expo-notifications', () => ({
   cancelScheduledNotificationAsync,
   setBadgeCountAsync: vi.fn(),
   setNotificationHandler: vi.fn(),
-  SchedulableTriggerInputTypes: { CALENDAR: 'calendar' },
+  // Android rejects `calendar` triggers outright, so the scheduler asks for the
+  // platform-agnostic weekly kind. The mock mirrors the real enum's values.
+  SchedulableTriggerInputTypes: { CALENDAR: 'calendar', WEEKLY: 'weekly' },
 }));
 
 import { rescheduleWeeklySummary, rescheduleWorkoutReminders, type ReminderSchedule } from './notification-scheduler';
@@ -62,7 +64,7 @@ describe('rescheduleWorkoutReminders', () => {
     const first = scheduleNotificationAsync.mock.calls[0]![0];
     expect(first.identifier).toBe('alcedo.workout-reminder.monday');
     expect(first.content.title).toBe('Time to train');
-    expect(first.trigger).toMatchObject({ weekday: 2, hour: 17, minute: 30, repeats: true });
+    expect(first.trigger).toMatchObject({ type: 'weekly', weekday: 2, hour: 17, minute: 30 });
   });
 
   it('requests permission once when not yet granted, and schedules on grant', async () => {
@@ -114,7 +116,7 @@ describe('rescheduleWeeklySummary', () => {
     expect(cancelScheduledNotificationAsync).toHaveBeenCalledWith('alcedo.weekly-summary');
     const [call] = scheduleNotificationAsync.mock.calls;
     expect(call![0].identifier).toBe('alcedo.weekly-summary');
-    expect(call![0].trigger).toMatchObject({ weekday: 1, hour: 8, minute: 0, repeats: true });
+    expect(call![0].trigger).toMatchObject({ type: 'weekly', weekday: 1, hour: 8, minute: 0 });
   });
 
   it('returns false when the OS denies permission', async () => {

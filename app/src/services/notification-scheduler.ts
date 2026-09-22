@@ -21,10 +21,13 @@ import {
  * summary on Sunday mornings. Identifiers are deterministic, so rescheduling
  * replaces rather than duplicates.
  *
- * Platform note: the shared expo-notifications scheduler is intentionally
- * inactive on Android (the workout worker owns notifications there — see
- * notification-service.ts). These reminder/summary triggers go through the
- * same service boundary so they inherit that behavior.
+ * Platform note: these weekly triggers go through expo-notifications on both
+ * platforms. Android rejects `calendar` triggers outright ("Trigger of type:
+ * calendar is not supported on Android"), while `weekly` is implemented
+ * natively there and maps to the same repeating
+ * `UNCalendarNotificationTrigger` (weekday + hour + minute, `repeats: true`)
+ * on iOS — so one trigger shape covers both. The workout worker still owns the
+ * in-session notifications (see notification-service.ts).
  */
 
 export interface ReminderSchedule {
@@ -44,16 +47,17 @@ async function permissionGranted(): Promise<boolean> {
   return requested.granted;
 }
 
-async function scheduleCalendarTrigger(trigger: ReminderTrigger, title: string, body: string): Promise<void> {
+async function scheduleWeeklyTrigger(trigger: ReminderTrigger, title: string, body: string): Promise<void> {
   await scheduleNotificationAsync({
     identifier: trigger.identifier,
     content: { title, body, sound: true },
     trigger: {
-      type: SchedulableTriggerInputTypes.CALENDAR,
+      // WEEKLY, not CALENDAR: Android has no calendar trigger, and iOS's weekly
+      // trigger is the same repeating weekday/hour/minute date-component match.
+      type: SchedulableTriggerInputTypes.WEEKLY,
       weekday: trigger.weekday,
       hour: trigger.hour,
       minute: trigger.minute,
-      repeats: true,
     },
   });
 }
@@ -87,7 +91,7 @@ export async function rescheduleWorkoutReminders(
     return false;
   }
   for (const trigger of triggers) {
-    await scheduleCalendarTrigger(trigger, strings.title, strings.body);
+    await scheduleWeeklyTrigger(trigger, strings.title, strings.body);
   }
   return true;
 }
@@ -103,7 +107,7 @@ export async function rescheduleWeeklySummary(
   if (!(await permissionGranted())) {
     return false;
   }
-  await scheduleCalendarTrigger(weeklySummaryTrigger(), strings.title, strings.body);
+  await scheduleWeeklyTrigger(weeklySummaryTrigger(), strings.title, strings.body);
   return true;
 }
 

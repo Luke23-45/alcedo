@@ -72,11 +72,12 @@ describe('planner-data', () => {
   });
 
   it('derives the next-session availability matrix', () => {
-    expect(nextSessionAvailability(true, true, 5)).toBe('ready');
-    expect(nextSessionAvailability(false, true, 5)).toBe('planner-off');
-    expect(nextSessionAvailability(false, false, 0)).toBe('planner-off');
-    expect(nextSessionAvailability(true, false, 5)).toBe('no-program');
-    expect(nextSessionAvailability(true, true, 0)).toBe('no-training-days');
+    expect(nextSessionAvailability(true, true, 5, 3)).toBe('ready');
+    expect(nextSessionAvailability(false, true, 5, 3)).toBe('planner-off');
+    expect(nextSessionAvailability(false, false, 0, 0)).toBe('planner-off');
+    expect(nextSessionAvailability(true, false, 5, 0)).toBe('no-program');
+    expect(nextSessionAvailability(true, true, 5, 0)).toBe('no-sessions');
+    expect(nextSessionAvailability(true, true, 0, 3)).toBe('no-training-days');
   });
 
   it('finds the Monday of a week', () => {

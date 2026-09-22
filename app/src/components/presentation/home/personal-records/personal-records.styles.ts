@@ -8,17 +8,17 @@ export const HeaderRow = styled.View`
   justify-content: space-between;
 `;
 
-/** 76×21 "THIS MONTH" chip, white wash. */
+/** 76×21 "THIS MONTH" chip, neutral wash per mode. */
 export const MonthChip = styled.View`
   width: 76px;
   height: 21px;
   border-radius: 10.5px;
-  background-color: ${alpha('#FFFFFF', 0.07)};
+  background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.07) : alpha('#787880', 0.12))};
   align-items: center;
   justify-content: center;
 `;
 
-/** Three 99×76 tiles, 12pt gaps. */
+/** Three tiles (99pt reference), 12pt gaps. Flex shares the row on narrow screens. */
 export const TilesRow = styled.View`
   flex-direction: row;
   gap: 12px;
@@ -26,17 +26,22 @@ export const TilesRow = styled.View`
 `;
 
 export const Tile = styled(HomeGradient).attrs({ variant: 'tile' as const })`
-  width: 99px;
-  height: 76px;
+  flex: 1;
+  min-width: 0px;
+  min-height: 76px;
   border-radius: 20px;
   padding: ${({ theme }) => theme.space.md}px;
   overflow: hidden;
 `;
 
-export const TileInner = styled.View<{ $highlight: boolean }>`
+/**
+ * Amber inner highlight for NEW records only. The card edge carries the
+ * default stroke, so non-highlighted tiles render no second border.
+ */
+export const TileInner = styled.View`
   border-width: 0.8px;
   border-radius: 19px;
-  border-color: ${({ $highlight }) => ($highlight ? alpha('#FF9F0A', 0.22) : alpha('#FFFFFF', 0.07))};
+  border-color: ${alpha('#FF9F0A', 0.22)};
   position: absolute;
   top: 0;
   left: 0;

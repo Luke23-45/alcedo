@@ -1,6 +1,5 @@
 // oxlint-disable typescript/no-misused-spread
 import { File, Paths } from 'expo-file-system';
-import { uuid } from '@/utils/uuid';
 
 const LOG_FILE_KEY = 'app.log';
 
@@ -62,32 +61,40 @@ export class Logger {
     }
   }
 
+  /**
+   * Appends one line, creating the file when needed.
+   *
+   * Append-only by design: the old read-modify-write cycle (read the log, write
+   * a temp file, move it over the log) had a window in which another writer — a
+   * second `Logger` instance, or `clearLogs()` — could remove the file between
+   * the `exists` check and the read. That surfaced on Android as
+   * "FileSystemFile.text has been rejected … app.log: open failed: ENOENT".
+   */
   private async appendToFile(line: string): Promise<void> {
     const finalFile = getFile(LOG_FILE_KEY);
-    const tempFile = getFile(LOG_FILE_KEY + '-tmp-' + uuid());
+    finalFile.write(line + '\n', { append: true });
 
-    let existingLines: string[] = [];
-    if (finalFile.exists) {
-      const existing = await finalFile.text();
-      existingLines = existing ? existing.split('\n').filter(Boolean) : [];
+    // Trim to maxFileLines so the file doesn't grow unbounded.
+    const lines = await this.readLines(finalFile);
+    if (lines.length > this.maxFileLines) {
+      finalFile.write(lines.slice(lines.length - this.maxFileLines).join('\n') + '\n');
     }
+  }
 
-    existingLines.push(line);
-
-    // Trim to maxFileLines so the file doesn't grow unbounded
-    if (existingLines.length > this.maxFileLines) {
-      existingLines = existingLines.slice(existingLines.length - this.maxFileLines);
+  /** The log file's non-empty lines; empty when it is missing or vanished mid-read. */
+  private async readLines(file: File): Promise<string[]> {
+    try {
+      if (!file.exists) {
+        return [];
+      }
+      const content = await file.text();
+      return content ? content.split('\n').filter(Boolean) : [];
+    } catch {
+      // The file was removed between the exists check and the read (a concurrent
+      // writer's clear, or clearLogs). The line just written is already durable,
+      // so skipping the trim is the safe outcome.
+      return [];
     }
-
-    const content = existingLines.join('\n') + '\n';
-
-    tempFile.create();
-    tempFile.write(content);
-
-    if (finalFile.exists) {
-      finalFile.delete();
-    }
-    await tempFile.move(finalFile, { overwrite: true });
   }
 
   private enqueueWrite(line: string): void {

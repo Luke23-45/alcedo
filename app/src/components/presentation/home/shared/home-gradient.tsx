@@ -53,8 +53,9 @@ function specFor(theme: AppTheme, variant: HomeGradientVariant): GradientSpec {
       };
     }
     case 'water':
+      // Reference gWater: dark #0A84FF→#5EDCF0, light #007AFF→#32ADE6.
       return {
-        colors: ['#0A84FF', '#5EDCF0'],
+        colors: theme.isDark ? (['#0A84FF', '#5EDCF0'] as const) : (['#007AFF', '#32ADE6'] as const),
         locations: [0, 1],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
@@ -79,9 +80,11 @@ function specFor(theme: AppTheme, variant: HomeGradientVariant): GradientSpec {
         end: { x: 0.5, y: 1 },
       };
     case 'brand':
-      // Reference gBrand: #FFB03A → #FF6A3D → #FF2D55, stops 0/0.45/1.
+      // Reference gBrand: dark #FFB03A→#FF6A3D→#FF2D55, light #FFA312→#FF5A3C→#E8003F.
       return {
-        colors: ['#FFB03A', '#FF6A3D', '#FF2D55'],
+        colors: theme.isDark
+          ? (['#FFB03A', '#FF6A3D', '#FF2D55'] as const)
+          : (['#FFA312', '#FF5A3C', '#E8003F'] as const),
         locations: [0, 0.45, 1],
         start: { x: 0, y: 0 },
         end: { x: 0.6, y: 1 },
@@ -129,7 +132,11 @@ export function HomeGradient({
   return (
     <LinearGradient
       colors={colors ?? spec.colors}
-      locations={locations ?? spec.locations}
+      // An explicit `colors` override invalidates the variant's stop positions:
+      // a 2-stop override with a 3-length `locations` (or vice versa) makes
+      // expo-linear-gradient warn and mis-place the stops. Leaving `locations`
+      // undefined lets it space the override's stops evenly.
+      locations={locations ?? (colors ? undefined : spec.locations)}
       start={start ?? spec.start}
       end={end ?? spec.end}
       style={style}

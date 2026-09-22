@@ -11,7 +11,7 @@ export const List = styled.View`
 export const RowInner = styled.View`
   flex-direction: row;
   align-items: center;
-  height: 40px;
+  min-height: 40px;
 `;
 
 /** 40×40 kind-tinted tile, rx14. Legs → blue well, upper → purple well. */

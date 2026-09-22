@@ -64,7 +64,10 @@ export function PreferencesGroup() {
         wellHue="#0A84FF"
         iconColor="#5EB0FF"
         title={t(settingsKey('settings.home.language.title'))}
-        subtitle={t(settingsKey('settings.home.language.subtitle'), { language })}
+        // The placeholder must not be named `language`: Tolgee reads a param
+        // literally called `language` as its language *override* option, strips
+        // it from the params object, and then throws "Missing parameter".
+        subtitle={t(settingsKey('settings.home.language.subtitle'), { languageName: language })}
         value={language}
         onPress={() => push('/settings/localization')}
       />
