@@ -267,3 +267,20 @@ Merging directly into `main` is rejected (no isolated verification gate;
   verified by SHA: `backup/main-before-merge`=`8491720`,
   `backup/redesign-backup-and-restore`=`f989506`,
   `backup/verification-final`=`ce8ef59`.
+
+- 2026-09-22 Phase 1 DONE (verified). INCIDENT: first ledger-commit attempt
+  (`9cf1a97`) swept the 6 pre-staged H1 entries into the commit — the exact
+  trap H1 warned about (I added docs files without clearing the index first).
+  Caught on post-commit review (8 files vs expected 2), before any push.
+  Recovered with `git reset --soft f989506` (HEAD restored, history clean),
+  then `git reset` (index emptied; worktree byte-intact, renames correctly
+  showing as D+?? pairs). Redo, clean order: tmp junk deleted (5 files, were
+  backed up in Phase 0); index verified empty; `git rm error.md` staged only
+  `D error.md`; `git commit --amend` → `f18b748` "render fix" (parent still
+  `af29a5e`, 26 files, `error.md` confirmed absent via `ls-tree`); ledger
+  commit → `82bb2a2` (exactly 2 files); `git add -A` reviewed entry-by-entry
+  (no `error.md`, no `tmp-*`, 5 R100 renames + theme-chooser split + 3 new
+  files) → WIP commit `e94107e` (64 files); tree confirmed clean.
+  `git push origin redesign/backup-and-restore` → `af29a5e..e94107e`,
+  local/remote in sync. Lesson recorded: verify `git diff --cached` is empty
+  BEFORE every `git add`, not just before amend.
