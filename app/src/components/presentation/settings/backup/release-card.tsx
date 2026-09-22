@@ -1,5 +1,6 @@
 import Icon from '@/components/presentation/foundation/icon';
 import { useTranslate } from '@tolgee/react';
+import * as Application from 'expo-application';
 import { chevronColor } from '../shared/grouped-settings-list.styles';
 import { settingsKey } from '../shared/settings-i18n';
 import * as S from './release-card.styles';
@@ -15,8 +16,9 @@ const BULLET_KEYS = [
 ] as const;
 
 /**
- * Release card (settings-dark.md Screen 6): brand tile, "Version 1.0.0",
- * NEW pill while unread, "June 2025 · build 238", the five contract bullets.
+ * Release card (settings-dark.md Screen 6): brand tile, the real
+ * app version/build from expo-application (never a fabricated build
+ * number), NEW pill while unread, and the five contract bullets.
  * Shared by the backup screen (standalone) and the what's-new route (with
  * "View all release notes" scrolling to the real entries).
  */
@@ -31,6 +33,10 @@ export function ReleaseCard({
 }) {
   const { t } = useTranslate();
 
+  // Real values from the native shell; the fallbacks match app.json.
+  const version = Application.nativeApplicationVersion ?? '1.0.0';
+  const build = Application.nativeBuildVersion ?? '1';
+
   return (
     <CardShell>
       <S.ReleaseHeader>
@@ -44,8 +50,8 @@ export function ReleaseCard({
           <Icon source="star" size={20} color="#FFFFFF" />
         </S.ReleaseTileBase>
         <S.ReleaseHeaderText>
-          <S.ReleaseTitle>{t(settingsKey('settings.backup.release.title'))}</S.ReleaseTitle>
-          <S.ReleaseMeta>{t(settingsKey('settings.backup.release.meta'))}</S.ReleaseMeta>
+          <S.ReleaseTitle>{t(settingsKey('settings.backup.release.title'), { version })}</S.ReleaseTitle>
+          <S.ReleaseMeta>{t(settingsKey('settings.backup.release.meta'), { build })}</S.ReleaseMeta>
         </S.ReleaseHeaderText>
         {isNew ? (
           <S.ReleasePill accessibilityLabel={t(settingsKey('settings.backup.release.badge'))}>

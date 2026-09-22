@@ -197,7 +197,7 @@ confirmation on device — no device used.
 | 15 | Settings notifications | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 16 | Settings AI planner | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 17 | Settings programs & import | docs/new_design/settings-dark.md | done 2026-09-22 |
-| 18 | Backup hub + remote/export/import | docs/new_design/backup-redesign.md | pending |
+| 18 | Backup hub + remote/export/import | docs/new_design/backup-redesign.md | done 2026-09-22 |
 | 19 | What's New | (settings spec) | pending |
 | 20 | Backends [id] | — | deferred (no design yet) |
 
@@ -1576,6 +1576,72 @@ no device used.
 i18n key coverage over the whole programs surface incl. the smart
 menu, push/Redirect targets resolving to real routes, parser edge
 cases, missing-program guards).
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.
+
+### 18. Backup hub + remote/export/import
+- Verified 2026-09-22 against `docs/new_design/settings-dark.md` Screen 6
+  and `docs/new_design/backup-redesign.md` (S1–S5). Route
+  `app/src/app/(tabs)/settings/backup-and-restore/{index,remote-backup,choose-server,plain-text-export,import-from-other-apps}.tsx`
+  (thin wrappers); screens `backup/` (backup-screen, backup-card,
+  storage-card, release-card, about-card, backup-dialogs, storage-segments,
+  card-shell), `backup-remote/` (caption, destination-card, last-tested-card,
+  honest-notes, test-footer), `choose-server/` (none-option, server-list),
+  `plaintext-export/` (9 cards), `import-apps/` (7 modules).
+- Sections inventoried (render order): BACKUP (Off/Automatic/Manual
+  segmented consent switch, truthful last-backup label, destination row →
+  remote-backup, Back Up Now gated on mode≠off + assigned backend,
+  Restore), STORAGE (exact-proportion bar 9.6/252.3/59.1 of 321pt,
+  remote/local/health legend with real backend name + last-backup status,
+  plaintext export / file backup / import-apps rows, Health export switch),
+  WHAT'S NEW (release card + view-all), ABOUT (privacy policy, licenses —
+  no Terms row, honestly, since no Terms URL could be verified), footer;
+  remote-backup (caption, destination card with instant-assign server
+  picker + feed-account toggle + How-it-works disclosure, last-tested
+  card with honest error classification, honest notes, floating Test /
+  Manage backends footer); choose-server (None, complete/incomplete
+  backends, add-new); plain-text export (format switch, live preview
+  counts, CSV columns, cardio-omission + weight caveats, JSON shape,
+  filename, privacy note, sticky Export); import-from-other-apps (last
+  imported, format radios, merge contract, unsupported list, Import).
+- State matrix simulated: backup modes off/automatic/manual (default
+  off), backend assigned/unassigned/incomplete, test never-run/success/
+  each error variant, no backends at all, export preview before/after
+  focus, feed export include/exclude, import format selection.
+- Data honesty: the fabricated "June 2025 · build 238" release meta is
+  gone — the card now renders the real native version/build from
+  expo-application ("Version {version}" / "build {build}"), the same
+  pattern the feed profile footer already used. Storage sizes stay
+  explicitly ≈ estimates (no measurement API exists).
+
+**Bugs found and fixed:**
+1. `release-card.tsx` — shipped the fictional "June 2025 · build 238"
+   meta (real: version 1.0.0, buildNumber "1"). Now reads
+   `Application.nativeApplicationVersion` / `nativeBuildVersion` with
+   app.json-matching fallbacks; en.json keys parameterized.
+2. `plaintext-export-screen.tsx` — `useFocusEffect(() => {
+   dispatch(refreshExportPreview()); })` without `useCallback`:
+   React Navigation re-subscribes on every render, and since
+   `setExportPreview` always assigns new state, the DB read + dispatch
+   looped forever while the screen was focused. Wrapped in `useCallback`
+   with `[dispatch]` so it fires once per focus.
+
+**Deliberate non-changes:**
+- `format-segmented.{tsx,styles}.ts` have 2 pre-existing oxfmt issues —
+  verified present on the committed tree, untouched.
+- Terms of Service row stays absent (no verifiable URL).
+- No storage-measurement API invented; ≈ estimates stay labelled.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 127 files /
+1,978 tests all green (one run failed with the known ENOSPC /tmp
+exhaustion from 544 stale liftlog-test DBs — cleared per the standing
+procedure and re-ran clean); oxlint 0 errors on touched files;
+`oxfmt --check` clean on touched files; `backup-simulation.spec.ts`
+(new, 8 tests: i18n key coverage over all five backup folders,
+push targets resolving to real routes, fabricated-string sweep across
+sources + en.json, release title/meta parameterization, focus-callback
+stability, backup-mode/last-test persistence contract).
 
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.

@@ -4,7 +4,7 @@ import type { PlaintextExportFormat } from '@/store/settings';
 import { useAppSelector } from '@/store';
 import { useTranslate } from '@tolgee/react';
 import { Stack, useFocusEffect } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { SettingsBackground } from '../shared/settings-background';
 import { ExportAction } from './export-action';
@@ -32,9 +32,13 @@ export function PlaintextExportScreen() {
   const [format, setFormat] = useState<PlaintextExportFormat>('CSV');
   const preview = useAppSelector((s) => s.settings.exportPreview);
 
-  useFocusEffect(() => {
+  // Stable identity: without useCallback, useFocusEffect re-subscribes on
+  // every render and the DB read + dispatch loop forever while focused.
+  const refreshOnFocus = useCallback(() => {
     dispatch(refreshExportPreview());
-  });
+  }, [dispatch]);
+
+  useFocusEffect(refreshOnFocus);
 
   return (
     <FullHeightScrollView
