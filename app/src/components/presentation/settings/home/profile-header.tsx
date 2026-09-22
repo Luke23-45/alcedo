@@ -3,8 +3,11 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { useAppSelector } from '@/store';
 import { useRouter } from 'expo-router';
 import { ReactNode, useState } from 'react';
+import { useTranslate } from '@tolgee/react';
 import { chevronColor } from '../shared/grouped-settings-list.styles';
 import { PressHighlight } from '../shared/grouped-settings-list.styles';
+import { settingsKey } from '../shared/settings-i18n';
+import { deriveProfileHeaderData } from './profile-header-data';
 import { ownPersonInitial } from '@/components/presentation/feed/shared/own-person';
 import * as S from './profile-header.styles';
 
@@ -52,22 +55,24 @@ function Avatar({ children }: { children: ReactNode }) {
  */
 export function ProfileHeader() {
   const { push } = useRouter();
+  const { t } = useTranslate();
   const [pressed, setPressed] = useState(false);
   const identityName = useAppSelector((s) => s.feed.identity.map((identity) => identity.name ?? '').unwrapOr(''));
   const username = useAppSelector((s) => s.settings.profileUsername);
 
   // No fictional fallback: before the user sets a name or username the
   // header shows whatever real identity exists (possibly nothing yet).
-  const cleanUsername = (username ?? '').trim().replace(/^@+/, '');
-  const title = identityName.trim() || (cleanUsername ? `@${cleanUsername}` : '');
-  const handle = cleanUsername ? `@${cleanUsername}` : '';
+  const { title, handle } = deriveProfileHeaderData(identityName, username);
+  // A button with no announced label is invisible to VoiceOver; the empty
+  // identity state still opens the profile editor, so say what it does.
+  const accessibilityLabel = title || t(settingsKey('settings.home.profile_header.accessibility'));
 
   return (
     <HeaderEdge>
       <HeaderBody>
         <S.HeaderPressable
           accessibilityRole="button"
-          accessibilityLabel={title}
+          accessibilityLabel={accessibilityLabel}
           onPressIn={() => setPressed(true)}
           onPressOut={() => setPressed(false)}
           onPress={() => push('/feed/profile-editor')}

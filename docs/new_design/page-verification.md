@@ -40,6 +40,7 @@ timing, real-device performance. Device checklist comes later with a dev build.
 | 9 | Feed post detail | docs/new_design/social-dark.md Screen 2 | done 2026-09-22 |
 | 10 | Feed share composer | docs/new_design/social-dark.md Screen 3 | done 2026-09-22 |
 | 11 | Feed profile editor | docs/new_design/social-dark.md Screen 4 | done 2026-09-22 |
+| 13 | Settings home | docs/new_design/settings-dark.md Screen 1 | done 2026-09-22 |
 
 ## Per-page log
 ### 1. Home
@@ -191,7 +192,7 @@ confirmation on device — no device used.
 | 10 | Feed share composer | docs/new_design/social-dark.md | done 2026-09-22 |
 | 11 | Feed profile editor | docs/new_design/social-dark.md | done 2026-09-22 |
 | 12 | Feed shared-item | (thin wrapper) | done 2026-09-22 |
-| 13 | Settings home | docs/new_design/settings-dark.md | pending |
+| 13 | Settings home | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 14 | Settings preferences | docs/new_design/settings-dark.md | pending |
 | 15 | Settings notifications | docs/new_design/settings-dark.md | pending |
 | 16 | Settings AI planner | docs/new_design/settings-dark.md | pending |
@@ -1103,3 +1104,85 @@ files (one formatting fix applied to the new spec).
 
 **Not claimed:** pixel/animation feel, real-device performance,
 haptics — no device used.
+
+### 13. Settings home
+- Verified 2026-09-22 against `docs/new_design/settings-dark.md` Screen 1
+  (Settings home, 393 × 1582). Route:
+  `app/src/app/(tabs)/settings/index.tsx`; screen
+  `components/presentation/settings/home/settings-home.tsx` plus the
+  home-section groups (profile-header, training-group, preferences-group,
+  data-sync-group, community-group, support-group) and the shared
+  `grouped-settings-list` row primitives.
+- Sections inventoried (render order): nav title, profile header
+  (avatar / name / handle → `/feed/profile-editor`), YOUR TRAINING
+  (Current Program → `/settings/program-list`, AI Planner + BETA badge →
+  `/settings/ai/planner`, Exercise Library → `/settings/manage-exercises`,
+  Rest Presets → `/settings/notifications`), PREFERENCES (Appearance →
+  `/settings/app-configuration`, Units & Measurement → `/settings/localization`,
+  Language & Region → `/settings/localization`, Notifications →
+  `/settings/notifications`), DATA & SYNC (Apple Health →
+  `/settings/backup-and-restore`, Apple Watch static, Backup & Restore →
+  `/settings/backup-and-restore`, Storage → `/settings/backup-and-restore`),
+  COMMUNITY (Privacy & Social → `/feed/profile-editor`, Community Guidelines
+  static), SUPPORT & ABOUT (What's New + NEW badge → `/settings/whats-new`,
+  Send Feedback → GitHub bug-report template URL, Rate Kinetic static,
+  Open-Source Licenses → LICENSE URL, Copy Logs → `copyLogs` action, App
+  Info → dialog), screen footer.
+- State matrix simulated: populated identity, empty/whitespace identity (no
+  fictional fallback, neutral avatar initial), program missing (fallback
+  name) vs real active program vs pre-hydration, AI planner backend
+  configured/unconfigured, library built-in/custom counts, rest timers
+  on/off, appearance dark/light/system + real accent seed (Ember), real unit
+  prefs, real language label + default fallback, notifications on/off with
+  the real reminder time, health unsupported/off/on, backup
+  never/unknown-time/today/yesterday/older (loading/error hide the row's
+  claim honestly), WhatsNew NEW badge unseen/seen, app version in App Info,
+  feedback URL construction, copy-logs dispatch, dialog open/dismiss.
+- Data honesty: the contract's sample email is not shown (no email is
+  stored); no "Week 3 of 6" (the program model has no week state); the Rest
+  row reflects the real rest-timer switch; library counts are real
+  built-in/custom counts; the Watch row is a static "Not connected" status
+  (no watch integration ships); Rate Kinetic is an honest "Not available"
+  value with no affordance (no App Store listing); identity stays the page-11
+  real-identity derivation (no `alexr` fallback).
+
+**Bugs found and fixed:**
+1. `settings-home.tsx` — PREFERENCES rendered before YOUR TRAINING, but
+   the spec puts YOUR TRAINING first. Group order swapped to match Screen 1.
+2. `profile-header.tsx` — the header button's `accessibilityLabel` was the
+   empty title when the user had neither name nor username, making the
+   button invisible to VoiceOver. It now falls back to the new
+   `settings.home.profile_header.accessibility` ("Edit profile") label; the
+   identity derivation was extracted to the pure, tested
+   `profile-header-data.ts` helper.
+
+**Tests (106 new, all green):**
+- `home/settings-home-simulation.spec.ts` (new, 106 tests): 9 unit tests
+  for `deriveProfileHeaderData` (real name/username, name fallback,
+  empty/whitespace/undefined identity, `@`-stripping, trimming); an i18n
+  completeness scan asserting every `settingsKey` used in the home folder
+  resolves in `en.json`; an icon-glyph scan asserting every `icon="…"` is
+  a registered MaterialSymbols/CustomIcons key (the page-12 blank-icon
+  follow-up — this page's 20 icons all resolve); a navigation scan
+  asserting every `push()` target resolves to a real route file, every
+  `openUrl` literal is a valid https URL, and `copyLogs` is exported from
+  the app store; and the TRAINING-before-PREFERENCES order assertion.
+
+**Deliberate non-changes:**
+- The spec's Haptic Feedback row is not added: no haptic preference exists
+  in the settings model, so the row would be a dead control or a fake
+  "On" — omitted honestly.
+- Community Guidelines keeps no navigation affordance (no destination
+  exists); Apple Health navigates to the backup hub because that is where
+  the real health-export toggle lives (verified in `storage-card.tsx`).
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 121 files /
+1,892 tests (1,891 green; the single failure is the pre-existing
+midnight-boundary flake in `backup-status.spec.ts` "labels a backup from
+earlier today", unrelated — it fails only in runs near local midnight);
+oxlint 0 errors on touched/new files; eslint (react-compiler) clean on the
+home folder; `oxfmt --check` clean on touched/new files (one formatting
+fix applied to the new spec).
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.

@@ -23,8 +23,8 @@ export function SettingsHome() {
       <Stack.Screen options={{ title: t(settingsKey('settings.home.title')) }} />
       <S.SettingsHomeContent>
         <ProfileHeader />
-        <PreferencesGroup />
         <TrainingGroup />
+        <PreferencesGroup />
         <DataSyncGroup />
         <CommunityGroup />
         <SupportGroup />

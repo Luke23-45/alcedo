@@ -1454,6 +1454,7 @@
   "settings.home.privacy.prs_shown": "PRs shown",
   "settings.home.privacy.subtitle": "{visibility} visibility · {prs}",
   "settings.home.privacy.title": "Privacy & Social",
+  "settings.home.profile_header.accessibility": "Edit profile",
   "settings.home.program.fallback_name": "Push / Pull / Legs",
   "settings.home.program.title": "Current Program",
   "settings.home.rate.subtitle": "If it earns it",
