@@ -1,9 +1,9 @@
 # Merge ledger — all branches to `main` (source of truth)
 
-Status: **PLAN — not executed.** No merge has been performed. This file is the
-single authoritative record for the all-branches merge. Update it (same change,
-same PR) whenever any fact below changes: new commits, new branches, worktree
-triage, dry-run results, merge completion, cleanup.
+Status: **MERGED 2026-09-22.** `main` = `83b1f55`, pushed to `origin/main`.
+All branches merged. This file remains the permanent record. Safety net
+retained: `..\LiftLog-merge-backup-2026-09-22\` (verified bundle + worktree
+patches + untracked copies) and `backup/*` branches.
 
 Verified: 2026-09-22, live against this repo (`git branch -a -vv`,
 `git for-each-ref`, `git rev-parse`, `git merge-base`, `git rev-list
@@ -323,8 +323,30 @@ Merging directly into `main` is rejected (no isolated verification gate;
   fresh install (130 nested-dupe deletions, same versions) and committed as
   `c9b428c`. Test-run artifacts (redirect logs, 2 CRLF-only snap rewrites,
   `tsbuildinfo`) were all reverted/deleted; tree verified clean after each.
-  OPEN DECISIONS for owner: (a) `styled-shim.js` +500 lint errors — add
+  OPEN DECISIONS for owner: (a) `  styled-shim.js` +500 lint errors — add
   `polyfills` to oxlint `ignorePatterns` (consistent with existing
   `migrations.js`/`dom.slim.d.ts` exclusions) or leave red; (b) land on
   `main` with typecheck/lint red-but-at-parity (proven: nothing new, 27
   fixed) vs holding the merge for the 90 pre-existing errors.
+
+- 2026-09-22 Phase 4 DONE (verified). Owner decisions: leave
+  `polyfills/styled-shim.js` fully untouched (it is the styled-components
+  runtime fix — no lint exclusion, no edit); LAND NOW. `git fetch origin
+  main` confirmed `main` unmoved at `8491720`; `git checkout main` +
+  `git merge --ff-only integrate/all-to-main` → `main` = `83b1f55`, tree
+  clean; `git push origin main` → `8491720..83b1f55` confirmed. Cleanup:
+  local `redesign/backup-and-restore` deleted (was `e60ca88`, fully merged);
+  remote `origin/verification/final-2026-09-22` deleted; 4 `refs/cline/*`
+  refs deleted via `git update-ref -d` (`git branch -D` cannot address that
+  namespace — first attempt correctly failed); baseline worktree removed
+  (junction unlinked with `rmdir` so the real `node_modules` survived
+  verified-intact, then directory deleted). Final state: `main` ==
+  `origin/main` == `83b1f55`, 1 worktree, 0 cline refs, clean tree.
+  Retained safety net: `backup/main-before-merge` (`8491720`),
+  `backup/redesign-backup-and-restore` (`f989506`, includes removed
+  `error.md`), `backup/verification-final` (`ce8ef59`), verified bundle +
+  patches in `..\LiftLog-merge-backup-2026-09-22\`. Remote
+  `origin/redesign/backup-and-restore` (`e60ca88`) intentionally left for
+  owner to delete. Follow-ups (pre-existing, NOT merge-caused): drizzle-orm
+  root types, stale `.expo` router types, CRLF format environment,
+  `backup-status.spec.ts`, `stream.spec.ts` flake.
