@@ -108,7 +108,6 @@ export function AchievementsSection() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ borderCurve: 'continuous' }}
-            accessibilityRole="image"
           >
             <S.Shine />
             <BadgeGlyph glyph={glyph} />

@@ -44,7 +44,7 @@ export function VideoHero({
 }) {
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const player = useVideoPlayer(video, (p) => {
+  const player = useVideoPlayer(video, (p: any) => {
     p.loop = true;
   });
 
