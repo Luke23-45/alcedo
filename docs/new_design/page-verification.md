@@ -199,7 +199,15 @@ confirmation on device — no device used.
 | 17 | Settings programs & import | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 18 | Backup hub + remote/export/import | docs/new_design/backup-redesign.md | done 2026-09-22 |
 | 19 | What's New | (settings spec) | done 2026-09-22 |
-| 20 | Backends [id] | — | deferred (no design yet) |
+| 20 | Backends [id] | — | done 2026-09-22 (contract only, design-first) |
+| 21 | Exercise search | — | done 2026-09-22 |
+| 22 | Exercise history | — | pending |
+| 23 | Manage exercises | — | pending |
+| 24 | AI planner chat | — | pending |
+
+Route-tree sweep 2026-09-22: every user-facing route is now covered.
+`/(tabs)/(session)/screenshot-collection.tsx` is dev-only (`__DEV__`
+guard, throws in prod) — intentionally excluded.
 
 ### 3. Workout editor (/workout-editor)
 - Verified 2026-09-22 (route `app/src/app/workout-editor.tsx`, container
