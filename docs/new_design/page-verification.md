@@ -190,7 +190,7 @@ confirmation on device — no device used.
 | 9 | Feed post detail | docs/new_design/social-dark.md | done 2026-09-22 |
 | 10 | Feed share composer | docs/new_design/social-dark.md | done 2026-09-22 |
 | 11 | Feed profile editor | docs/new_design/social-dark.md | done 2026-09-22 |
-| 12 | Feed shared-item | (thin wrapper) | pending |
+| 12 | Feed shared-item | (thin wrapper) | done 2026-09-22 |
 | 13 | Settings home | docs/new_design/settings-dark.md | pending |
 | 14 | Settings preferences | docs/new_design/settings-dark.md | pending |
 | 15 | Settings notifications | docs/new_design/settings-dark.md | pending |
@@ -1010,6 +1010,96 @@ midnight-boundary flake in `backup-status.spec.ts` "labels a backup
 from earlier today", unrelated — it fails only in runs crossing
 midnight); oxlint 0 errors on touched/new files; `oxfmt --check` back
 at the 118 pre-existing repo-wide issues, 0 new.
+
+**Not claimed:** pixel/animation feel, real-device performance,
+haptics — no device used.
+
+### 12. Feed shared-item (`/feed/share?id=` share-request branch)
+- Verified 2026-09-22. Route: `app/src/app/(tabs)/feed/share.tsx`; the
+  `?id=` share-request deep link is a thin wrapper over the flow module
+  `app/src/app/(tabs)/feed/share-request-flow.ts` (new): `FeedSharePage`
+  renders `FeedShareRequest` when `?id=` is present, otherwise the
+  Share Composer. The social-dark spec does not cover this screen, so
+  there is no new-design reference to match — it stays legacy Paper
+  chrome; the audit focused on functional/honesty defects.
+- Sections inventoried (render order): stack title (`feed.feed.title`),
+  `Remote` states (loading spinner, retryable error), card (leading
+  icon, `feed.profile_share_request.title`), message
+  (`feed.user_wants_to_share_profile.message` with the sender name),
+  explanation (`feed.accept_to_follow.explanation`), actions
+  (Cancel outlined / Accept contained with `feed-share-accept-button`
+  testID).
+- State matrix simulated: populated (link name shown), missing
+  `?name=` (translated "Anonymous User" label), loading, fetch error
+  + retry (re-dispatches), offline (online-only; honest retryable
+  error), unknown ID (NotFound → error chrome, no fake content),
+  accept (follow request + pending record + shared-user reset + back),
+  double-tap accept (one-shot guard), accept with no feed identity
+  (no request sent, screen still pops), cancel (back, no dispatch).
+- Data honesty: the sender name travels on the deep link because the
+  API deliberately returns no display name — names are end-to-end
+  encrypted blobs the server cannot read (`getUserAsync` returns id,
+  lookup, and encrypted payloads only). This is the intended trust
+  model (you receive the link from the sender), documented in the flow
+  module. No fictional defaults, no sample seeds on this screen.
+
+**Bugs found and fixed:**
+1. `share.tsx` — the card's leading icon used Paper `Icon
+   source="personFill"`, which is not a Material Design Icons glyph
+   name (verified against the shipped glyphmap) and rendered as blank
+   space. Now uses the exported `MsIconSrc` resolver with the
+   `personFill` Material Symbols key; `MsIconSrc`'s props were widened
+   (`{ name: string } & Partial<IconProps>`) since it was previously
+   typed to MDI names and had no consumers.
+2. `share.tsx` — empty sender names fell back to a hard-coded English
+   `'Anonymous user'`. Now uses the existing
+   `feed.anonymous_user.label` key (present in 18/19 locales; tr falls
+   back to English like every other feed string) via the new pure
+   `shareRequestDisplayName` helper.
+3. `share.tsx` — rapid double-tap on Accept dispatched two
+   `requestFollowUser` actions (two follow requests). Now one-shot via
+   an `acceptedRef` guard (same pattern as the composer's double-Share
+   fix).
+4. `share.tsx` — branch logic was inline and untestable. Extracted to
+   `share-request-flow.ts` (`useShareRequestFlow` + pure
+   `shareRequestDisplayName`) so the fetch-on-mount contract, retry,
+   and the one-shot guard are unit-testable without a device.
+
+**Tests (11 new, all green):**
+- `app/(tabs)/feed/share-request-simulation.spec.ts` (new, 11 tests):
+  mount dispatches `fetchAndSetSharedFeedUser` with the exact
+  `{ idOrLookup, name, fromUserAction }` payload; success stores a
+  `PendingFeedUser` carrying the link name; empty `?name=` carries
+  `''`; error state is retryable and retry re-dispatches the fetch;
+  accept sends one follow request, records the pending follow, resets
+  the shared user, and goes back; double-tap accept dispatches once;
+  accept with no feed identity sends nothing but still pops; cancel
+  pops with zero dispatches; display-name fallback
+  (present/empty/blank/missing).
+
+**Deliberate non-changes:**
+- The card keeps the legacy Paper styling — the social-dark spec has
+  no design for this screen, and inventing one is a design decision,
+  not a safe patch.
+- Accept still pops immediately while the follow request runs; the
+  existing `feedApiError` toast path reports failures. No fake
+  in-flight state added.
+- Accept with no feed identity silently sends nothing (matches the
+  other follow effects' missing-identity behavior); flagged, not
+  patched.
+- The foundation `Icon` passthrough still forwards Material Symbols
+  key strings (e.g. `"openInBrowser"`, `"description"`) to Paper's
+  MDI-backed `Icon`, where they render blank — a wider pre-existing
+  issue across legacy screens; this page fixed only its own screen via
+  `MsIconSrc`. Follow-up recommended for Settings-era pages.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 120 files /
+1,786 tests (1,785 green; the single failure is the pre-existing
+midnight-boundary flake in `backup-status.spec.ts` "labels a backup
+from earlier today", unrelated — it fails only in runs crossing
+midnight local time); oxlint 0 errors and eslint (react-compiler)
+clean on touched/new files; `oxfmt --check` clean on touched/new
+files (one formatting fix applied to the new spec).
 
 **Not claimed:** pixel/animation feel, real-device performance,
 haptics — no device used.

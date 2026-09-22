@@ -296,7 +296,13 @@ const MaterialSymbols = {
 
 export type AppIconSource = keyof typeof MaterialSymbols | keyof typeof CustomIcons | (() => JSX.Element);
 
-export function MsIconSrc({ name, ...rest }: IconProps) {
+/**
+ * Resolves a Material Symbols key (e.g. "personFill") to its font and renders
+ * it, falling back to the "info" glyph for unknown names. Takes a plain
+ * string name — unlike Paper's Icon it is not limited to the Material
+ * Design Icons glyph set.
+ */
+export function MsIconSrc({ name, ...rest }: { name: string } & Partial<IconProps>) {
   if ((name as keyof typeof CustomIcons) in CustomIcons) {
     return (
       <SvgXml
