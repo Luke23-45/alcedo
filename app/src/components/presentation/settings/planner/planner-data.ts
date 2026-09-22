@@ -10,17 +10,84 @@ import { DayOfWeek, LocalDate } from '@js-joda/core';
  * planner preference keys) — nothing is hardcoded sample content.
  */
 
-const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const WEEKDAY_ABBR = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+/**
+ * Cached Intl formatters — one per locale + option set, reused forever (the
+ * same pattern as hooks/useFormatDate; constructing one per render is far too
+ * expensive). Passing `undefined` resolves to the device default locale.
+ */
+const dateFormatters = new Map<string, Intl.DateTimeFormat>();
 
-/** "Jun 30". */
-export function formatMonthDay(date: LocalDate): string {
-  return `${MONTH_ABBR[date.monthValue() - 1]} ${date.dayOfMonth()}`;
+function dateFormatterFor(locale: string | undefined, opts: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  const key = `${locale ?? ''}|${JSON.stringify(opts)}`;
+  const existing = dateFormatters.get(key);
+  if (existing) {
+    return existing;
+  }
+  const formatter = new Intl.DateTimeFormat(locale, opts);
+  dateFormatters.set(key, formatter);
+  return formatter;
 }
 
-/** "Tue, Jun 10". */
-export function formatWeekdayMonthDay(date: LocalDate): string {
-  return `${WEEKDAY_ABBR[date.dayOfWeek().value() - 1]}, ${formatMonthDay(date)}`;
+const numberFormatters = new Map<string, Intl.NumberFormat>();
+
+function decimalFormatterFor(locale: string | undefined): Intl.NumberFormat {
+  const key = locale ?? '';
+  const existing = numberFormatters.get(key);
+  if (existing) {
+    return existing;
+  }
+  const formatter = new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  numberFormatters.set(key, formatter);
+  return formatter;
+}
+
+function jsDate(date: LocalDate): Date {
+  return new Date(date.year(), date.monthValue() - 1, date.dayOfMonth());
+}
+
+/** 2026-06-08 is a Monday; day.value() 1..7 maps onto Jun 8..14. */
+function anchorDateFor(day: DayOfWeek): Date {
+  return new Date(2026, 5, 7 + day.value());
+}
+
+/** "Jun 30" in the preferred language (device default when unset). */
+export function formatMonthDay(date: LocalDate, locale?: string): string {
+  return dateFormatterFor(locale, { month: 'short', day: 'numeric' }).format(jsDate(date));
+}
+
+/** "Tue, Jun 10" in the preferred language (device default when unset). */
+export function formatWeekdayMonthDay(date: LocalDate, locale?: string): string {
+  return dateFormatterFor(locale, { weekday: 'short', month: 'short', day: 'numeric' }).format(jsDate(date));
+}
+
+/** "Thu" in the preferred language (device default when unset). */
+export function weekdayShort(day: DayOfWeek, locale?: string): string {
+  return dateFormatterFor(locale, { weekday: 'short' }).format(anchorDateFor(day));
+}
+
+/** "7.5" (or "8" for whole numbers), with the locale's decimal separator. */
+export function formatRpeValue(value: number, locale?: string): string {
+  return Number.isInteger(value) ? value.toString() : decimalFormatterFor(locale).format(value);
+}
+
+/** Why the NEXT SESSION preview can or cannot render its card. */
+export type NextSessionAvailability = 'ready' | 'planner-off' | 'no-program' | 'no-training-days';
+
+export function nextSessionAvailability(
+  plannerEnabled: boolean,
+  hasProgram: boolean,
+  trainingDayCount: number,
+): NextSessionAvailability {
+  if (!plannerEnabled) {
+    return 'planner-off';
+  }
+  if (!hasProgram) {
+    return 'no-program';
+  }
+  if (trainingDayCount === 0) {
+    return 'no-training-days';
+  }
+  return 'ready';
 }
 
 /** The Monday starting the week that contains `date`. */

@@ -195,7 +195,7 @@ confirmation on device — no device used.
 | 13 | Settings home | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 14 | Settings preferences | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 15 | Settings notifications | docs/new_design/settings-dark.md | done 2026-09-22 |
-| 16 | Settings AI planner | docs/new_design/settings-dark.md | pending |
+| 16 | Settings AI planner | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 17 | Settings programs & import | docs/new_design/settings-dark.md | pending |
 | 18 | Backup hub + remote/export/import | docs/new_design/backup-redesign.md | pending |
 | 19 | What's New | (settings spec) | pending |
@@ -1411,6 +1411,99 @@ change); oxlint 0 errors on touched/new files; eslint clean on the
 notifications folder and scheduler (the one react-compiler error in
 `grouped-settings-list.tsx` predates this change); `oxfmt --check` clean
 (four formatting fixes applied).
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.
+
+### 16. Settings AI planner
+- Verified 2026-09-22 against `docs/new_design/settings-dark.md` Screen 4
+  (AI Planner, 393 × 1736). Route
+  `app/src/app/(tabs)/settings/ai-planner.tsx` (thin wrapper rendering
+  `AiPlannerScreen`); screen
+  `components/presentation/settings/planner/ai-planner-screen.tsx` plus
+  the six section modules (kinetic-planner hero + master switch,
+  training-days, session-shape, recovery, next-session, planner-actions)
+  and the pure helper module `planner-data.ts`.
+- Sections inventoried (render order): KINETIC PLANNER hero (SVG sparkles
+  + brain mark, BETA badge, master toggle gated on hydration), TRAINING
+  DAYS (7 day circles Mon..Sun, rest caption with localized short day
+  names, active-program split strip — honestly hidden with no program),
+  SESSION SHAPE (target-length slider 30–120 min, target-RPE slider
+  5–10 × 0.5, focus segmented Strength/Hypertrophy/Conditioning),
+  RECOVERY (auto-deload switch, next-deload-week date: stored preference
+  or three weeks from today), NEXT SESSION (rotation preview: next
+  session name, localized "Wed, Jun 10 · N exercises · ~45 min", two top
+  muscle chips with localized deltas, volume-insight card with localized
+  deload date), REGENERATE (Regenerate with AI, Chat with Planner —
+  both route to `/settings/ai/planner-chat`), screen footer.
+- State matrix simulated: defaults (planner on, M–F 45 min RPE 7.5
+  strength 2.5 kg auto-deload on no stored deload week), hydration gate
+  (toggles inert until settings hydrated), planner on/off master switch
+  (now gates the NEXT SESSION preview — it previously read nothing),
+  active program vs deleted/no program, zero training days selected,
+  no sessions this week (insight hidden), all eight planner keys through
+  their real registry codecs, en locale contract + device-locale fallback,
+  every settingsKey in the folder resolving in en.json, both `push`
+  targets resolving to real route files.
+- Data honesty: the NEXT SESSION header never floats above a blank card
+  anymore — planner off shows an honest "AI Planner is off" card; no
+  program shows "No program yet" with a 44pt "Choose program" CTA to the
+  real `/settings/program-list` route; zero training days shows "No
+  training days". The "matches your split" caption strip already hides
+  with no program (kept). All displayed dates/day names and the RPE value
+  now use the app's preferred language instead of hard-coded English
+  ("Jun 30", "Thu"). The focus picker no longer resolves a raw
+  "settings.planner.focus.strength" string for every locale — the three
+  labels are real localized keys. The auto-deload comment "today + 4
+  weeks" was corrected to the actual three-week behavior. The master
+  switch no longer lies: the preview gates on it. Planner preferences
+  still do not feed AI generation prompts (the chat service sends only
+  locale/schema/unit) — documented as the honest pending integration,
+  no fake controls added, no invented backend/model UI.
+
+**Bugs found and fixed:**
+1. `session-shape.tsx` — the focus segmented control resolved
+   `settingsKey(\`settings.planner.focus.${option}\`)` with no keys in
+   en.json, so every locale showed the raw key string. Added
+   `settings.planner.focus.{strength,hypertrophy,conditioning}` keys.
+2. `next-session.tsx` — `if (!program) return null;` left the NEXT
+   SESSION header floating above a blank card when the active program was
+   deleted (the selector's `!` lied about nullability), and the section
+   ignored the master switch entirely. Replaced with an honest
+   availability matrix (`ready`/`planner-off`/`no-program`/
+   `no-training-days`) with explicit empty cards, plus a real CTA to
+   `/settings/program-list` for the no-program state.
+3. `planner-data.ts` — all month/day names hard-coded English; added
+   cached `Intl` formatters for `formatMonthDay`, `formatWeekdayMonthDay`,
+   `weekdayShort`, and `formatRpeValue` taking the preferred language
+   (device default when unset, never throws). Deleted `WEEKDAY_SHORT`
+   from `training-days.tsx` and the local RPE formatter from
+   `session-shape.tsx` in favor of the shared locale-aware helpers.
+4. `next-session.tsx` — declared `const program` typed non-null from a
+   lying selector; now typed honestly as
+   `ProgramBlueprint | undefined` (the `!` assertions became unnecessary
+   per the lying type — the lint errors are gone).
+
+**Deliberate non-changes:**
+- No backend/model/instruction UI: the spec's Screen 4 has none and the
+  AI service has no model list; not invented.
+- Planner preferences are not yet sent to the generation service
+  (`introduce()` sends locale/schema/unit only) — flagged as the pending
+  integration rather than faked.
+- Training-day circle letters (M T W T F S S) stay per the spec's compact
+  visual; full localized day names carry the a11y labels.
+- The hero SVG was not re-measured; geometry left exactly as supplied.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 125 files /
+1,962 tests all green (the run at 00:59 showed the one known
+`backup-status.spec.ts` midnight-boundary flake; a clean re-run passed
+all 1,962); oxlint 0 errors on the planner folder; `oxfmt --check`
+clean; `planner-simulation.spec.ts` (new, 10 tests: i18n key coverage
+over every settingsKey in the folder, push targets resolving to real
+route files, locale honesty incl. German decimal-separator tolerance,
+availability matrix, registry codec/persistence contract) plus 5 new
+`planner-data.spec.ts` contract tests (English contract, locale
+fallback, availability matrix).
 
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.

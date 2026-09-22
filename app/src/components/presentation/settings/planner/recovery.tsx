@@ -21,13 +21,14 @@ import {
 /**
  * RECOVERY: the auto-deload switch, then a hairline divider and the next
  * scheduled deload week. The deload week is the stored preference when set,
- * otherwise today + 4 weeks — never a hardcoded date.
+ * otherwise three weeks from today — never a hardcoded date.
  */
 export function Recovery() {
   const { t } = useTranslate();
   const dispatch = useDispatch();
   const autoDeload = useAppSelector((s) => s.settings.plannerAutoDeload);
   const deloadWeek = useAppSelector((s) => s.settings.plannerDeloadWeek);
+  const locale = useAppSelector((s) => s.settings.preferredLanguage);
 
   const nextDeload = resolveDeloadWeek(deloadWeek, LocalDate.now());
 
@@ -48,7 +49,7 @@ export function Recovery() {
       <RecoveryDivider />
       <DeloadRow>
         <DeloadLabel>{t(settingsKey('settings.planner.deload_next.label'))}</DeloadLabel>
-        <DeloadDate>{formatMonthDay(nextDeload)}</DeloadDate>
+        <DeloadDate>{formatMonthDay(nextDeload, locale)}</DeloadDate>
       </DeloadRow>
     </RecoveryCard>
   );

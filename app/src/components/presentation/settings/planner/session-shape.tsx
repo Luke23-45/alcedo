@@ -6,13 +6,10 @@ import { useAppSelector } from '@/store';
 import { useTranslate } from '@tolgee/react';
 import { settingsKey } from '@/components/presentation/settings/shared/settings-i18n';
 import { PlannerSlider } from './planner-slider';
+import { formatRpeValue } from './planner-data';
 import { FocusCard, FocusLabel, FocusOption, FocusOptionText, FocusTrack, ShapeCard } from './session-shape.styles';
 
 const FOCUS_OPTIONS: PlannerFocus[] = ['strength', 'hypertrophy', 'conditioning'];
-
-function formatRpe(value: number): string {
-  return Number.isInteger(value) ? value.toString() : value.toFixed(1);
-}
 
 /**
  * SESSION SHAPE: target-length slider (30–90 min), focus chips, and target
@@ -25,6 +22,9 @@ export function SessionShape() {
   const targetMinutes = useAppSelector((s) => s.settings.plannerTargetSessionMinutes);
   const targetRpe = useAppSelector((s) => s.settings.plannerTargetRpe);
   const focus = useAppSelector((s) => s.settings.plannerFocus);
+  const locale = useAppSelector((s) => s.settings.preferredLanguage);
+
+  const formatRpe = (value: number) => formatRpeValue(value, locale);
 
   return (
     <>

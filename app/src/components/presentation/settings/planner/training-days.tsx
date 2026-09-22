@@ -7,6 +7,7 @@ import { selectActiveProgram } from '@/store/program';
 import { setPlannerTrainingDays } from '@/store/settings';
 import { useTranslate } from '@tolgee/react';
 import { settingsKey } from '@/components/presentation/settings/shared/settings-i18n';
+import { weekdayShort } from './planner-data';
 import {
   DayCircle,
   DayLetter,
@@ -28,8 +29,6 @@ const WEEK: { day: DayOfWeek; letter: string }[] = [
   { day: DayOfWeek.SUNDAY, letter: 'S' },
 ];
 
-const WEEKDAY_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
 /**
  * The 7-day training/rest picker. Selected days fill with the brand gradient;
  * rest days stay hollow. The strip below maps each training day onto the
@@ -40,6 +39,7 @@ export function TrainingDays() {
   const dispatch = useDispatch();
   const trainingDays = useAppSelector((s) => s.settings.plannerTrainingDays);
   const program = useAppSelector(selectActiveProgram);
+  const locale = useAppSelector((s) => s.settings.preferredLanguage);
 
   const selected = new Set(trainingDays.map((d) => d.value()));
   const training = WEEK.filter(({ day }) => selected.has(day.value()));
@@ -68,7 +68,7 @@ export function TrainingDays() {
         {rest.length > 0 && (
           <DaysRestCaption>
             {t(settingsKey('settings.planner.training_days.rest'), {
-              days: rest.map(({ day }) => WEEKDAY_SHORT[day.value() - 1]).join(' & '),
+              days: rest.map(({ day }) => weekdayShort(day, locale)).join(' & '),
             })}
           </DaysRestCaption>
         )}
@@ -83,7 +83,7 @@ export function TrainingDays() {
               accessibilityRole="checkbox"
               accessibilityState={{ checked: isSelected }}
               accessibilityLabel={t(settingsKey('settings.planner.training_days.day_label'), {
-                day: WEEKDAY_SHORT[day.value() - 1],
+                day: weekdayShort(day, locale),
               })}
               hitSlop={2}
               style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}

@@ -6,14 +6,17 @@ import { DayOfWeek, LocalDate, OffsetDateTime } from '@js-joda/core';
 import { describe, expect, it } from 'vitest';
 import {
   formatMonthDay,
+  formatRpeValue,
   formatWeekdayMonthDay,
   mondayOfWeek,
   muscleLoadThisWeek,
+  nextSessionAvailability,
   nextSessionName,
   nextTrainingDay,
   resolveDeloadWeek,
   sessionVolumeKg,
   volumeChangePercent,
+  weekdayShort,
   weeklyVolumeKg,
 } from './planner-data';
 
@@ -46,9 +49,34 @@ const descriptor = (name: string, muscles: string[]): ExerciseDescriptor => ({
 });
 
 describe('planner-data', () => {
-  it('formats contract dates', () => {
-    expect(formatMonthDay(LocalDate.of(2026, 6, 30))).toBe('Jun 30');
-    expect(formatWeekdayMonthDay(LocalDate.of(2026, 6, 10))).toBe('Wed, Jun 10');
+  it('formats contract dates in English', () => {
+    expect(formatMonthDay(LocalDate.of(2026, 6, 30), 'en')).toBe('Jun 30');
+    expect(formatWeekdayMonthDay(LocalDate.of(2026, 6, 10), 'en')).toBe('Wed, Jun 10');
+  });
+
+  it('formats short weekday names in the requested locale', () => {
+    expect(weekdayShort(DayOfWeek.THURSDAY, 'en')).toBe('Thu');
+    expect(weekdayShort(DayOfWeek.SUNDAY, 'en')).toBe('Sun');
+  });
+
+  it('falls back to the device locale without throwing when none is given', () => {
+    expect(() => formatMonthDay(LocalDate.of(2026, 6, 30))).not.toThrow();
+    expect(() => formatWeekdayMonthDay(LocalDate.of(2026, 6, 10))).not.toThrow();
+    expect(() => weekdayShort(DayOfWeek.MONDAY)).not.toThrow();
+  });
+
+  it('formats RPE values with the locale decimal separator', () => {
+    expect(formatRpeValue(8, 'en')).toBe('8');
+    expect(formatRpeValue(7.5, 'en')).toBe('7.5');
+    expect(formatRpeValue(8.5, 'de')).toContain('8');
+  });
+
+  it('derives the next-session availability matrix', () => {
+    expect(nextSessionAvailability(true, true, 5)).toBe('ready');
+    expect(nextSessionAvailability(false, true, 5)).toBe('planner-off');
+    expect(nextSessionAvailability(false, false, 0)).toBe('planner-off');
+    expect(nextSessionAvailability(true, false, 5)).toBe('no-program');
+    expect(nextSessionAvailability(true, true, 0)).toBe('no-training-days');
   });
 
   it('finds the Monday of a week', () => {

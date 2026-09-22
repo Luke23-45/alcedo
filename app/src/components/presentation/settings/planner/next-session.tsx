@@ -4,6 +4,7 @@ import Svg, { Path, Rect } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { selectActiveProgram } from '@/store/program';
+import { ProgramBlueprint } from '@/models/blueprint-models';
 import { selectCompletedDistinctSessionNames, selectExercises, selectSessions } from '@/store/stored-sessions';
 import { useTranslate } from '@tolgee/react';
 import { settingsKey } from '@/components/presentation/settings/shared/settings-i18n';
@@ -14,6 +15,7 @@ import {
   formatWeekdayMonthDay,
   mondayOfWeek,
   muscleLoadThisWeek,
+  nextSessionAvailability,
   nextSessionName,
   nextTrainingDay,
   resolveDeloadWeek,
@@ -21,6 +23,11 @@ import {
   weeklyVolumeKg,
 } from './planner-data';
 import {
+  EmptyCaption,
+  EmptyCta,
+  EmptyCtaText,
+  EmptyTitle,
+  EmptyWrap,
   InsightRow,
   InsightText,
   MuscleChip,
@@ -79,28 +86,72 @@ function SparkIcon() {
  * training day after today, its exercise count, the planner's target length,
  * this week's top muscle load, and the volume insight that feeds the deload
  * scheduler. Everything is derived from real sessions — the percentage is
- * computed, never hardcoded.
+ * computed, never hardcoded. The master switch gates the preview: when the
+ * planner is off, or there is no program / no training days to plan from,
+ * the section shows an honest empty card instead of a silent gap.
  */
 export function NextSession() {
   const { t } = useTranslate();
   const { push } = useRouter();
-  const program = useAppSelector(selectActiveProgram);
+  // selectActiveProgram asserts non-null, but deleting the active program
+  // leaves savedPrograms[activePlanId] undefined at runtime.
+  const program = useAppSelector(selectActiveProgram) as ProgramBlueprint | undefined;
+  const enabled = useAppSelector((s) => s.settings.plannerEnabled);
   const trainingDays = useAppSelector((s) => s.settings.plannerTrainingDays);
   const targetMinutes = useAppSelector((s) => s.settings.plannerTargetSessionMinutes);
   const autoDeload = useAppSelector((s) => s.settings.plannerAutoDeload);
   const deloadWeekSetting = useAppSelector((s) => s.settings.plannerDeloadWeek);
   const descriptors = useAppSelector(selectExercises);
+  const locale = useAppSelector((s) => s.settings.preferredLanguage);
 
   const today = LocalDate.now();
   // Names of sessions completed in the last 7 days, to rotate past them.
   const recentNames = useAppSelectorWithArg(selectCompletedDistinctSessionNames, today.minusDays(7));
   const allSessions = Object.values(useAppSelector(selectSessions));
 
-  if (!program) {
-    return null;
+  const availability = nextSessionAvailability(enabled, program !== undefined, trainingDays.length);
+
+  if (availability !== 'ready') {
+    const copy =
+      availability === 'planner-off'
+        ? {
+            title: t(settingsKey('settings.planner.next_session.off.title')),
+            caption: t(settingsKey('settings.planner.next_session.off.caption')),
+            cta: undefined as string | undefined,
+          }
+        : availability === 'no-program'
+          ? {
+              title: t(settingsKey('settings.planner.next_session.empty_program.title')),
+              caption: t(settingsKey('settings.planner.next_session.empty_program.caption')),
+              cta: t(settingsKey('settings.planner.next_session.empty_program.cta')),
+            }
+          : {
+              title: t(settingsKey('settings.planner.next_session.empty_days.title')),
+              caption: t(settingsKey('settings.planner.next_session.empty_days.caption')),
+              cta: undefined as string | undefined,
+            };
+    return (
+      <NextCard>
+        <EmptyWrap>
+          <EmptyTitle>{copy.title}</EmptyTitle>
+          <EmptyCaption>{copy.caption}</EmptyCaption>
+          {copy.cta ? (
+            <Pressable
+              onPress={() => push('/settings/program-list')}
+              accessibilityRole="button"
+              accessibilityLabel={copy.cta}
+            >
+              <EmptyCta>
+                <EmptyCtaText>{copy.cta}</EmptyCtaText>
+              </EmptyCta>
+            </Pressable>
+          ) : undefined}
+        </EmptyWrap>
+      </NextCard>
+    );
   }
 
-  const sessionName = nextSessionName(program.sessions, recentNames) ?? program.sessions[0]!.name;
+  const sessionName = nextSessionName(program!.sessions, recentNames) ?? program!.sessions[0]!.name;
   const session = program.sessions.find((s) => s.name === sessionName);
   const exerciseCount = session?.exercises.length ?? 0;
   const nextDate = nextTrainingDay(today, trainingDays);
@@ -112,7 +163,7 @@ export function NextSession() {
   const deloadDate = resolveDeloadWeek(deloadWeekSetting, today);
 
   const meta = t(settingsKey('settings.planner.next_session.meta'), {
-    date: formatWeekdayMonthDay(nextDate),
+    date: formatWeekdayMonthDay(nextDate, locale),
     count: exerciseCount,
     minutes: targetMinutes,
   });
@@ -170,7 +221,7 @@ export function NextSession() {
                   change >= 0 ? 'settings.planner.volume_insight.up' : 'settings.planner.volume_insight.down',
                 ),
               ),
-              date: formatMonthDay(deloadDate),
+              date: formatMonthDay(deloadDate, locale),
             })}
           </InsightText>
         </InsightRow>

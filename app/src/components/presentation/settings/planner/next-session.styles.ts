@@ -112,3 +112,43 @@ export const InsightText = styled.Text`
   line-height: 15px;
   color: ${({ theme }) => (theme.isDark ? '#86868B' : '#8E8E93')};
 `;
+
+export const EmptyWrap = styled.View`
+  gap: 8px;
+  padding-vertical: 4px;
+`;
+
+export const EmptyTitle = styled.Text`
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: ${({ theme }) => theme.color.content.primary};
+`;
+
+export const EmptyCaption = styled.Text`
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: ${({ theme }) => (theme.isDark ? '#98989F' : '#636366')};
+`;
+
+export const EmptyCta = styled(HomeGradient).attrs({ variant: 'brand' })`
+  height: 44px;
+  border-radius: 22px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+  overflow: hidden;
+  shadow-color: #ff2d55;
+  shadow-offset: 0px 7px;
+  shadow-opacity: 0.5;
+  shadow-radius: 12px;
+  elevation: 6;
+`;
+
+export const EmptyCtaText = styled.Text`
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.25px;
+  color: #ffffff;
+`;
