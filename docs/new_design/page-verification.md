@@ -194,7 +194,7 @@ confirmation on device — no device used.
 | 12 | Feed shared-item | (thin wrapper) | done 2026-09-22 |
 | 13 | Settings home | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 14 | Settings preferences | docs/new_design/settings-dark.md | done 2026-09-22 |
-| 15 | Settings notifications | docs/new_design/settings-dark.md | pending |
+| 15 | Settings notifications | docs/new_design/settings-dark.md | done 2026-09-22 |
 | 16 | Settings AI planner | docs/new_design/settings-dark.md | pending |
 | 17 | Settings programs & import | docs/new_design/settings-dark.md | pending |
 | 18 | Backup hub + remote/export/import | docs/new_design/backup-redesign.md | pending |
@@ -1294,6 +1294,123 @@ earlier today" — the run crossed local midnight, unrelated to this
 change); oxlint 0 errors on touched/new files; eslint (react-compiler)
 clean on the preferences folder; `oxfmt --check` clean (three
 formatting fixes applied to new/touched files).
+
+**Not claimed:** pixel/animation feel, real-device performance, haptics —
+no device used.
+
+### 15. Settings notifications
+- Verified 2026-09-22 against `docs/new_design/settings-dark.md` Screen 3
+  (Notifications, 393 × 1124). Route
+  `app/src/app/(tabs)/settings/notifications.tsx` (thin wrapper rendering
+  `NotificationsScreen`); screen
+  `components/presentation/settings/notifications/notifications-screen.tsx`
+  plus the section cards (workout, results, social, delivery) and the new
+  pure day-chip helper module `notification-day-chips.ts`.
+- Sections inventoried (render order): WORKOUT (Workout Reminders toggle,
+  reminder editor: 7 Monday-first day chips 28×22 r11 + 77×22 r11 time pill
+  in 44pt press cells, Rest Timer Alerts, Auto-pause on Phone Lock, legacy
+  Rest Timers), RESULTS (Goal Completions, Personal Records, Weekly
+  Summary — the spec's real caption "Every Sunday · 8:00 AM"), SOCIAL
+  (Kudos & Comments, Challenge Updates, New Followers — the spec SVG's
+  deliberate-off row is New Followers), DELIVERY (Quiet Hours
+  display-only "10 PM – 6 AM", Badge App Icon), screen footer.
+- State matrix simulated: registry defaults (reminders on Mon/Tue/Wed/Fri/
+  Sat 5:30 PM, quiet hours 22:00–6:00, badge on, challenge updates on, new
+  followers off), Monday-first localized chips (en narrow M T W T F S S, de
+  M D M D F S S, full names for a11y labels), 12h/24h + app-language time
+  pill and picker, OS permission granted / not-determined-then-granted /
+  denied (scheduler returns false, effect rolls the toggle back so the UI
+  never claims delivery it cannot make), reminder time inside quiet hours
+  (false, no permission prompt fired), no selected days (false, no prompt),
+  removed-day stale notifications cancelled, deterministic weekday
+  identifiers (no duplicates), weekly summary Sunday 8:00 AM, badge handler
+  configured + badge cleared on switch-off, settings hydrated vs not (no
+  scheduling before hydration), persistence/rehydration through the real
+  settings slice, rest-timer alert broadcasts gated on the toggle.
+- Data honesty: the five category toggles with no delivery path anywhere
+  (Goal Completions, Personal Records, Kudos & Comments, Challenge
+  Updates, New Followers — no fire point reads those preferences) are now
+  inert dimmed toggles with an honest "Not available" caption; their
+  registry keys and stored values are preserved for compatibility. The
+  weekly summary toggle stays live (the only wired RESULTS row). Rest
+  Timer Alerts is real: `notifySetTimer` returns early unless both it and
+  legacy Rest Timers are on, otherwise schedules the next-set notification;
+  Auto-pause on Phone Lock has its real consumer. Quiet Hours shows the
+  real stored window (no editor exists in the spec — display-only, not a
+  fake affordance); no Alert Sound row because no custom sound model
+  exists.
+
+**Bugs found and fixed:**
+1. `notification-scheduler.ts` — rescheduling only cancelled the
+   currently-selected days, so removing Tuesday left its old notification
+   scheduled. Now cancels all seven deterministic weekday identifiers
+   before rescheduling.
+2. `notification-scheduler.ts` — scheduling exceptions were swallowed
+   with a log, leaving the toggle on with nothing scheduled. The
+   scheduler now computes triggers before prompting: enabled-but-nothing-
+   schedulable (no days, or the time entirely inside quiet hours) returns
+   `false` without firing the OS permission prompt; notification effects
+   roll the toggle back off on `false`.
+3. `registry.ts` — the spec's one OFF social category was implemented on
+   the wrong row (Challenge Updates off / New Followers on); defaults now
+   match the Screen 3 SVG (Challenge Updates on, New Followers off).
+4. `workout-card.tsx` — the reminder picker ignored the app language
+   (`locale="default"`) and the 24-hour preference; it now receives both
+   from the store, like the time pill.
+5. `workout-card.tsx` — row order diverged from the SVG (legacy Rest
+   Timers before Workout Reminders); now Reminders → Rest Timer Alerts →
+   Auto-pause → legacy Rest Timers. Day helpers extracted to the pure,
+   tested `notification-day-chips.ts` (verified Monday reference
+   2026-01-05); the inappropriate `radiogroup` role is gone and the time
+   button exposes its disabled state.
+6. `workout-card.styles.ts` — chips/time pill used dark-only white-alpha
+   fills and `#ffffff` text (invisible in light mode); inactive surfaces
+   and text now derive from theme tokens, keeping the spec's ember accent
+   for the active chip in both modes.
+7. `results-card.tsx` / `social-card.tsx` — the five dead category
+   toggles are now inert `SettingsToggle`s (`disabled` support added to
+   the shared component: dimmed track + `disabled` accessibility state)
+   with the new `settings.notifications.unavailable.subtitle` caption,
+   instead of pretending to control notifications that cannot fire.
+
+**Tests (33 new, all green):**
+- `notifications/notifications-simulation.spec.ts` (new, 24 tests):
+  registry contract (defaults incl. the corrected off row,
+  persistence/rehydration through the real settings slice), day chips
+  (Monday-first order, real calendar references, en/de narrow letters,
+  a11y day names), effect honesty (toggle kept on success, rolled back on
+  denied weekly/workout schedules, live days/time/quiet-hours passed to
+  the scheduler, disabled toggle tells the scheduler, nothing before
+  hydration, badge handler + badge clearing), an i18n scan resolving
+  every `settings.notifications.*` key used by the five screens in
+  `en.json`, and static scans (spec row order, picker locale/24h props,
+  inert-with-caption dead toggles, no `en-US` hard-codes, no
+  dark-only white-alpha styles).
+- `services/notification-scheduler.spec.ts` (new, 9 tests): real
+  scheduler against mocked expo-notifications — cancel-all-seven then
+  schedule with deterministic identifiers (a deselected Thursday is
+  cancelled too, so no stale notification survives), permission request
+  on not-determined, false-with-nothing-scheduled on denial, false with
+  no permission prompt on quiet-hours conflict or empty days,
+  cancel-only on disable, weekly summary Sunday 8:00 AM.
+
+**Deliberate non-changes:**
+- The `SettingsToggle` disabled support keeps `onValueChange` required
+  in the row descriptor type; the pre-existing react-compiler lint error
+  on `offset.value =` in that file (Reanimated shared-value mutation, the
+  correct API) exists on the committed file too — not introduced here.
+- Quiet Hours has no editor: the spec shows a display row, and inventing
+  an editor would go beyond the design; the row shows the real stored
+  window.
+
+**Verification:** `npm run typecheck` 0 errors; full vitest 124 files /
+1,948 tests (1,947 green; the single failure is the pre-existing
+midnight-boundary flake in `backup-status.spec.ts` "labels a backup from
+earlier today" — the run crossed local midnight, unrelated to this
+change); oxlint 0 errors on touched/new files; eslint clean on the
+notifications folder and scheduler (the one react-compiler error in
+`grouped-settings-list.tsx` predates this change); `oxfmt --check` clean
+(four formatting fixes applied).
 
 **Not claimed:** pixel/animation feel, real-device performance, haptics —
 no device used.

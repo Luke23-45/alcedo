@@ -1,8 +1,13 @@
 import styled from 'styled-components/native';
+import { alpha } from '@/styles/theme';
 
 /**
  * Workout reminder editor (settings-dark.md Screen 3): 7 day chips
  * (28×22 r11) + the time pill (77×22 r11) in 44pt-tall press cells.
+ *
+ * Spec colors (#FF6A3D active fill/stroke, #FFB84D active letter) are kept
+ * for dark mode; inactive surfaces and all text derive from theme tokens
+ * so the chips stay visible in light mode too.
  */
 
 export const Block = styled.View`
@@ -32,23 +37,24 @@ export const DayCell = styled.Pressable`
   justify-content: center;
 `;
 
-// Active chip: #FF6A3D .16 fill, #FF6A3D .3 stroke. Inactive: white .06 / .08.
+// Active chip: #FF6A3D .16 fill, #FF6A3D .3 stroke. Inactive: theme control
+// fill + hairline, so the chips read in both modes.
 export const DayChip = styled.View<{ $active: boolean }>`
   width: 28px;
   height: 22px;
   border-radius: 11px;
   align-items: center;
   justify-content: center;
-  background-color: ${({ $active }) => ($active ? 'rgba(255,106,61,0.16)' : 'rgba(255,255,255,0.06)')};
+  background-color: ${({ theme, $active }) => ($active ? alpha('#FF6A3D', 0.16) : theme.color.fill.quaternary)};
   border-width: 0.8px;
-  border-color: ${({ $active }) => ($active ? 'rgba(255,106,61,0.3)' : 'rgba(255,255,255,0.08)')};
+  border-color: ${({ theme, $active }) => ($active ? alpha('#FF6A3D', 0.3) : theme.color.border.hairline)};
 `;
 
 export const DayLetter = styled.Text<{ $active: boolean }>`
   font-family: ${({ theme }) => theme.font.text};
   font-size: 10px;
   font-weight: ${({ theme }) => theme.weight.bold};
-  color: ${({ $active }) => ($active ? '#FFB84D' : '#6C6C70')};
+  color: ${({ theme, $active }) => ($active ? (theme.isDark ? '#FFB84D' : '#B26A00') : theme.color.content.tertiary)};
 `;
 
 export const TimeCell = styled.Pressable`
@@ -57,22 +63,22 @@ export const TimeCell = styled.Pressable`
   justify-content: center;
 `;
 
-// 77×22 r11, white .08 fill, white .10 stroke, 10.5/600 white.
+// 77×22 r11; theme control fill + hairline so the pill reads in both modes.
 export const TimePill = styled.View`
   width: 77px;
   height: 22px;
   border-radius: 11px;
   align-items: center;
   justify-content: center;
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: ${({ theme }) => theme.color.fill.quaternary};
   border-width: 0.8px;
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: ${({ theme }) => theme.color.border.hairline};
 `;
 
 export const TimeText = styled.Text`
   font-family: ${({ theme }) => theme.font.text};
   font-size: 10.5px;
   font-weight: ${({ theme }) => theme.weight.semibold};
-  color: #ffffff;
+  color: ${({ theme }) => theme.color.content.primary};
   font-variant: tabular-nums;
 `;

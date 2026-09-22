@@ -167,11 +167,12 @@ export const BadgePillText = styled.Text`
 // --- iOS toggle (44×26) -----------------------------------------------------
 // Spec: 44×26 rx13; ON #30D158 dark / #34C759 light; knob r11 white with
 // dy2/blur4 black .55 shadow (settings-dark.md Screen 1; phase-6 light deltas).
-export const ToggleTrack = styled.View<{ $on: boolean }>`
+export const ToggleTrack = styled.View<{ $on: boolean; $disabled?: boolean }>`
   width: 44px;
   height: 26px;
   border-radius: 13px;
   justify-content: center;
+  opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
   background-color: ${({ theme, $on }) =>
     $on ? (theme.isDark ? '#30D158' : '#34C759') : theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(120,120,128,0.12)'};
 `;

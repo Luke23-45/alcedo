@@ -1503,6 +1503,7 @@
   "settings.notifications.screen_subtitle": "Reminders, results, social and delivery",
   "settings.notifications.screen_title": "Notifications",
   "settings.notifications.social.header": "SOCIAL",
+  "settings.notifications.unavailable.subtitle": "Not available",
   "settings.notifications.weekly.body": "Your weekly summary is ready.",
   "settings.notifications.weekly.title": "Your week in training",
   "settings.notifications.weekly_summary.label": "Weekly Summary",

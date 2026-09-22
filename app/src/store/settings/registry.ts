@@ -45,13 +45,7 @@ export interface LastBackup {
 }
 
 /** Honest classification of a failed remote-backup upload, for error copy. */
-export type RemoteBackupErrorKind =
-  | 'connection'
-  | 'http401'
-  | 'http500'
-  | 'http413'
-  | 'httpOther'
-  | 'unknown';
+export type RemoteBackupErrorKind = 'connection' | 'http401' | 'http500' | 'http413' | 'httpOther' | 'unknown';
 
 const REMOTE_BACKUP_ERROR_KINDS: readonly RemoteBackupErrorKind[] = [
   'connection',
@@ -156,10 +150,7 @@ const lastRemoteBackupTestCodec: Codec<LastRemoteBackupTest | undefined> = {
       return undefined;
     }
   },
-  serialize: (value) =>
-    value === undefined
-      ? undefined
-      : JSON.stringify({ ...value, time: value.time.toString() }),
+  serialize: (value) => (value === undefined ? undefined : JSON.stringify({ ...value, time: value.time.toString() })),
 };
 
 const lastExternalImportCodec: Codec<LastExternalImport | undefined> = {
@@ -187,10 +178,7 @@ const lastExternalImportCodec: Codec<LastExternalImport | undefined> = {
       return undefined;
     }
   },
-  serialize: (value) =>
-    value === undefined
-      ? undefined
-      : JSON.stringify({ ...value, time: value.time.toString() }),
+  serialize: (value) => (value === undefined ? undefined : JSON.stringify({ ...value, time: value.time.toString() })),
 };
 
 /**
@@ -343,10 +331,13 @@ export const preferenceRegistry = {
   notifyWeeklySummary: pref({ default: true, codec: boolCodec }),
   /** Kudos & comments notifications. */
   notifyKudosComments: pref({ default: true, codec: boolCodec }),
-  /** Challenge-update notifications. Deliberately off: the one quiet category. */
-  notifyChallengeUpdates: pref({ default: false, codec: boolCodec }),
-  /** New-follower notifications. */
-  notifyNewFollowers: pref({ default: true, codec: boolCodec }),
+  /** Challenge-update notifications. On per the contract SVG (Screen 3). */
+  notifyChallengeUpdates: pref({ default: true, codec: boolCodec }),
+  /**
+   * New-follower notifications. Deliberately off: the contract's one quiet
+   * category (settings-dark.md Screen 3 shows this toggle off).
+   */
+  notifyNewFollowers: pref({ default: false, codec: boolCodec }),
   /** Quiet hours start, minutes after midnight (22:00). Scheduled notifications wait. */
   quietHoursStartMinutes: pref({ default: 22 * 60, codec: intCodec }),
   /** Quiet hours end, minutes after midnight (6:00). */

@@ -63,14 +63,13 @@ export async function rescheduleWorkoutReminders(
   schedule: ReminderSchedule,
   strings: { title: string; body: string },
 ): Promise<boolean> {
-  for (const day of schedule.days) {
+  // Cancel all seven owned identifiers — not just the currently selected
+  // days — so a deselected day can never leave a stale notification behind.
+  for (const day of DayOfWeek.values()) {
     await cancelScheduledNotificationAsync(`alcedo.workout-reminder.${day.name().toLowerCase()}`);
   }
   if (!schedule.enabled) {
     return true;
-  }
-  if (!(await permissionGranted())) {
-    return false;
   }
   const triggers = computeReminderTriggers(
     schedule.days,
@@ -78,13 +77,25 @@ export async function rescheduleWorkoutReminders(
     schedule.quietStartMinutes,
     schedule.quietEndMinutes,
   );
+  if (triggers.length === 0) {
+    // Nothing can be delivered (the reminder time falls inside quiet hours,
+    // or no training day is selected): the toggle must not claim otherwise,
+    // and there is no point prompting for OS permission.
+    return false;
+  }
+  if (!(await permissionGranted())) {
+    return false;
+  }
   for (const trigger of triggers) {
     await scheduleCalendarTrigger(trigger, strings.title, strings.body);
   }
   return true;
 }
 
-export async function rescheduleWeeklySummary(enabled: boolean, strings: { title: string; body: string }): Promise<boolean> {
+export async function rescheduleWeeklySummary(
+  enabled: boolean,
+  strings: { title: string; body: string },
+): Promise<boolean> {
   await cancelScheduledNotificationAsync(WEEKLY_SUMMARY_ID);
   if (!enabled) {
     return true;

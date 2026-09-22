@@ -32,7 +32,7 @@ export interface SettingsRowProps {
   /** Gold pill such as BETA / NEW. */
   badge?: string;
   /** iOS toggle at the trailing edge (replaces the chevron). */
-  toggle?: { value: boolean; onValueChange: (v: boolean) => void; label: string };
+  toggle?: { value: boolean; onValueChange: (v: boolean) => void; label: string; disabled?: boolean };
   /** Custom trailing content (e.g. a picker); replaces badge/value/toggle/chevron. */
   trailing?: ReactNode;
   /** Override the subtitle color (e.g. the danger tone for incomplete backends). */
@@ -182,10 +182,13 @@ export function SettingsToggle({
   value,
   onValueChange,
   accessibilityLabel,
+  disabled,
 }: {
   value: boolean;
-  onValueChange: (v: boolean) => void;
+  onValueChange?: (v: boolean) => void;
   accessibilityLabel: string;
+  /** Inert, dimmed toggle for preferences with no delivery path yet. */
+  disabled?: boolean;
 }) {
   const reduceMotion = useAppReducedMotion();
   const offset = useSharedValue(value ? 20 : 2);
@@ -196,6 +199,9 @@ export function SettingsToggle({
   }, [value, reduceMotion, offset]);
 
   const toggle = () => {
+    if (disabled || !onValueChange) {
+      return;
+    }
     const next = !value;
     offset.value = reduceMotion ? (next ? 20 : 2) : withTiming(next ? 20 : 2, { duration: 160 });
     onValueChange(next);
@@ -204,13 +210,14 @@ export function SettingsToggle({
   return (
     <Pressable
       onPress={toggle}
+      disabled={disabled}
       hitSlop={S.ToggleHitSlop}
       accessibilityRole="switch"
-      accessibilityState={{ checked: value }}
+      accessibilityState={{ checked: value, disabled }}
       accessibilityLabel={accessibilityLabel}
       style={{ padding: 4 }}
     >
-      <S.ToggleTrack $on={value}>
+      <S.ToggleTrack $on={value} $disabled={disabled}>
         <Animated.View style={{ transform: [{ translateX: offset }] }}>
           <S.ToggleKnob />
         </Animated.View>

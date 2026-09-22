@@ -26,6 +26,7 @@ export function DeliveryCard() {
     settings.quietHoursStartMinutes,
     settings.quietHoursEndMinutes,
     settings.use24HourTime,
+    settings.preferredLanguage ?? undefined,
   );
 
   return (
