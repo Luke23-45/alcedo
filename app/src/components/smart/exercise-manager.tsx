@@ -2,7 +2,7 @@ import { spacing, useAppTheme } from '@/hooks/useAppTheme';
 import { useTranslate } from '@tolgee/react';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, View } from 'react-native';
-import { Icon, List, TextInput } from 'react-native-paper';
+import { Icon, List, Text, TextInput } from 'react-native-paper';
 import { PageActions } from '@/components/presentation/foundation/page-actions';
 import AddIcon from '@expo/material-symbols/add.xml';
 import TouchableRipple from '@/components/presentation/foundation/touchable-ripple';
@@ -10,7 +10,6 @@ import { AccordionItem } from '@/components/presentation/foundation/accordion-it
 import { useScroll } from '@/hooks/useScrollListener';
 import {
   deleteExercise as deleteExerciseAction,
-  restoreExercise,
   selectExerciseById,
   selectExercises,
   setFilteredExerciseIds as setFilteredExerciseIdsAction,
@@ -22,6 +21,7 @@ import { uuid } from '@/utils/uuid';
 import { SwipeRow } from 'react-native-swipe-list-view';
 import { showSnackbar } from '@/store/app';
 import { useMountEffect } from '@/hooks/useMountEffect';
+import { buildUndoAction, newExerciseDescriptor } from './exercise-manager-logic';
 import ExerciseMuscleSelector from '@/components/presentation/workout-editor/exercise-muscle-selector';
 import ExerciseFilterer from '@/components/presentation/workout-editor/exercise-filterer';
 import { LegendList } from '@legendapp/list';
@@ -73,7 +73,7 @@ function ExerciseListItem({
             justifyContent: 'center',
             alignItems: 'center',
           }}
-          testID={`exercise-delete-btn`}
+          testID={`exercise-delete-btn-${exerciseId}`}
         >
           <Icon source={'delete'} size={30} color={colors.onError} />
         </TouchableRipple>
@@ -96,7 +96,7 @@ function ExerciseListItem({
             setExpanded(false);
           }
         }}
-        testID={`exercise-accordion`}
+        testID={`exercise-accordion-${exerciseId}`}
       >
         <AccordionItem
           isExpanded={expanded}
@@ -118,6 +118,7 @@ function ExerciseListItem({
 export default function ExerciseManager() {
   const dispatch = useDispatch();
   const { t } = useTranslate();
+  const { space } = useAppTheme();
   const { getState } = useStore<RootState>();
   const exercises = useAppSelector(selectExercises);
   const filteredExerciseIds = useAppSelector((s) => s.storedSessions.filteredExerciseIds);
@@ -127,30 +128,23 @@ export default function ExerciseManager() {
 
   useMountEffect(() => {
     setFilteredExerciseIds(Object.keys(exercises));
+    setFiltersInitialized(true);
   });
   const insets = useSafeAreaInsets();
   const headerHeight = useContext(HeaderHeightContext); // Intentionally don't use useHeaderHeight as it might not be in a stack
   const topInsetHeight = Platform.select({ ios: headerHeight }) ?? 0;
   const [floatingBottomSize, setFloatingBottomSize] = useState(0);
+  // filteredExerciseIds starts empty before the mount effect runs; the
+  // empty state must not flash on that first frame.
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
   const bottomInsetHeight = floatingBottomSize + (Platform.select({ ios: insets.bottom }) ?? 0);
+  // Honest empty state: nothing rendered until the mount effect has seeded
+  // the filtered list, so the pre-init frame never flashes "no matches".
+  const showEmptyState = filtersInitialized && filteredExerciseIds.length === 0;
 
   const addExercise = () => {
     const newId = uuid();
-    dispatch(
-      updateExercise({
-        id: newId,
-        exercise: {
-          name: 'New exercise',
-          category: '',
-          equipment: null,
-          force: null,
-          instructions: '',
-          level: 'beginner',
-          mechanic: null,
-          muscles: [],
-        },
-      }),
-    );
+    dispatch(updateExercise({ id: newId, exercise: newExerciseDescriptor() }));
     setFilteredExerciseIds([newId]);
   };
 
@@ -165,9 +159,10 @@ export default function ExerciseManager() {
 
     setFilteredExerciseIds(filteredExerciseIds.filter((x) => x !== id));
     dispatch(deleteExerciseAction(id));
-    // Built-ins are tombstoned, so undo restores the tombstone; user exercises are re-inserted.
-    const undoAction =
-      isBuiltIn || !savedExercise ? restoreExercise(id) : updateExercise({ id, exercise: savedExercise });
+    // Built-ins are tombstoned by deleteExercise (an override row, if the
+    // user edited the built-in, is kept), so undo lifts the tombstone;
+    // user exercises are re-inserted from the saved copy.
+    const undoAction = buildUndoAction(id, { isBuiltIn, savedExercise });
     dispatch(
       showSnackbar({
         text: t('deletion.item_deleted.message', { name: exercise.name }),
@@ -177,7 +172,10 @@ export default function ExerciseManager() {
     );
   };
 
-  const flatListItems = useMemo(() => ['filter', ...filteredExerciseIds], [filteredExerciseIds]);
+  const flatListItems = useMemo(
+    () => ['filter', ...(showEmptyState ? ['empty'] : filteredExerciseIds)],
+    [filteredExerciseIds, showEmptyState],
+  );
   const { handleScroll } = useScroll();
   return (
     <SafeAreaView style={{ flex: 1 }} edges={{ left: 'additive', right: 'additive', top: 'off', bottom: 'off' }}>
@@ -189,7 +187,7 @@ export default function ExerciseManager() {
         }}
         style={{ flex: 1 }}
         data={flatListItems}
-        getItemType={(_, index) => (index === 0 ? 'filters' : 'exercise')}
+        getItemType={(_, index) => (index === 0 ? 'filters' : flatListItems[index] === 'empty' ? 'empty' : 'exercise')}
         keyExtractor={(item, index) => (index === 0 ? 'filters' : item)}
         renderItem={({ item, index }) => {
           if (index === 0) {
@@ -199,6 +197,18 @@ export default function ExerciseManager() {
                 onFilteredExerciseIdsChange={setFilteredExerciseIds}
                 onSuggestedNewExercise={() => {}}
               />
+            );
+          }
+          if (item === 'empty') {
+            // The library itself is empty on a fresh install before the
+            // built-ins load; otherwise the filters matched nothing.
+            const libraryEmpty = Object.keys(exercises).length === 0;
+            return (
+              <View style={{ padding: space.xl, alignItems: 'center' }}>
+                <Text variant="bodyMedium">
+                  {t(libraryEmpty ? 'generic.nothing_here_yet.message' : 'exercise.search.no_results')}
+                </Text>
+              </View>
             );
           }
           return (

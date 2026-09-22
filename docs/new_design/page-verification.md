@@ -202,7 +202,7 @@ confirmation on device — no device used.
 | 20 | Backends [id] | — | done 2026-09-22 (contract only, design-first) |
 | 21 | Exercise search | — | done 2026-09-22 |
 | 22 | Exercise history | — | done 2026-09-22 |
-| 23 | Manage exercises | — | pending |
+| 23 | Manage exercises | — | done 2026-09-22 |
 | 24 | AI planner chat | — | pending |
 
 Route-tree sweep 2026-09-22: every user-facing route is now covered.
@@ -1816,6 +1816,70 @@ percent + zero guard, weighted row headline/subline/PR chip, PR-chip
 exclusivity, locale-aware month badge source sweep, 4-row collapse,
 weight formatting, href encoding + movement-key round-trip, i18n key
 coverage).
+
+**Not claimed:** pixel/animation feel, real-device performance — no
+device used.
+
+### 23. Manage exercises (`/settings/manage-exercises`)
+- Verified 2026-09-22. Route `app/src/app/(tabs)/settings/
+  manage-exercises.tsx` (thin wrapper, `Stack.Screen` title
+  `exercise.manage.title`); new-design chrome
+  `exercise-manager-screen.tsx` (`SettingsBackground` variant
+  "programs", `SectionHeader`, `ManagerPage`); legacy behavior in
+  `components/smart/exercise-manager.tsx` (Paper `List.Accordion` rows,
+  `SwipeRow` delete, `ExerciseFilterer`, add FAB via `PageActions`).
+- Sections inventoried (render order): filter row (search + muscle
+  filters via `ExerciseFilterer`), exercise rows (swipe-to-delete with
+  70pt red action, accordion expands `ExerciseEditSheet`: name,
+  instructions, muscle selector — every keystroke upserts), floating
+  add button (`exercise.add.button`).
+- State matrix simulated: add (inserts blank descriptor, filters to the
+  new id, auto-expands), delete built-in (tombstones `hiddenBuiltInIds`,
+  override row kept), delete user exercise (removes `savedExercises`
+  row), undo in all three cases, delete of unknown id (no-op),
+  filter-no-match, empty library, pre-mount first frame.
+- Delete/undo traced against the real reducer: `deleteExercise` →
+  tombstone vs row removal matches `isBuiltIn`; the snackbar undo
+  dispatches the inverse action plus the pre-delete filtered-id list.
+
+**Bugs found and fixed:**
+1. No empty state: a filter matching nothing (or an empty library)
+   rendered only the filter row with no feedback. Now renders an
+   honest row — `generic.nothing_here_yet.message` when the library
+   itself is empty, `exercise.search.no_results` when filters match
+   nothing (existing keys reused, none invented). Gated on a
+   `filtersInitialized` flag so the pre-mount frame (filtered ids start
+   `[]` before the mount effect seeds them) never flashes "no matches".
+2. Misleading comment: "undo restores the tombstone" — undo *lifts*
+   (removes) the tombstone via `restoreExercise`; the comment now says
+   what the reducer does.
+3. Duplicate `testID`s: every row rendered `exercise-delete-btn` /
+   `exercise-accordion` identically. Now suffixed with the exercise id.
+4. Extracted `newExerciseDescriptor()` + `buildUndoAction()` into
+   RN-free `exercise-manager-logic.ts` (house rule: non-visual modules
+   stay flat); the component's undo matrix is now a tested pure
+   function with the exact original semantics preserved (built-in or
+   corrupt-missing → `restoreExercise`; user → `updateExercise`).
+
+**Deliberate non-changes:**
+- The manager body stays legacy Paper UI (not redesigned); only the
+  page chrome is new-design. No visual restyle attempted.
+- The mount effect still resets the filtered list to the full library
+  on every visit — intended fresh-start behavior (`filteredExerciseIds`
+  is transient, not persisted).
+- `oxlint` reports 9 `no-unsafe-*` errors in `exercise-manager.tsx`;
+  proven present on the committed baseline (legacy `spacing: any`
+  shim) via stash — no new issues added (the new `space.xl` padding
+  uses the typed theme).
+
+**Verification:** typecheck 0 errors; full vitest pending page 24;
+oxlint 0 new errors (9 pre-existing baseline, unchanged); `oxfmt
+--check` clean on touched files;
+`exercise-manager-simulation.spec.ts` (new, 12 tests: descriptor
+shape, undo-action matrix incl. the defensive branch, three
+delete→undo reducer round-trips, empty-state gating + copy
+distinction + unique testIDs, i18n key coverage); adjacent
+`stored-sessions/index.spec.ts` (26 tests) green.
 
 **Not claimed:** pixel/animation feel, real-device performance — no
 device used.
