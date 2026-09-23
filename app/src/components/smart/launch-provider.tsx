@@ -10,8 +10,8 @@ const SPLASH = require('../../../assets/splash.png') as number;
 const EASE_OUT_EXPO = Easing.bezier(0.16, 0.84, 0.24, 1);
 
 /**
- * Minimum time the branded launch screen stays up: the brand beat. The lockup
- * pushes in and the loading dots run while the app finishes preparing.
+ * Minimum time the branded launch screen stays up: the brand beat. The bird
+ * pushes in and breathes while the app finishes preparing.
  */
 const MIN_BRAND_MS = 1700;
 /** Dismiss crossfade from the branded splash into the app. */
@@ -31,9 +31,8 @@ export function useSplashHidden() {
  * stays up until the first frame is laid out and the artwork is decoded; then
  * the native splash hides and this provider mounts the animated launch screen
  * — its first frame is pixel-identical to the still, so the handoff is
- * invisible — which plays the brand beat (slow push-in, breathing lockup,
- * loading dots). Once the app is ready and the beat has played, the screen
- * crossfades into the app and the welcome hero wakes up underneath.
+ * invisible — which plays the brand beat (slow push-in, breathing bird).
+ * Once the app is ready and the beat has played, the screen crossfades into the app and the welcome hero wakes up underneath.
  */
 export function LaunchProvider({ children }: { children: ReactNode }) {
   const reduceMotion = useReducedMotion();
