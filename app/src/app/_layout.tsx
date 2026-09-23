@@ -16,6 +16,10 @@ import StackWithHeader from '@/components/layout/stack-with-header';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { requireOptionalNativeModule } from 'expo';
+import * as SplashScreen from 'expo-splash-screen';
+import { LaunchProvider } from '@/components/smart/launch-provider';
+
+void SplashScreen.preventAutoHideAsync();
 
 install();
 
@@ -42,9 +46,11 @@ export default function RootLayout() {
               <AppStateProvider>
                 <SnackbarProvider>
                   {Platform.OS === 'android' && <StatusBar style="auto" />}
-                  <PlanImportGate />
-                  <AutoPauseOnLock />
-                  <Layout />
+                  <LaunchProvider>
+                    <PlanImportGate />
+                    <AutoPauseOnLock />
+                    <Layout />
+                  </LaunchProvider>
                 </SnackbarProvider>
               </AppStateProvider>
             </AppThemeProvider>

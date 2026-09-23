@@ -57,25 +57,46 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const EASE_IN_OUT = Easing.inOut(Easing.ease);
 const EASE_OUT_EXPO = Easing.bezier(0.16, 0.84, 0.24, 1);
 
-function useLoop(value: Animated.Value, build: () => Animated.CompositeAnimation) {
+function useLoop(value: Animated.Value, build: () => Animated.CompositeAnimation, enabled: boolean) {
   const buildRef = useRef(build);
   buildRef.current = build;
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     const loop = Animated.loop(buildRef.current());
     loop.start();
     return () => loop.stop();
-  }, [value]);
+  }, [value, enabled]);
 }
 
-export function KingfisherMark({ style }: { style?: StyleProp<ViewStyle> }) {
+/**
+ * @param frozen Render the mark once, at rest, with no entrance and no ambient
+ * loops. Used for the launch handoff: the native launch image already shows the
+ * mark at rest, so the first live frame must match it exactly. When `frozen`
+ * flips to false the mark snaps to its rest state (no fade-in replay) and the
+ * ambient loops start from there.
+ */
+export function KingfisherMark({ style, frozen = false }: { style?: StyleProp<ViewStyle>; frozen?: boolean }) {
   const entrance = useRef(new Animated.Value(0)).current;
   const floatY = useRef(new Animated.Value(0)).current;
   const bloomOpacity = useRef(new Animated.Value(0.85)).current;
   const sheenX = useRef(new Animated.Value(-160)).current;
   const sheenOpacity = useRef(new Animated.Value(0)).current;
   const glintOpacity = useRef(new Animated.Value(0)).current;
+  const wasFrozen = useRef(frozen);
 
   useEffect(() => {
+    if (frozen) {
+      return;
+    }
+    if (wasFrozen.current) {
+      // Launch handoff: the static launch image is already on screen, so skip
+      // the fade-in and continue from the visible rest state.
+      wasFrozen.current = false;
+      entrance.setValue(1);
+      return;
+    }
     const animation = Animated.timing(entrance, {
       toValue: 1,
       duration: 1200,
@@ -84,46 +105,58 @@ export function KingfisherMark({ style }: { style?: StyleProp<ViewStyle> }) {
     });
     animation.start();
     return () => animation.stop();
-  }, [entrance]);
+  }, [entrance, frozen]);
 
-  useLoop(floatY, () =>
-    Animated.sequence([
-      Animated.timing(floatY, { toValue: -7, duration: 2500, easing: EASE_IN_OUT, useNativeDriver: true }),
-      Animated.timing(floatY, { toValue: 0, duration: 2500, easing: EASE_IN_OUT, useNativeDriver: true }),
-    ]),
-  );
-  useLoop(bloomOpacity, () =>
-    Animated.sequence([
-      Animated.timing(bloomOpacity, { toValue: 1, duration: 1200, easing: EASE_IN_OUT, useNativeDriver: false }),
-      Animated.timing(bloomOpacity, { toValue: 0.85, duration: 1200, easing: EASE_IN_OUT, useNativeDriver: false }),
-    ]),
-  );
-  useLoop(sheenX, () =>
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(sheenX, { toValue: 560, duration: 4000, easing: Easing.linear, useNativeDriver: false }),
-        Animated.sequence([
-          Animated.timing(sheenOpacity, { toValue: 1, duration: 480, easing: Easing.linear, useNativeDriver: false }),
-          Animated.delay(3040),
-          Animated.timing(sheenOpacity, { toValue: 0, duration: 480, easing: Easing.linear, useNativeDriver: false }),
-        ]),
+  useLoop(
+    floatY,
+    () =>
+      Animated.sequence([
+        Animated.timing(floatY, { toValue: -7, duration: 2500, easing: EASE_IN_OUT, useNativeDriver: true }),
+        Animated.timing(floatY, { toValue: 0, duration: 2500, easing: EASE_IN_OUT, useNativeDriver: true }),
       ]),
-      Animated.timing(sheenX, { toValue: -160, duration: 0, useNativeDriver: false }),
-    ]),
+    !frozen,
   );
-  useLoop(glintOpacity, () =>
-    Animated.sequence([
-      Animated.timing(glintOpacity, { toValue: 0.85, duration: 384, easing: Easing.linear, useNativeDriver: false }),
-      Animated.timing(glintOpacity, { toValue: 0, duration: 480, easing: Easing.linear, useNativeDriver: false }),
-      Animated.delay(3936),
-    ]),
+  useLoop(
+    bloomOpacity,
+    () =>
+      Animated.sequence([
+        Animated.timing(bloomOpacity, { toValue: 1, duration: 1200, easing: EASE_IN_OUT, useNativeDriver: false }),
+        Animated.timing(bloomOpacity, { toValue: 0.85, duration: 1200, easing: EASE_IN_OUT, useNativeDriver: false }),
+      ]),
+    !frozen,
+  );
+  useLoop(
+    sheenX,
+    () =>
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(sheenX, { toValue: 560, duration: 4000, easing: Easing.linear, useNativeDriver: false }),
+          Animated.sequence([
+            Animated.timing(sheenOpacity, { toValue: 1, duration: 480, easing: Easing.linear, useNativeDriver: false }),
+            Animated.delay(3040),
+            Animated.timing(sheenOpacity, { toValue: 0, duration: 480, easing: Easing.linear, useNativeDriver: false }),
+          ]),
+        ]),
+        Animated.timing(sheenX, { toValue: -160, duration: 0, useNativeDriver: false }),
+      ]),
+    !frozen,
+  );
+  useLoop(
+    glintOpacity,
+    () =>
+      Animated.sequence([
+        Animated.timing(glintOpacity, { toValue: 0.85, duration: 384, easing: Easing.linear, useNativeDriver: false }),
+        Animated.timing(glintOpacity, { toValue: 0, duration: 480, easing: Easing.linear, useNativeDriver: false }),
+        Animated.delay(3936),
+      ]),
+    !frozen,
   );
 
   const entranceRise = entrance.interpolate({ inputRange: [0, 1], outputRange: [18, 0] });
   const shadowOpacity = floatY.interpolate({ inputRange: [-7, 0], outputRange: [0.22, 0.34] });
 
   return (
-    <MarkRoot style={[style, { opacity: entrance, transform: [{ translateY: entranceRise }] }]}>
+    <MarkRoot style={[style, !frozen ? { opacity: entrance, transform: [{ translateY: entranceRise }] } : null]}>
       {/* Back layer: bloom + grounding shadow. */}
       <BackLayer>
         <Svg width="100%" height="100%" viewBox="0 40 393 340" preserveAspectRatio="xMidYMid meet">

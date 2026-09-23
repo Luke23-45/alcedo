@@ -28,6 +28,7 @@ import { useMemo, useState } from 'react';
 import { Portal } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 import { useCanExportHealth } from './health-export-switch';
+import { useSplashHidden } from './launch-provider';
 
 /**
  * First-run onboarding: welcome, localisation/theme, notifications/feed.
@@ -42,6 +43,7 @@ export function WelcomeWizard() {
   const notificationsEnabled = useAppSelector((x) => x.settings.restNotifications);
   const exportToHealthAggregator = useAppSelector((x) => x.settings.exportToHealthAggregator);
   const canExportHealth = useCanExportHealth();
+  const splashHidden = useSplashHidden();
   const formatDate = useFormatDate();
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -101,8 +103,9 @@ export function WelcomeWizard() {
         onPrevious={handlePrevious}
         onNext={() => void handleNext()}
         onFinish={() => void handleNext()}
+        revealed={splashHidden}
       >
-        <OnboardingWelcomePage />
+        <OnboardingWelcomePage revealed={splashHidden} />
         <OnboardingLocalisationPage
           useImperialUnits={settings.useImperialUnits}
           onToggleUnits={() => dispatch(setUseImperialUnits(!settings.useImperialUnits))}
