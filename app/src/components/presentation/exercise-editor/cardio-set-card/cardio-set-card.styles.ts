@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 // ============================================================================
@@ -24,7 +25,7 @@ export const SetHeader = styled.View`
 `;
 
 export const SetTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   line-height: 18px;
   font-weight: 600;
@@ -55,13 +56,18 @@ export const TargetRow = styled.View`
   margin-top: 4px;
 `;
 
-/** Fixed 90pt label column so the value input centers in the full row. */
+/**
+ * 90pt label column at reference widths; shrinks (never wraps) on narrow
+ * screens so the stepper and unit picker keep their spec sizes.
+ */
 export const TargetLabelWrap = styled.View`
   width: 90px;
+  min-width: 64px;
+  flex-shrink: 1;
 `;
 
 export const TargetLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   line-height: 18px;
   font-weight: 600;
@@ -94,7 +100,7 @@ export const HMSUnit = styled.View`
 `;
 
 export const HMSSub = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 8px;
   line-height: 10px;
   font-weight: 700;
@@ -108,11 +114,11 @@ export const HMSColonWrap = styled.View`
 `;
 
 export const HMSColon = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 14px;
   line-height: 18px;
   font-weight: 700;
-  color: ${({ theme }) => editorPalette(theme.isDark).text.tertiary};
+  color: ${({ theme }) => (theme.isDark ? '#48484A' : editorPalette(false).text.tertiary)};
 `;
 
 // ============================================================================
@@ -130,7 +136,7 @@ export const TrackGrid = styled.View`
 `;
 
 export const TrackColumnLeft = styled.View`
-  width: 196px;
+  flex: 1;
 `;
 
 export const TrackColumnRight = styled.View`
@@ -146,7 +152,8 @@ export const TrackCell = styled.View<{ $right?: boolean }>`
 `;
 
 export const TrackLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  flex-shrink: 1;
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   line-height: 16px;
   font-weight: 500;
@@ -183,7 +190,7 @@ export const RestValueRow = styled.Pressable`
 `;
 
 export const RestValueText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   line-height: 18px;
   font-weight: 700;

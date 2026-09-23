@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 /**
@@ -28,37 +29,25 @@ export const ResistanceTextColumn = styled.View`
 `;
 
 export const ResistanceLabel = styled.Text<{ $selected: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   line-height: 18px;
   font-weight: 600;
   letter-spacing: -0.2px;
-  color: ${({ theme, $selected }) => ($selected ? '#FFFFFF' : editorPalette(theme.isDark).text.secondary)};
+  color: ${({ theme, $selected }) =>
+    $selected ? editorPalette(theme.isDark).text.primary : editorPalette(theme.isDark).text.secondary};
 `;
 
 export const ResistanceBody = styled.Text<{ $selected: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
-  color: ${({ theme, $selected }) => ($selected ? '#98989F' : editorPalette(theme.isDark).text.caption)};
+  color: ${({ theme, $selected }) =>
+    $selected
+      ? theme.isDark
+        ? '#98989F'
+        : editorPalette(false).text.caption
+      : editorPalette(theme.isDark).text.caption};
 `;
 
-export const Radio = styled.View<{ $selected?: boolean }>`
-  width: 20px;
-  height: 20px;
-  border-radius: 10px;
-  border-curve: continuous;
-  border-width: ${({ $selected }) => ($selected ? 2 : 1.6)}px;
-  border-color: ${({ theme, $selected }) =>
-    $selected ? editorPalette(theme.isDark).accent.ember : editorPalette(theme.isDark).radio};
-  align-items: center;
-  justify-content: center;
-`;
-
-export const RadioDot = styled.View`
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
-  background-color: ${({ theme }) => editorPalette(theme.isDark).accent.ember};
-`;

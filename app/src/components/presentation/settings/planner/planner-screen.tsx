@@ -62,8 +62,8 @@ export function PlannerScreen() {
                 </HomeGradient>
               </ChatIconWell>
               <ChatRowText>
-                <ChatRowTitle>{t(settingsKey('settings.planner.chat_row.title'))}</ChatRowTitle>
-                <ChatRowCaption>{t(settingsKey('settings.planner.chat_row.caption'))}</ChatRowCaption>
+                <ChatRowTitle numberOfLines={1}>{t(settingsKey('settings.planner.chat_row.title'))}</ChatRowTitle>
+                <ChatRowCaption numberOfLines={2}>{t(settingsKey('settings.planner.chat_row.caption'))}</ChatRowCaption>
               </ChatRowText>
               <Svg width={8} height={12} viewBox="0 0 8 12">
                 <Path

@@ -1,4 +1,5 @@
 {
+  "feed.profile.avatar.photo": "Profile photo",
   "feed.profile.blocked.empty_body": "Accounts you block will appear here.",
   "feed.profile.blocked.empty_title": "No blocked accounts",
   "feed.profile.blocked.title": "Blocked Accounts",
@@ -9,7 +10,7 @@
   "feed.profile.connected.section": "CONNECTED",
   "feed.profile.connected.watch_subtitle": "Rings from your wrist",
   "feed.profile.connected.watch_title": "Apple Watch",
-  "feed.profile.footer.version": "Kinetic {version} ({build})",
+  "feed.profile.footer.version": "Alcedo {version} ({build})",
   "feed.profile.goals.daily_rings": "Daily Rings",
   "feed.profile.goals.exercise": "Exercise",
   "feed.profile.goals.hr": "{value} hr",

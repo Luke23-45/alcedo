@@ -30,10 +30,13 @@ export const SwatchRow = styled.View`
   min-height: 44px;
 `;
 
-// 52pt pitch per the spec (32pt visual + 20pt gap); visual left-aligned so
-// the first swatch's edge sits on the 20pt padding.
+// 52pt pitch per the spec (32pt visual + 20pt gap) on reference widths;
+// below that the five equal cells share the row so nothing clips (PF02:
+// 393 → 52 exact; 320 → 49.2 each, still ≥ the 44pt target). Visuals stay
+// left-aligned so the first swatch's edge sits on the 20pt padding.
 export const SwatchButton = styled.Pressable`
-  width: 52px;
+  flex: 1;
+  max-width: 52px;
   height: 44px;
   align-items: flex-start;
   justify-content: center;

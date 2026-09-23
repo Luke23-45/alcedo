@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 
@@ -27,7 +28,7 @@ export const RecoveryCaption = styled.Text`
 `;
 
 export const RecoveryDivider = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-vertical: 16px;
   ${({ theme }) =>
     theme.isDark

@@ -32,18 +32,25 @@ export function VolumeSlider({
   const palette = profilePalette(theme.isDark);
   const { t } = useTranslate();
   const [dragX, setDragX] = useState<number | undefined>(undefined);
+  const [areaW, setAreaW] = useState(0);
   const areaPageX = useRef(0);
   // The release handler must not commit inside the setState updater —
   // updaters must stay pure (React may invoke them twice). The ref carries
   // the latest drag position outside the render cycle.
   const dragXRef = useRef<number | undefined>(undefined);
 
-  const thumbX = dragX ?? sliderXForValue(goalKg);
-  const nowX = sliderXForNow(thisWeekKg);
+  // The track spans the measured card (36 left inset, 4 right — the reference's
+  // real asymmetric insets); 321-space math scales onto it. Fallback is exact.
+  const trackW = areaW > 0 ? areaW - 40 : trackWidth;
+  const scale = trackW / trackWidth;
+  const toDisplay = (x321: number): number => trackX + (x321 - trackX) * scale;
 
-  const clampToTrack = (localX: number): number => Math.min(trackX + trackWidth, Math.max(trackX, localX));
+  const thumbX = dragX ?? toDisplay(sliderXForValue(goalKg));
+  const nowX = toDisplay(sliderXForNow(thisWeekKg));
 
-  const commitX = (x: number) => onGoalChange(sliderValueForX(x));
+  const clampToTrack = (localX: number): number => Math.min(trackX + trackW, Math.max(trackX, localX));
+
+  const commitX = (x: number) => onGoalChange(sliderValueForX(x, trackW));
 
   const trackDrag = (pageX: number) => {
     const x = clampToTrack(pageX - areaPageX.current);
@@ -95,13 +102,15 @@ export function VolumeSlider({
         }
       }}
       onLayout={(event) => {
+        const { width } = event.nativeEvent.layout;
+        setAreaW((prev) => (prev === width ? prev : width));
         event.currentTarget.measure((_x, _y, _w, _h, pageX) => {
           areaPageX.current = pageX;
         });
       }}
       {...panResponder.panHandlers}
     >
-      <S.TrackBase $track={palette.sliderTrack}>
+      <S.TrackBase $track={palette.sliderTrack} style={{ width: trackW }}>
         <S.TrackFill
           colors={[PROFILE.brandGradient[0], PROFILE.brandGradient[1], PROFILE.brandGradient[2]]}
           start={{ x: 0, y: 0 }}

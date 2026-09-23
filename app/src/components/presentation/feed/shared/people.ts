@@ -1,5 +1,5 @@
 /**
- * The default social graph for the Kinetic Feed.
+ * The default social graph for the ALCEDO Feed.
  *
  * Source of truth: docs/new_design/social-dark.md — SOCIAL DATA CONTRACT.
  * These twelve people back the bundled default posts served when no backend

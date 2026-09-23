@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Pressable } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { requireOptionalNativeModule } from 'expo';
+import { useTranslate } from '@tolgee/react';
+import { feedKey } from './feed-i18n';
 import * as S from './media-hero.styles';
 
 // expo-video native module may be missing from dev APK built before the dep was added.
@@ -44,6 +46,7 @@ export function VideoHero({
 }) {
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const { t } = useTranslate();
   const player = useVideoPlayer(video, (p: any) => {
     p.loop = true;
   });
@@ -66,7 +69,11 @@ export function VideoHero({
     <S.ShadowWrap>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={playing ? `${a11yLabel} — pause` : `${a11yLabel} — play`}
+        accessibilityLabel={
+          playing
+            ? `${a11yLabel} — ${t(feedKey('feed.shared.video.pause'))}`
+            : `${a11yLabel} — ${t(feedKey('feed.shared.video.play'))}`
+        }
         onPress={toggle}
       >
         <S.MediaFrame>

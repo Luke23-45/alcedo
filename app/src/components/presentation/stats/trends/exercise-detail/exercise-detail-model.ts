@@ -75,18 +75,35 @@ export function formatBare(value: number): string {
   return localeFormatBigNumber(new BigNumber(value), Number.isInteger(rounded) ? 0 : 1);
 }
 
+const dec1Formatters = new Map<string, Intl.NumberFormat>();
+
+/** One decimal in the caller's locale (undefined = system), cached like useFormatNumber. */
+function dec1(locale: string | undefined): Intl.NumberFormat {
+  const key = locale ?? 'system';
+  const existing = dec1Formatters.get(key);
+  if (existing) return existing;
+  const created = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  dec1Formatters.set(key, created);
+  return created;
+}
+
 /** Signed percent delta, e.g. "+11.1%" / "−2.3%" (U+2212, matches the reference). */
-export function formatDeltaPercent(from: number, to: number): string | null {
+export function formatDeltaPercent(from: number, to: number, locale: string | undefined): string | null {
   if (from <= 0) {
     return null;
   }
   const pct = ((to - from) / from) * 100;
   const sign = pct > 0 ? '+' : pct < 0 ? '−' : '';
-  return `${sign}${Math.abs(pct).toFixed(1)}%`;
+  return `${sign}${dec1(locale).format(Math.abs(pct))}%`;
 }
 
-export function formatWeeklyRate(value: number): string {
-  return Math.abs(value - Math.round(value)) < 0.05 ? Math.round(value).toString() : value.toFixed(1);
+export function formatWeeklyRate(value: number, locale: string | undefined): string {
+  return Math.abs(value - Math.round(value)) < 0.05
+    ? Math.round(value).toString()
+    : dec1(locale).format(value);
 }
 
 /* ------------------------------------------------------------------ */

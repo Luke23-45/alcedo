@@ -1,7 +1,7 @@
 import { useTranslate } from '@tolgee/react';
 import * as S from './export-caption.styles';
 
-/** Screen 1 of S4: the verbatim plaintext-export caption (Kinetic brand). */
+/** Screen 1 of S4: the verbatim plaintext-export caption (ALCEDO brand). */
 export function ExportCaption() {
   const { t } = useTranslate();
   return (

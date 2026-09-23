@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 /** The reference insets card content 12pt (16 card + 16 inner). */
@@ -29,7 +30,7 @@ export const RowTextColumn = styled.View`
 
 /** Caption stacked under the row label ("Same target every set"). */
 export const RowCaptionUnder = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
@@ -38,7 +39,7 @@ export const RowCaptionUnder = styled.Text`
 
 /** Inline caption beside the "Sets" label in per-set mode. */
 export const RowInlineCaption = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
@@ -74,7 +75,7 @@ export const SetCellInner = styled.View`
 `;
 
 export const SetCellLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9px;
   line-height: 11px;
   font-weight: 700;
@@ -90,7 +91,7 @@ export const SetCellStepper = styled.View`
 `;
 
 export const TailCaption = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;

@@ -89,7 +89,7 @@ const ALEX_POSTER: WorkoutPosterData = {
   kind: 'workout',
   theme: 'ember',
   gradient: ['#FFB03A', '#FF5A3C', '#C1143C'],
-  kicker: 'KINETIC · MONDAY, JUNE 9',
+  kicker: 'ALCEDO · MONDAY, JUNE 9',
   heroValue: '8,420',
   heroUnit: 'kg',
   workoutName: 'Push Day · Strength',

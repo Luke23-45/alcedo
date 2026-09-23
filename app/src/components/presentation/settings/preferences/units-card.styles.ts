@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 /** Units card (settings-dark.md Screen 2): three 56pt rows, caption below. */
 
@@ -17,9 +18,8 @@ export const UnitRow = styled.View`
 
 export const UnitLabel = styled.Text`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 13.5px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.color.content.primary};
 `;

@@ -13,7 +13,7 @@ export function SessionNotesCard({ notes, onEdit }: { notes: string; onEdit: () 
   return (
     <HomeCard radius={30} pad={20}>
       <S.HeaderRow>
-        <S.Label>{t('workout.post_workout.notes.title')}</S.Label>
+        <S.Label>{t('workout.post_workout.notes.title').toLocaleUpperCase()}</S.Label>
         <S.EditButton
           onPress={onEdit}
           accessibilityRole="button"

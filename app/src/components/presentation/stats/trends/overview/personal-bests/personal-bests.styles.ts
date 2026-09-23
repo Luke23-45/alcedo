@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 
 /** Tight 20/20/14 padding — the reference card is 252pt, not the hero 20pt. */
@@ -23,7 +24,7 @@ export const RightCell = styled.View<{ $width: number }>`
 `;
 
 export const HeaderDivider = styled.View<{ $dark: boolean }>`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-top: 6px;
   background-color: ${({ $dark }) => ($dark ? 'rgba(255,255,255,0.08)' : 'rgba(60,60,67,0.12)')};
 `;
@@ -34,7 +35,7 @@ export const DataRow = styled.View<{ $first: boolean }>`
 `;
 
 export const RowDivider = styled.View<{ $dark: boolean }>`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-top: 10px;
   background-color: ${({ $dark }) => ($dark ? 'rgba(255,255,255,0.05)' : 'rgba(60,60,67,0.08)')};
 `;

@@ -11,33 +11,49 @@ const MINUS = '−'; // U+2212, the reference's minus
 
 describe('formatSigned1', () => {
   it('signs positive values with +', () => {
-    expect(formatSigned1(1.84)).toBe('+1.8');
+    expect(formatSigned1(1.84, 'en-US')).toBe('+1.8');
   });
 
   it('uses U+2212 for negative values', () => {
-    expect(formatSigned1(-1.84)).toBe(`${MINUS}1.8`);
+    expect(formatSigned1(-1.84, 'en-US')).toBe(`${MINUS}1.8`);
   });
 
   it('renders zero without a sign', () => {
-    expect(formatSigned1(0.001)).toBe('0.0');
+    expect(formatSigned1(0.001, 'en-US')).toBe('0.0');
+  });
+
+  it('uses the locale decimal separator', () => {
+    expect(formatSigned1(1.84, 'de-DE')).toBe('+1,8');
   });
 });
 
 describe('formatSignedPct', () => {
   it('formats the hero delta with one decimal', () => {
-    expect(formatSignedPct(0.18)).toBe('+18.0%');
-    expect(formatSignedPct(-0.022)).toBe(`${MINUS}2.2%`);
-    expect(formatSignedPct(0)).toBe('0.0%');
+    expect(formatSignedPct(0.18, 'en-US')).toBe('+18.0%');
+    expect(formatSignedPct(-0.022, 'en-US')).toBe(`${MINUS}2.2%`);
+    expect(formatSignedPct(0, 'en-US')).toBe('0.0%');
+  });
+
+  it('uses the locale decimal separator', () => {
+    expect(formatSignedPct(0.18, 'de-DE')).toBe('+18,0%');
   });
 });
 
 describe('formatInt / format1', () => {
   it('groups thousands', () => {
-    expect(formatInt(24480)).toBe('24,480');
+    expect(formatInt(24480, 'en-US')).toBe('24,480');
+  });
+
+  it('groups thousands per locale', () => {
+    expect(formatInt(24480, 'de-DE')).toBe('24.480');
   });
 
   it('rounds to one decimal', () => {
-    expect(format1(116.74)).toBe('116.7');
+    expect(format1(116.74, 'en-US')).toBe('116.7');
+  });
+
+  it('uses the locale decimal separator', () => {
+    expect(format1(116.74, 'de-DE')).toBe('116,7');
   });
 });
 

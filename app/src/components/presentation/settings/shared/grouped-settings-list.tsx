@@ -1,6 +1,7 @@
 import Icon from '@/components/presentation/foundation/icon';
 import type { AppIconSource } from '@/components/presentation/foundation/ms-icon-source';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useAppSelector } from '@/store';
 import { alpha } from '@/styles/theme';
 import { Children, ReactNode, isValidElement, useEffect } from 'react';
 import { Pressable } from 'react-native';
@@ -66,7 +67,28 @@ function RowChrome({ row, pressed, trailing }: { row: SettingsRowProps; pressed:
   );
 }
 
+/**
+ * iOS disclosure chevron: #48484A dark / #C7C7CC light (the profile tokens
+ * already use this pair). SH06 — replaces the fixed `chevronColor` import
+ * wherever a loop has migrated the call site.
+ */
+export function useChevronColor(): string {
+  const theme = useAppTheme();
+  return theme.isDark ? '#48484A' : '#C7C7CC';
+}
+
+/**
+ * Group-label casing in the app language (SH02): `toLocaleUpperCase` with
+ * the preferred language, so Turkish dotted-İ etc. follow the app locale
+ * rather than the device locale that the native `text-transform` uses.
+ * Idempotent over pre-uppercased translations ("SESSIONS").
+ */
+export function toGroupLabelCase(label: string, locale: string | undefined): string {
+  return label.toLocaleUpperCase(locale ?? undefined);
+}
+
 function RowTrailing({ row }: { row: SettingsRowProps }) {
+  const chevron = useChevronColor();
   if (row.trailing) {
     return <>{row.trailing}</>;
   }
@@ -91,7 +113,7 @@ function RowTrailing({ row }: { row: SettingsRowProps }) {
           accessibilityLabel={row.toggle.label}
         />
       ) : row.onPress && !row.hideChevron ? (
-        <Icon source="chevronRight" size={18} color={S.chevronColor} />
+        <Icon source="chevronRight" size={18} color={chevron} />
       ) : undefined}
     </>
   );
@@ -99,6 +121,11 @@ function RowTrailing({ row }: { row: SettingsRowProps }) {
 
 export function SettingsRow(row: SettingsRowProps) {
   const trailing = <RowTrailing row={row} />;
+  // SH07 — voice the value/badge with the title ("Appearance, Dark");
+  // toggle rows keep the inner switch's own label as the single control.
+  const announced = [row.title, row.value ?? row.subtitle, row.badge].filter(
+    (part): part is string => typeof part === 'string' && part.length > 0,
+  );
   if (!row.onPress && !row.toggle) {
     return (
       <S.RowStatic testID={row.testID} accessibilityRole="text">
@@ -110,7 +137,7 @@ export function SettingsRow(row: SettingsRowProps) {
     <S.RowPressable
       testID={row.testID}
       accessibilityRole={row.toggle ? undefined : 'button'}
-      accessibilityLabel={row.toggle ? undefined : row.title}
+      accessibilityLabel={row.toggle ? undefined : announced.join(', ')}
       accessibilityState={row.toggle ? { checked: row.toggle.value } : undefined}
       onPress={row.toggle ? undefined : row.onPress}
     >
@@ -120,10 +147,11 @@ export function SettingsRow(row: SettingsRowProps) {
 }
 
 export function SettingsGroup({ label, children }: { label: string; children: ReactNode }) {
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
   const rows = Children.toArray(children).filter(isValidElement);
   return (
     <S.GroupWrap>
-      <S.GroupLabel>{label}</S.GroupLabel>
+      <S.GroupLabel>{toGroupLabelCase(label, locale)}</S.GroupLabel>
       <CardEdge>
         <CardBody>
           {rows.map((child, i) => (

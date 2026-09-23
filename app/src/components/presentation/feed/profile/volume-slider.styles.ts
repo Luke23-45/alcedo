@@ -14,7 +14,7 @@ const TRACK_H = 6;
 const THUMB_R = 13;
 
 export const SliderArea = styled.View`
-  width: ${PROFILE.cardWidth}px;
+  width: 100%;
   height: ${SLIDER_HEIGHT}px;
 `;
 
@@ -85,7 +85,7 @@ export const ThumbCore = styled(LinearGradient)`
 export const RangeEdge = styled.Text<{ $color: string; $right?: boolean }>`
   position: absolute;
   bottom: 6px;
-  ${({ $right }) => ($right ? "right: 36px;" : "left: 36px;")}
+  ${({ $right }) => ($right ? "right: 4px;" : "left: 36px;")}
   font-family: ${({ theme }) => profileFontFamily(theme)};
   font-size: 9px;
   font-weight: 600;

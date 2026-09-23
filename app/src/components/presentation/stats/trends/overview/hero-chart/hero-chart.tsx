@@ -23,6 +23,7 @@ import {
   smoothAreaPath,
   smoothLinePath,
 } from '../shared/chart-math';
+import { useState } from 'react';
 import {
   ActivePill,
   ChartWrap,
@@ -36,11 +37,12 @@ export type HeroMetricKey = 'volume' | 'e1rm' | 'bodyweight';
 
 const METRICS: HeroMetricKey[] = ['volume', 'e1rm', 'bodyweight'];
 
-/* SVG-local geometry (card-local y minus the 112pt above the chart block). */
-const W = 321;
+/* SVG-local geometry (card-local y minus the 112pt above the chart block).
+   W is the reference fallback until ChartWrap measures itself; X1 keeps the
+   spec's 4pt right inset at any width. */
+const W_FALLBACK = 321;
 const H = 164;
 const X0 = 4;
-const X1 = 317;
 const Y_TOP = 45.3;
 const Y_BASE = 120;
 const GRID_Y = [36, 78, 120];
@@ -100,6 +102,10 @@ export function HeroChart({
         ? palette.deltaDown
         : palette.deltaNeutral;
 
+  // The plot spans the measured card width — fixed 321 only until layout.
+  const [plotW, setPlotW] = useState(W_FALLBACK);
+  const W = plotW;
+  const X1 = W - X0;
   const pts = layoutSeries(
     metric.points.map((p) => p.value),
     X0,
@@ -116,7 +122,7 @@ export function HeroChart({
       : undefined;
 
   return (
-    <HomeCard hero style={{ height: 276 }}>
+    <HomeCard hero>
       <CardAura
         width={361}
         height={276}
@@ -126,7 +132,6 @@ export function HeroChart({
         {METRICS.map((key) => (
           <MetricTab
             key={key}
-            $width={key === 'bodyweight' ? 88 : 66}
             onPress={() => onChange(key)}
             hitSlop={{ top: 9, bottom: 9, left: 4, right: 4 }}
             accessibilityRole="tab"
@@ -141,6 +146,7 @@ export function HeroChart({
             <HomeText
               weight={key === active ? fontWeight.semibold : fontWeight.medium}
               tracking={-0.15}
+              numberOfLines={1}
               style={{
                 fontSize: 11.5,
                 lineHeight: 14,
@@ -195,7 +201,7 @@ export function HeroChart({
           style={{
             fontSize: 11.5,
             lineHeight: 15,
-            marginTop: 2,
+            marginTop: 4,
             color: palette.secondary,
           }}
         >
@@ -203,7 +209,7 @@ export function HeroChart({
         </HomeText>
       ) : null}
 
-      <ChartWrap>
+      <ChartWrap onLayout={(e) => setPlotW(e.nativeEvent.layout.width)}>
         <Svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}>
           <Defs>
             <LinearGradient id="trendLine" x1="0" y1="0" x2="1" y2="0">

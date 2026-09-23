@@ -30,7 +30,7 @@ export const LiveDot = styled.View`
   width: 6.4px;
   height: 6.4px;
   border-radius: 3.2px;
-  background-color: #30d158;
+  background-color: ${({ theme }) => (theme.isDark ? '#30D158' : '#34C759')};
 `;
 
 export const LiveLabel = styled.Text`
@@ -38,7 +38,7 @@ export const LiveLabel = styled.Text`
   font-size: 10px;
   font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: 0.2px;
-  color: #4ade80;
+  color: ${({ theme }) => (theme.isDark ? '#4ADE80' : '#248A3D')};
 `;
 
 export const PosterSlot = styled.View`

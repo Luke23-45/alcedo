@@ -32,6 +32,11 @@ import {
   IndexTile,
 } from './exercise-section.styles';
 
+/** Bottom padding inside the active card: tighter under the Add Set row. */
+const CARD_END_PAD_WITH_ADD_ROW = 7;
+/** Bottom padding when the set list ends the card. */
+const CARD_END_PAD_IDLE = 41;
+
 interface ExerciseSectionProps<T extends RecordedExercise> {
   recordedExercise: T;
   previousRecordedExercises: RecordedExercise[];
@@ -60,7 +65,11 @@ function useStatusChip(recordedExercise: RecordedExercise): { text: string; done
     const reps = recordedExercise.repsTargetForSet(0).max;
     if (recordedExercise.isComplete) {
       return {
-        text: t('workout.session.chip.done', { sets, reps, done: t('workout.session.done.label').toUpperCase() }),
+        text: t('workout.session.chip.done', {
+          sets,
+          reps,
+          done: t('workout.session.done.label').toLocaleUpperCase(),
+        }),
         done: true,
       };
     }
@@ -90,7 +99,7 @@ function AddSetButton({ onPress }: { onPress: () => void }) {
   return (
     <AddSetRow
       onPress={onPress}
-      hitSlop={{ top: 6, bottom: 6 }}
+      hitSlop={{ top: 9, bottom: 9 }}
       accessibilityRole="button"
       accessibilityLabel={t('workout.session.add_set.button')}
       testID="exercise-add-set"
@@ -98,7 +107,7 @@ function AddSetButton({ onPress }: { onPress: () => void }) {
       <Svg width={11} height={11} viewBox="-5.5 -5.5 11 11">
         <Path d="M-5.5 0 H5.5 M0 -5.5 V5.5" stroke={c.addPlus} strokeWidth={2.4} strokeLinecap="round" fill="none" />
       </Svg>
-      <AddSetLabel>{t('workout.session.add_set.button')}</AddSetLabel>
+      <AddSetLabel numberOfLines={1}>{t('workout.session.add_set.button')}</AddSetLabel>
       <Svg width={6} height={10} viewBox="-3 -5 6 10">
         <Path
           d="M-2 -4 L2 0 L-2 4"
@@ -230,7 +239,9 @@ export default function ExerciseSection<T extends RecordedExercise>(props: Exerc
               </ExerciseName>
               {statusChip.text !== '' && (
                 <ChipPill $done={statusChip.done}>
-                  <ChipText $done={statusChip.done}>{statusChip.text}</ChipText>
+                  <ChipText $done={statusChip.done} numberOfLines={1}>
+                    {statusChip.text}
+                  </ChipText>
                 </ChipPill>
               )}
             </CardHeader>
@@ -245,7 +256,8 @@ export default function ExerciseSection<T extends RecordedExercise>(props: Exerc
             />
           </CardBody>
           {props.onAddSet && <AddSetButton onPress={props.onAddSet} />}
-          <View style={{ height: props.onAddSet ? 7 : 41 }} />
+          {/* Card end-cap: 7pt under the Add Set row, 41pt when the card ends here. */}
+          <View style={{ height: props.onAddSet ? CARD_END_PAD_WITH_ADD_ROW : CARD_END_PAD_IDLE }} />
         </HomeCard>
 
         <RecordedExerciseNotesEditor
@@ -259,6 +271,7 @@ export default function ExerciseSection<T extends RecordedExercise>(props: Exerc
           headline={t('exercise.remove.confirm.title')}
           textContent={t('exercise.remove.confirm.body')}
           okText={t('generic.remove.button')}
+          destructive
           open={removeExerciseDialogOpen}
           onOk={() => {
             setRemoveExerciseDialogOpen(false);
@@ -315,6 +328,7 @@ export default function ExerciseSection<T extends RecordedExercise>(props: Exerc
         headline={t('exercise.remove.confirm.title')}
         textContent={t('exercise.remove.confirm.body')}
         okText={t('generic.remove.button')}
+        destructive
         open={removeExerciseDialogOpen}
         onOk={() => {
           setRemoveExerciseDialogOpen(false);

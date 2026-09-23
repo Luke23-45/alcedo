@@ -81,8 +81,10 @@ export function ProfileGoals({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         />
-        <S.RingLabel $color={palette.label}>{row.label}</S.RingLabel>
-        <S.RingValue $color={palette.value} style={{ fontVariant: ["tabular-nums"] }}>
+        <S.RingLabel $color={palette.label} numberOfLines={1} ellipsizeMode="tail">
+          {row.label}
+        </S.RingLabel>
+        <S.RingValue $color={palette.value} style={{ fontVariant: ["tabular-nums"] }} numberOfLines={1} ellipsizeMode="tail">
           {row.value}
         </S.RingValue>
         <ChevronGlyph size={12} color={palette.chevron} />
@@ -105,10 +107,15 @@ export function ProfileGoals({
       <S.RowsGap />
       <S.Divider $color={theme.isDark ? "rgba(255,255,255,0.08)" : palette.divider} $top={210} />
       <S.VolumeHeader>
-        <S.VolumeLabel $color={palette.label}>
+        <S.VolumeLabel $color={palette.label} numberOfLines={1} ellipsizeMode="tail">
           {t(feedKey("feed.profile.goals.weekly_volume"))}
         </S.VolumeLabel>
-        <S.VolumeValue $color={palette.value} style={{ fontVariant: ["tabular-nums"] }}>
+        <S.VolumeValue
+          $color={palette.value}
+          style={{ fontVariant: ["tabular-nums"] }}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {t(feedKey("feed.profile.goals.weekly_volume_value"), {
             value: formatGrouped(volumeGoalKg, locale),
           })}

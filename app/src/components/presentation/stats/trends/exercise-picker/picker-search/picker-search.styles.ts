@@ -48,7 +48,9 @@ export const FieldInner = styled.View<{ $focused: boolean }>`
   gap: 10px;
   background-color: ${({ theme, $focused }) =>
     $focused
-      ? 'rgba(255,255,255,0.08)'
+      ? theme.isDark
+        ? 'rgba(255,255,255,0.08)'
+        : 'rgba(255,255,255,0.75)'
       : theme.isDark
         ? 'rgba(255,255,255,0.06)'
         : 'rgba(120,120,128,0.12)'};

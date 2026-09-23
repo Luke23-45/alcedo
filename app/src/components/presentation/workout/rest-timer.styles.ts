@@ -3,7 +3,7 @@ import type { StyleProp, ViewStyle } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { alpha, type FontWeight } from '@/styles/theme';
+import { alpha, type FontWeight, type as typeHelper } from '@/styles/theme';
 
 /* ------------------------------------------------------------------ *
  * Gradient shells. `styled(LinearGradient)` keeps `colors` required in
@@ -49,12 +49,17 @@ function BodyGradient({ children, style }: ShellProps) {
   );
 }
 
-/** Brand gradient: #FFB03A → #FF6A3D → #FF2D55, stops 0 / 0.45 / 1. Same in both themes. */
+/**
+ * Brand gradient, following the home `brand` variant per mode (dark
+ * #FFB03A→#FF6A3D→#FF2D55, light #FFA312→#FF5A3C→#E8003F) so the resume circle
+ * and Log Set pill match the footer Finish button in both themes.
+ */
 function BrandGradient({ children, style }: ShellProps) {
+  const theme = useAppTheme();
   return createElement(
     LinearGradient,
     {
-      colors: ['#FFB03A', '#FF6A3D', '#FF2D55'],
+      colors: theme.isDark ? ['#FFB03A', '#FF6A3D', '#FF2D55'] : ['#FFA312', '#FF5A3C', '#E8003F'],
       locations: [0, 0.45, 1],
       start: { x: 0, y: 0 },
       end: { x: 0.6, y: 1 },
@@ -117,7 +122,7 @@ export const TimerCardBody = styled(BodyGradient)`
 export const CardRow = styled.View`
   flex-direction: row;
   align-items: center;
-  height: 88px;
+  min-height: 88px;
   padding-left: 14.5px;
   padding-right: 14px;
 `;
@@ -158,7 +163,7 @@ export const RingOverlay = styled.View`
 `;
 
 export const RingCenterLabel = styled.Text<{ $color: string; $dimmed: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   font-weight: 700;
   letter-spacing: -0.4px;
@@ -189,7 +194,7 @@ export const TimerText = styled.Text<{
   $color: string;
   $lineHeight?: number;
 }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: ${({ $size }) => $size}px;
   font-weight: ${({ $weight }) => $weight};
   letter-spacing: ${({ $tracking }) => $tracking ?? 0}px;
@@ -213,7 +218,7 @@ export const Chip = styled.View<{ $width: number; $fill: string }>`
 `;
 
 export const ChipLabel = styled.Text<{ $color: string }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.8px;
@@ -226,7 +231,7 @@ export const ChipRow = styled.View`
 `;
 
 export const ChipDetail = styled.Text<{ $color: string }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   font-weight: 500;
   color: ${({ $color }) => $color};
@@ -236,7 +241,7 @@ export const ChipDetail = styled.Text<{ $color: string }>`
 /** Complete-state "Set N · {exercise}": 19pt. Spec says 650, but RN renders
     non-hundred weights as Regular — 600 is the nearest representable. */
 export const CompleteTitle = styled.Text<{ $color: string }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 19px;
   font-weight: 600;
   letter-spacing: -0.4px;
@@ -270,7 +275,7 @@ export const AdjustButton = styled.Pressable<{ $gapAfter: number }>`
 `;
 
 export const AdjustLabel = styled.Text<{ $color: string }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9.5px;
   font-weight: 700;
   color: ${({ $color }) => $color};
@@ -288,7 +293,7 @@ export const SkipPill = styled.Pressable<{ $width: number }>`
 `;
 
 export const SkipLabel = styled.Text<{ $color: string }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   font-weight: 600;
   letter-spacing: -0.15px;
@@ -344,7 +349,7 @@ export const LogSetEdge = styled.View`
 `;
 
 export const LogSetLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   /* Spec says 650; RN falls back to Regular for non-hundred weights, so 600. */
   font-weight: 600;

@@ -42,7 +42,7 @@ export function SessionDetailHero({ session }: { session: Session }) {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
-  }).toUpperCase();
+  }).toLocaleUpperCase();
 
   const start = session.firstExercise?.earliestTime;
   const end = session.lastExercise?.latestTime;

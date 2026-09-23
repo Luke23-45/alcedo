@@ -1,5 +1,5 @@
 import Icon from '@/components/presentation/foundation/icon';
-import { SettingsGroup, SettingsToggle } from '../shared/grouped-settings-list';
+import { SettingsGroup, SettingsToggle, useChevronColor } from '../shared/grouped-settings-list';
 import { settingsKey } from '../shared/settings-i18n';
 import { useAppSelector } from '@/store';
 import {
@@ -27,38 +27,45 @@ export function DisplayCard() {
   const { t } = useTranslate();
   const dispatch = useDispatch();
   const settings = useAppSelector((s) => s.settings);
+  const chevron = useChevronColor();
 
   const rows: {
+    id: 'bodyweight' | 'feed' | 'summary' | 'notes' | 'awake';
     label: string;
     subtitle: string;
     value: boolean;
     onChange: (v: boolean) => void;
   }[] = [
     {
+      id: 'bodyweight',
       label: t('settings.show_bodyweight.label'),
       subtitle: t('settings.show_bodyweight.subtitle'),
       value: settings.showBodyweight,
       onChange: (v) => dispatch(setShowBodyweight(v)),
     },
     {
+      id: 'feed',
       label: t('feed.show_feed.label'),
       subtitle: t('feed.show_feed.subtitle'),
       value: settings.showFeed,
       onChange: (v) => dispatch(setShowFeed(v)),
     },
     {
+      id: 'summary',
       label: t('workout.show_post_workout_summary.label'),
       subtitle: t('workout.show_post_workout_summary.subtitle'),
       value: settings.showPostWorkoutSummary,
       onChange: (v) => dispatch(setShowPostWorkoutSummary(v)),
     },
     {
+      id: 'notes',
       label: t('workout.notes_expanded_by_default.label'),
       subtitle: t('workout.notes_expanded_by_default.subtitle'),
       value: settings.notesExpandedByDefault,
       onChange: (v) => dispatch(setNotesExpandedByDefault(v)),
     },
     {
+      id: 'awake',
       label: t('workout.keep_screen_awake.label'),
       subtitle: t('workout.keep_screen_awake.subtitle'),
       value: settings.keepScreenAwakeDuringWorkout,
@@ -70,7 +77,7 @@ export function DisplayCard() {
     <SettingsGroup label={t(settingsKey('settings.preferences.display.header'), 'DISPLAY')}>
       <S.Block>
         {rows.map((row, i) => (
-          <Fragment key={row.label}>
+          <Fragment key={row.id}>
             {i > 0 ? <RowSeparator /> : undefined}
             <PreferenceRow
               title={row.label}
@@ -84,7 +91,7 @@ export function DisplayCard() {
         <RowSeparator />
         <PreferenceRow
           title={t(settingsKey('settings.preferences.restart_wizard.label'), 'Restart setup wizard')}
-          trailing={<Icon source="chevronRight" size={18} color="#48484A" />}
+          trailing={<Icon source="chevronRight" size={18} color={chevron} />}
           onPress={() => dispatch(setWelcomeWizardCompleted(false))}
           accessibilityLabel={t(settingsKey('settings.preferences.restart_wizard.label'), 'Restart setup wizard')}
         />

@@ -22,7 +22,7 @@ export function SessionDetailAuras() {
         end={spec.end}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
       />
-      <Svg width="100%" height="100%" viewBox="0 0 393 1848" preserveAspectRatio="none">
+      <Svg width="100%" height="100%" viewBox="0 0 393 1848" preserveAspectRatio="xMidYMid slice">
         <Defs>
           <RadialGradient id="sda1" cx="50%" cy="50%" r="50%">
             <Stop offset="0%" stopColor="#FF6A3D" stopOpacity={0.18 * dim} />

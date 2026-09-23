@@ -4,7 +4,8 @@ import { WhatsNewEntry } from '@/models/whats-new';
 import { alpha } from '@/styles/theme';
 import { T, useTranslate } from '@tolgee/react';
 import { Href, useRouter } from 'expo-router';
-import { BadgePill, BadgePillText, chevronColor } from '../shared/grouped-settings-list.styles';
+import { BadgePill, BadgePillText } from '../shared/grouped-settings-list.styles';
+import { useChevronColor } from '../shared/grouped-settings-list';
 import { settingsKey } from '../shared/settings-i18n';
 import { CardShell } from '../backup/card-shell';
 import * as S from './whats-new-entry-card.styles';
@@ -24,6 +25,7 @@ export function WhatsNewEntryCard({ entry, isNew }: { entry: WhatsNewEntry; isNe
   const { t } = useTranslate();
   const { push } = useRouter();
   const theme = useAppTheme();
+  const chevron = useChevronColor();
   const well = ENTRY_WELLS[entry.icon as string] ?? { hue: '#0A84FF', tint: '#5EB0FF' };
 
   const goToFeature = (route: Href) => push(route);
@@ -34,7 +36,7 @@ export function WhatsNewEntryCard({ entry, isNew }: { entry: WhatsNewEntry; isNe
         <S.EntryTile $well={alpha(well.hue, theme.isDark ? 0.15 : 0.12)}>
           <Icon source={entry.icon} size={20} color={well.tint} />
         </S.EntryTile>
-        <S.EntryTitle>
+        <S.EntryTitle numberOfLines={2}>
           <T keyName={entry.titleKey} />
         </S.EntryTitle>
         {isNew ? (
@@ -48,10 +50,10 @@ export function WhatsNewEntryCard({ entry, isNew }: { entry: WhatsNewEntry; isNe
       </S.EntryBody>
       {entry.cta ? (
         <S.EntryCta accessibilityRole="button" onPress={() => goToFeature(entry.cta!.route)}>
-          <S.EntryCtaText>
+          <S.EntryCtaText numberOfLines={2}>
             <T keyName={entry.cta.labelKey} />
           </S.EntryCtaText>
-          <Icon source="chevronRight" size={18} color={chevronColor} />
+          <Icon source="chevronRight" size={18} color={chevron} />
         </S.EntryCta>
       ) : undefined}
     </CardShell>

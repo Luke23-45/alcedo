@@ -39,7 +39,7 @@ export function NotesEditor({
 
   return (
     <>
-      <S.NotesLabel>{t('history.edit.notes.label', 'Notes')}</S.NotesLabel>
+      <S.NotesLabel>{t('history.edit.notes.label', 'Notes').toLocaleUpperCase()}</S.NotesLabel>
       <S.NotesOuter $focused={focused} style={{ borderCurve: 'continuous' }}>
         <S.NotesBody style={{ borderCurve: 'continuous' }}>
           <S.NotesInput

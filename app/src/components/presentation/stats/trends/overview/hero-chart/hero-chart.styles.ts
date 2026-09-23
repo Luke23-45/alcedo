@@ -6,8 +6,8 @@ export const SwitcherRow = styled.View`
   height: 26px;
 `;
 
-export const MetricTab = styled.Pressable<{ $width: number }>`
-  width: ${({ $width }) => $width}px;
+export const MetricTab = styled.Pressable`
+  flex: 1;
   height: 26px;
   align-items: center;
   justify-content: center;
@@ -15,11 +15,10 @@ export const MetricTab = styled.Pressable<{ $width: number }>`
 
 export const ActivePill = styled.View<{ $fill: string; $border: string }>`
   position: absolute;
-  left: 50%;
+  left: 2px;
+  right: 2px;
   top: 0;
-  width: 66px;
-  height: 26px;
-  margin-left: -33px;
+  bottom: 0;
   border-radius: 13px;
   background-color: ${({ $fill }) => $fill};
   border-width: 0.8px;

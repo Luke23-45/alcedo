@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { sessionPalette } from '../session-tokens';
 
 export const HeaderRow = styled.View`
@@ -10,19 +11,18 @@ export const HeaderRow = styled.View`
 `;
 
 export const HeaderTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10px;
   line-height: 13px;
   font-weight: 700;
   letter-spacing: 1.35px;
-  text-transform: uppercase;
   color: ${({ theme }) => sessionPalette(theme.isDark).header.title};
 `;
 
 export const HeaderCount = styled.Text`
   flex: 1;
   text-align: right;
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10px;
   line-height: 13px;
   font-weight: 600;

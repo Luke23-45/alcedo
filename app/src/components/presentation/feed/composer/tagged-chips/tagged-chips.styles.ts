@@ -23,6 +23,7 @@ export const ChipRow = styled.View`
 `;
 
 export const TagChip = styled.Pressable`
+  max-width: 100%;
   height: 28px;
   border-radius: 14px;
   flex-direction: row;
@@ -41,6 +42,7 @@ export const AvatarSlot = styled.View`
 `;
 
 export const TagName = styled.Text`
+  flex-shrink: 1;
   font-family: ${({ theme }) => theme.font.text};
   font-size: 11px;
   font-weight: ${({ theme }) => theme.weight.semibold};
@@ -68,5 +70,5 @@ export const AddLabel = styled.Text`
   font-size: 11px;
   font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.1px;
-  color: #ffb84d;
+  color: #FFB84D;
 `;

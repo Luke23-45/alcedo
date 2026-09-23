@@ -38,6 +38,7 @@ export const DaySlot = styled.View`
 `;
 
 export const WeeksRow = styled.View`
+  flex: 1;
   flex-direction: row;
   gap: 5px;
 `;
@@ -60,14 +61,15 @@ export const Cell = styled.View<{
 export const TodayRing = styled.View<{
   $left: number;
   $top: number;
+  $size: number;
   $dark: boolean;
 }>`
   position: absolute;
   left: ${({ $left }) => $left}px;
   top: ${({ $top }) => $top}px;
-  width: 18.8px;
-  height: 18.8px;
-  border-radius: 5.9px;
+  width: ${({ $size }) => $size}px;
+  height: ${({ $size }) => $size}px;
+  border-radius: ${({ $size }) => ($size * 5.9) / 18.8}px;
   border-width: 1.8px;
   border-color: ${({ $dark }) => ($dark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.55)')};
 `;

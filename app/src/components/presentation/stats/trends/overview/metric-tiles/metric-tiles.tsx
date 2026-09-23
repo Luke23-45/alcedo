@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Path, Svg } from 'react-native-svg';
 import { fontWeight } from '@/styles/theme';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -34,6 +35,10 @@ export function MetricTiles({
   const theme = useAppTheme();
   const palette = trendsPalette(theme.isDark);
   const keys: HeroMetricKey[] = ['volume', 'e1rm', 'bodyweight'];
+  // Tiles are flex thirds — the spark spans the measured tile minus the 14pt
+  // card pads, never the 84pt reference constant.
+  const [tileW, setTileW] = useState(0);
+  const sparkW = tileW > 0 ? tileW - 28 : 84;
 
   return (
     <TileRow>
@@ -51,8 +56,9 @@ export function MetricTiles({
             onPress={() => onSelect(keys[index]!)}
             accessibilityRole="button"
             accessibilityLabel={`${tile.label} ${tile.value}`}
+            onLayout={(e) => setTileW(e.nativeEvent.layout.width)}
           >
-            <HomeCard radius={24} elev="tile" pad={14} style={{ height: 104 }}>
+            <HomeCard radius={24} elev="tile" pad={14}>
               <HomeText
                 weight={fontWeight.bold}
                 micro
@@ -108,13 +114,13 @@ export function MetricTiles({
               </HomeText>
               {tile.spark.length > 1 ? (
                 <Svg
-                  width={84}
+                  width={sparkW}
                   height={12}
-                  viewBox="0 0 84 12"
+                  viewBox={`0 0 ${sparkW} 12`}
                   style={{ marginTop: 6 }}
                 >
                   <Path
-                    d={sparkPath(tile.spark, 84, 16)}
+                    d={sparkPath(tile.spark, sparkW, 12)}
                     fill="none"
                     stroke={spark}
                     strokeWidth={1.6}

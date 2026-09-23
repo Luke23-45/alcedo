@@ -1,4 +1,5 @@
 import { LocalDate } from '@js-joda/core';
+import { useState } from 'react';
 import { useTranslate } from '@tolgee/react';
 import { fontWeight } from '@/styles/theme';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -24,8 +25,9 @@ import {
   WindowPill,
 } from './consistency-heatmap.styles';
 
-const CELL = 17;
-const PITCH = 22;
+/** Reference geometry until the grid measures itself: 17pt cells, 5pt gaps. */
+const CELL_FALLBACK = 17;
+const GAP = 5;
 
 /**
  * 13-week training heatmap, Monday-first, ending today. L0 is rest;
@@ -77,6 +79,14 @@ export function ConsistencyHeatmap({
     return `rgba(${r},${g},${b},${opacity})`;
   };
 
+  // 13 columns + 12 gaps must fit the measured row: cells shrink/grow from
+  // the 17pt reference instead of overflowing on narrow screens.
+  const [gridW, setGridW] = useState(0);
+  const cell = gridW > 0 ? (gridW - GAP * 12) / 13 : CELL_FALLBACK;
+  const pitch = cell + GAP;
+  const radius = Math.max(2.5, (cell * 5) / CELL_FALLBACK);
+  const ring = cell + 1.8;
+
   const dayNames = [t('trends.consistency.day_mon'), t('trends.consistency.day_wed'), t('trends.consistency.day_fri')];
 
   return (
@@ -117,7 +127,7 @@ export function ConsistencyHeatmap({
           <GridWrap>
             <DayLabels>
               {[0, 1, 2, 3, 4, 5, 6].map((row) => (
-                <DaySlot key={row}>
+                <DaySlot key={row} style={{ height: pitch }}>
                   {row % 2 === 0 && row < 6 ? (
                     <HomeText
                       weight={fontWeight.bold}
@@ -135,16 +145,21 @@ export function ConsistencyHeatmap({
                 </DaySlot>
               ))}
             </DayLabels>
-            <WeeksRow>
+            <WeeksRow onLayout={(e) => setGridW(e.nativeEvent.layout.width)}>
               {heatmap.map((week, col) => (
                 <WeekColumn key={col}>
-                  {week.map((cell, row) => (
-                    <Cell key={row} $size={CELL} $radius={5} $bg={cellColor(cell)} />
+                  {week.map((c, row) => (
+                    <Cell key={row} $size={cell} $radius={radius} $bg={cellColor(c)} />
                   ))}
                 </WeekColumn>
               ))}
               {todayCol >= 0 && todayRow >= 0 ? (
-                <TodayRing $left={todayCol * PITCH - 0.9} $top={todayRow * PITCH - 0.9} $dark={dark} />
+                <TodayRing
+                  $left={todayCol * pitch - (ring - cell) / 2}
+                  $top={todayRow * pitch - (ring - cell) / 2}
+                  $size={ring}
+                  $dark={dark}
+                />
               ) : null}
             </WeeksRow>
           </GridWrap>

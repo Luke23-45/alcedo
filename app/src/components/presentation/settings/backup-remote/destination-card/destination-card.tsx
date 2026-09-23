@@ -8,7 +8,7 @@ import { useTranslate } from '@tolgee/react';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { SettingsGroup, SettingsRow } from '../../shared/grouped-settings-list';
+import { SettingsGroup, SettingsRow, useChevronColor } from '../../shared/grouped-settings-list';
 import * as GS from '../../shared/grouped-settings-list.styles';
 import * as S from './destination-card.styles';
 
@@ -17,6 +17,7 @@ function HowItWorksRow() {
   const { t } = useTranslate();
   const [open, setOpen] = useState(false);
   const reduceMotion = useAppReducedMotion();
+  const chevron = useChevronColor();
 
   return (
     <>
@@ -37,7 +38,7 @@ function HowItWorksRow() {
             </GS.RowText>
             <GS.RowTrailing>
               <GS.ChevronRotator $open={open}>
-                <Icon source="chevronRight" size={18} color={GS.chevronColor} />
+                <Icon source="chevronRight" size={18} color={chevron} />
               </GS.ChevronRotator>
             </GS.RowTrailing>
           </>

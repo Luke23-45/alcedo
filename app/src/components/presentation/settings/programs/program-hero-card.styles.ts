@@ -56,6 +56,7 @@ export const HeroTitleRow = styled.View`
 `;
 
 export const HeroName = styled.Text`
+  flex: 1;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.3px;
@@ -63,6 +64,7 @@ export const HeroName = styled.Text`
 `;
 
 export const ActiveBadge = styled.View`
+  flex-shrink: 0;
   padding-horizontal: 8px;
   padding-vertical: 3px;
   border-radius: 8.5px;

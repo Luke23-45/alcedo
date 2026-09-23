@@ -1,3 +1,4 @@
+import { StyleSheet } from "react-native";
 import styled from "styled-components/native";
 import { PROFILE, profileFontFamily } from "./profile-tokens";
 
@@ -20,7 +21,9 @@ export const VisibilityLabel = styled.Text<{ $color: string }>`
   font-size: 13.5px;
   font-weight: 500;
   color: ${({ $color }) => $color};
-  flex: 1;
+  flex-grow: 0;
+  flex-shrink: 1;
+  flex-basis: auto;
   padding-top: 9px;
 `;
 
@@ -68,7 +71,9 @@ export const BlockedValue = styled.Text<{ $color: string }>`
 `;
 
 export const VisibilityWrap = styled.View`
-  margin-left: auto;
+  flex: 1;
+  align-items: flex-end;
+  margin-left: 12px;
 `;
 
 export const Divider = styled.View<{ $color: string; $top: number }>`
@@ -76,6 +81,6 @@ export const Divider = styled.View<{ $color: string; $top: number }>`
   top: ${({ $top }) => $top}px;
   left: ${PROFILE.inset}px;
   right: ${PROFILE.inset}px;
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ $color }) => $color};
 `;

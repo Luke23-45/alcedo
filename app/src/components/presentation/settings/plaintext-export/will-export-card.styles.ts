@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import { type as typeStyle } from '@/styles/theme';
 
@@ -22,7 +23,7 @@ export const StatCell = styled.View`
 `;
 
 export const StatDivider = styled.View`
-  width: 1px;
+  width: ${StyleSheet.hairlineWidth}px;
   align-self: stretch;
   background-color: ${({ theme }) =>
     theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(60,60,67,0.12)'};

@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components/native';
+import { StyleSheet } from 'react-native';
 
 export const CardInner = styled.View``;
 
@@ -31,7 +32,6 @@ export const SetsChipText = styled.Text`
   line-height: 11px;
   font-weight: 700;
   letter-spacing: 0.8px;
-  text-transform: uppercase;
   color: ${({ theme }) => theme.color.content.secondary};
 `;
 
@@ -46,18 +46,17 @@ export const ColumnLabel = styled.Text`
   line-height: 10px;
   font-weight: 700;
   letter-spacing: 0.8px;
-  text-transform: uppercase;
   color: ${({ theme }) => theme.color.content.tertiary};
 `;
 
 export const HeaderDivider = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-top: 8px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)')};
 `;
 
 export const RowDivider = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)')};
 `;
 

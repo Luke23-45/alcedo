@@ -1,5 +1,6 @@
 import styled from 'styled-components/native';
 import { TextInput as RNTextInput } from 'react-native';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 /** Card inner padding on the reference canvases. */
@@ -13,7 +14,7 @@ export const SearchSection = styled.View`
 `;
 
 export const NameText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   flex: 1;
   font-size: 14px;
   line-height: 19px;
@@ -35,7 +36,7 @@ export const AddSearchPad = styled.View`
 `;
 
 export const SearchHint = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   line-height: 16px;
   font-weight: 500;
@@ -59,7 +60,7 @@ export const ResultTextColumn = styled.View`
 `;
 
 export const ResultName = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   line-height: 18px;
   font-weight: 600;
@@ -68,14 +69,16 @@ export const ResultName = styled.Text`
 `;
 
 export const ResultSubtitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
   color: ${({ theme }) => editorPalette(theme.isDark).text.caption};
 `;
 
-export const SearchInput = styled(RNTextInput)`
+export const SearchInput = styled(RNTextInput).attrs(({ theme }) => ({
+  selectionColor: theme.isDark ? '#FF6A3D' : '#E8542F',
+}))`
   flex: 1;
   font-size: 13.5px;
   line-height: 18px;

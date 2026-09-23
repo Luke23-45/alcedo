@@ -127,7 +127,7 @@ export function ProfileIdentity({
           <S.BioKicker $color={palette.tertiary}>
             {t(feedKey("feed.profile.identity.bio"))}
           </S.BioKicker>
-          <S.BioCounter $color={palette.faint}>
+          <S.BioCounter $color={palette.faint} style={{ fontVariant: ["tabular-nums"] }}>
             {t(feedKey("feed.profile.identity.bio_counter"), { count: `${draft.bio.length}` })}
           </S.BioCounter>
         </S.BioHeader>

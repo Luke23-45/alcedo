@@ -53,6 +53,8 @@ export function heaviestRecordedWeightKg(
  * Row summary in the spec's shape: "4 × 5 · 100 kg · 90s rest".
  * The weight segment reads the last-recorded lift; for a never-logged
  * exercise it vanishes cleanly instead of inventing a target.
+ * The rest segment is translator-owned via `formatRest` (unit + word travel
+ * together so word order and the short unit localize as one string).
  */
 export function formatRowSummary(
   blueprint: ExerciseBlueprint,
@@ -60,6 +62,7 @@ export function formatRowSummary(
   bodyweight: Weight | undefined,
   formatWeight: (kg: number) => string,
   bodyweightLabel: string,
+  formatRest: (seconds: number) => string = (seconds) => `${seconds}s rest`,
 ): string {
   if (blueprint instanceof WeightedExerciseBlueprint) {
     const parts = [`${blueprint.plannedSets.length} × ${formatPlannedSets(blueprint.plannedSets)}`];
@@ -71,8 +74,8 @@ export function formatRowSummary(
         parts.push(formatWeight(kg));
       }
     }
-    parts.push(`${Math.round(blueprint.restBetweenSets.minRest.toMillis() / 1000)}s rest`);
-    return parts.join('  ·  ');
+    parts.push(formatRest(Math.round(blueprint.restBetweenSets.minRest.toMillis() / 1000)));
+    return parts.join(' · ');
   }
   return `${blueprint.sets.length} × ${formatCardioTarget(blueprint.sets[0]!.target)}`;
 }

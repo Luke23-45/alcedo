@@ -181,7 +181,7 @@ function SharedSessionContent({ sharedItem }: { sharedItem: SharedSession }) {
   const volume = session.totalWeightLifted.convertTo(preferredWeightUnit);
   const date = session.date;
   const kickerDate = new Date(date.year(), date.monthValue() - 1, date.dayOfMonth());
-  const kicker = `KINETIC · ${kickerDate
+  const kicker = `ALCEDO · ${kickerDate
     .toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'long',

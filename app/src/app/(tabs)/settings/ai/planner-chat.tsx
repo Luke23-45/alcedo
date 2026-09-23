@@ -128,6 +128,7 @@ export default function AiPlannerChat() {
   const now = Date.now();
   const todayLabel = t('ai.chat.day.today');
   const yesterdayLabel = t('ai.chat.day.yesterday');
+  const locale = useAppSelector((x) => x.settings.preferredLanguage) ?? undefined;
 
   return (
     <S.Screen style={{ paddingLeft: insets.left, paddingRight: insets.right }}>
@@ -177,7 +178,7 @@ export default function AiPlannerChat() {
                 <S.ItemColumn>
                   {showsDayDivider(messages, index) && item.sentAt != null && (
                     <DayDivider
-                      label={dayDividerLabel(item.sentAt, now, todayLabel, yesterdayLabel)}
+                      label={dayDividerLabel(item.sentAt, now, todayLabel, yesterdayLabel, locale)}
                     />
                   )}
                   <ChatBubble

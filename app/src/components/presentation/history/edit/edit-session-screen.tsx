@@ -1,4 +1,5 @@
 import { Session } from '@/models/session-models';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { useTranslate } from '@tolgee/react';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, useWindowDimensions } from 'react-native';
@@ -14,12 +15,13 @@ import * as S from './edit-session-screen.styles';
 /** Amber aura at (width-63, 180), r=280, #FF9F0A @ .12 → 0 — spec background. */
 function Aura() {
   const { width } = useWindowDimensions();
+  const { isDark } = useAppTheme();
   const cx = width - 63;
   return (
     <Svg style={{ position: 'absolute', left: 0, top: 0 }} width={width} height={460} viewBox={`0 0 ${width} 460`}>
       <Defs>
         <RadialGradient id="editSessionAura" gradientUnits="userSpaceOnUse" cx={cx} cy={180} r={280}>
-          <Stop offset="0" stopColor="#FF9F0A" stopOpacity={0.12} />
+          <Stop offset="0" stopColor="#FF9F0A" stopOpacity={isDark ? 0.12 : 0.06} />
           <Stop offset="1" stopColor="#FF9F0A" stopOpacity={0} />
         </RadialGradient>
       </Defs>

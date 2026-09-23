@@ -134,7 +134,7 @@ export function CoachCard({ onAdjust, onDismiss }: { onAdjust?: () => void; onDi
             tracking={1.3}
             style={{ fontSize: 9, lineHeight: 11, color: labelColor, marginLeft: 10 }}
           >
-            {t('home.coach.label').toLocaleUpperCase() /* en: "KINETIC COACH" */}
+            {t('home.coach.label').toLocaleUpperCase() /* en: "ALCEDO COACH" */}
           </HomeText>
           <SampleBadge />
           <S.BetaChip>

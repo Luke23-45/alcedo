@@ -39,7 +39,9 @@ export function CardioTimer({ set, onPersist, onStop, style }: CardioTimerProps)
         return {
           reached,
           time: reached ? `+${formatTimeSpan(elapsedMs - targetMs)}` : formatTimeSpan(targetMs - elapsedMs),
-          status: reached ? t('cardio_timer.status.over_target') : t('cardio_timer.status.working'),
+          status: reached
+            ? t('cardio_timer.status.over_target').toLocaleUpperCase()
+            : t('cardio_timer.status.working').toLocaleUpperCase(),
           accent: reached ? 'green' : 'onSurfaceVariant',
           segments: [
             {

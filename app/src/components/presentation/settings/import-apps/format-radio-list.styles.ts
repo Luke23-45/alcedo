@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import { type as typeStyle } from '@/styles/theme';
 
@@ -82,7 +83,7 @@ export const OptionDrops = styled.Text`
 
 /** Hairline between the two options, inset to the text column. */
 export const OptionSeparator = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-horizontal: 16px;
   background-color: ${({ theme }) => theme.color.border.hairline};
 `;

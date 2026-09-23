@@ -88,7 +88,9 @@ function CommentItem({ comment, postId, postAuthorId, nested = false, onReply }:
             onPress={() => dispatch(toggleCommentKudos(comment.id))}
             accessibilityRole="button"
             accessibilityState={{ selected: comment.kudoed }}
-            accessibilityLabel={`Kudos, ${comment.kudos}`}
+            accessibilityLabel={t(feedKey('feed.detail.comment.a11y.kudos'), `Kudos, ${comment.kudos}`, {
+              count: comment.kudos,
+            })}
           >
             <HeartGlyph size={13} color={comment.kudoed ? kudoedHeart : idleHeart} filled={comment.kudoed} />
             <S.ActionCount $kudoed={comment.kudoed}>{comment.kudos}</S.ActionCount>
@@ -99,7 +101,9 @@ function CommentItem({ comment, postId, postAuthorId, nested = false, onReply }:
       <S.ReplyButton
         onPress={() => onReply({ commentId: comment.id, authorName })}
         accessibilityRole="button"
-        accessibilityLabel={`Reply to ${authorName}`}
+        accessibilityLabel={t(feedKey('feed.detail.comment.a11y.reply_to'), `Reply to ${authorName}`, {
+          name: authorName,
+        })}
       >
         <S.ReplyText>{t(feedKey('feed.detail.comment.reply'), 'Reply')}</S.ReplyText>
       </S.ReplyButton>
@@ -111,7 +115,9 @@ function CommentItem({ comment, postId, postAuthorId, nested = false, onReply }:
       <FeedAvatar person={person} size={avatarSize} ringColor={theme.color.background.base} />
       <S.Content>
         <S.NameRow>
-          <S.Name>{authorName}</S.Name>
+          <S.Name numberOfLines={1} ellipsizeMode="tail">
+            {authorName}
+          </S.Name>
           {isPostAuthor ? (
             <S.BadgeSlot>
               <IdentityBadge variant="author" />

@@ -18,7 +18,7 @@ const COLUMNS: { key: keyof StatStripValues; labelKey: TranslationKey; labelPara
   {
     key: 'trailing7dVolume',
     labelKey: 'stats.exercise_detail.strip.this_week',
-    labelParams: (unitLabel) => ({ unit: unitLabel.toUpperCase() }),
+    labelParams: (unitLabel) => ({ unit: unitLabel.toLocaleUpperCase() }),
   },
 ];
 

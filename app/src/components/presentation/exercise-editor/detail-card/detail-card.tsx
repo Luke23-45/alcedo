@@ -30,7 +30,7 @@ export function DetailCard({
     <Card>
       <DetailPad>
         <SubHeadRow>
-          <SubHead>{t('plan.notes.label', 'Notes')}</SubHead>
+          <SubHead>{t('plan.notes.label', 'Notes').toLocaleUpperCase()}</SubHead>
           <SubHeadCounter>
             {t('exercise.editor.notes.count', '{count} / {max}', {
               count: exercise.notes.length,
@@ -53,7 +53,7 @@ export function DetailCard({
           />
         </NotesWell>
         <SubHeadRow>
-          <SubHead>{t('exercise.editor.link.label', 'External link')}</SubHead>
+          <SubHead>{t('exercise.editor.link.label', 'External link').toLocaleUpperCase()}</SubHead>
         </SubHeadRow>
         <LinkWell $focused={focused === 'link'}>
           <LinkGlyphWrap>

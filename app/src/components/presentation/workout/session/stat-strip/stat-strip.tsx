@@ -24,19 +24,19 @@ export function StatStrip({ stats, dimmed }: { stats: SessionStats; dimmed?: boo
           {!dim && stats.setsTotal > 0 && <ValueSuffix $dimmed={dim}>/{stats.setsTotal}</ValueSuffix>}
         </Value>
       ),
-      label: t('workout.session.sets.label'),
+      label: t('workout.session.sets.label').toLocaleUpperCase(),
     },
     {
       value: <Value $dimmed={dim}>{stats.volume}</Value>,
-      label: t('workout.session.volume_kg.label'),
+      label: t('workout.session.volume_kg.label').toLocaleUpperCase(),
     },
     {
       value: <Value $dimmed={dim}>{stats.reps}</Value>,
-      label: t('workout.session.reps.label'),
+      label: t('workout.session.reps.label').toLocaleUpperCase(),
     },
     {
       value: <Value $dimmed={dim}>{dim ? '—' : (stats.avgBpm ?? '—')}</Value>,
-      label: t('workout.session.avg_bpm.label'),
+      label: t('workout.session.avg_bpm.label').toLocaleUpperCase(),
       sample: !dim,
     },
   ];

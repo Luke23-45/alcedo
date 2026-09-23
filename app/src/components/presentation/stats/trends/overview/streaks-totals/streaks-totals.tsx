@@ -17,6 +17,7 @@ import { TrendsSectionHeader } from '../shared/trends-section-header';
 import { CardAura } from '../shared/card-aura';
 import { formatInt } from '../trends-overview-data';
 import { trendsPalette } from '../trends-colors';
+import { useAppSelector } from '@/store';
 import {
   CardInner,
   Divider,
@@ -56,11 +57,12 @@ export function StreaksTotals({
   const dark = theme.isDark;
   const palette = trendsPalette(dark);
   const year = LocalDate.now().year();
+  const locale = useAppSelector((x) => x.settings.preferredLanguage);
 
   const stats: { value: string; label: string }[] = [
-    { value: formatInt(totalSessions), label: t('trends.streaks.total_label') },
+    { value: formatInt(totalSessions, locale), label: t('trends.streaks.total_label') },
     {
-      value: formatInt(sessionsThisYear),
+      value: formatInt(sessionsThisYear, locale),
       label: t('trends.streaks.year_label', { year }),
     },
     { value: avgPerWeek, label: t('trends.streaks.avg_label') },

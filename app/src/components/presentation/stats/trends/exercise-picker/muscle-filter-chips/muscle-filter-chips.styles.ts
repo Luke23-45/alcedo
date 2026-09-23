@@ -19,7 +19,8 @@ export const ChipsContent = styled.View`
 
 export const Chip = styled.Pressable<{ $selected: boolean; $width: number }>`
   height: 28px;
-  width: ${({ $width }) => $width}px;
+  min-width: ${({ $width }) => $width}px;
+  padding-horizontal: 14px;
   border-radius: 14px;
   align-items: center;
   justify-content: center;

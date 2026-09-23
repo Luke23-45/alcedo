@@ -26,8 +26,10 @@ export const BadgeWrap = styled.View`
 
 /** 152×42 pill — dispatches a real feed refresh, never a visual no-op. */
 export const LoadButton = styled.Pressable<{ $dark: boolean }>`
-  width: 152px;
-  height: 42px;
+  min-width: 152px;
+  min-height: 42px;
+  padding-horizontal: 20px;
+  padding-vertical: 10px;
   border-radius: 21px;
   border-width: 1px;
   align-items: center;

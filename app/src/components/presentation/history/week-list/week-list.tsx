@@ -100,7 +100,7 @@ function WeekSessionRow({
                 color: isPr ? GOLD.softInk : '#8E8E93',
               }}
             >
-              {formatDate(session.date, { weekday: 'narrow' }).toUpperCase()}
+              {formatDate(session.date, { weekday: 'narrow' }).toLocaleUpperCase()}
             </HomeText>
             <HomeText
               weight={fontWeight.bold}
@@ -208,7 +208,7 @@ export function WeekList({
             color: theme.color.content.secondary,
           }}
         >
-          {t('history.v2.week.title')}
+          {t('history.v2.week.title').toLocaleUpperCase()}
         </HomeText>
         <HomeText
           weight={fontWeight.semibold}

@@ -132,7 +132,7 @@ describe('typeSwitchCopy', () => {
 describe('formatBodyweight', () => {
   it('formats the real session bodyweight, omits when absent', () => {
     expect(formatBodyweight(new Weight(80.6, 'kilograms'), false)).toBe('80.6 kg');
-    expect(formatBodyweight(new Weight(80.6, 'kilograms'), true)).toContain('lbs');
+    expect(formatBodyweight(new Weight(80.6, 'kilograms'), true)).toBe('177.7 lb');
     expect(formatBodyweight(undefined, false)).toBeUndefined();
   });
 });

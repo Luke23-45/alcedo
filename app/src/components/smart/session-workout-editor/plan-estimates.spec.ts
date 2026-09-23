@@ -207,13 +207,13 @@ describe('formatRowSummary', () => {
     const session = pushDaySession();
     const blueprint = session.blueprint.exercises[0] as WeightedExerciseBlueprint;
     expect(formatRowSummary(blueprint, session.recordedExercises[0], undefined, formatWeight, 'Bodyweight')).toBe(
-      '4 × 5  ·  100 kg  ·  90s rest',
+      '4 × 5 · 100 kg · 90s rest',
     );
   });
 
   it('omits the weight segment when nothing was ever logged', () => {
     const blueprint = makeWeightedBlueprint({ name: 'Squat', sets: 3, repsConfig: { type: 'fixed', reps: 10 } });
-    expect(formatRowSummary(blueprint, undefined, undefined, formatWeight, 'Bodyweight')).toBe('3 × 10  ·  90s rest');
+    expect(formatRowSummary(blueprint, undefined, undefined, formatWeight, 'Bodyweight')).toBe('3 × 10 · 90s rest');
   });
 
   it('labels bodyweight moves instead of showing a number', () => {
@@ -225,8 +225,18 @@ describe('formatRowSummary', () => {
     });
     const recorded = makeRecordedExercise(blueprint, [8, 8, 8]);
     expect(formatRowSummary(blueprint, recorded, new Weight(80, 'kilograms'), formatWeight, 'Bodyweight')).toBe(
-      '3 × 8  ·  Bodyweight  ·  90s rest',
+      '3 × 8 · Bodyweight · 90s rest',
     );
+  });
+
+  it('lets the host own the rest segment (unit + word localize together)', () => {
+    const session = pushDaySession();
+    const blueprint = session.blueprint.exercises[0] as WeightedExerciseBlueprint;
+    expect(
+      formatRowSummary(blueprint, session.recordedExercises[0], undefined, formatWeight, 'Bodyweight', (seconds) => {
+        return `${seconds}s Pause`;
+      }),
+    ).toBe('4 × 5 · 100 kg · 90s Pause');
   });
 
   it('formats cardio as sets × target', () => {

@@ -115,7 +115,7 @@ export function HistoryStatTiles({ session }: { session: Session }) {
               <S.Value style={{ fontVariant: ['tabular-nums'] }} numberOfLines={1} adjustsFontSizeToFit>
                 {tile.value}
               </S.Value>
-              <S.Unit numberOfLines={1}>{tile.label.toUpperCase()}</S.Unit>
+              <S.Unit numberOfLines={1}>{tile.label.toLocaleUpperCase()}</S.Unit>
             </S.Bottom>
           </S.TileBody>
         </S.TileCard>

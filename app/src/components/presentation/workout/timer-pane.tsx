@@ -1,8 +1,8 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { alpha, type AppTheme } from '@/styles/theme';
-import { Animated, Platform, useWindowDimensions, View, ViewStyle } from 'react-native';
-import { GlassBackground } from '@/components/presentation/foundation/glass-background';
+import { type AppTheme } from '@/styles/theme';
+import { Animated, useWindowDimensions, View, ViewStyle } from 'react-native';
+import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { SurfaceText } from '@/components/presentation/foundation/surface-text';
 import { Jiggler } from '@/components/presentation/foundation/jiggler';
 
@@ -35,8 +35,9 @@ export function TimerPane({ time, status, accent, segments, controls, jiggling, 
   const isLandscape = width > height;
 
   return (
-    // The bar clips its glass to the radius, and a clipping layer cannot cast a shadow - so the lift
-    // has to come from a wrapper. Android separates itself with a hairline instead.
+    // The card edge carries the lift on both platforms (its own shadow +
+    // hairline edge), so the pane reads as one family with the rest-timer card
+    // it sits beside in the footer slot.
     <View
       style={[
         {
@@ -44,54 +45,45 @@ export function TimerPane({ time, status, accent, segments, controls, jiggling, 
           // Separates the bar from the action floating above it, which the shared gap alone leaves too tight.
           marginTop: theme.space.sm,
         },
-        Platform.OS === 'ios' ? theme.elevation.sm : undefined,
         style,
       ]}
     >
-      <View
-        testID={testID}
-        style={{
-          borderRadius: barRadius,
-          overflow: 'hidden',
-          paddingVertical: theme.space.sm,
-          paddingLeft: theme.space.base,
-          paddingRight: theme.space.sm,
-          gap: theme.space.xs,
-          borderColor: theme.color.border.hairline,
-          borderWidth: Platform.OS === 'android' ? 1 : 0,
-        }}
-      >
-        <GlassBackground
-          radius={barRadius}
-          color={theme.color.background.elevated}
-          tintColor={alpha(theme.color.background.elevated, 0.75)}
-        />
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Jiggler jiggling={!!jiggling}>
-            <SurfaceText style={{ fontVariant: ['tabular-nums'] }} variant="title1" weight="bold" color={accent}>
-              {time}
+      <HomeCard radius={barRadius} pad={0}>
+        <View
+          testID={testID}
+          style={{
+            paddingVertical: theme.space.sm,
+            paddingLeft: theme.space.base,
+            paddingRight: theme.space.sm,
+            gap: theme.space.xs,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Jiggler jiggling={!!jiggling}>
+              <SurfaceText style={{ fontVariant: ['tabular-nums'] }} variant="title1" weight="bold" color={accent}>
+                {time}
+              </SurfaceText>
+            </Jiggler>
+            <SurfaceText
+              style={{
+                marginLeft: theme.space.sm,
+                letterSpacing: 0.8,
+                marginRight: 'auto',
+              }}
+              numberOfLines={1}
+              variant="caption1"
+              weight="bold"
+              color={accent}
+            >
+              {status}
             </SurfaceText>
-          </Jiggler>
-          <SurfaceText
-            style={{
-              marginLeft: theme.space.sm,
-              textTransform: 'uppercase',
-              letterSpacing: 0.8,
-              marginRight: 'auto',
-            }}
-            numberOfLines={1}
-            variant="caption1"
-            weight="bold"
-            color={accent}
-          >
-            {status}
-          </SurfaceText>
-          {controls}
+            {controls}
+          </View>
+          <View style={{ paddingBottom: theme.space.sm }}>
+            <ProgressBar segments={segments} theme={theme} trackColor={theme.color.border.hairline} />
+          </View>
         </View>
-        <View style={{ paddingBottom: theme.space.sm }}>
-          <ProgressBar segments={segments} theme={theme} trackColor={theme.color.border.hairline} />
-        </View>
-      </View>
+      </HomeCard>
     </View>
   );
 }

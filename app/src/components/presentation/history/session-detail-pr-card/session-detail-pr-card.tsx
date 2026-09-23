@@ -43,7 +43,7 @@ export function SessionDetailPrCard({ session }: { session: Session }) {
               <S.NewChipText>
                 {t('workout.post_workout.new_badge.label', {
                   count: recordsWithMatches.length.toString(),
-                })}
+                }).toLocaleUpperCase()}
               </S.NewChipText>
             </S.NewChip>
           ) : null}

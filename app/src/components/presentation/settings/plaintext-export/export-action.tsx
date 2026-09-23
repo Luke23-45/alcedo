@@ -44,7 +44,7 @@ export function ExportAction({ format }: { format: PlaintextExportFormat }) {
           end={{ x: 0, y: 1 }}
         />
         <S.ButtonEdge />
-        <S.ButtonLabel>{label}</S.ButtonLabel>
+        <S.ButtonLabel numberOfLines={1}>{label}</S.ButtonLabel>
       </S.ExportButton>
     </S.ExportActionBar>
   );

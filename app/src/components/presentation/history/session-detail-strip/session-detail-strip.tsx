@@ -27,7 +27,7 @@ export function SessionDetailStrip({ session }: { session: Session }) {
       <S.StripInner>
         <S.Cell>
           <S.Value style={{ fontVariant: ['tabular-nums'] }}>{formatCount(estimateSessionKcal(session))}</S.Value>
-          <S.Label>{t('workout.post_workout.kcal.label')}</S.Label>
+          <S.Label>{t('workout.post_workout.kcal.label').toLocaleUpperCase()}</S.Label>
         </S.Cell>
         <S.Divider />
         <S.Cell>
@@ -35,17 +35,17 @@ export function SessionDetailStrip({ session }: { session: Session }) {
             <S.Value style={{ fontVariant: ['tabular-nums'] }}>164</S.Value>
             <SampleBadge compact />
           </S.MaxBpmRow>
-          <S.Label>{t('history.session_detail.strip.max_bpm', 'Max bpm')}</S.Label>
+          <S.Label>{t('history.session_detail.strip.max_bpm', 'Max bpm').toLocaleUpperCase()}</S.Label>
         </S.Cell>
         <S.Divider />
         <S.Cell>
           <S.Value style={{ fontVariant: ['tabular-nums'] }}>{started}</S.Value>
-          <S.Label>{t('workout.session.exercises.label')}</S.Label>
+          <S.Label>{t('workout.session.exercises.label').toLocaleUpperCase()}</S.Label>
         </S.Cell>
         <S.Divider />
         <S.Cell>
           <S.Value style={{ fontVariant: ['tabular-nums'] }}>{rest}</S.Value>
-          <S.Label>{t('history.session_detail.strip.total_rest', 'Total rest')}</S.Label>
+          <S.Label>{t('history.session_detail.strip.total_rest', 'Total rest').toLocaleUpperCase()}</S.Label>
         </S.Cell>
       </S.StripInner>
     </S.StripCard>

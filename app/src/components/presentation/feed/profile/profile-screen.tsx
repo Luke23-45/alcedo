@@ -91,12 +91,20 @@ export function ProfileScreen({
     <S.ScreenRoot>
       <ProfileBackground />
       <S.NavBar style={{ marginTop: insets.top }}>
-        <S.NavButton accessibilityRole="button" onPress={onCancel}>
+        <S.NavButton
+          accessibilityRole="button"
+          accessibilityLabel={t(feedKey("feed.profile.nav.cancel"))}
+          onPress={onCancel}
+        >
           <S.NavCancel $color={palette.cancel}>{t(feedKey("feed.profile.nav.cancel"))}</S.NavCancel>
         </S.NavButton>
         <S.NavTitle $color={palette.navTitle}>{t(feedKey("feed.profile.nav.title"))}</S.NavTitle>
         <S.NavSpacer />
-        <S.NavButton accessibilityRole="button" onPress={() => onSave(draft)}>
+        <S.NavButton
+          accessibilityRole="button"
+          accessibilityLabel={t(feedKey("feed.profile.nav.save"))}
+          onPress={() => onSave(draft)}
+        >
           <S.NavSave $color={palette.save}>{t(feedKey("feed.profile.nav.save"))}</S.NavSave>
         </S.NavButton>
       </S.NavBar>

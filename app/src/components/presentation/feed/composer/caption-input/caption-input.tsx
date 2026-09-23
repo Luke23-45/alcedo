@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { tabularNumbers } from '@/styles/theme';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useComposerT } from '../composer-i18n';
 import { CAPTION_MAX_LENGTH } from '../composer-types';
@@ -40,7 +41,9 @@ export function CaptionInput({ value, onChange }: CaptionInputProps) {
             />
             <S.HeaderRow>
               <S.ComposerLabel>{t('feed.composer.caption.label', 'SAY SOMETHING')}</S.ComposerLabel>
-              <S.Counter>{t('feed.composer.caption.counter', '{count} / 280', { count: value.length })}</S.Counter>
+              <S.Counter style={tabularNumbers as any}>
+                {t('feed.composer.caption.counter', '{count} / 280', { count: value.length })}
+              </S.Counter>
             </S.HeaderRow>
             <S.Input
               value={value}

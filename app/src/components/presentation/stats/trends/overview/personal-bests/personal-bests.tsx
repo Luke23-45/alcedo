@@ -76,13 +76,13 @@ export function PersonalBests({
               <LiftCell>
                 {headerCell(t('trends.personal_bests.col.lift'))}
               </LiftCell>
-              <RightCell $width={80}>
+              <RightCell $width={70}>
                 {headerCell(t('trends.personal_bests.col.set'))}
               </RightCell>
-              <RightCell $width={70}>
+              <RightCell $width={62}>
                 {headerCell(t('trends.personal_bests.col.e1rm'))}
               </RightCell>
-              <RightCell $width={77}>
+              <RightCell $width={68}>
                 {headerCell(t('trends.personal_bests.col.date'))}
               </RightCell>
             </ColumnRow>
@@ -105,7 +105,7 @@ export function PersonalBests({
                         {row.name}
                       </HomeText>
                     </LiftCell>
-                    <RightCell $width={80}>
+                    <RightCell $width={70}>
                       <HomeText
                         weight={fontWeight.medium}
                         numberOfLines={1}
@@ -118,7 +118,7 @@ export function PersonalBests({
                         {row.bestSet}
                       </HomeText>
                     </RightCell>
-                    <RightCell $width={70}>
+                    <RightCell $width={62}>
                       <HomeText
                         weight={fontWeight.bold}
                         tracking={-0.25}
@@ -133,7 +133,7 @@ export function PersonalBests({
                         {row.e1rm}
                       </HomeText>
                     </RightCell>
-                    <RightCell $width={77}>
+                    <RightCell $width={68}>
                       <HomeText
                         weight={fontWeight.medium}
                         numberOfLines={1}

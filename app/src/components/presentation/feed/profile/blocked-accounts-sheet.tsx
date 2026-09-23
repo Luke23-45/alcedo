@@ -99,7 +99,9 @@ export function BlockedAccountsSheet({
           ) : (
             blocked.map((name) => (
               <S.BlockedRow key={name}>
-                <S.BlockedName $color={palette.value}>@{name}</S.BlockedName>
+                <S.BlockedName $color={palette.value} numberOfLines={1} ellipsizeMode="tail">
+                  @{name}
+                </S.BlockedName>
                 <S.UnblockButton
                   accessibilityRole="button"
                   accessibilityLabel={`${t(feedKey("feed.profile.blocked.unblock"))} @${name}`}

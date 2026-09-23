@@ -1,5 +1,6 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 /* Screen ------------------------------------------------------------------ */
 
@@ -39,10 +40,9 @@ export const NavTitleWrap = styled.View`
 `;
 
 export const NavTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline', { weight: '600' })}
   font-size: 15px;
   line-height: 20px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.3px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
@@ -50,7 +50,7 @@ export const NavTitle = styled.Text`
 /* PR banner --------------------------------------------------------------- */
 
 export const PrCard = styled.View`
-  height: 88px;
+  min-height: 88px;
   border-radius: 26px;
   border-width: 1px;
   border-color: rgba(255, 255, 255, 0.45);
@@ -74,9 +74,11 @@ export const PrGloss = styled.View`
 export const PrContent = styled.View`
   flex-direction: row;
   align-items: center;
-  height: 88px;
+  min-height: 88px;
   padding-left: 20px;
   padding-right: 20px;
+  padding-top: 12px;
+  padding-bottom: 12px;
 `;
 
 export const PrMedal = styled.View`
@@ -94,30 +96,27 @@ export const PrTexts = styled.View`
 `;
 
 export const PrHeading = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 9px;
   line-height: 11px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 1.3px;
   text-transform: uppercase;
   color: ${({ theme }) => theme.exerciseHistory.gold.heading};
 `;
 
 export const PrValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'title3', { weight: '700' })}
   font-size: 20px;
   line-height: 24px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: -0.55px;
   color: ${({ theme }) => theme.exerciseHistory.gold.value};
   margin-top: 2px;
 `;
 
 export const PrSub = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '600' })}
   font-size: 10.5px;
   line-height: 13px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   color: ${({ theme }) => theme.exerciseHistory.gold.heading};
   margin-top: 3px;
 `;
@@ -125,12 +124,12 @@ export const PrSub = styled.Text`
 /* Chart ------------------------------------------------------------------- */
 
 export const ChartPad = styled.View`
-  height: 184px;
   /* 19px, not 20: HomeCard's 1pt edge insets the content, so the plot top
      lands exactly 82pt below the card top (gridlines at 286/318/350). */
   padding-top: 19px;
   padding-left: 20px;
   padding-right: 20px;
+  padding-bottom: 15px;
 `;
 
 export const ChartHeader = styled.View`
@@ -145,19 +144,16 @@ export const ChartTitleBlock = styled.View`
 `;
 
 export const ChartTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline', { weight: '600' })}
   font-size: 15.5px;
   line-height: 20px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.3px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 export const ChartSub = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 11px;
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   line-height: 14px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   margin-top: 5px;
   color: ${({ theme }) => (theme.isDark ? '#86868B' : '#6C6C70')};
 `;
@@ -175,10 +171,9 @@ export const ChartChip = styled.View`
 `;
 
 export const ChartChipText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 8.5px;
   line-height: 10px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 0.8px;
   text-transform: uppercase;
   color: ${({ theme }) => (theme.isDark ? '#98989F' : '#8E8E93')};
@@ -207,10 +202,9 @@ export const SectionHead = styled.View`
 `;
 
 export const SectionLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 10px;
   line-height: 12px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 1.35px;
   text-transform: uppercase;
   color: #86868b;
@@ -227,10 +221,8 @@ export const SeeAllHit = styled.Pressable`
 `;
 
 export const SeeAllText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 11px;
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '600' })}
   line-height: 14px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   color: ${({ theme }) => theme.home.seeAll};
 `;
 
@@ -259,20 +251,17 @@ export const DateTile = styled.View<{ $pr: boolean }>`
 `;
 
 export const TileMonth = styled.Text<{ $pr: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 8px;
   line-height: 10px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 0.6px;
   text-transform: uppercase;
   color: ${({ $pr }) => ($pr ? '#A08000' : '#8E8E93')};
 `;
 
 export const TileDay = styled.Text<{ $pr: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 16px;
+  ${({ theme }) => typeStyle(theme, 'callout', { weight: '700' })}
   line-height: 19px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: -0.5px;
   margin-top: 1px;
   color: ${({ theme, $pr }) => ($pr ? theme.exerciseHistory.tilePrDay : theme.color.content.primary)};
@@ -280,31 +269,30 @@ export const TileDay = styled.Text<{ $pr: boolean }>`
 
 export const RowMiddle = styled.View`
   flex: 1;
+  min-width: 0;
   margin-left: 12px;
   margin-right: 8px;
   justify-content: center;
 `;
 
 export const RowHeadline = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 13.5px;
   line-height: 17px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 export const RowSubline = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 11px;
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   line-height: 14px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   color: #86868b;
   margin-top: 3px;
 `;
 
 export const PrChip = styled.View`
   align-self: flex-start;
+  flex-shrink: 0;
   margin-top: 10px;
   /* Spec: chip right edge at x=331 (24pt left of the chevron). */
   margin-right: 24px;
@@ -321,10 +309,9 @@ export const PrChip = styled.View`
 `;
 
 export const PrChipText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 8.5px;
   line-height: 10px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 0.5px;
   color: #ffd84d;
 `;

@@ -38,7 +38,7 @@ export function ModeSegmentedControl({ mode, sessionName, onModeChange }: ModeSe
             accessibilityLabel={segment.label}
           >
             <S.SegmentThumb $selected={selected} $dark={dark} />
-            <S.SegmentLabel $selected={selected} $dark={dark}>
+            <S.SegmentLabel $selected={selected} $dark={dark} numberOfLines={1}>
               {segment.label}
             </S.SegmentLabel>
           </S.SegmentButton>

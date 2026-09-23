@@ -1,5 +1,5 @@
 import Svg, { Path } from 'react-native-svg';
-import { LinearGradient } from 'expo-linear-gradient';
+import { HomeGradient } from '../../home/shared/home-gradient';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useTranslate } from '@tolgee/react';
 import * as S from './plan-commit-bar.styles';
@@ -57,7 +57,9 @@ export function PlanCommitBar({ selectedCount, saveDisabled, onSave, onDiscard }
         accessibilityLabel={t('plan.diff.commit.discard')}
         style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
       >
-        <S.DiscardLabel $dark={dark}>{t('plan.diff.commit.discard')}</S.DiscardLabel>
+        <S.DiscardLabel $dark={dark} numberOfLines={1}>
+          {t('plan.diff.commit.discard')}
+        </S.DiscardLabel>
       </S.DiscardButton>
       <S.SaveButton
         $dark={dark}
@@ -71,12 +73,9 @@ export function PlanCommitBar({ selectedCount, saveDisabled, onSave, onDiscard }
       >
         {!saveDisabled && (
           <S.SaveGradientFill>
-            <LinearGradient
-              colors={dark ? ['#FF9F0A', '#FF6A3D', '#FF2D55'] : ['#E07800', '#FF6A3D', '#D70015']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{ flex: 1 }}
-            />
+            <HomeGradient variant="brand" style={{ flex: 1 }} />
+            <S.SaveGloss />
+            <S.SaveEdge pointerEvents="none" />
           </S.SaveGradientFill>
         )}
         <S.SaveContent>

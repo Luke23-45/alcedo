@@ -107,12 +107,14 @@ export interface RowContext {
   today: LocalDate;
   prSessionId: string | undefined;
   bodyweightLabel: string;
+  /** App language for casing/digits (EH05–EH06); undefined = device default. */
+  locale: string | undefined;
 }
 
-export function setCountLabel(t: RowContext['t'], count: number): string {
+export function setCountLabel(t: RowContext['t'], count: number, locale: string | undefined): string {
   return count === 1
     ? t('exercise.history.set_count.one')
-    : t('exercise.history.set_count.other', { count: count.toString() });
+    : t('exercise.history.set_count.other', { count: count.toLocaleString(locale ?? undefined) });
 }
 
 export function buildRow(entry: ExerciseHistoryEntry, index: number, ctx: RowContext): ExerciseHistoryRow {
@@ -121,14 +123,18 @@ export function buildRow(entry: ExerciseHistoryEntry, index: number, ctx: RowCon
   const key = `${session.id}:${index}`;
   // Locale-aware like every other date badge (session-comparison-table);
   // the previous code sliced a hard-coded English month abbreviation.
-  const month = ctx.formatDate(session.date, { month: 'short' }).toUpperCase();
-  const day = session.date.dayOfMonth().toString().padStart(2, '0');
+  // Cased in the app language, not blind Unicode default (EH05).
+  const month = ctx.formatDate(session.date, { month: 'short' }).toLocaleUpperCase(ctx.locale ?? undefined);
+  const day = session.date
+    .dayOfMonth()
+    .toLocaleString(ctx.locale ?? undefined, { minimumIntegerDigits: 2, useGrouping: false });
   const isPr = ctx.prSessionId !== undefined && session.id === ctx.prSessionId;
   const prLabel = t('exercise.history.pr_chip.label');
 
   if (exercise instanceof RecordedWeightedExercise) {
     const sets = completedSetsOf(entry);
-    const setCount = setCountLabel(t, sets.length);
+    const setCount = setCountLabel(t, sets.length, ctx.locale);
+    const reps = sets.map((set) => set.reps.toLocaleString(ctx.locale ?? undefined)).join(' · ');
     if (sets.length > 0 && exercise.tracksResistance) {
       const top = topSetOf(entry)!;
       const volume = exercise.totalWeightLiftedWith(session.bodyweight);
@@ -137,7 +143,7 @@ export function buildRow(entry: ExerciseHistoryEntry, index: number, ctx: RowCon
         sessionId: session.id,
         month,
         day,
-        headline: `${sets.map((set) => set.reps.toString()).join(' · ')} @ ${formatWeight(top.weight)}`,
+        headline: `${reps} @ ${formatWeight(top.weight)}`,
         subline: `${formatWeight(volume, 0)} ${t('exercise.history.volume.label')} · ${setCount}`,
         isPr,
         prLabel,
@@ -150,7 +156,7 @@ export function buildRow(entry: ExerciseHistoryEntry, index: number, ctx: RowCon
       day,
       headline:
         sets.length > 0
-          ? sets.map((set) => set.reps.toString()).join(' · ')
+          ? reps
           : formatExerciseSummary(exercise, {
               isFilled: true,
               showWeight: true,
@@ -174,7 +180,7 @@ export function buildRow(entry: ExerciseHistoryEntry, index: number, ctx: RowCon
       showWeight: true,
       bodyweightLabel: ctx.bodyweightLabel,
     }),
-    subline: setCountLabel(t, cardioSets),
+    subline: setCountLabel(t, cardioSets, ctx.locale),
     isPr,
     prLabel,
   };
@@ -220,12 +226,17 @@ export function buildChartPoints(entries: ExerciseHistoryEntry[], ctx: RowContex
   return { points, first: tops[0], last: tops[tops.length - 1] };
 }
 
-export function buildSubtitle(first: Weight, last: Weight): string {
+export function buildSubtitle(first: Weight, last: Weight, locale?: string): string {
   const range = `${formatWeight(first)} → ${formatWeight(last)}`;
   if (first.value.isZero()) {
     return range;
   }
   const pct = last.value.minus(first.value).dividedBy(first.value).multipliedBy(100);
-  const delta = `${pct.isNegative() ? '−' : '+'}${pct.abs().toFixed(1)}%`;
+  // EH06: locale decimal separator, not toFixed's Latin point.
+  const magnitude = new Intl.NumberFormat(locale ?? undefined, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(pct.abs().toNumber());
+  const delta = `${pct.isNegative() ? '−' : '+'}${magnitude}%`;
   return `${range} · ${delta}`;
 }

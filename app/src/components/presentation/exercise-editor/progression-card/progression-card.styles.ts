@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 /** Collapsed: 56pt row, label + summary stacked, chevron right. */
@@ -20,7 +21,7 @@ export const ProgressionTextColumn = styled.View`
 `;
 
 export const ProgressionLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   line-height: 18px;
   font-weight: 600;
@@ -29,7 +30,7 @@ export const ProgressionLabel = styled.Text`
 `;
 
 export const ProgressionSummary = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
@@ -57,7 +58,7 @@ export const RuleHeader = styled.View`
 `;
 
 export const RuleTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   line-height: 16px;
   font-weight: 700;
@@ -74,7 +75,7 @@ export const DeleteRule = styled.Pressable`
 `;
 
 export const DeleteRuleText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;
@@ -103,7 +104,7 @@ export const AddRuleButton = styled.Pressable`
 `;
 
 export const AddRuleText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   line-height: 18px;
   font-weight: 600;
@@ -111,11 +112,11 @@ export const AddRuleText = styled.Text`
 `;
 
 export const NoLoadWarning = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 11px;
   line-height: 15px;
   font-weight: 500;
-  color: #ffb340;
+  color: ${({ theme }) => (theme.isDark ? '#FFB340' : '#A05A00')};
   padding-left: 4px;
   padding-right: 4px;
 `;

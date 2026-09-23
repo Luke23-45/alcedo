@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components/native';
 import Animated from 'react-native-reanimated';
-import { alpha, fontWeight } from '@/styles/theme';
+import { alpha, fontWeight, type as typeHelper } from '@/styles/theme';
 import { HomeGradient, type HomeGradientVariant } from '@/components/presentation/home/shared/home-gradient';
 
 /* Live totals · 361×68 rx24. Green hairline edge + pulsing sync dot. */
@@ -48,7 +48,7 @@ export const Cell = styled.View`
 `;
 
 export const CellValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: ${fontWeight.bold};
@@ -57,12 +57,11 @@ export const CellValue = styled.Text`
 `;
 
 export const CellLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 7.5px;
   line-height: 10px;
   font-weight: ${fontWeight.bold};
   letter-spacing: 0.7px;
-  text-transform: uppercase;
   margin-top: 6px;
   color: #86868b;
 `;

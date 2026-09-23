@@ -35,7 +35,6 @@ export const NewChipText = styled.Text`
   line-height: 11px;
   font-weight: 700;
   letter-spacing: 0.8px;
-  text-transform: uppercase;
   color: #ffd84d;
 `;
 

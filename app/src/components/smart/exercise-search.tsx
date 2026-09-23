@@ -9,6 +9,7 @@ import { clearRecentExerciseSearches, recordRecentExerciseSearch, setExerciseSea
 import { selectExerciseById, selectExercises, selectMuscles, updateExercise } from '@/store/stored-sessions';
 import { alpha } from '@/styles/theme';
 import { translateExerciseMeta } from '@/utils/exercise-meta';
+import { toGroupLabelCase } from '@/components/presentation/settings/shared/grouped-settings-list';
 import { uuid } from '@/utils/uuid';
 import { LegendList } from '@legendapp/list';
 import type { TranslationKey } from '@tolgee/web';
@@ -69,14 +70,16 @@ function PlateGlyph({ color }: { color: string }) {
   );
 }
 
-/** Spec fix: the chevron def carries the stroke (#48484A); the <use> must not. */
 function ChevronGlyph() {
+  // ES05: iOS chevron pair (SH06 family) — the settings hook lives in another
+  // domain, so this screen resolves the same pair from its own theme.
+  const theme = useAppTheme();
   return (
     <Svg width={10} height={16} viewBox="-5 -8 10 16">
       <Path
         d="M-2 -4 L2 0 L-2 4"
         fill="none"
-        stroke="#48484A"
+        stroke={theme.isDark ? '#48484A' : '#C7C7CC'}
         strokeWidth={1.9}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -201,11 +204,12 @@ function ExerciseRow({ id, onAdd }: { id: string; onAdd: (exercise: ExerciseDesc
   ].slice(0, 3);
 
   return (
-    <HomeCard radius={18} elev="tile" pad={0} style={{ height: 52 }}>
+    <HomeCard radius={18} elev="tile" pad={0} style={{ minHeight: 52 }}>
       <S.RowPressable
         onPress={() => onAdd(exercise, id)}
         style={{ borderCurve: 'continuous' }}
         accessibilityRole="button"
+        accessibilityLabel={exercise.name}
       >
         <S.IconTile style={{ backgroundColor: alpha(accent.bg, 0.15) }}>
           {kind === 'dumbbell' ? (
@@ -220,7 +224,12 @@ function ExerciseRow({ id, onAdd }: { id: string; onAdd: (exercise: ExerciseDesc
           <S.RowName numberOfLines={1}>{exercise.name}</S.RowName>
           <S.RowSub numberOfLines={1}>{segments.join(' · ')}</S.RowSub>
         </S.RowTexts>
-        <S.AddButton onPress={() => onAdd(exercise, id)} hitSlop={7} accessibilityRole="button">
+        <S.AddButton
+          onPress={() => onAdd(exercise, id)}
+          hitSlop={7}
+          accessibilityRole="button"
+          accessibilityLabel={t('exercise.search.add_exercise', 'Add {name}', { name: exercise.name })}
+        >
           <PlusGlyph color="#FF6A88" width={2} />
         </S.AddButton>
       </S.RowPressable>
@@ -282,6 +291,8 @@ export function ExerciseSearch(props: { requestId: string; exerciseName: string 
   const exercises = useAppSelector(selectExercises);
   const muscleChips = useAppSelector(selectMuscles);
   const recentIds = useAppSelector((s) => s.app.recentExerciseSearchIds);
+  // ES04: micro-labels cased in the app language (SH02 family).
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
 
   const [searchText, setSearchText] = useState(props.exerciseName);
   const [focused, setFocused] = useState(false);
@@ -420,8 +431,17 @@ export function ExerciseSearch(props: { requestId: string; exerciseName: string 
   }, [result]);
 
   const renderChip = (key: string, label: string, active: boolean, onPress: () => void) => (
-    <S.Chip key={key} $active={active} onPress={onPress} hitSlop={{ top: 8, bottom: 8 }} accessibilityRole="button">
-      <S.ChipText $active={active}>{label}</S.ChipText>
+    <S.Chip
+      key={key}
+      $active={active}
+      onPress={onPress}
+      hitSlop={{ top: 8, bottom: 8 }}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+    >
+      <S.ChipText $active={active} numberOfLines={1}>
+        {label}
+      </S.ChipText>
     </S.Chip>
   );
 
@@ -456,6 +476,7 @@ export function ExerciseSearch(props: { requestId: string; exerciseName: string 
               <SearchField
                 inputRef={searchInputRef}
                 testID="exercise-search-input"
+                accessibilityLabel={t('exercise.search.placeholder', 'Search exercises')}
                 value={searchText}
                 onChangeText={updateSearchText}
                 placeholder={t('exercise.search.placeholder', 'Search exercises')}
@@ -474,13 +495,15 @@ export function ExerciseSearch(props: { requestId: string; exerciseName: string 
               />
             </S.SearchInner>
           </S.SearchOuter>
-          {/* Spec: Cancel's trailing edge at x=377 — the pressable fills the
-              row's remainder and right-aligns the label. */}
+          {/* Spec: Cancel's trailing edge at x=377 — the pressable keeps its
+              intrinsic width at the row's end (ES01: a second flexer here
+              would halve the field on 393). */}
           <Pressable
             onPress={() => dismiss()}
             hitSlop={14}
             accessibilityRole="button"
-            style={{ flex: 1, alignItems: 'flex-end' }}
+            accessibilityLabel={t('generic.cancel.button')}
+            style={{ flexShrink: 0, alignItems: 'flex-end' }}
           >
             <S.CancelText>{t('generic.cancel.button')}</S.CancelText>
           </Pressable>
@@ -540,7 +563,9 @@ export function ExerciseSearch(props: { requestId: string; exerciseName: string 
             {recents.length > 0 && (
               <S.Section>
                 <S.SectionHeaderRow>
-                  <S.SectionLabel>{t('exercise.search.recents', 'RECENTS')}</S.SectionLabel>
+                  <S.SectionLabel>
+                    {toGroupLabelCase(t('exercise.search.recents', 'RECENTS'), locale)}
+                  </S.SectionLabel>
                   <Pressable
                     onPress={() => dispatch(clearRecentExerciseSearches())}
                     hitSlop={16}
@@ -565,9 +590,12 @@ export function ExerciseSearch(props: { requestId: string; exerciseName: string 
               <S.Section>
                 <S.SectionHeaderRow>
                   <S.SectionLabel>
-                    {headerCopy
-                      ? t(headerCopy.key, headerCopy.fallback)
-                      : t('exercise.search.suggested_other', 'SUGGESTED')}
+                    {toGroupLabelCase(
+                      headerCopy
+                        ? t(headerCopy.key, headerCopy.fallback)
+                        : t('exercise.search.suggested_other', 'SUGGESTED'),
+                      locale,
+                    )}
                   </S.SectionLabel>
                 </S.SectionHeaderRow>
                 <S.RowsList>

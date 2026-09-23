@@ -24,7 +24,7 @@ export const CardInner = styled.View`
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 14px;
-  height: 104px;
+  min-height: 104px;
 `;
 
 export const IconTile = styled.View`
@@ -67,6 +67,7 @@ export const Meta = styled.Text`
 
 export const ChipRow = styled.View`
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 6px;
   margin-top: 7px;
 `;

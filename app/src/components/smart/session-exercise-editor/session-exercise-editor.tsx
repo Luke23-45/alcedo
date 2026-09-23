@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useOnDismiss } from '@/hooks/useOnDismiss';
 import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
-import { useColorScheme } from 'react-native';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import * as S from './session-exercise-editor.styles';
 
 export function getSessionExerciseEditorHref(sessionId: string, index: number, opts?: { isNew?: boolean }): Href {
@@ -27,7 +27,7 @@ const AURA_COLORS: Record<AuraMode, string> = {
 };
 
 function ScreenAura({ mode }: { mode: AuraMode }) {
-  const dark = useColorScheme() === 'dark';
+  const { isDark: dark } = useAppTheme();
   const color = AURA_COLORS[mode];
   const opacity = dark ? (mode === 'add' ? 0.1 : mode === 'weighted' ? 0.14 : 0.12) : 0.06;
   return (
@@ -120,7 +120,7 @@ export function SessionExerciseEditor(props: { sessionId: string; index: number;
           bodyweight={session?.bodyweight}
           nextExerciseName={nextExerciseName}
           catalog={catalog}
-          weightSuffix={useImperialUnits ? 'lbs' : 'kg'}
+          weightSuffix={useImperialUnits ? 'lb' : 'kg'}
         />
       ) : null}
     </FullHeightScrollView>

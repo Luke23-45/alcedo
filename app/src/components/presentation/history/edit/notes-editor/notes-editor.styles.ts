@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components/native';
-import { alpha, fontWeight } from '@/styles/theme';
+import { alpha, fontWeight, type as typeHelper } from '@/styles/theme';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
 
 /* ------------------------------------------------------------------ *
@@ -8,11 +8,10 @@ import { HomeGradient } from '@/components/presentation/home/shared/home-gradien
  * ------------------------------------------------------------------ */
 
 export const NotesLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9px;
   font-weight: ${fontWeight.bold};
   letter-spacing: 1.3px;
-  text-transform: uppercase;
   color: #86868b;
   padding-horizontal: 8px;
   margin-bottom: 12px;
@@ -54,7 +53,7 @@ export const NotesInput = styled.TextInput.attrs(({ theme }) => ({
   placeholderTextColor: theme.isDark ? '#3F3F46' : '#A7A7AB',
 }))`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   font-weight: ${fontWeight.medium};
   letter-spacing: -0.2px;
@@ -66,7 +65,7 @@ export const NotesCounter = styled.Text`
   position: absolute;
   right: 20px;
   bottom: 14px;
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9px;
   font-weight: ${fontWeight.medium};
   letter-spacing: 0.2px;

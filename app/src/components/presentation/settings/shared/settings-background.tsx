@@ -23,11 +23,6 @@ export type SettingsBackgroundVariant = 'home' | 'backup' | 'planner' | 'program
 // r280), and the Screen 3 aura (red .12 at (60,180) r280), all on a
 // 393-wide canvas.
 
-// Measured off docs/new_design/settings-dark.md: Screen 1 auras (red .13 at
-// (60,160) r290; blue .10 at (375,800) r320), Screen 6 auras (blue .13 at
-// (330,180) r280; gold .10 at (40,860) r280), Screen 4 auras (violet .16
-// at (330,200) r290; red .10 at (40,1100) r280), and the Screen 5 aura
-// (amber .12 at (60,160) r280) on a 393-wide canvas.
 const AURAS: Record<SettingsBackgroundVariant, Aura[]> = {
   home: [
     { id: 'sh-a1', color: '#FF2D55', opacity: 0.13, cx: 60, cy: 160, r: 290 },

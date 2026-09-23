@@ -1,5 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 /**
  * Canonical iOS grouped-inset settings anatomy, measured off
@@ -14,10 +16,12 @@ export const GroupWrap = styled.View`
 `;
 
 // Spec: 10pt/700, letter-spacing +1.35, #86868B (settings-dark.md Screen 1).
+// Casing itself is applied in JS (toGroupLabelCase); the CSS transform stays
+// as a no-op backstop for direct GroupLabel users in loops 18/19 until they
+// migrate to the helper.
 export const GroupLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 10px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 1.35px;
   text-transform: uppercase;
   color: #86868b;
@@ -84,6 +88,7 @@ export const IconWell = styled.View<{ $well: string }>`
 
 export const RowText = styled.View`
   flex: 1;
+  min-width: 0;
   margin-left: 12px;
   margin-right: 8px;
   justify-content: center;
@@ -92,28 +97,25 @@ export const RowText = styled.View`
 
 // Spec: 13.5pt/600, letter-spacing -0.2, #F5F5F7 (settings-dark.md Screen 1).
 export const RowTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 13.5px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 // Spec: 10.5pt/500 #86868B (settings-dark.md Screen 1).
 export const RowSubtitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   font-size: 10.5px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   color: #86868b;
 `;
 
 // Spec: 12pt/500 #98989F end-anchored (settings-dark.md Screen 1).
 export const RowValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 12px;
-  font-weight: ${({ theme }) => theme.weight.medium};
+  ${({ theme }) => typeStyle(theme, 'caption1', { weight: '500' })}
   color: ${({ theme }) => (theme.isDark ? '#98989F' : '#8E8E93')};
   text-align: right;
+  flex-shrink: 1;
 `;
 
 // Green status text ("On", "Connected"): 12pt/600 #30D158 dark / #34C759 light
@@ -126,6 +128,7 @@ export const RowValueActive = styled(RowValue)`
 export const RowTrailing = styled.View`
   flex-direction: row;
   align-items: center;
+  flex-shrink: 0;
   gap: 4px;
 `;
 
@@ -136,7 +139,7 @@ export const ChevronRotator = styled.View<{ $open: boolean }>`
 // Separator aligned to the text column: x78→x357 on 393pt, i.e. left inset 62,
 // right inset 20 relative to the card (settings-dark.md Screen 1).
 export const RowSeparator = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-left: 62px;
   margin-right: 20px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(60,60,67,0.12)')};
@@ -157,9 +160,8 @@ export const BadgePill = styled.View`
 `;
 
 export const BadgePillText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 7.5px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 0.5px;
   color: #ffd84d;
 `;

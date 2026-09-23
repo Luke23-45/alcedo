@@ -27,7 +27,7 @@ export function ExerciseDetailBackground() {
         width="100%"
         height="100%"
         viewBox="0 0 393 1650"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid slice"
         style={S.auraSvg}
         pointerEvents="none"
       >

@@ -70,6 +70,15 @@ export function formatRpeValue(value: number, locale?: string): string {
   return Number.isInteger(value) ? value.toString() : decimalFormatterFor(locale).format(value);
 }
 
+/** Stepper display ("2" / "2.5" / "2,5"): halves only, locale separator,
+ * bare integers stay bare. AP06 — the old toFixed('.') was Latin-only. */
+export function formatOverloadValue(value: number, locale?: string): string {
+  return new Intl.NumberFormat(locale ?? undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
 /** Why the NEXT SESSION preview can or cannot render its card. */
 export type NextSessionAvailability = 'ready' | 'planner-off' | 'no-program' | 'no-sessions' | 'no-training-days';
 

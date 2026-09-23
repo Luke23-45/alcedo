@@ -73,6 +73,7 @@ export function dayDividerLabel(
   now: number,
   todayLabel: string,
   yesterdayLabel: string,
+  locale?: string,
 ): string {
   if (isSameCalendarDay(sentAt, now)) {
     return todayLabel;
@@ -85,5 +86,9 @@ export function dayDividerLabel(
   if (isSameCalendarDay(sentAt, yesterday.getTime())) {
     return yesterdayLabel;
   }
-  return new Date(sentAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(sentAt).toLocaleDateString(locale ?? undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }

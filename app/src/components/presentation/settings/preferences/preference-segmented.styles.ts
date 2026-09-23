@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 /**
  * Segmented control (settings-dark.md Screens 2–3): quiet track with a
@@ -44,9 +45,13 @@ export const OptionPressable = styled.Pressable`
 `;
 
 export const OptionLabel = styled.Text<{ $selected: boolean; $large: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: ${({ $large }) => ($large ? 12.5 : 12)}px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
+  ${({ theme }) => typeStyle(theme, 'caption1', { weight: '600' })}
+  ${({ $large }) =>
+    $large
+      ? css`
+          font-size: 12.5px;
+        `
+      : ''}
   color: ${({ theme, $selected }) =>
     $selected ? (theme.isDark ? '#FFFFFF' : '#1C1C1E') : theme.isDark ? '#98989F' : '#8E8E93'};
 `;

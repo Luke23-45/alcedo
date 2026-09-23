@@ -40,16 +40,18 @@ const ROW_HEIGHT = 64;
 const ROW_GAP = 10;
 /** Visual pitch of a row: 64pt row + 1pt divider + 9pt breathing room. */
 const PITCH = ROW_HEIGHT + ROW_GAP;
+/** Notes field reveal: scroll offset above the section + focus delay for the push transition. */
+const NOTES_SCROLL_OFFSET = 140;
+const NOTES_FOCUS_DELAY_MS = 450;
 
 /* ------------------------------------------------------------------ *
  * Glyphs — drawn from the spec's geometry.
  * ------------------------------------------------------------------ */
 
 function DotsGlyph() {
-  const theme = useAppTheme();
   return (
     <Svg width={18} height={8} viewBox="0 0 18 8">
-      <G fill={theme.home.seeAll}>
+      <G fill="#8E8E93">
         <Circle cx={2} cy={4} r={2} />
         <Circle cx={9} cy={4} r={2} />
         <Circle cx={16} cy={4} r={2} />
@@ -120,7 +122,7 @@ function DumbbellGlyph() {
   const theme = useAppTheme();
   return (
     <Svg width={42} height={24} viewBox="-21 -12 42 24">
-      <G fill="none" stroke={theme.color.content.tertiary} strokeLinecap="round">
+      <G fill="none" stroke={theme.isDark ? '#48484A' : '#AEAEB2'} strokeLinecap="round">
         <Rect x={-15} y={-6} width={5} height={12} rx={2} strokeWidth={1.8} />
         <Rect x={10} y={-6} width={5} height={12} rx={2} strokeWidth={1.8} />
         <Line x1={-10} y1={0} x2={10} y2={0} strokeWidth={2.6} />
@@ -264,19 +266,19 @@ function ExerciseRow(props: {
   );
 
   return (
-    <S.RowSlot style={animatedStyle} $last={last}>
+      <S.RowSlot style={animatedStyle} $last={last}>
       <S.ActiveBorder style={borderStyle} pointerEvents="none" />
       <S.RowPress
         onPress={props.onPress}
         onLongPress={props.onLongPress}
         accessibilityRole="button"
-        accessibilityLabel={props.name || t('workout.editor.untitled_exercise', 'Untitled exercise')}
+        accessibilityLabel={`${index + 1}. ${props.name || t('workout.editor.untitled_exercise', 'Untitled exercise')}`}
       >
         <GestureDetector gesture={pan}>
-          <S.GrabZone
-            accessibilityRole="button"
-            accessibilityLabel={t('workout.editor.drag_to_reorder.label', 'Drag to reorder')}
-          >
+          {/* No button role here: this zone lives inside the row button, and a
+              nested VoiceOver target would announce two buttons per row. The pan
+              gesture still drags for sighted users; position stays in the row label. */}
+          <S.GrabZone accessible={false}>
             <S.Grip>
               <DragHandleGlyph />
             </S.Grip>
@@ -459,9 +461,12 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
       return;
     }
     const id = setTimeout(() => {
-      scrollRef.current?.scrollTo({ y: Math.max(0, notesSectionY.current - 140), animated: !reduceMotion });
+      scrollRef.current?.scrollTo({
+        y: Math.max(0, notesSectionY.current - NOTES_SCROLL_OFFSET),
+        animated: !reduceMotion,
+      });
       notesInputRef.current?.focus();
-    }, 450);
+    }, NOTES_FOCUS_DELAY_MS);
     return () => clearTimeout(id);
   }, [focusNotes, reduceMotion]);
 
@@ -489,7 +494,15 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
     volumeKg === undefined
       ? '–'
       : localeFormatBigNumber(new Weight(volumeKg, 'kilograms').convertTo(displayUnit).value, 0);
-  const volumeLabel = `${useImperialUnits ? 'LBS' : 'KG'} · ${t('workout.editor.meta.est_volume', 'EST. VOLUME')}`;
+  const volumeLabel = `${useImperialUnits ? 'LBS' : 'KG'} · ${t('workout.editor.meta.est_volume', 'EST. VOLUME')}`
+    .toLocaleUpperCase();
+  const formatRest = (seconds: number) =>
+    t('workout.editor.rest_segment', {
+      defaultValue: '{seconds}{unit} {rest}',
+      seconds,
+      unit: t('workout.editor.rest.second_short', 's'),
+      rest: t('workout.editor.rest.label', 'rest'),
+    });
   const formatWeight = (kg: number) => new Weight(kg, 'kilograms').convertTo(displayUnit).shortLocaleFormat();
 
   const isDirty = nameDirty.current || notesDirty.current;
@@ -512,7 +525,9 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
           >
             <BackGlyph />
           </S.NavSideButton>
-          <S.NavTitle>{t('workout.editor.title', 'Edit Plan')}</S.NavTitle>
+          <S.NavTitle numberOfLines={1}>
+            {t('workout.editor.title', 'Edit Plan')}
+          </S.NavTitle>
           <Menu
             trigger={(open) => (
               <S.MenuTrigger
@@ -552,7 +567,9 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
         <S.Scroll ref={scrollRef} scrollEnabled={!dragging} showsVerticalScrollIndicator={false}>
           <S.Content>
             <S.PlanNameWrap>
-              <S.MicroLabel>{t('workout.editor.plan_name.label', 'Plan name')}</S.MicroLabel>
+              <S.MicroLabel>
+                {t('workout.editor.plan_name.label', 'Plan name').toLocaleUpperCase()}
+              </S.MicroLabel>
               <S.PlanNameInput
                 testID="workout-name"
                 value={name}
@@ -565,7 +582,7 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
                 onSubmitEditing={onSave}
                 accessibilityLabel={t('workout.editor.plan_name.label', 'Plan name')}
               />
-              <S.PlanNameUnderline $focused={nameFocused} />
+              {nameFocused && <S.PlanNameUnderline $focused={nameFocused} />}
             </S.PlanNameWrap>
 
             <S.Section>
@@ -591,7 +608,9 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
                       <S.MetaValue style={{ fontVariant: ['tabular-nums'] }}>
                         {minutes === undefined ? '–' : minutes}
                       </S.MetaValue>
-                      <S.MetaLabel>{t('workout.editor.meta.est_time', 'MIN · EST. TIME')}</S.MetaLabel>
+                      <S.MetaLabel>
+                        {t('workout.editor.meta.est_time', 'MIN · EST. TIME').toLocaleUpperCase()}
+                      </S.MetaLabel>
                     </S.MetaCol>
                   </S.MetaRow>
                   <S.MetaFootnote>
@@ -603,7 +622,7 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
 
             <S.Section onLayout={(event) => (notesSectionY.current = event.nativeEvent.layout.y)}>
               <S.SectionHeaderRow>
-                <S.MicroLabel>{t('workout.editor.notes.label', 'Notes')}</S.MicroLabel>
+                <S.MicroLabel>{t('workout.editor.notes.label', 'Notes').toLocaleUpperCase()}</S.MicroLabel>
                 <S.NotesHint>{t('workout.editor.notes.hint', 'no limit · optional')}</S.NotesHint>
               </S.SectionHeaderRow>
               <HomeCard radius={24} pad={16} elev="card">
@@ -616,7 +635,7 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
                   autoCorrect
                   onFocus={() =>
                     scrollRef.current?.scrollTo({
-                      y: Math.max(0, notesSectionY.current - 140),
+                      y: Math.max(0, notesSectionY.current - NOTES_SCROLL_OFFSET),
                       animated: !reduceMotion,
                     })
                   }
@@ -627,7 +646,9 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
 
             <S.Section>
               <S.SectionHeaderRow>
-                <S.MicroLabel>{t('workout.editor.exercises.label', 'Exercises')}</S.MicroLabel>
+                <S.MicroLabel>
+                  {t('workout.editor.exercises.label', 'Exercises').toLocaleUpperCase()}
+                </S.MicroLabel>
                 {exercises.length > 0 && (
                   <S.HeaderHint>{t('workout.editor.drag_to_reorder.label', 'Drag to reorder')}</S.HeaderHint>
                 )}
@@ -669,6 +690,7 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
                           workout.bodyweight,
                           formatWeight,
                           t('workout.editor.bodyweight.label', 'Bodyweight'),
+                          formatRest,
                         )}
                         drag={drag}
                         onPress={() => push(getSessionExerciseEditorHref(sessionId, index))}

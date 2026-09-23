@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useAnimatedStyle,
   useSharedValue,
@@ -12,7 +12,8 @@ import { RANGES, TrendRange } from '../constants';
 import { trendsPalette } from '../trends-colors';
 import { Option, Thumb, Track } from './range-selector.styles';
 
-const SLOT = 361 / RANGES.length; // 72.2pt per option; thumb sits 2pt inside
+/** Reference fallback until the track measures itself: 361/5 = 72.2pt/slot. */
+const SLOT_FALLBACK = 361 / RANGES.length;
 
 /**
  * 7D / 4W / 6M / 1Y / ALL segmented control. The thumb glides between
@@ -31,10 +32,16 @@ export function RangeSelector({
   const palette = trendsPalette(theme.isDark);
   const selected = RANGES.indexOf(range);
 
-  const thumbX = useSharedValue(selected * SLOT);
+  // The track stretches full-width on every device, so the slot pitch comes
+  // from the measured track — never the 361pt reference constant.
+  const [trackW, setTrackW] = useState(0);
+  const slot = trackW > 0 ? trackW / RANGES.length : SLOT_FALLBACK;
+  const thumbW = slot - 4;
+
+  const thumbX = useSharedValue(selected * SLOT_FALLBACK);
   useEffect(() => {
-    thumbX.value = withTiming(selected * SLOT, { duration: 220 });
-  }, [selected, thumbX]);
+    thumbX.value = withTiming(selected * slot, { duration: 220 });
+  }, [selected, slot, thumbX]);
   const thumbStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: thumbX.value }],
   }));
@@ -48,12 +55,16 @@ export function RangeSelector({
   };
 
   return (
-    <Track $fill={palette.segmentedTrack} accessibilityRole="tablist">
+    <Track
+      $fill={palette.segmentedTrack}
+      accessibilityRole="tablist"
+      onLayout={(e) => setTrackW(e.nativeEvent.layout.width)}
+    >
       <Thumb
         $fill={palette.segmentedThumb}
         $border={palette.segmentedThumbBorder}
         $dark={theme.isDark}
-        style={thumbStyle}
+        style={[thumbStyle, { width: thumbW }]}
       />
       {RANGES.map((key, index) => {
         const active = index === selected;

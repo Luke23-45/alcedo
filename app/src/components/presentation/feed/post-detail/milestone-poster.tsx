@@ -41,10 +41,18 @@ export function MilestonePoster({ value, unit, subtitle, range }: MilestonePoste
           <M.StarDisc>
             <StarGlyph size={28} color="#5C4300" />
           </M.StarDisc>
-          <M.MedalValue>{value}</M.MedalValue>
-          <M.MedalUnit>{unit}</M.MedalUnit>
-          <M.MedalSubtitle>{subtitle}</M.MedalSubtitle>
-          <M.MedalRange>{range}</M.MedalRange>
+          <M.MedalValue numberOfLines={1} ellipsizeMode="tail">
+            {value}
+          </M.MedalValue>
+          <M.MedalUnit numberOfLines={1} ellipsizeMode="tail">
+            {unit}
+          </M.MedalUnit>
+          <M.MedalSubtitle numberOfLines={1} ellipsizeMode="tail">
+            {subtitle}
+          </M.MedalSubtitle>
+          <M.MedalRange numberOfLines={1} ellipsizeMode="tail">
+            {range}
+          </M.MedalRange>
         </M.Medallion>
         <M.MilestoneEdge />
       </S.Poster>

@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 
 /** Tight 20/20/14 padding — the reference card is 152pt, not the hero 20pt. */
@@ -11,7 +12,7 @@ export const TopRow = styled.View`
   flex-direction: row;
   align-items: flex-start;
   margin-top: 2px;
-  margin-left: -8px;
+  margin-left: -6px;
 `;
 
 export const Medallion = styled.View`
@@ -40,11 +41,11 @@ export const TodayPill = styled.View<{ $bg: string }>`
   align-items: center;
   justify-content: center;
   margin-top: 2px;
-  margin-left: auto;
+  margin-left: 8px;
 `;
 
 export const Divider = styled.View<{ $dark: boolean }>`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-top: 14px;
   background-color: ${({ $dark }) => ($dark ? 'rgba(255,255,255,0.07)' : 'rgba(60,60,67,0.10)')};
 `;
@@ -66,6 +67,6 @@ export const StatDivider = styled.View<{ $dark: boolean; $pct: number }>`
   left: ${({ $pct }) => $pct}%;
   top: -1px;
   bottom: -6px;
-  width: 1px;
+  width: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ $dark }) => ($dark ? 'rgba(255,255,255,0.07)' : 'rgba(60,60,67,0.10)')};
 `;

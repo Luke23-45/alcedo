@@ -64,7 +64,7 @@ export const InputRow = styled.View`
   flex-direction: row;
   align-items: center;
   padding-left: 24px;
-  padding-right: 17px;
+  padding-right: 30px;
   padding-top: 12px;
 `;
 
@@ -97,7 +97,6 @@ export const SendButton = styled.Pressable`
   height: 44px;
   align-items: center;
   justify-content: center;
-  margin-right: -5px;
 `;
 
 /** 34pt circle; the styled 44pt SendButton carries the touch target. */

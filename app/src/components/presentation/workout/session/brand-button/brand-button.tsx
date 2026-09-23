@@ -84,7 +84,12 @@ export function BrandButton({
         />
         <BrandContent>
           {withPlus && <PlusIcon />}
-          <BrandLabel $fontSize={fontSize} $fontWeight={fontWeight} $letterSpacing={letterSpacing}>
+          <BrandLabel
+            $fontSize={fontSize}
+            $fontWeight={fontWeight}
+            $letterSpacing={letterSpacing}
+            numberOfLines={1}
+          >
             {label}
           </BrandLabel>
         </BrandContent>

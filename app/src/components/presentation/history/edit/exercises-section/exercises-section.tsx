@@ -228,7 +228,7 @@ function ExerciseRow(props: {
 
   const volumeText = weighted
     ? `${localeFormatBigNumber(weighted.totalWeightLiftedWith(props.bodyweight).convertTo('kilograms').value, 0)} kg`
-    : `${(recorded as RecordedCardioExercise).sets.length} ${t('history.edit.totals.sets.label', 'Sets').toLowerCase()}`;
+    : `${(recorded as RecordedCardioExercise).sets.length} ${t('history.edit.totals.sets.label', 'Sets').toLocaleLowerCase()}`;
 
   const selectedPotential = props.selectedSet !== null ? sets[props.selectedSet] : undefined;
   const editingWeight = selectedPotential?.weight;
@@ -306,14 +306,14 @@ function ExerciseRow(props: {
           </S.RowTop>
 
           {expanded && selectedPotential && (
-            <S.EditorPanel style={{ borderCurve: 'continuous' }}>
-              <S.EditorHeaderRow>
-                <S.EditorTitle>
-                  {t('history.edit.set_editor.title', 'Editing set {n} of {m}', {
-                    n: (props.selectedSet ?? 0) + 1,
-                    m: sets.length,
-                  })}
-                </S.EditorTitle>
+              <S.EditorPanel style={{ borderCurve: 'continuous' }}>
+                <S.EditorHeaderRow>
+                  <S.EditorTitle>
+                    {t('history.edit.set_editor.title', 'Editing set {n} of {m}', {
+                      n: (props.selectedSet ?? 0) + 1,
+                      m: sets.length,
+                    }).toLocaleUpperCase()}
+                  </S.EditorTitle>
                 <S.DeleteSetButton
                   onPress={() => props.onDeleteSet(props.selectedSet ?? 0)}
                   accessibilityRole="button"
@@ -513,7 +513,7 @@ export function ExercisesSection({
   return (
     <>
       <S.SectionHeaderRow>
-        <S.SectionLabel>{t('history.edit.exercises.label', 'Exercises')}</S.SectionLabel>
+        <S.SectionLabel>{t('history.edit.exercises.label', 'Exercises').toLocaleUpperCase()}</S.SectionLabel>
         <S.DragHint>
           {t('history.edit.exercises.drag_to_reorder', '{count} · drag to reorder', { count: exercises.length })}
         </S.DragHint>

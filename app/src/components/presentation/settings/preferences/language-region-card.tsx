@@ -1,7 +1,7 @@
 import SelectPicker from '@/components/presentation/foundation/select-picker';
 import type { SelectPickerOption } from '@/components/presentation/foundation/select-picker/select-picker-props';
 import Icon from '@/components/presentation/foundation/icon';
-import { SettingsGroup, SettingsToggle } from '../shared/grouped-settings-list';
+import { SettingsGroup, SettingsToggle, useChevronColor } from '../shared/grouped-settings-list';
 import { settingsKey } from '../shared/settings-i18n';
 import { useAppSelector } from '@/store';
 import { setFirstDayOfWeek, setUse24HourTime } from '@/store/settings';
@@ -15,9 +15,9 @@ import { PreferenceRow } from './preference-row';
 import { RowSeparator } from './preference-row.styles';
 import * as S from './language-region-card.styles';
 
-/** Trailing chevron for the language row (spec: #48484A). */
+/** Trailing chevron for the language row (theme-aware per SH06/PF05). */
 function Chevron() {
-  return <Icon source="chevronRight" size={18} color="#48484A" />;
+  return <Icon source="chevronRight" size={18} color={useChevronColor()} />;
 }
 
 /** Monday-first list of all seven days for the native first-day menu. */

@@ -716,7 +716,7 @@ export const gradients = {
   },
 } as const satisfies Record<string, Gradient>;
 
-/* --- Home screen (Kinetic reference) -------------------------------------- *
+/* --- Home screen (ALCEDO reference) -------------------------------------- *
  * Pixel-spec tokens for the redesigned home screen, measured off
  * docs/new_design/home_page_screen1.svg (dark) and home_screen_light_mode.svg.
  * These are the Apple-style surface treatments (diagonal 3-stop card bodies,

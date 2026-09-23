@@ -9,7 +9,7 @@ import * as Application from 'expo-application';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useReducedMotion } from 'react-native-reanimated';
+import { useAppReducedMotion } from '@/hooks/useMotionSettings';
 import { SettingsBackground } from '../shared/settings-background';
 import { GroupLabel, ScreenFooter } from '../shared/grouped-settings-list.styles';
 import { settingsKey } from '../shared/settings-i18n';
@@ -40,7 +40,7 @@ export function WhatsNewScreen() {
 
   const scrollRef = useRef<ScrollView>(null);
   const [entriesY, setEntriesY] = useState(0);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
 
   useEffect(() => {
     if (hasUnseen) {
@@ -65,7 +65,12 @@ export function WhatsNewScreen() {
           <ReleaseCard isNew={initialUnseen} onViewAll={scrollToEntries} />
         </View>
         {entries.length > 0 ? (
-          <View onLayout={(e) => setEntriesY(e.nativeEvent.layout.y)}>
+          <View
+            onLayout={(e) => {
+              const y = e.nativeEvent.layout.y;
+              setEntriesY((prev) => (prev === y ? prev : y));
+            }}
+          >
             <GroupLabel>{t(settingsKey('settings.whatsnew.section.entries'))}</GroupLabel>
             <S.WhatsNewEntries>
               {[...entries].reverse().map((entry) => (

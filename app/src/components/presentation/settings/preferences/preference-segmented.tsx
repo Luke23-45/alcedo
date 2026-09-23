@@ -57,7 +57,10 @@ export function PreferenceSegmented<T extends string>({
       testID={testID}
       accessibilityRole="radiogroup"
       accessibilityLabel={accessibilityLabel}
-      onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+      onLayout={(e) => {
+        const width = e.nativeEvent.layout.width;
+        setTrackWidth((prev) => (prev === width ? prev : width));
+      }}
     >
       {segmentWidth > 0 ? <AnimatedThumb $height={height} style={thumbStyle} /> : undefined}
       {options.map((option) => {
@@ -71,7 +74,7 @@ export function PreferenceSegmented<T extends string>({
             hitSlop={size === 'large' ? undefined : { top: 7, bottom: 7, left: 4, right: 4 }}
             onPress={() => onChange(option.value)}
           >
-            <S.OptionLabel $selected={selected} $large={size === 'large'}>
+            <S.OptionLabel $selected={selected} $large={size === 'large'} numberOfLines={1}>
               {option.label}
             </S.OptionLabel>
           </S.OptionPressable>

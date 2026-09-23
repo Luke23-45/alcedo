@@ -55,7 +55,12 @@ export const DateTile = styled.View<{ $pr: boolean }>`
   border-radius: 14px;
   align-items: center;
   padding-top: 10px;
-  background-color: ${({ $pr }) => ($pr ? 'rgba(255,214,10,0.12)' : 'rgba(255,255,255,0.06)')};
+  background-color: ${({ $pr, theme }) =>
+    $pr
+      ? 'rgba(255,214,10,0.12)'
+      : theme.isDark
+        ? 'rgba(255,255,255,0.06)'
+        : 'rgba(120,120,128,0.12)'};
 `;
 
 export const DateMonth = styled.Text<{ $pr: boolean }>`
@@ -64,7 +69,7 @@ export const DateMonth = styled.Text<{ $pr: boolean }>`
   line-height: 10px;
   font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 0.6px;
-  color: ${({ $pr }) => ($pr ? '#A08000' : '#8E8E93')};
+  color: ${({ $pr, theme }) => ($pr ? '#A08000' : theme.isDark ? '#8E8E93' : '#6C6C70')};
 `;
 
 export const DateDay = styled.Text<{ $pr: boolean }>`

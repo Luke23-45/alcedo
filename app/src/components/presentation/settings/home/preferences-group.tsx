@@ -27,7 +27,8 @@ export function PreferencesGroup() {
         ? t(settingsKey('settings.home.appearance.value_light'))
         : t(settingsKey('settings.home.appearance.value_system'));
   const accentName = accentSeedFor(settings.colorSchemeSeed).id;
-  const accentLabel = accentName.charAt(0).toUpperCase() + accentName.slice(1);
+  const locale = settings.preferredLanguage ?? undefined;
+  const accentLabel = accentName.charAt(0).toLocaleUpperCase(locale) + accentName.slice(1);
   const units = `${settings.unitWeight} · ${settings.unitDistance} · ${settings.unitHeight}`;
   const language =
     supportedLanguages.find((x) => x.code === settings.preferredLanguage)?.label ??

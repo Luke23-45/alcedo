@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { StyleSheet } from 'react-native';
 
 /** "MONDAY, JUNE 9" — 24pt page margin per the section-header convention. */
 export const SectionLabel = styled.View`
@@ -10,10 +11,10 @@ export const DaySection = styled.View`
   gap: 12px;
 `;
 
-/** 68pt aggregate strip: 4 cells split by 1pt hairlines. */
+/** 68pt aggregate strip budget: 4 cells split by hairlines. Grows, never clips. */
 export const AggregateRow = styled.View`
   flex-direction: row;
-  height: 68px;
+  min-height: 68px;
   align-items: stretch;
 `;
 
@@ -21,8 +22,8 @@ export const AggregateCell = styled.View<{ $first?: boolean }>`
   flex: 1;
   align-items: center;
   justify-content: center;
-  border-left-width: ${({ $first }) => ($first ? 0 : 1)}px;
-  border-left-color: rgba(255, 255, 255, 0.08);
+  border-left-width: ${({ $first }) => ($first ? 0 : StyleSheet.hairlineWidth)}px;
+  border-left-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)')};
 `;
 
 /** Selected-day session card, 104pt. */

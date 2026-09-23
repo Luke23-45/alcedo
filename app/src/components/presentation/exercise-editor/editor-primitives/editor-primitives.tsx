@@ -1,5 +1,6 @@
 import { Pressable } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import type { ReactNode } from 'react';
 import {
   CardBody,
@@ -106,19 +107,17 @@ export function LockGlyph() {
 }
 
 export function TrashGlyph() {
+  const { isDark } = useAppTheme();
   return glyph(
-    '#FF6B60',
+    isDark ? '#FF6B60' : '#FF3B30',
     1.9,
     'M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m3 0l-.8 12.2a1 1 0 0 1-1 .8H7.8a1 1 0 0 1-1-.8L6 7',
   );
 }
 
-export function CheckGlyph({ color = '#30D158' }: { color?: string }) {
-  return glyph(color, 2.4, 'M5 13l5 5L20 7');
-}
-
 export function ChevronRightGlyph() {
-  return glyph('#48484A', 2.0, 'M9 6l6 6-6 6');
+  const { isDark } = useAppTheme();
+  return glyph(isDark ? '#48484A' : '#C7C7CC', 2.0, 'M9 6l6 6-6 6');
 }
 
 export function PlusGlyph() {

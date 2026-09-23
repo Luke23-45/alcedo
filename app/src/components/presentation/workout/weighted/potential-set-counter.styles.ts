@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { sessionPalette } from '../session/session-tokens';
 
 export type SetRowState = 'done' | 'current' | 'upcoming';
@@ -14,7 +15,7 @@ function tileText(theme: { isDark: boolean }, state: SetRowState): string {
 }
 
 export const SetRow = styled.View`
-  height: 32px;
+  min-height: 32px;
   flex-direction: row;
   align-items: flex-start;
 `;
@@ -29,7 +30,7 @@ export const NumberTile = styled.View<{ $state: SetRowState }>`
 `;
 
 export const NumberText = styled.Text<{ $state: SetRowState }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10px;
   line-height: 14px;
   font-weight: 700;
@@ -45,7 +46,7 @@ export const WeightPressable = styled.Pressable`
 `;
 
 export const WeightText = styled.Text<{ $state: SetRowState; $tracking?: number }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 14px;
   line-height: 18px;
   font-weight: ${({ $state }) => ($state === 'current' ? 700 : 600)};
@@ -65,7 +66,7 @@ export const RepsPressable = styled.Pressable`
 
 export const PrevText = styled.Text<{ $state: SetRowState }>`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;

@@ -1,5 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 // iCloud backup card (settings-dark.md Screen 6): x16 w361 h232 rx28.
 
@@ -20,23 +22,21 @@ export const BackupHeaderText = styled.View`
 `;
 
 export const BackupTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 13.5px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 export const BackupSubtitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   font-size: 10.5px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   color: #86868b;
 `;
 
 // Full-bleed separators for the backup cards: x36→x357 (margin 20/20).
 export const BackupSeparator = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-left: 20px;
   margin-right: 20px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(60,60,67,0.12)')};
@@ -50,9 +50,7 @@ export const ModeSegmentWrap = styled.View`
 `;
 
 export const ModeHintText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 11px;
-  font-weight: ${({ theme }) => theme.weight.medium};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   color: #86868b;
   margin-top: 10px;
   margin-bottom: 6px;
@@ -70,19 +68,18 @@ export const DestinationRow = styled.Pressable`
 
 export const DestinationRowTitle = styled.Text`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 13.5px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 export const DestinationRowValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '500' })}
   font-size: 12.5px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   color: #98989f;
   margin-right: 6px;
+  flex-shrink: 1;
 `;
 
 // Back Up Now: x36 w321 h50 rx25. Brand gradient, gloss top half, white .22
@@ -119,9 +116,8 @@ export const BackupCtaGlossBase = styled(LinearGradient)`
 `;
 
 export const BackupCtaText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline', { weight: '600' })}
   font-size: 15px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.3px;
   color: #ffffff;
 `;
@@ -135,9 +131,7 @@ export const BackupHint = styled.Pressable`
 `;
 
 export const BackupHintText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 11px;
-  font-weight: ${({ theme }) => theme.weight.medium};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   color: #86868b;
   text-align: center;
 `;
@@ -152,9 +146,7 @@ export const RestoreLink = styled.Pressable`
 `;
 
 export const RestoreLinkText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 13px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   letter-spacing: -0.2px;
   color: ${({ theme }) => (theme.isDark ? '#FF6B60' : '#D70015')};
 `;

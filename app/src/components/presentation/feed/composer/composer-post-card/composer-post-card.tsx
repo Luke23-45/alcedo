@@ -55,7 +55,9 @@ export function ComposerPostCard({ post, data, poster, now, people, locale }: Co
         <S.HeaderRow>
           <FeedAvatar person={person} size={36} ringColor={theme.isDark ? '#17171A' : '#FFFFFF'} />
           <S.HeaderText>
-            <S.AuthorName>{person.name}</S.AuthorName>
+            <S.AuthorName numberOfLines={1} ellipsizeMode="tail">
+              {person.name}
+            </S.AuthorName>
             <S.Age>· {formatPostAge(post.postedAt, now, t, locale)}</S.Age>
           </S.HeaderText>
         </S.HeaderRow>

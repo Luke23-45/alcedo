@@ -1,6 +1,8 @@
 import { ExportPreviewCounts } from '@/store/settings';
+import { useAppSelector } from '@/store';
 import { useTranslate } from '@tolgee/react';
 import { Fragment } from 'react';
+import { toGroupLabelCase } from '../shared/grouped-settings-list';
 import { ExportCard, SectionLabel } from './export-card';
 import * as S from './will-export-card.styles';
 
@@ -14,6 +16,7 @@ import * as S from './will-export-card.styles';
  */
 export function WillExportCard({ preview }: { preview: ExportPreviewCounts | undefined }) {
   const { t } = useTranslate();
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
   const stats = [
     { key: 'backup.plaintext_export.will_export.sessions_label' as const, count: preview?.sessions },
     { key: 'backup.plaintext_export.will_export.sets_label' as const, count: preview?.completedSets },
@@ -29,9 +32,9 @@ export function WillExportCard({ preview }: { preview: ExportPreviewCounts | und
               {index > 0 ? <S.StatDivider /> : undefined}
               <S.StatCell>
                 <S.StatValue>
-                  {stat.count === undefined ? '—' : stat.count.toLocaleString()}
+                  {stat.count === undefined ? '—' : stat.count.toLocaleString(locale)}
                 </S.StatValue>
-                <S.StatLabel>{t(stat.key)}</S.StatLabel>
+                <S.StatLabel>{toGroupLabelCase(t(stat.key), locale)}</S.StatLabel>
               </S.StatCell>
             </Fragment>
           ))}

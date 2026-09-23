@@ -10,6 +10,7 @@ export const SliderLabel = styled.Text`
   font-size: 13.5px;
   font-weight: 600;
   letter-spacing: -0.2px;
+  flex: 1;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
@@ -17,6 +18,7 @@ export const SliderValue = styled.Text`
   font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.3px;
+  flex-shrink: 0;
   color: ${({ theme }) => theme.home.amber};
 `;
 

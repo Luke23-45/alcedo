@@ -2,7 +2,7 @@ import type { ReactElement } from 'react';
 import Svg, { Circle, G, Path, Rect } from 'react-native-svg';
 
 /**
- * Bottom tab bar glyphs — the custom Kinetic HIG icon system.
+ * Bottom tab bar glyphs — the custom ALCEDO HIG icon system.
  *
  * Geometry is transcribed verbatim from the production symbols in
  * docs/new_design/tab-bar-icons.svg (24×24 viewport, centered at the origin).

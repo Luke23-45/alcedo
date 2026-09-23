@@ -4,8 +4,8 @@ import { useAppSelector } from '@/store';
 import { useRouter } from 'expo-router';
 import { ReactNode, useState } from 'react';
 import { useTranslate } from '@tolgee/react';
-import { chevronColor } from '../shared/grouped-settings-list.styles';
 import { PressHighlight } from '../shared/grouped-settings-list.styles';
+import { useChevronColor } from '../shared/grouped-settings-list';
 import { settingsKey } from '../shared/settings-i18n';
 import { deriveProfileHeaderData } from './profile-header-data';
 import { ownPersonInitial } from '@/components/presentation/feed/shared/own-person';
@@ -63,6 +63,7 @@ export function ProfileHeader() {
   // No fictional fallback: before the user sets a name or username the
   // header shows whatever real identity exists (possibly nothing yet).
   const { title, handle } = deriveProfileHeaderData(identityName, username);
+  const chevron = useChevronColor();
   // A button with no announced label is invisible to VoiceOver; the empty
   // identity state still opens the profile editor, so say what it does.
   const accessibilityLabel = title || t(settingsKey('settings.home.profile_header.accessibility'));
@@ -85,7 +86,7 @@ export function ProfileHeader() {
             <S.HeaderName numberOfLines={1}>{title}</S.HeaderName>
             <S.HeaderSubtitle numberOfLines={1}>{handle}</S.HeaderSubtitle>
           </S.HeaderText>
-          <Icon source="chevronRight" size={18} color={chevronColor} />
+          <Icon source="chevronRight" size={18} color={chevron} />
         </S.HeaderPressable>
       </HeaderBody>
     </HeaderEdge>

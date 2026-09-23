@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
 
@@ -24,7 +25,7 @@ export const BarHairline = styled.View`
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) =>
     theme.isDark ? 'rgba(255,255,255,0.11)' : 'rgba(60,60,67,0.16)'};
 `;

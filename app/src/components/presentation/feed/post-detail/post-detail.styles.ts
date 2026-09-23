@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 
 export const AuthorRow = styled.View`
@@ -68,7 +69,7 @@ export const SampleRow = styled.View`
 
 /** Hairline between the meta and the kudos row, at 16pt page margins. */
 export const Divider = styled.View`
-  height: 0.67px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.08)' : theme.color.border.hairline)};
   margin-top: 10px;
   margin-left: -8px;

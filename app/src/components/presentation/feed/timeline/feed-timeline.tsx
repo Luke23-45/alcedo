@@ -255,14 +255,14 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
           const caption = post.id === 'alex' ? (draftCaption ?? null) : post.caption;
           const shareText =
             caption != null
-              ? `${post.person.name} on Kinetic: ${caption}`
+              ? `${post.person.name} on Alcedo: ${caption}`
               : post.kind === 'workout'
-                ? `${post.person.name} on Kinetic: ${post.poster.heroValue} ${post.poster.heroUnit} · ${post.poster.workoutName}`
+                ? `${post.person.name} on Alcedo: ${post.poster.heroValue} ${post.poster.heroUnit} · ${post.poster.workoutName}`
                 : post.kind === 'milestone'
-                  ? `${post.person.name} on Kinetic: ${post.milestone.value} ${post.milestone.unit.toLowerCase()} milestone`
+                  ? `${post.person.name} on Alcedo: ${post.milestone.value} ${post.milestone.unit.toLowerCase()} milestone`
                   : post.kind === 'photo'
-                    ? `${post.person.name} on Kinetic: shared a photo`
-                    : `${post.person.name} on Kinetic: shared a video`;
+                    ? `${post.person.name} on Alcedo: shared a photo`
+                    : `${post.person.name} on Alcedo: shared a video`;
           const isAlexPost = post.id === 'alex';
           return (
             <TimelinePostRow

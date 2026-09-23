@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { StyleSheet } from 'react-native';
 
 /** "{MONTH} SO FAR" — 24pt page margin. */
 export const SectionLabel = styled.View`
@@ -31,8 +32,8 @@ export const DaysBadge = styled.View`
 `;
 
 export const Divider = styled.View`
-  height: 1px;
-  background-color: rgba(255, 255, 255, 0.07);
+  height: ${StyleSheet.hairlineWidth}px;
+  background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.07)')};
   margin-vertical: 14px;
 `;
 
@@ -45,8 +46,8 @@ export const StatCell = styled.View<{ $first?: boolean }>`
   flex: 1;
   align-items: center;
   justify-content: center;
-  border-left-width: ${({ $first }) => ($first ? 0 : 1)}px;
-  border-left-color: rgba(255, 255, 255, 0.07);
+  border-left-width: ${({ $first }) => ($first ? 0 : StyleSheet.hairlineWidth)}px;
+  border-left-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.07)')};
 `;
 
 export const Footer = styled.View`

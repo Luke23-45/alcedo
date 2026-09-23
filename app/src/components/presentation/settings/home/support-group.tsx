@@ -11,6 +11,7 @@ import { Platform } from 'react-native';
 import { Dialog, Portal } from 'react-native-paper';
 import { useState } from 'react';
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 import { SettingsGroup, SettingsRow } from '../shared/grouped-settings-list';
 import { settingsKey } from '../shared/settings-i18n';
 
@@ -26,15 +27,13 @@ function bugReportUrl(): string {
 // App-info dialog: styled on plain RN primitives (Paper's Dialog carries its
 // own theme type that clashes with the app theme under styled()).
 const DialogTitleText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 17px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
+  ${({ theme }) => typeStyle(theme, 'headline')}
   color: ${({ theme }) => theme.color.content.primary};
   padding: 24px 24px 12px;
 `;
 
 const DialogBodyText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote')}
   font-size: 14px;
   line-height: 20px;
   color: ${({ theme }) => theme.color.content.secondary};
@@ -49,9 +48,7 @@ const DialogCloseButton = styled.Pressable`
 `;
 
 const DialogCloseText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 16px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
+  ${({ theme }) => typeStyle(theme, 'callout', { weight: '600' })}
   color: ${({ theme }) => theme.color.interactive.tint};
 `;
 
@@ -62,7 +59,7 @@ const DialogCloseText = styled.Text`
  * redesigned dialog; Open-Source Licenses opens the project's AGPL-3.0
  * license text.
  *
- * Rate Kinetic is required by the spec but the app has no App Store listing,
+ * Rate ALCEDO is required by the spec but the app has no App Store listing,
  * so no review can be left anywhere real. The row is present with an honest
  * "Not available" value and no navigation affordance — never a dead link.
  */

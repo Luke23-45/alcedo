@@ -95,6 +95,8 @@ export function SegmentedControl<T extends string>({
             $selected={index === selectedIndex}
             $size={labelSize}
             $selectedColor={palette.value}
+            numberOfLines={1}
+            ellipsizeMode="tail"
           >
             {option.label}
           </S.OptionLabel>

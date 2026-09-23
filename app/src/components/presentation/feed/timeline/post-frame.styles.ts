@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import { HAIRLINE, INK_BODY, INK_META, INK_TITLE } from './timeline-tokens';
 
@@ -54,8 +55,8 @@ export const MenuWrap = styled.View`
 
 export const PosterWrap = styled.View`
   margin-top: 8px;
-  margin-left: 15px;
-  margin-right: 15px;
+  margin-left: 16px;
+  margin-right: 16px;
 `;
 
 export const Caption = styled.Text<{ $dark: boolean }>`
@@ -75,7 +76,7 @@ export const KudosWrap = styled.View`
 `;
 
 export const Hairline = styled.View<{ $dark: boolean }>`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-top: 10px;
   margin-left: 20px;
   margin-right: 20px;

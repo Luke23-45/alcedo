@@ -11,7 +11,9 @@ import {
 export const BannerRow = styled.View`
   flex-direction: row;
   align-items: center;
-  height: 76px;
+  min-height: 76px;
+  padding-top: 12px;
+  padding-bottom: 12px;
   padding-left: 12px;
   padding-right: 20px;
 `;
@@ -53,7 +55,7 @@ export const Sub = styled.Text<{ $dark: boolean }>`
 `;
 
 export const Track = styled.View<{ $dark: boolean }>`
-  width: 200px;
+  flex: 1;
   height: 3.5px;
   border-radius: 1.75px;
   margin-top: 8px;

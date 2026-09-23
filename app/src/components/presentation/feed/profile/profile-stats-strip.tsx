@@ -37,8 +37,12 @@ export function ProfileStatsStrip({
         {cells.map((cell, index) => (
           <S.Cell key={cell.label}>
             {index > 0 && <S.Divider $color={hairline} />}
-            <S.Value $color={palette.value}>{cell.value}</S.Value>
-            <S.Label $color={palette.tertiary}>{cell.label}</S.Label>
+            <S.Value $color={palette.value} numberOfLines={1} ellipsizeMode="tail">
+              {cell.value}
+            </S.Value>
+            <S.Label $color={palette.tertiary} numberOfLines={1} ellipsizeMode="tail">
+              {cell.label}
+            </S.Label>
           </S.Cell>
         ))}
       </S.Strip>

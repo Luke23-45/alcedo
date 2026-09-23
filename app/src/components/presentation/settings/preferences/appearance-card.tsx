@@ -63,7 +63,7 @@ export function AppearanceCard() {
             const selected = seed.id === selectedSeed.id;
             const name = t(
               settingsKey(`settings.preferences.accent.${seed.id}`),
-              seed.id.charAt(0).toUpperCase() + seed.id.slice(1),
+              seed.id.charAt(0).toLocaleUpperCase(settings.preferredLanguage ?? undefined) + seed.id.slice(1),
             );
             return (
               <S.SwatchButton

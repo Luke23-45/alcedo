@@ -9,7 +9,7 @@ import { useTranslate } from '@tolgee/react';
 import { useRouter } from 'expo-router';
 import { Platform } from 'react-native';
 import { useState } from 'react';
-import { chevronColor } from '../shared/grouped-settings-list.styles';
+import { useChevronColor } from '../shared/grouped-settings-list';
 import { SettingsToggle } from '../shared/grouped-settings-list';
 import { didLastBackupSucceed } from '../shared/backup-status';
 import { settingsKey } from '../shared/settings-i18n';
@@ -36,10 +36,10 @@ function LegendEntry({
     <S.LegendRow>
       <S.LegendDot $color={color} />
       <S.LegendText>
-        <S.LegendTitle>{title}</S.LegendTitle>
-        <S.LegendSub>{sub}</S.LegendSub>
+        <S.LegendTitle numberOfLines={1}>{title}</S.LegendTitle>
+        <S.LegendSub numberOfLines={2}>{sub}</S.LegendSub>
       </S.LegendText>
-      {value ? <S.LegendValue>{value}</S.LegendValue> : undefined}
+      {value ? <S.LegendValue numberOfLines={1}>{value}</S.LegendValue> : undefined}
       {trailing}
     </S.LegendRow>
   );
@@ -70,11 +70,19 @@ export function StorageCard() {
   const canExportHealth = useCanExportHealth();
   const exportToHealth = useAppSelector((s) => s.settings.exportToHealthAggregator);
 
+  const chevron = useChevronColor();
   const remoteTitle = backupBackend?.backend.name ?? t(settingsKey('settings.backup.legend.remote'));
   const remoteSub = backupBackend
     ? t(settingsKey(synced ? 'settings.backup.legend.primary_synced' : 'settings.backup.legend.primary_not_synced'))
     : t(settingsKey('settings.backup.legend.not_configured'));
   const dot = (i: 0 | 1 | 2) => (theme.isDark ? STORAGE_SEGMENTS[i].dark : STORAGE_SEGMENTS[i].light);
+  // BK06 — voice the composition with the same ≈ estimates the legend shows.
+  // Text-only (no fabricated now/max): the sizes are estimates by design.
+  const barVoice = t(settingsKey('settings.backup.storage.voice'), {
+    remote: `${remoteTitle} ${t(settingsKey('settings.backup.legend.icloud_value'))}`,
+    local: `${t(settingsKey('settings.backup.legend.local'))} ${t(settingsKey('settings.backup.legend.local_value'))}`,
+    health: `${t(settingsKey('settings.backup.legend.health'))} ${t(settingsKey('settings.backup.legend.health_value'))}`,
+  });
 
   return (
     <>
@@ -86,6 +94,7 @@ export function StorageCard() {
         <S.StorageBarTrack
           accessibilityRole="progressbar"
           accessibilityLabel={t(settingsKey('settings.backup.storage_used'))}
+          accessibilityValue={{ text: barVoice }}
         >
           <StorageSegments />
         </S.StorageBarTrack>
@@ -113,18 +122,20 @@ export function StorageCard() {
         <BackupSeparator />
         <S.ExportRow accessibilityRole="button" onPress={() => push('/settings/backup-and-restore/plain-text-export')}>
           <S.ExportRowText>
-            <S.ExportRowTitle>{t(settingsKey('settings.backup.export.title'))}</S.ExportRowTitle>
+            <S.ExportRowTitle numberOfLines={1}>{t(settingsKey('settings.backup.export.title'))}</S.ExportRowTitle>
           </S.ExportRowText>
-          <S.ExportRowValue>{t(settingsKey('settings.backup.export.subtitle'))}</S.ExportRowValue>
-          <Icon source="chevronRight" size={18} color={chevronColor} />
+          <S.ExportRowValue numberOfLines={1}>{t(settingsKey('settings.backup.export.subtitle'))}</S.ExportRowValue>
+          <Icon source="chevronRight" size={18} color={chevron} />
         </S.ExportRow>
         <BackupSeparator />
         <S.ExportRow accessibilityRole="button" onPress={() => setFeedExportOpen(true)}>
           <S.ExportRowText>
-            <S.ExportRowTitle>{t(settingsKey('settings.backup.backup_file.title'))}</S.ExportRowTitle>
-            <S.ExportRowSubtitle>{t(settingsKey('settings.backup.backup_file.subtitle'))}</S.ExportRowSubtitle>
+            <S.ExportRowTitle numberOfLines={1}>{t(settingsKey('settings.backup.backup_file.title'))}</S.ExportRowTitle>
+            <S.ExportRowSubtitle numberOfLines={2}>
+              {t(settingsKey('settings.backup.backup_file.subtitle'))}
+            </S.ExportRowSubtitle>
           </S.ExportRowText>
-          <Icon source="chevronRight" size={18} color={chevronColor} />
+          <Icon source="chevronRight" size={18} color={chevron} />
         </S.ExportRow>
         <BackupSeparator />
         <S.ExportRow
@@ -132,22 +143,24 @@ export function StorageCard() {
           onPress={() => push('/settings/backup-and-restore/import-from-other-apps')}
         >
           <S.ExportRowText>
-            <S.ExportRowTitle>{t(settingsKey('settings.backup.import_apps.title'))}</S.ExportRowTitle>
-            <S.ExportRowSubtitle>{t(settingsKey('settings.backup.import_apps.subtitle'))}</S.ExportRowSubtitle>
+            <S.ExportRowTitle numberOfLines={1}>{t(settingsKey('settings.backup.import_apps.title'))}</S.ExportRowTitle>
+            <S.ExportRowSubtitle numberOfLines={2}>
+              {t(settingsKey('settings.backup.import_apps.subtitle'))}
+            </S.ExportRowSubtitle>
           </S.ExportRowText>
-          <Icon source="chevronRight" size={18} color={chevronColor} />
+          <Icon source="chevronRight" size={18} color={chevron} />
         </S.ExportRow>
         {canExportHealth ? (
           <>
             <BackupSeparator />
             <S.ExportRowStatic>
               <S.ExportRowText>
-                <S.ExportRowTitle>
+                <S.ExportRowTitle numberOfLines={1}>
                   {Platform.OS === 'ios'
                     ? t(settingsKey('settings.backup.health_export.ios_title'))
                     : t(settingsKey('settings.backup.health_export.android_title'))}
                 </S.ExportRowTitle>
-                <S.ExportRowSubtitle>
+                <S.ExportRowSubtitle numberOfLines={2}>
                   {Platform.OS === 'ios'
                     ? t(settingsKey('settings.backup.health_export.ios_subtitle'))
                     : t(settingsKey('settings.backup.health_export.android_subtitle'))}

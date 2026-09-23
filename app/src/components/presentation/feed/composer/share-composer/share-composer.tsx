@@ -70,7 +70,7 @@ function ScreenBackground() {
         style={S.fill}
       />
       <S.Aura>
-        <Svg width="100%" height={700} viewBox="0 0 393 700">
+        <Svg width="100%" height={700} viewBox="0 0 393 700" preserveAspectRatio="xMidYMid slice">
           <Defs>
             <RadialGradient id="composer-aura" gradientUnits="userSpaceOnUse" cx="196" cy="350" r="300">
               <Stop offset="0" stopColor="#FF6A3D" stopOpacity="0.14" />

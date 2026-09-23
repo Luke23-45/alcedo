@@ -126,7 +126,8 @@ function weightedSummary(t: T, blueprint: ExerciseBlueprint): string | undefined
   const sets = blueprint.plannedSets.length;
   const reps = formatPlannedSets(blueprint.plannedSets);
   const rest = t('plan.diff.rest.seconds', { seconds: restSeconds(blueprint.restBetweenSets) });
-  return t('plan.diff.exercise_summary', { sets, reps, rest });
+  const restWord = t('plan.diff.rest.word', 'rest');
+  return t('plan.diff.exercise_summary', { sets, reps, rest, restWord });
 }
 
 function labelOf(change: DiffChange): { titleKey: TranslationKey; titleParams?: Record<string, string | number> } {

@@ -1,5 +1,6 @@
 import styled from 'styled-components/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 export const SheetContainer = styled.View`
@@ -23,7 +24,7 @@ export const Sheet = styled.View<{ $bottomPad: number }>`
 `;
 
 export const SheetTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;
@@ -53,7 +54,7 @@ export const BigStepButton = styled.Pressable`
 `;
 
 export const SheetValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 40px;
   line-height: 48px;
   font-weight: 700;
@@ -68,8 +69,10 @@ export const SheetValue = styled.Text`
 
 export const ChipRow = styled.View`
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
+  row-gap: 8px;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 16px;
@@ -101,7 +104,7 @@ export const Chip = styled.Pressable<{ $selected: boolean }>`
 `;
 
 export const ChipText = styled.Text<{ $selected: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 11.5px;
   line-height: 14px;
   font-weight: 600;
@@ -139,7 +142,7 @@ export const ApplyAllGradient = styled(LinearGradient)`
 `;
 
 export const ApplyAllText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;

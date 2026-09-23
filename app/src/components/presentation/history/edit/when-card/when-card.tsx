@@ -168,10 +168,12 @@ export function WhenCard({
             >
               <S.WhenLabel>{row.label}</S.WhenLabel>
               <S.WhenValueWrap>
-                <S.WhenValue style={{ fontVariant: ['tabular-nums'] }}>{row.value}</S.WhenValue>
+                <S.WhenValue numberOfLines={1} style={{ fontVariant: ['tabular-nums'] }}>
+                  {row.value}
+                </S.WhenValue>
                 {row.key === 'duration' && (
                   <S.AutoChip>
-                    <S.AutoChipText>{t('history.edit.when.auto.label', 'Auto')}</S.AutoChipText>
+                    <S.AutoChipText>{t('history.edit.when.auto.label', 'Auto').toLocaleUpperCase()}</S.AutoChipText>
                   </S.AutoChip>
                 )}
                 {row.editable && (

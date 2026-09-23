@@ -8,14 +8,14 @@ export const CardWrap = styled.View`
   padding-right: 16px;
 `;
 
-/** Owns the drop shadow; the inner card clips to the radius. */
+/** Owns the drop shadow (tile scale); softened in light per the HomeCard language. */
 export const CardShadow = styled.View`
   border-radius: 22px;
-  shadow-color: #000000;
-  shadow-offset: 0px 6px;
-  shadow-opacity: 0.42;
-  shadow-radius: 8px;
-  elevation: 6;
+  shadow-color: ${({ theme }) => (theme.isDark ? '#000000' : '#14142b')};
+  shadow-offset: ${({ theme }) => (theme.isDark ? '0px 6px' : '0px 5px')};
+  shadow-opacity: ${({ theme }) => (theme.isDark ? 0.42 : 0.06)};
+  shadow-radius: ${({ theme }) => (theme.isDark ? 8 : 10)}px;
+  elevation: ${({ theme }) => (theme.isDark ? 6 : 2)};
 `;
 
 export const Card = styled.View`

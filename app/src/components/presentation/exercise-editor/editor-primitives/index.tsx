@@ -1,7 +1,6 @@
 export {
   BackChevronGlyph,
   Card,
-  CheckGlyph,
   ChevronRightGlyph,
   LinkGlyph,
   LockGlyph,
@@ -24,6 +23,8 @@ export {
   Hairline,
   MicroLabel,
   OverlayBackdrop,
+  RadioDot,
+  RadioRing,
   ResultTile,
   ResultTileLetter,
   RowCaption,

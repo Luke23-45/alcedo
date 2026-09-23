@@ -44,7 +44,9 @@ export function StatChips({ visible, onToggle }: StatChipsProps) {
               hitSlop={{ top: 8, bottom: 8 }}
             >
               {on ? <CheckGlyph size={12} color={onTint} strokeWidth={2} /> : <HollowRingGlyph />}
-              <S.ChipLabel $on={on}>{label}</S.ChipLabel>
+              <S.ChipLabel $on={on} numberOfLines={1}>
+                {label}
+              </S.ChipLabel>
             </S.Chip>
           );
         })}

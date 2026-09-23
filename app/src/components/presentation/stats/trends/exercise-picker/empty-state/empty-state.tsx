@@ -1,4 +1,5 @@
 import { HomeText } from '@/components/presentation/home/shared/home-text';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { fontWeight } from '@/styles/theme';
 import { useTranslate } from '@tolgee/react';
 import { MagnifierGlyph } from '../picker-icons';
@@ -9,6 +10,7 @@ import { EmptyGlyphWrap, EmptyWrap } from './empty-state.styles';
  */
 export function PickerEmptyState() {
   const { t } = useTranslate();
+  const theme = useAppTheme();
   return (
     <EmptyWrap>
       <EmptyGlyphWrap>
@@ -23,7 +25,7 @@ export function PickerEmptyState() {
       </HomeText>
       <HomeText
         weight={fontWeight.medium}
-        style={{ fontSize: 12.5, lineHeight: 17, marginTop: 6, textAlign: 'center', color: '#8E8E93' }}
+        style={{ fontSize: 12.5, lineHeight: 17, marginTop: 6, textAlign: 'center', color: theme.isDark ? '#8E8E93' : '#6C6C70' }}
       >
         {t('stats.exercise_picker.empty.body')}
       </HomeText>

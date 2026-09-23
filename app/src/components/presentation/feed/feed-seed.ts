@@ -11,7 +11,7 @@
  *
  * Ages are seeded truthfully relative to `now` at build time, so the
  * relative-time labels are always honest. Metrics are internally consistent
- * per post. All captions follow the Kinetic voice: no emojis, no shouting.
+ * per post. All captions follow the Alcedo voice: no emojis, no shouting.
  */
 import anaTrailPhoto from '../../../../assets/feed/posts/ana-trail.jpg';
 import devRunPhoto from '../../../../assets/feed/posts/dev-run.jpg';
@@ -45,12 +45,15 @@ export function buildDefaultPosts(now: number): TimelinePost[] {
   // The poster kicker names the workout's own day, so it is derived from the
   // seeded timestamp — never a frozen calendar date that would disagree with
   // the relative "2h" age beside it.
-  const kickerDate = new Intl.DateTimeFormat('en-US', {
+  // System locale (not pinned English): sample kickers name the workout's own
+  // day in the user's language, like every other date in the app.
+  const kickerDate = new Intl.DateTimeFormat(undefined, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
   });
-  const kickerFor = (postedAt: number): string => `KINETIC · ${kickerDate.format(new Date(postedAt)).toUpperCase()}`;
+  const kickerFor = (postedAt: number): string =>
+    `ALCEDO · ${kickerDate.format(new Date(postedAt)).toLocaleUpperCase()}`;
   return [
     {
       kind: 'workout',

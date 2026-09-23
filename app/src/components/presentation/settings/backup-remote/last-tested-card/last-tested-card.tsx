@@ -35,8 +35,8 @@ function LastTestedContent({ test }: { test: LastRemoteBackupTest | undefined })
       <S.LastTestedRow accessibilityRole="text">
         <S.StatusDot $color="#48484A" />
         <S.LastTestedText>
-          <S.NeverTitle>{t('backup.remote.last_tested.never')}</S.NeverTitle>
-          <S.LastTestedDetail>
+          <S.NeverTitle numberOfLines={1}>{t('backup.remote.last_tested.never')}</S.NeverTitle>
+          <S.LastTestedDetail numberOfLines={2}>
             {t('backup.remote.last_tested.never_hint')}
           </S.LastTestedDetail>
         </S.LastTestedText>
@@ -50,10 +50,10 @@ function LastTestedContent({ test }: { test: LastRemoteBackupTest | undefined })
       <S.LastTestedRow accessibilityRole="text">
         <S.StatusDot $color="#30D158" />
         <S.LastTestedText>
-          <S.LastTestedTitle>
+          <S.LastTestedTitle numberOfLines={1}>
             {t('backup.remote.last_tested.success')} · {date}
           </S.LastTestedTitle>
-          <S.LastTestedDetail>
+          <S.LastTestedDetail numberOfLines={2}>
             {t('backup.remote.last_tested.success_detail', {
               bytes: formatBackupBytes(test.uploadedBytes ?? 0),
               duration: formatBackupDuration(test.durationMs ?? 0),
@@ -65,15 +65,17 @@ function LastTestedContent({ test }: { test: LastRemoteBackupTest | undefined })
   }
 
   return (
-    <S.LastTestedRow accessibilityRole="text">
-      <S.StatusDot $color="#FF6B60" />
-      <S.LastTestedText>
-        <S.LastTestedTitle $color="#FF6B60">
-          {t('backup.remote.last_tested.failed')} · {date}
-        </S.LastTestedTitle>
-        <S.LastTestedDetail>{t('backup.remote.last_tested.error_detail', { error: errorDetail })}</S.LastTestedDetail>
-      </S.LastTestedText>
-    </S.LastTestedRow>
+      <S.LastTestedRow accessibilityRole="text">
+        <S.StatusDot $color="#FF6B60" />
+        <S.LastTestedText>
+          <S.LastTestedTitle $color="#FF6B60" numberOfLines={1}>
+            {t('backup.remote.last_tested.failed')} · {date}
+          </S.LastTestedTitle>
+          <S.LastTestedDetail numberOfLines={2}>
+            {t('backup.remote.last_tested.error_detail', { error: errorDetail })}
+          </S.LastTestedDetail>
+        </S.LastTestedText>
+      </S.LastTestedRow>
   );
 }
 

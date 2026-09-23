@@ -51,7 +51,7 @@ export function RingGoalSheet({
         : t(feedKey("feed.profile.ring_editor.stand_title"));
 
   return (
-    <Modal transparent animationType="fade" onRequestClose={onClose}>
+    <Modal transparent animationType="slide" onRequestClose={onClose}>
       <S.Backdrop
         accessibilityRole="button"
         accessibilityLabel={t(feedKey("feed.profile.ring_editor.cancel"))}
@@ -79,7 +79,11 @@ export function RingGoalSheet({
           >
             <S.StepGlyph $color={palette.value}>−</S.StepGlyph>
           </S.StepButton>
-          <S.StepValue $color={palette.value} accessibilityLiveRegion="polite">
+          <S.StepValue
+            $color={palette.value}
+            accessibilityLiveRegion="polite"
+            style={{ fontVariant: ["tabular-nums"] }}
+          >
             {`${value} ${t(feedKey(limits.unitKey))}`}
           </S.StepValue>
           <S.StepButton

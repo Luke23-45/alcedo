@@ -37,12 +37,12 @@ describe('no js-joda text patterns', () => {
 });
 
 describe('deriveComposerSessionData kicker', () => {
-  it('uppercases the Intl weekday/month/day date after KINETIC', () => {
+  it('uppercases the Intl weekday/month/day date after ALCEDO', () => {
     // A session with no recorded exercises is enough: the reference-time
     // fallback is session.date itself, so the date is deterministic in any TZ.
     const session = makeSession([], LocalDate.of(2026, 9, 9));
     const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate, enUsFormatNumber);
-    expect(data.kicker).toBe('KINETIC · WEDNESDAY, SEPTEMBER 9');
+    expect(data.kicker).toBe('ALCEDO · WEDNESDAY, SEPTEMBER 9');
   });
 });
 

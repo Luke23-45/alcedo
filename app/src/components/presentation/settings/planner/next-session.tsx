@@ -153,7 +153,7 @@ export function NextSession() {
               accessibilityLabel={copy.cta}
             >
               <EmptyCta>
-                <EmptyCtaText>{copy.cta}</EmptyCtaText>
+                <EmptyCtaText numberOfLines={1}>{copy.cta}</EmptyCtaText>
               </EmptyCta>
             </Pressable>
           ) : undefined}
@@ -191,8 +191,8 @@ export function NextSession() {
             <DumbbellIcon />
           </NextIcon>
           <NextTitleBlock>
-            <NextName>{sessionName}</NextName>
-            <NextMeta>{meta}</NextMeta>
+            <NextName numberOfLines={1}>{sessionName}</NextName>
+            <NextMeta numberOfLines={2}>{meta}</NextMeta>
           </NextTitleBlock>
         </NextHeader>
         {muscleLoad.length > 0 && (
@@ -200,7 +200,7 @@ export function NextSession() {
             {muscleLoad.map(({ muscle, sets }) => (
               <MuscleChip key={muscle}>
                 <MuscleChipText>
-                  {translateExerciseMeta(t, 'muscle', muscle).toUpperCase()} · {sets}
+                  {translateExerciseMeta(t, 'muscle', muscle).toLocaleUpperCase(locale ?? undefined)} · {sets}
                 </MuscleChipText>
               </MuscleChip>
             ))}
@@ -217,7 +217,7 @@ export function NextSession() {
               style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 22, opacity: 0.35 }}
             />
             <RegenIcon />
-            <RegenLabel>{t(settingsKey('settings.planner.regenerate.button'))}</RegenLabel>
+            <RegenLabel numberOfLines={1}>{t(settingsKey('settings.planner.regenerate.button'))}</RegenLabel>
           </RegenButton>
         </Pressable>
       </NextCard>
@@ -226,7 +226,9 @@ export function NextSession() {
           <SparkIcon />
           <InsightText>
             {t(settingsKey('settings.planner.volume_insight.message'), {
-              change: Math.abs(change),
+              change: new Intl.NumberFormat(locale ?? undefined, { maximumFractionDigits: 0 }).format(
+                Math.abs(change),
+              ),
               direction: t(
                 settingsKey(
                   change >= 0 ? 'settings.planner.volume_insight.up' : 'settings.planner.volume_insight.down',

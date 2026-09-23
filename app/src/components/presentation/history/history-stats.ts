@@ -8,6 +8,7 @@
 import type { Session } from '@/models/session-models';
 import { RecordedCardioExercise, RecordedWeightedExercise } from '@/models/session-models';
 import { sessionVolumeKg as trendsSessionVolumeKg } from '@/components/presentation/stats/trends/overview/trends-overview-data';
+import { formatGrouped } from '@/components/presentation/home/shared/home-format';
 import { Duration } from '@js-joda/core';
 
 /** Total lifted volume of a session in kg, mirroring the home screen's math. */
@@ -111,9 +112,9 @@ export function formatClockDuration(duration: Duration | undefined): string {
   return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
-/** Locale-aware thousands separator ("8,420"), matching home/stats displays. */
+/** Device-locale thousands separator ("8,420" / "8.420"), matching home/stats displays. */
 export function formatCount(value: number): string {
-  return Math.round(value).toLocaleString('en-US');
+  return formatGrouped(value);
 }
 
 export function hasCompletedSets(session: Session): boolean {

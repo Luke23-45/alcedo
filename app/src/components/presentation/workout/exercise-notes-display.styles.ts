@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 
 export const NotesWrap = styled.View`
   margin-top: 8px;
@@ -6,7 +7,7 @@ export const NotesWrap = styled.View`
 `;
 
 export const NotesText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   line-height: 17px;
   font-weight: 500;

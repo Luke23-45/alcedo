@@ -51,6 +51,6 @@ export const SegmentLabel = styled.Text<{ $selected: boolean; $dark: boolean }>`
   font-size: 12.5px;
   line-height: 16px;
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.15px;
   color: ${({ $selected, $dark }) => ($selected ? ($dark ? '#FFFFFF' : '#111111') : '#8E8E93')};
 `;

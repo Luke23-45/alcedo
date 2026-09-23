@@ -84,7 +84,7 @@ export function PlannerSlider({
   const onTrackLayout = (event: LayoutChangeEvent) => {
     const width = event.nativeEvent.layout.width;
     trackWidthRef.current = width;
-    setTrackWidth(width);
+    setTrackWidth((prev) => (prev === width ? prev : width));
   };
 
   const fraction = (value - min) / (max - min);
@@ -94,8 +94,8 @@ export function PlannerSlider({
   return (
     <View testID={testID}>
       <SliderRow>
-        <SliderLabel>{label}</SliderLabel>
-        <SliderValue>{formatValue(value)}</SliderValue>
+        <SliderLabel numberOfLines={1}>{label}</SliderLabel>
+        <SliderValue numberOfLines={1}>{formatValue(value)}</SliderValue>
       </SliderRow>
       <SliderTouchZone
         {...panResponder.panHandlers}

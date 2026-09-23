@@ -1,7 +1,7 @@
 import { type as typeStyle } from '@/styles/theme';
 import styled from 'styled-components/native';
 
-// Caption (backup-redesign.md S1): the verbatim audit line, Kinetic brand,
+// Caption (backup-redesign.md S1): the verbatim audit line, ALCEDO brand,
 // 14pt medium on the secondary tone.
 export const CaptionText = styled.Text`
   ${({ theme }) => typeStyle(theme, 'subheadline', { weight: '500' })}

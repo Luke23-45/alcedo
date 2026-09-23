@@ -1,7 +1,7 @@
 import Icon from '@/components/presentation/foundation/icon';
 import { useTranslate } from '@tolgee/react';
 import * as Application from 'expo-application';
-import { chevronColor } from '../shared/grouped-settings-list.styles';
+import { useChevronColor } from '../shared/grouped-settings-list';
 import { settingsKey } from '../shared/settings-i18n';
 import * as S from './release-card.styles';
 import { CardShell } from './card-shell';
@@ -33,6 +33,7 @@ export function ReleaseCard({
 }) {
   const { t } = useTranslate();
 
+  const chevron = useChevronColor();
   // Real values from the native shell; the fallbacks match app.json.
   const version = Application.nativeApplicationVersion ?? '1.0.0';
   const build = Application.nativeBuildVersion ?? '1';
@@ -72,7 +73,7 @@ export function ReleaseCard({
           <BackupSeparator />
           <S.ReleaseMoreRow accessibilityRole="button" onPress={onViewAll}>
             <S.ReleaseMoreText>{t(settingsKey('settings.backup.release.view_all'))}</S.ReleaseMoreText>
-            <Icon source="chevronRight" size={18} color={chevronColor} />
+            <Icon source="chevronRight" size={18} color={chevron} />
           </S.ReleaseMoreRow>
         </>
       ) : undefined}

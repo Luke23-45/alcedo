@@ -68,7 +68,9 @@ export function ComposerCta({ canShare, audience, friendCount, visible, onShare 
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
           />
-          <S.CtaLabel>{t('feed.composer.cta.share', 'Share to Feed')}</S.CtaLabel>
+          <S.CtaLabel numberOfLines={2} ellipsizeMode="tail">
+            {t('feed.composer.cta.share', 'Share to Feed')}
+          </S.CtaLabel>
           <S.CtaEdge />
         </S.CtaButton>
       </S.CtaShadow>

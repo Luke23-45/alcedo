@@ -31,7 +31,7 @@ export const DetailRow = styled.View`
 `;
 
 export const Pill = styled.Pressable`
-  width: 115px;
+  flex: 1;
   height: 48px;
   border-radius: 24px;
   flex-direction: row;

@@ -79,14 +79,16 @@ export function PostFrame({
         <FeedAvatar person={post.person} size={36} ringColor={dark ? AVATAR_RING.dark : AVATAR_RING.light} />
         <S.NameCol>
           <S.NameRow>
-            <S.Name $dark={dark}>{post.person.name}</S.Name>
+            <S.Name $dark={dark} numberOfLines={1} ellipsizeMode="tail">
+              {post.person.name}
+            </S.Name>
             {post.badge && (
               <S.BadgeWrap>
                 <IdentityBadge variant={post.badge} />
               </S.BadgeWrap>
             )}
           </S.NameRow>
-          <S.Meta $dark={dark}>
+          <S.Meta $dark={dark} numberOfLines={1} ellipsizeMode="tail">
             {post.person.handle} · {age} · {audience}
           </S.Meta>
         </S.NameCol>

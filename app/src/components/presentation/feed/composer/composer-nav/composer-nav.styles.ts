@@ -28,6 +28,8 @@ export const NavButtonText = styled.Text<{ $color: string; $tone: 'regular' | 's
 `;
 
 export const NavTitle = styled.Text`
+  flex: 1;
+  text-align: center;
   font-family: ${({ theme }) => theme.font.text};
   font-size: 15px;
   font-weight: ${({ theme }) => theme.weight.semibold};

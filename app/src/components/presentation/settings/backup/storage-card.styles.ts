@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 // Storage card (settings-dark.md Screen 6): x16 w361 rx28. Header, exact-
 // proportion bar, legend, export rows.
@@ -15,17 +16,15 @@ export const StorageHeader = styled.View`
 
 export const StorageTitle = styled.Text`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 13.5px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 export const StorageTotal = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline', { weight: '700' })}
   font-size: 15px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: -0.35px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
@@ -71,24 +70,20 @@ export const LegendText = styled.View`
 `;
 
 export const LegendTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 13px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 export const LegendSub = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   font-size: 10.5px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   color: #86868b;
 `;
 
 export const LegendValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 12.5px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
@@ -115,24 +110,20 @@ export const ExportRowText = styled.View`
 `;
 
 export const ExportRowTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 13.5px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 export const ExportRowSubtitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   font-size: 10.5px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   color: #86868b;
 `;
 
 export const ExportRowValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 12px;
-  font-weight: ${({ theme }) => theme.weight.medium};
+  ${({ theme }) => typeStyle(theme, 'caption1', { weight: '500' })}
   color: #98989f;
   margin-right: 6px;
 `;

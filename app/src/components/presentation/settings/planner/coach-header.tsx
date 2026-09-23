@@ -20,7 +20,7 @@ import {
 } from './coach-header.styles';
 
 /**
- * The planner's hero card: violet mark, "Kinetic Planner", the live session
+ * The planner's hero card: violet mark, "ALCEDO Planner", the live session
  * count it learns from, a BETA badge, and the master enable switch.
  */
 export function CoachHeader() {
@@ -58,8 +58,8 @@ export function CoachHeader() {
           </Svg>
         </CoachIcon>
         <CoachText>
-          <CoachTitle>{t(settingsKey('settings.planner.title'))}</CoachTitle>
-          <CoachCaption>
+          <CoachTitle numberOfLines={1}>{t(settingsKey('settings.planner.title'))}</CoachTitle>
+          <CoachCaption numberOfLines={2}>
             {t(settingsKey('settings.planner.sessions_learned.caption'), { count: sessionCount })}
           </CoachCaption>
         </CoachText>

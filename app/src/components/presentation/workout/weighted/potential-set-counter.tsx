@@ -169,18 +169,24 @@ export default function PotentialSetCounter(props: PotentialSetCounterProps) {
           disabled={props.isReadonly}
           hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
         >
-          <WeightText $state={state}>{weightText}</WeightText>
+          <WeightText $state={state} numberOfLines={1}>
+            {weightText}
+          </WeightText>
         </WeightPressable>
         <RepsPressable
           onPress={props.isReadonly ? undefined : props.onTap}
           disabled={props.isReadonly}
           hitSlop={{ top: 6, bottom: 6, left: 4, right: 4 }}
         >
-          <WeightText $state={state} $tracking={0}>
+          <WeightText $state={state} $tracking={0} numberOfLines={1}>
             × {loggedReps ?? maxReps}
           </WeightText>
         </RepsPressable>
-        {prevText !== undefined && <PrevText $state={state}>{prevText}</PrevText>}
+        {prevText !== undefined && (
+          <PrevText $state={state} numberOfLines={1}>
+            {prevText}
+          </PrevText>
+        )}
         {prevText === undefined && <View style={{ flex: 1 }} />}
         <CheckPressable
           onPress={props.isReadonly ? undefined : props.onTap}

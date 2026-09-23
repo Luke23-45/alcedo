@@ -47,7 +47,7 @@ export function ProfileFooter({ onDeleteAccount }: { onDeleteAccount: () => void
         accessibilityRole="button"
         onPress={confirmDelete}
       >
-        <S.DangerLabel $color={palette.destructiveLabel}>
+        <S.DangerLabel $color={palette.destructiveLabel} numberOfLines={2} ellipsizeMode="tail">
           {t(feedKey("feed.profile.footer.delete_account"))}
         </S.DangerLabel>
       </S.DangerButton>

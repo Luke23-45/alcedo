@@ -19,7 +19,7 @@ export function ElapsedCard({ seconds }: { seconds: number }) {
     <CardWrap>
       <HomeCard radius={28} pad={0} style={{ flex: 1 }}>
         <CardInner>
-          <Label>{t('workout.session.elapsed.label')}</Label>
+          <Label>{t('workout.session.elapsed.label').toLocaleUpperCase()}</Label>
           <TimerText>{formatElapsed(seconds)}</TimerText>
           <LivePill>
             <Animated.View style={{ opacity: pulse }}>

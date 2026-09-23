@@ -13,7 +13,6 @@ export const DateLabel = styled.Text`
   line-height: 12px;
   font-weight: 700;
   letter-spacing: 1.6px;
-  text-transform: uppercase;
   color: ${({ theme }) => theme.color.content.secondary};
 `;
 

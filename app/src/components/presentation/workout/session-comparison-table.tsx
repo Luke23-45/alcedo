@@ -57,7 +57,7 @@ export function SessionComparisonTable({
     return null;
   }
 
-  const prevDateShort = formatDate(previousSession.date, { month: 'short', day: 'numeric' }).toUpperCase();
+  const prevDateShort = formatDate(previousSession.date, { month: 'short', day: 'numeric' }).toLocaleUpperCase();
   const daysAgo = Math.max(0, session.date.toEpochDay() - previousSession.date.toEpochDay());
   const subtitle = t(
     daysAgo === 1 ? 'workout.post_workout.vs_previous.subtitle_one_day' : 'workout.post_workout.vs_previous.subtitle',
@@ -132,9 +132,9 @@ export function SessionComparisonTable({
       <S.Title>{t('workout.post_workout.vs_previous.title', { name: previousSession.blueprint.name })}</S.Title>
       <S.Subtitle>{subtitle}</S.Subtitle>
       <S.HeaderRow>
-        <S.HeaderMetric>{t('workout.post_workout.metric.label').toUpperCase()}</S.HeaderMetric>
+        <S.HeaderMetric>{t('workout.post_workout.metric.label').toLocaleUpperCase()}</S.HeaderMetric>
         <S.HeaderPrev>{prevDateShort}</S.HeaderPrev>
-        <S.HeaderToday>{t('workout.post_workout.metric.today').toUpperCase()}</S.HeaderToday>
+        <S.HeaderToday>{t('workout.post_workout.metric.today').toLocaleUpperCase()}</S.HeaderToday>
         <S.HeaderDelta>{t('workout.post_workout.metric.delta')}</S.HeaderDelta>
       </S.HeaderRow>
       {rows.map((row, index) => (

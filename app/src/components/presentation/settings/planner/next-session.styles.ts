@@ -45,6 +45,7 @@ export const NextMeta = styled.Text`
 
 export const MuscleChips = styled.View`
   flex-direction: row;
+  flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 16px;
 `;

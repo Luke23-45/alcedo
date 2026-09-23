@@ -103,13 +103,19 @@ export function WorkoutCard() {
           </S.DayCells>
           <S.TimeCell
             accessibilityRole="button"
-            accessibilityLabel={t(settingsKey('settings.notifications.workout_reminders.label'), 'Workout Reminders')}
+            accessibilityLabel={t(
+              settingsKey('settings.notifications.workout_reminders.time_label'),
+              'Workout reminder time, {time}',
+              { time: formatMinutesAsTime(reminderTime, settings.use24HourTime, language) },
+            )}
             accessibilityState={{ disabled: !remindersOn }}
             disabled={!remindersOn}
             onPress={() => setTimeOpen(true)}
           >
             <S.TimePill>
-              <S.TimeText>{formatMinutesAsTime(reminderTime, settings.use24HourTime, language)}</S.TimeText>
+              <S.TimeText style={{ fontVariant: ['tabular-nums'] }}>
+                {formatMinutesAsTime(reminderTime, settings.use24HourTime, language)}
+              </S.TimeText>
             </S.TimePill>
           </S.TimeCell>
         </S.ReminderArea>

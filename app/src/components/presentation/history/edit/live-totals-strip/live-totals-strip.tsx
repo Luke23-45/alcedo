@@ -38,22 +38,22 @@ export function LiveTotalsStrip({ session }: { session: Session }) {
   const cells: Array<{ value: string; label: string; testID: string }> = [
     {
       value: volume,
-      label: t('history.edit.totals.volume.label', 'Volume kg'),
+      label: t('history.edit.totals.volume.label', 'Volume kg').toLocaleUpperCase(),
       testID: 'live-total-volume',
     },
     {
       value: sets,
-      label: t('history.edit.totals.sets.label', 'Sets'),
+      label: t('history.edit.totals.sets.label', 'Sets').toLocaleUpperCase(),
       testID: 'live-total-sets',
     },
     {
       value: reps,
-      label: t('history.edit.totals.reps.label', 'Reps'),
+      label: t('history.edit.totals.reps.label', 'Reps').toLocaleUpperCase(),
       testID: 'live-total-reps',
     },
     {
       value: duration,
-      label: t('history.edit.totals.duration.label', 'Duration'),
+      label: t('history.edit.totals.duration.label', 'Duration').toLocaleUpperCase(),
       testID: 'live-total-duration',
     },
   ];

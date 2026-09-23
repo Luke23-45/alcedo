@@ -6,8 +6,10 @@ import { localeFormatBigNumber } from '@/utils/locale-bignumber';
 import { Duration, OffsetDateTime } from '@js-joda/core';
 import { useEffect, useState } from 'react';
 
-import { View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import Icon from '@/components/presentation/foundation/icon';
 import IconButton from '@/components/presentation/foundation/icon-button';
+import { alpha } from '@/styles/theme';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { Text } from 'react-native-paper';
 import Menu from '@/components/presentation/foundation/menu';
@@ -280,16 +282,30 @@ function CardioDistanceTile(props: {
 
 function CardioTimerButton(props: { isTimerRunning: boolean; onStart: () => void; onStop: () => void }) {
   const theme = useAppTheme();
+  const { t } = useTranslate();
   return (
-    <IconButton
+    <Pressable
       testID="cardio-timer-play-pause"
-      icon={props.isTimerRunning ? 'pause' : 'playArrow'}
-      mode="contained-tonal"
       onPress={props.isTimerRunning ? props.onStop : props.onStart}
-      containerColor={props.isTimerRunning ? theme.color.interactive.accent : theme.color.status.success.base}
-      iconColor={props.isTimerRunning ? theme.color.content.onAccent : theme.color.content.inverse}
-      style={{ borderRadius: theme.radius.md }}
-    />
+      accessibilityRole="button"
+      accessibilityLabel={t('cardio_timer.stop')}
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: props.isTimerRunning ? theme.color.interactive.accent : theme.color.status.success.base,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: alpha('#FFFFFF', 0.22),
+      }}
+    >
+      <Icon
+        source={props.isTimerRunning ? 'pause' : 'playArrow'}
+        size={22}
+        color={props.isTimerRunning ? theme.color.content.onAccent : theme.color.content.inverse}
+      />
+    </Pressable>
   );
 }
 

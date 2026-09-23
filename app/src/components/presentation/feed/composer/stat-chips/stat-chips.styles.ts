@@ -38,7 +38,7 @@ export const ChipRow = styled.View`
 `;
 
 export const Chip = styled.Pressable<{ $on: boolean; $width: number }>`
-  width: ${({ $width }) => $width}px;
+  min-width: ${({ $width }) => $width}px;
   height: 28px;
   border-radius: 14px;
   flex-direction: row;

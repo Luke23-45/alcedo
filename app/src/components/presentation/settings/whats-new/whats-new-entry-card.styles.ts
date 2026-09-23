@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 // What's-new entry card: the backup-screen card language (rx28), entry tile
 // 40×40 rx14 (translucent hue well, like the settings icon wells), title
@@ -22,9 +23,8 @@ export const EntryHeader = styled.View`
 
 export const EntryTitle = styled.Text`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline', { weight: '600' })}
   font-size: 15px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.3px;
   color: ${({ theme }) => theme.color.content.primary};
   margin-left: 14px;
@@ -32,10 +32,7 @@ export const EntryTitle = styled.Text`
 `;
 
 export const EntryBody = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 13px;
-  font-weight: ${({ theme }) => theme.weight.regular};
-  line-height: 18px;
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '400' })}
   color: ${({ theme }) => theme.color.content.secondary};
   padding-top: 12px;
   padding-left: 20px;
@@ -53,9 +50,7 @@ export const EntryCta = styled.Pressable`
 
 export const EntryCtaText = styled.Text`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 13px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.home.seeAll};
 `;

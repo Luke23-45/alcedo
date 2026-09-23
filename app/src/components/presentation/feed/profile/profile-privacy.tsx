@@ -36,6 +36,11 @@ export function ProfilePrivacy({
   const palette = profilePalette(theme.isDark);
   const { t } = useTranslate();
   const [blockedOpen, setBlockedOpen] = useState(false);
+  // The 3-option control scales to its measured wrap (spec 161 exact on 393);
+  // the thumb keeps the spec's 2pt side insets per segment.
+  const [segW, setSegW] = useState(0);
+  const segWidth = segW > 0 ? segW : 161;
+  const segThumb = segWidth / 3 - 4;
 
   const visibilityOptions: SegmentedOption<VisibilityValue>[] = [
     { value: "public", label: t(feedKey("feed.profile.privacy.public")) },
@@ -53,7 +58,7 @@ export function ProfilePrivacy({
       accessibilityLabel={t(feedKey(labelKey))}
       onPress={() => onDraftChange({ ...draft, [key]: !draft[key] })}
     >
-      <S.ToggleLabel $color={draft[key] ? palette.label : palette.tertiary}>
+      <S.ToggleLabel $color={draft[key] ? palette.label : palette.tertiary} numberOfLines={2} ellipsizeMode="tail">
         {t(feedKey(labelKey))}
       </S.ToggleLabel>
       <ProfileToggle value={draft[key]} />
@@ -66,16 +71,21 @@ export function ProfilePrivacy({
         accessibilityRole="radiogroup"
         accessibilityLabel={t(feedKey("feed.profile.privacy.visibility"))}
       >
-        <S.VisibilityLabel $color={palette.label}>
+        <S.VisibilityLabel $color={palette.label} numberOfLines={1} ellipsizeMode="tail">
           {t(feedKey("feed.profile.privacy.visibility"))}
         </S.VisibilityLabel>
-        <S.VisibilityWrap>
+        <S.VisibilityWrap
+          onLayout={(e) => {
+            const { width } = e.nativeEvent.layout;
+            setSegW((prev) => (prev === width ? prev : width));
+          }}
+        >
           <SegmentedControl
             options={visibilityOptions}
             value={draft.visibility}
             onChange={(visibility) => onDraftChange({ ...draft, visibility })}
-            width={161}
-            thumbWidth={49.7}
+            width={segWidth}
+            thumbWidth={segThumb}
             labelSize={11}
             testID="profile-visibility"
           />

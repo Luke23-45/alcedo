@@ -205,19 +205,19 @@ export function PostDetailScreen({ postId, keyValueStore }: { postId: string; ke
     const authorName = author?.name ?? '';
     const value =
       caption != null
-        ? `${authorName} on Kinetic: ${caption}`
+        ? `${authorName} on Alcedo: ${caption}`
         : poster.kind === 'milestone'
-          ? t(feedKey('feed.detail.share.milestone'), '{author} — {value} {unit} on Kinetic', {
+          ? t(feedKey('feed.detail.share.milestone'), '{author} — {value} {unit} on Alcedo', {
               author: authorName,
               value: poster.value,
               unit: poster.unit,
             })
           : poster.kind === 'photo'
-            ? t(feedKey('feed.detail.share.photo'), '{author} — shared a photo on Kinetic', {
+            ? t(feedKey('feed.detail.share.photo'), '{author} — shared a photo on Alcedo', {
                 author: authorName,
               })
             : poster.kind === 'video'
-              ? t(feedKey('feed.detail.share.video'), '{author} — shared a video on Kinetic', {
+              ? t(feedKey('feed.detail.share.video'), '{author} — shared a video on Alcedo', {
                   author: authorName,
                 })
               : t(feedKey('feed.detail.share.workout'), '{author} — {workout}: {value} {unit} in {duration}', {
@@ -229,7 +229,7 @@ export function PostDetailScreen({ postId, keyValueStore }: { postId: string; ke
                 });
     dispatch(
       shareString({
-        title: t(feedKey('feed.detail.share.subject'), 'Kinetic post'),
+        title: t(feedKey('feed.detail.share.subject'), 'Alcedo post'),
         value,
       }),
     );

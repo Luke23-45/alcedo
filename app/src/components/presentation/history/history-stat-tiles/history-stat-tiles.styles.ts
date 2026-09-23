@@ -1,10 +1,10 @@
 import styled from 'styled-components/native';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 
-/* Reference: tiles are 82×104 — flex fills the 361pt row across 11pt gaps. */
+/* Reference: tiles are 82×104 — flex fills the 361pt row across 11pt gaps. Budget, not a lock. */
 export const TileCard = styled(HomeCard)`
   flex: 1;
-  height: 104px;
+  min-height: 104px;
 `;
 
 export const TilesRow = styled.View`
@@ -57,6 +57,5 @@ export const Unit = styled.Text`
   line-height: 10px;
   font-weight: 700;
   letter-spacing: 0.8px;
-  text-transform: uppercase;
   color: ${({ theme }) => theme.color.content.secondary};
 `;

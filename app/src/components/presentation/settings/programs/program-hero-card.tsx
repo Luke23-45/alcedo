@@ -8,6 +8,7 @@ import { selectCompletedDistinctSessionNames } from '@/store/stored-sessions';
 import { useTranslate } from '@tolgee/react';
 import { settingsKey } from '@/components/presentation/settings/shared/settings-i18n';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
+import { useChevronColor } from '@/components/presentation/settings/shared/grouped-settings-list';
 import { ItemMenu } from '@/components/smart/program-list-item';
 import {
   ActiveBadge,
@@ -51,9 +52,12 @@ export function ProgramHeroCard({ id }: { id: string }) {
 
   const today = LocalDate.now();
   const recentNames = useAppSelectorWithArg(selectCompletedDistinctSessionNames, today.minusDays(7));
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
+  const chevron = useChevronColor();
   const total = program?.sessions.length ?? 0;
   const covered = program?.sessions.filter((s) => recentNames.includes(s.name)).length ?? 0;
   const fraction = total > 0 ? covered / total : 0;
+  const percent = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(fraction * 100));
 
   if (!program) {
     return null;
@@ -78,10 +82,10 @@ export function ProgramHeroCard({ id }: { id: string }) {
             <HeroTitleRow>
               <HeroName numberOfLines={1}>{program.name}</HeroName>
               <ActiveBadge>
-                <ActiveBadgeText>{t('plan.active.label').toUpperCase()}</ActiveBadgeText>
+                <ActiveBadgeText>{t('plan.active.label').toLocaleUpperCase(locale)}</ActiveBadgeText>
               </ActiveBadge>
             </HeroTitleRow>
-            <HeroCaption>
+            <HeroCaption numberOfLines={1}>
               {total > 0
                 ? t(settingsKey('settings.programs.hero.coverage'), { covered, total })
                 : t(settingsKey('settings.programs.hero.empty'))}
@@ -91,7 +95,7 @@ export function ProgramHeroCard({ id }: { id: string }) {
                 <HeroTrack>
                   <HomeGradient variant="brand" style={{ width: `${fraction * 100}%`, height: 4 }} />
                 </HeroTrack>
-                <HeroPercent>{Math.round(fraction * 100)}%</HeroPercent>
+                <HeroPercent style={{ fontVariant: ['tabular-nums'] }}>{percent}%</HeroPercent>
               </HeroProgressRow>
             ) : undefined}
           </HeroText>
@@ -99,7 +103,7 @@ export function ProgramHeroCard({ id }: { id: string }) {
             <Path
               d="M-2 -4 L2 0 L-2 4"
               fill="none"
-              stroke="#48484A"
+              stroke={chevron}
               strokeWidth={1.9}
               strokeLinecap="round"
               strokeLinejoin="round"

@@ -1,5 +1,7 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { ReactNode } from 'react';
+import { useAppSelector } from '@/store';
+import { toGroupLabelCase } from '../shared/grouped-settings-list';
 import * as S from './export-card.styles';
 import { ExportCardVariant } from './export-card.styles';
 
@@ -49,4 +51,21 @@ export function ExportCard({
   );
 }
 
-export { SectionLabel } from './export-card.styles';
+/**
+ * Micro-label wrapper: cases string children in the app language (SH02
+ * family) instead of relying on the device-locale CSS transform.
+ */
+export function SectionLabel({
+  children,
+  $tone,
+}: {
+  children: ReactNode;
+  $tone?: 'secondary' | 'danger';
+}) {
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
+  return (
+    <S.SectionLabel $tone={$tone}>
+      {typeof children === 'string' ? toGroupLabelCase(children, locale) : children}
+    </S.SectionLabel>
+  );
+}

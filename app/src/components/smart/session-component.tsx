@@ -42,6 +42,7 @@ import { localeFormatBigNumber } from '@/utils/locale-bignumber';
 import { useAddExercise } from '@/hooks/useAddExercise';
 import SessionMoreMenuComponent from '@/components/smart/session-more-menu-component';
 import { HomeScreenBackground } from '@/components/presentation/home/shared/home-auras';
+import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { SessionNav } from '@/components/presentation/workout/session/session-nav/session-nav';
 import { ElapsedCard } from '@/components/presentation/workout/session/elapsed-card/elapsed-card';
 import { StatStrip } from '@/components/presentation/workout/session/stat-strip/stat-strip';
@@ -114,7 +115,10 @@ function ActiveSessionView(props: {
           <ExercisesHeader done={sessionStartedExerciseCount(session)} total={session.recordedExercises.length} />
           <View style={{ gap: 12 }}>
             {session.recordedExercises.map((item, index) => (
-              <Fragment key={index}>{props.renderItem(item, index)}</Fragment>
+              // Exercises can be removed mid-list (which shifts positions), so the key
+              // carries the movement identity — set rows below stay index-keyed: sets are
+              // append-only with in-place cycling, never reordered or removed here.
+              <Fragment key={`${item.movementKey()}-${index}`}>{props.renderItem(item, index)}</Fragment>
             ))}
           </View>
         </View>
@@ -186,14 +190,12 @@ export default function SessionComponent(props: {
     updateSession((s) => s.withCardioTimerStarted(exerciseIndex, setIndex, OffsetDateTime.now()));
 
   const notesComponent = session.blueprint.notes ? (
-    <Card
-      mode="contained"
-      style={{
-        marginVertical: theme.space.sm,
-        marginHorizontal: theme.layout.screenPadding,
-      }}
+    <HomeCard
+      radius={theme.home.radius.row}
+      pad={theme.space.base}
+      style={{ marginVertical: theme.space.sm, marginHorizontal: theme.layout.screenPadding }}
     >
-      <Card.Content
+      <View
         style={{
           gap: theme.space.base,
           flexDirection: 'row',
@@ -201,11 +203,11 @@ export default function SessionComponent(props: {
         }}
       >
         <Icon source={'text'} size={20} />
-        <View style={{ paddingRight: theme.space.sm }}>
+        <View style={{ flex: 1, paddingRight: theme.space.sm }}>
           <SurfaceText>{session.blueprint.notes}</SurfaceText>
         </View>
-      </Card.Content>
-    </Card>
+      </View>
+    </HomeCard>
   ) : null;
 
   const emptyInfo =
@@ -269,8 +271,13 @@ export default function SessionComponent(props: {
   };
 
   const bodyweight = props.showBodyweight ? (
-    <Card style={{ marginHorizontal: theme.layout.screenPadding }} mode="contained" testID="bodyweight-card">
-      <Card.Content
+    <HomeCard
+      radius={theme.home.radius.row}
+      pad={theme.space.base}
+      style={{ marginHorizontal: theme.layout.screenPadding }}
+    >
+      <View
+        testID="bodyweight-card"
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -293,8 +300,8 @@ export default function SessionComponent(props: {
           increment={new BigNumber('0.1')}
           label={t('exercise.bodyweight.label')}
         />
-      </Card.Content>
-    </Card>
+      </View>
+    </HomeCard>
   ) : null;
 
   const lastExercise = session.lastExercise;
@@ -360,7 +367,6 @@ export default function SessionComponent(props: {
       startTime={session.restTimer.startedAt}
       pausedAt={session.restTimer.pausedAt}
       failed={!!lastSetFailed}
-      onRestart={() => resetTimer(OffsetDateTime.now())}
       onDismiss={dismissTimer}
       onTogglePause={toggleRestTimerPaused}
       onLogSet={logNextSet}

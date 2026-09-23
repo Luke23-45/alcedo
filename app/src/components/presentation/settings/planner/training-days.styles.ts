@@ -14,12 +14,15 @@ export const DaysTitle = styled.Text`
   font-size: 13.5px;
   font-weight: 600;
   letter-spacing: -0.2px;
+  flex-shrink: 1;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 export const DaysRestCaption = styled.Text`
   font-size: 11px;
   font-weight: 500;
+  flex: 1;
+  text-align: right;
   color: ${({ theme }) => (theme.isDark ? '#86868B' : '#8E8E93')};
 `;
 

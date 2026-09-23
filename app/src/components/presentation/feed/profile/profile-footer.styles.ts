@@ -14,8 +14,10 @@ export const Footer = styled.View`
 `;
 
 export const DangerButton = styled.Pressable<{ $fill: string; $stroke: string }>`
-  width: 361px;
-  height: 48px;
+  width: 100%;
+  min-height: 48px;
+  padding-vertical: 12px;
+  padding-horizontal: 20px;
   border-radius: 24px;
   background-color: ${({ $fill }) => $fill};
   border-width: 1px;
@@ -29,6 +31,7 @@ export const DangerLabel = styled.Text<{ $color: string }>`
   font-size: 14.5px;
   font-weight: 600;
   letter-spacing: -0.25px;
+  text-align: center;
   color: ${({ $color }) => $color};
 `;
 

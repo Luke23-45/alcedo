@@ -105,24 +105,24 @@ export function UpdatePlanScreen({
       {diff.hasChanges ? (
         <Fragment>
           <S.ReviewHeader>
-            <S.ReviewTitle $dark={dark}>{t('plan.diff.review.title')}</S.ReviewTitle>
+            <S.ReviewTitle $dark={dark}>{t('plan.diff.review.title').toLocaleUpperCase()}</S.ReviewTitle>
             <S.SelectedChip $dark={dark}>
               <S.SelectedChipText $dark={dark}>
-                {t('plan.diff.review.selected', { count: selectedCount })}
+                {t('plan.diff.review.selected', { count: selectedCount }).toLocaleUpperCase()}
               </S.SelectedChipText>
             </S.SelectedChip>
           </S.ReviewHeader>
           <S.CardsWrap>
             {sessionRows.length > 0 && (
-              <DiffReviewCard tone="neutral" label={t('plan.diff.review.session')}>
+              <DiffReviewCard tone="neutral" label={t('plan.diff.review.session').toLocaleUpperCase()}>
                 {sessionRows}
               </DiffReviewCard>
             )}
             {addedRows.length > 0 && (
               <DiffReviewCard
                 tone="added"
-                label={t('plan.diff.review.added')}
-                countText={t('plan.diff.review.card_count', { count: addedRows.length })}
+                label={t('plan.diff.review.added').toLocaleUpperCase()}
+                countText={String(addedRows.length)}
               >
                 {addedRows}
               </DiffReviewCard>
@@ -130,8 +130,8 @@ export function UpdatePlanScreen({
             {removedRows.length > 0 && (
               <DiffReviewCard
                 tone="removed"
-                label={t('plan.diff.review.removed')}
-                countText={t('plan.diff.review.card_count', { count: removedRows.length })}
+                label={t('plan.diff.review.removed').toLocaleUpperCase()}
+                countText={String(removedRows.length)}
               >
                 {removedRows}
               </DiffReviewCard>
@@ -139,12 +139,11 @@ export function UpdatePlanScreen({
             {hasModified && (
               <DiffReviewCard
                 tone="modified"
-                label={t('plan.diff.review.modified')}
-                countText={t('plan.diff.review.card_count', {
-                  count:
-                    diff.modifiedExercises.reduce((total, group) => total + group.changes.length, 0) +
+                label={t('plan.diff.review.modified').toLocaleUpperCase()}
+                countText={String(
+                  diff.modifiedExercises.reduce((total, group) => total + group.changes.length, 0) +
                     diff.reorderedExercises.length,
-                })}
+                )}
               >
                 {modifiedGroups}
                 {reorderedGroups}

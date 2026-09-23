@@ -4,8 +4,10 @@ import { useDispatch } from 'react-redux';
 import { usePreferredWeightSuffix, usePreferredWeightUnit } from '@/hooks/usePreferredWeightUnit';
 import { useAppSelector } from '@/store';
 import { setPlannerWeeklyOverloadKg } from '@/store/settings';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { useTranslate } from '@tolgee/react';
 import { settingsKey } from '@/components/presentation/settings/shared/settings-i18n';
+import { formatOverloadValue } from './planner-data';
 import {
   OverloadCaption,
   OverloadCard,
@@ -20,10 +22,6 @@ const STEP_KG = 0.5;
 const MIN_KG = 0;
 const MAX_KG = 10;
 
-function trimZeros(value: number): string {
-  return value.toFixed(1).replace(/\.0$/, '');
-}
-
 /**
  * Weekly overload stepper: how much the planner adds to main lifts each week.
  * Stored in kilograms; displayed in the preferred unit.
@@ -31,12 +29,14 @@ function trimZeros(value: number): string {
 export function WeeklyOverload() {
   const { t } = useTranslate();
   const dispatch = useDispatch();
+  const theme = useAppTheme();
   const overloadKg = useAppSelector((s) => s.settings.plannerWeeklyOverloadKg);
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
   const unit = usePreferredWeightUnit();
   const suffix = usePreferredWeightSuffix();
 
   const displayKg = unit === 'pounds' ? overloadKg * 2.20462 : overloadKg;
-  const display = `${trimZeros(Math.round(displayKg * 2) / 2)} ${suffix}`;
+  const display = `${formatOverloadValue(Math.round(displayKg * 2) / 2, locale)} ${suffix}`;
 
   const set = (kg: number) =>
     dispatch(setPlannerWeeklyOverloadKg(Math.min(MAX_KG, Math.max(MIN_KG, Math.round(kg * 2) / 2))));
@@ -61,7 +61,9 @@ export function WeeklyOverload() {
             </Svg>
           </StepButton>
         </Pressable>
-        <StepValue>{display}</StepValue>
+        <StepValue numberOfLines={1} style={{ fontVariant: ['tabular-nums'] }}>
+          {display}
+        </StepValue>
         <Pressable
           onPress={() => set(overloadKg + STEP_KG)}
           accessibilityRole="button"
@@ -71,7 +73,13 @@ export function WeeklyOverload() {
         >
           <StepButton>
             <Svg width={14} height={14} viewBox="-7 -7 14 14">
-              <Path d="M-5 0 H5 M0 -5 V5" stroke="#FFFFFF" strokeWidth={2} strokeLinecap="round" />
+              {/* AP13: white-on-pale is near-invisible in light mode. */}
+              <Path
+                d="M-5 0 H5 M0 -5 V5"
+                stroke={theme.isDark ? '#FFFFFF' : '#1C1C1E'}
+                strokeWidth={2}
+                strokeLinecap="round"
+              />
             </Svg>
           </StepButton>
         </Pressable>

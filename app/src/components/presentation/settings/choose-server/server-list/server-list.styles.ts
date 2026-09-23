@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet } from 'react-native';
 import { type as typeStyle } from '@/styles/theme';
 import styled from 'styled-components/native';
 
@@ -80,6 +81,7 @@ export const ServerRowStatic = styled.View`
 
 export const ServerRowText = styled.View`
   flex: 1;
+  min-width: 0;
   gap: 3px;
   justify-content: center;
 `;
@@ -103,7 +105,7 @@ export const ServerSubtitle = styled.Text`
 `;
 
 export const RowSeparator = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-left: 20px;
   margin-right: 16px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(60,60,67,0.12)')};
@@ -119,12 +121,12 @@ export const IncompleteTag = styled.View`
   background-color: rgba(255, 59, 48, 0.12);
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 `;
 
 export const IncompleteTagText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 7.5px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 0.6px;
   color: #ff6b60;
 `;

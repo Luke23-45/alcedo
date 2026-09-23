@@ -64,7 +64,7 @@ function ownPostWith(prPills: string[]): TimelineWorkoutPost {
     postedAt: NOW,
     caption: null,
     poster: {
-      kicker: 'KINETIC · TUESDAY, SEPTEMBER 22',
+      kicker: 'ALCEDO · TUESDAY, SEPTEMBER 22',
       heroValue: '8,420',
       heroUnit: 'kg',
       workoutName: 'Push Day · Strength',
@@ -337,7 +337,7 @@ describe('deriveComposerSessionData feeding the timeline card', () => {
   it('formats the kicker through the cached Intl path (no js-joda text patterns)', () => {
     const session = sessionWithSets('Push Day', LocalDate.of(2026, 9, 22), [10, 8]);
     const data = deriveComposerSessionData(session, [session], new Map(), enUsFormatDate, enUsFormatNumber);
-    expect(data.kicker).toBe('KINETIC · TUESDAY, SEPTEMBER 22');
+    expect(data.kicker).toBe('ALCEDO · TUESDAY, SEPTEMBER 22');
   });
 });
 

@@ -31,7 +31,7 @@ function IdleRestCard() {
   const c = sessionPalette(isDark).footer;
 
   return (
-    <HomeCard radius={26} pad={0} style={{ height: 88 }}>
+    <HomeCard radius={26} pad={0} style={{ minHeight: 88 }}>
       <IdleCardInner>
         <Svg width={60} height={60} viewBox="0 0 60 60">
           <Circle cx={30} cy={30} r={26} stroke={c.ringTrack} strokeWidth={7} fill="none" />
@@ -48,7 +48,7 @@ function IdleRestCard() {
           </SvgText>
         </Svg>
         <IdleTexts>
-          <IdleLabel>{t('workout.session.rest_timer.label')}</IdleLabel>
+          <IdleLabel>{t('workout.session.rest_timer.label').toLocaleUpperCase()}</IdleLabel>
           <IdleSub>{t('workout.session.rest_timer.idle.body')}</IdleSub>
         </IdleTexts>
         <SkipPill>

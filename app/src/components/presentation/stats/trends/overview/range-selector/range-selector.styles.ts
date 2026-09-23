@@ -16,7 +16,6 @@ export const Thumb = styled(Animated.View)<{
   position: absolute;
   left: 2px;
   top: 2px;
-  width: 68.2px;
   height: 32px;
   border-radius: 16px;
   background-color: ${({ $fill }) => $fill};

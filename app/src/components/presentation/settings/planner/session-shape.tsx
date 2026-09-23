@@ -54,10 +54,11 @@ export function SessionShape() {
                 accessibilityRole="radio"
                 accessibilityState={{ checked: selected }}
                 accessibilityLabel={t(settingsKey(`settings.planner.focus.${option}`))}
+                hitSlop={{ top: 9, bottom: 9 }}
                 style={{ flex: 1 }}
               >
                 <FocusOption $selected={selected}>
-                  <FocusOptionText $selected={selected}>
+                  <FocusOptionText $selected={selected} numberOfLines={1}>
                     {t(settingsKey(`settings.planner.focus.${option}`))}
                   </FocusOptionText>
                 </FocusOption>

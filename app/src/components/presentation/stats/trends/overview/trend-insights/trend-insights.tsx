@@ -45,8 +45,6 @@ export function TrendInsights({
         <CardAura
           width={361}
           height={152}
-          top={-12}
-          left={-20}
           stops={[
             { cx: 330, cy: 25, r: 155, color: '#8E7BFF', opacity: 0.26 },
             { cx: 50, cy: 145, r: 130, color: '#2CE9F7', opacity: 0.14 },

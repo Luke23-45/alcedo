@@ -3,11 +3,11 @@ import styled from 'styled-components/native';
 
 export const CardShadow = styled.View`
   border-radius: 22px;
-  shadow-color: #000000;
-  shadow-offset: 0px 10px;
-  shadow-opacity: 0.5;
-  shadow-radius: 14px;
-  elevation: 8;
+  shadow-color: ${({ theme }) => (theme.isDark ? '#000000' : '#14142b')};
+  shadow-offset: ${({ theme }) => (theme.isDark ? '0px 10px' : '0px 8px')};
+  shadow-opacity: ${({ theme }) => (theme.isDark ? 0.5 : 0.075)};
+  shadow-radius: ${({ theme }) => (theme.isDark ? 14 : 16)}px;
+  elevation: ${({ theme }) => (theme.isDark ? 8 : 4)};
 `;
 
 export const Card = styled.View`
@@ -33,6 +33,7 @@ export const HeaderRow = styled.View`
 `;
 
 export const HeaderText = styled.View`
+  flex: 1;
   margin-left: 12px;
   flex-direction: row;
   align-items: baseline;
@@ -40,6 +41,7 @@ export const HeaderText = styled.View`
 `;
 
 export const AuthorName = styled.Text`
+  flex-shrink: 1;
   font-family: ${({ theme }) => theme.font.text};
   font-size: 14px;
   font-weight: ${({ theme }) => theme.weight.semibold};

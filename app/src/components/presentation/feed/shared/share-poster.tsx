@@ -1,11 +1,13 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslate } from '@tolgee/react';
+import { feedKey } from './feed-i18n';
 import * as S from './share-poster.styles';
 
 export type SharePosterTheme = 'ember' | 'aurora' | 'slate';
 
 interface SharePosterProps {
   theme: SharePosterTheme;
-  /** e.g. "KINETIC · MONDAY, JUNE 9" — rendered uppercase. */
+  /** e.g. "ALCEDO · MONDAY, JUNE 9" — rendered uppercase. */
   kicker: string;
   /** Big number, e.g. "8,420". */
   heroValue: string;
@@ -99,6 +101,11 @@ export function SharePoster({
         end: gradient.end ?? { x: 0.7, y: 1 },
       }
     : { ...THEMES[theme], start: { x: 0, y: 0 }, end: { x: 0.7, y: 1 } };
+  // Stat micro-labels in the app language (CSS uppercase handles the caps);
+  // posters otherwise do not theme.
+  const { t } = useTranslate();
+  const durationLabel = t(feedKey('feed.shared.poster.duration'));
+  const setsLabel = t(feedKey('feed.shared.poster.sets'));
 
   return (
     <S.ShadowWrap>
@@ -133,7 +140,7 @@ export function SharePoster({
                 {duration}
               </S.StatValue>
               <S.StatLabel $column={0} numberOfLines={1}>
-                Duration
+                {durationLabel}
               </S.StatLabel>
             </>
           ) : null}
@@ -143,7 +150,7 @@ export function SharePoster({
                 {sets}
               </S.StatValue>
               <S.StatLabel $column={1} numberOfLines={1}>
-                Sets
+                {setsLabel}
               </S.StatLabel>
             </>
           ) : null}

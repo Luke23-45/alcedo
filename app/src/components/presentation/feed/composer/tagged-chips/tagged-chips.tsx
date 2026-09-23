@@ -47,7 +47,9 @@ export function TaggedChips({ taggedIds, people, onRemove, onAdd }: TaggedChipsP
               <S.AvatarSlot>
                 <FeedAvatar person={person} size={18} ringColor="transparent" />
               </S.AvatarSlot>
-              <S.TagName>{person.name}</S.TagName>
+              <S.TagName numberOfLines={1} ellipsizeMode="tail">
+                {person.name}
+              </S.TagName>
               <CloseGlyph size={10} color={theme.isDark ? '#8E8E93' : '#6E6E73'} strokeWidth={1.5} />
             </S.TagChip>
           );

@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 export const DialogContainer = styled.View`
@@ -26,7 +27,7 @@ export const Dialog = styled.View`
 `;
 
 export const DialogTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 16px;
   line-height: 21px;
   font-weight: 600;
@@ -39,7 +40,7 @@ export const DialogTitle = styled.Text`
 `;
 
 export const DialogBody = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12.5px;
   line-height: 18px;
   font-weight: 500;
@@ -51,7 +52,7 @@ export const DialogBody = styled.Text`
 `;
 
 export const DialogBodyKept = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12.5px;
   line-height: 18px;
   font-weight: 500;
@@ -60,7 +61,7 @@ export const DialogBodyKept = styled.Text`
 `;
 
 export const DialogDividerH = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)')};
 `;
 
@@ -76,12 +77,12 @@ export const DialogActionButton = styled.Pressable`
 `;
 
 export const DialogDividerV = styled.View`
-  width: 1px;
+  width: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)')};
 `;
 
 export const CancelText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;
@@ -90,10 +91,10 @@ export const CancelText = styled.Text`
 `;
 
 export const ConfirmText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;
   letter-spacing: -0.3px;
-  color: #ff6b60;
+  color: ${({ theme }) => (theme.isDark ? '#FF6B60' : '#D70015')};
 `;

@@ -97,11 +97,14 @@ function MessageBubble({
           colors={[...S.USER_BUBBLE_COLORS]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
+          style={{ borderCurve: 'continuous' }}
         >
           {children}
         </S.UserBubble>
       ) : (
-        <S.AgentBubble {...corners}>{children}</S.AgentBubble>
+        <S.AgentBubble {...corners} style={{ borderCurve: 'continuous' }}>
+          {children}
+        </S.AgentBubble>
       )}
     </S.Row>
   );

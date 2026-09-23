@@ -40,7 +40,9 @@ export function TestFooter() {
       >
         {disabled && !testInFlight ? (
           <S.TestButtonDisabled>
-            <S.TestLabel $disabled>{t('backup.remote.test.button')}</S.TestLabel>
+            <S.TestLabel $disabled numberOfLines={1}>
+              {t('backup.remote.test.button')}
+            </S.TestLabel>
           </S.TestButtonDisabled>
         ) : (
           <S.TestButtonSurface
@@ -50,7 +52,7 @@ export function TestFooter() {
             style={testInFlight ? { opacity: 0.55 } : undefined}
           >
             {testInFlight ? <ActivityIndicator size="small" color="#FFFFFF" /> : undefined}
-            <S.TestLabel $disabled={false}>
+            <S.TestLabel $disabled={false} numberOfLines={1}>
               {testInFlight ? t('backup.remote.test.sending') : t('backup.remote.test.button')}
             </S.TestLabel>
           </S.TestButtonSurface>
@@ -66,7 +68,7 @@ export function TestFooter() {
         accessibilityLabel={t('backup.remote.manage_backends.button')}
         onPress={() => push('/settings/backends')}
       >
-        <S.ManageLabel>{t('backup.remote.manage_backends.button')}</S.ManageLabel>
+        <S.ManageLabel numberOfLines={1}>{t('backup.remote.manage_backends.button')}</S.ManageLabel>
       </S.ManageButton>
     </S.FooterBar>
   );

@@ -1,6 +1,7 @@
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
 import { HomeText } from '@/components/presentation/home/shared/home-text';
 import { Switch } from '@/components/presentation/foundation/switch';
+import { useAppReducedMotion } from '@/hooks/useMotionSettings';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { fontWeight } from '@/styles/theme';
 import { useHistoryTranslate } from '../history-i18n';
@@ -69,6 +70,7 @@ export function FilterSheet({
   const theme = useAppTheme();
   const t = useHistoryTranslate();
   const insets = useSafeAreaInsets();
+  const reduceMotion = useAppReducedMotion();
 
   const toggleType = (name: string) => {
     onFiltersChange({
@@ -78,7 +80,7 @@ export function FilterSheet({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType={reduceMotion ? 'none' : 'slide'} onRequestClose={onClose}>
       <Backdrop onPress={onClose} />
       <SheetWrap style={{ paddingBottom: insets.bottom }}>
         <HomeGradient variant="cardBody" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
@@ -154,10 +156,12 @@ export function FilterSheet({
                         onPress={() => toggleType(name)}
                         accessibilityRole="button"
                         accessibilityState={{ selected }}
+                        accessibilityLabel={name}
                         testID={`history-filter-type-${name}`}
                       >
                         <HomeText
                           weight={selected ? fontWeight.semibold : fontWeight.medium}
+                          numberOfLines={1}
                           style={{
                             fontSize: 13,
                             lineHeight: 17,

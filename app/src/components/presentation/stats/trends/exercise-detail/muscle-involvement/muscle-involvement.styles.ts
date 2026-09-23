@@ -5,14 +5,14 @@ export const CardInner = styled.View`
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 16px;
-  height: 140px;
+  min-height: 140px;
 `;
 
 export const TitleRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  height: 20px;
+  min-height: 20px;
 `;
 
 export const Title = styled.Text`
@@ -42,7 +42,7 @@ export const Name = styled.Text`
 `;
 
 export const Track = styled.View`
-  width: 180px;
+  flex: 1;
   height: 6px;
   margin-top: 4px;
   border-radius: 3px;
@@ -52,7 +52,7 @@ export const Track = styled.View`
 `;
 
 export const Fill = styled.View<{ $widthPct: number; $color: string }>`
-  width: ${({ $widthPct }) => ($widthPct * 180) / 100}px;
+  width: ${({ $widthPct }) => $widthPct}%;
   height: 6px;
   border-radius: 3px;
   background-color: ${({ $color }) => $color};

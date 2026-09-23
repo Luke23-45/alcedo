@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, TextInput } from 'react-native';
+import { Platform, Pressable, TextInput } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
@@ -36,9 +36,9 @@ import {
   SubmitLabel,
 } from './import-plan-screen.styles';
 
-function formatSets(exercise: ParsedExercise): string {
+function formatSets(exercise: ParsedExercise, secondSuffix: string): string {
   const reps = exercise.reps === 'amrap' ? 'AMRAP' : exercise.reps;
-  const rest = exercise.restSeconds ? ` · ${exercise.restSeconds}s` : '';
+  const rest = exercise.restSeconds ? ` · ${exercise.restSeconds}${secondSuffix}` : '';
   return `${exercise.sets} × ${reps}${rest}`;
 }
 
@@ -49,20 +49,22 @@ function RecognizedRowView({ exercise }: { exercise: ParsedExercise }) {
       ? t(settingsKey('settings.programs.import.matched_renamed'), { name: exercise.rawName })
       : t(settingsKey('settings.programs.import.matched'))
     : t(settingsKey('settings.programs.import.unmatched'));
+  // AMRAP is a universal gym tag (recorded keep); the seconds unit is localizable.
+  const secondSuffix = t(settingsKey('settings.programs.import.seconds_short'), 's');
   return (
     <RecognizedRow>
       <RecognizedName>
         {exercise.name}
         <RecognizedNote $ok={exercise.matched}>{`\n${note}`}</RecognizedNote>
       </RecognizedName>
-      <RecognizedSets>{formatSets(exercise)}</RecognizedSets>
+      <RecognizedSets style={{ fontVariant: ['tabular-nums'] }}>{formatSets(exercise, secondSuffix)}</RecognizedSets>
     </RecognizedRow>
   );
 }
 
 /**
  * Screen 5 (bottom) — the import-plan parser. Paste plan text (or pull it
- * from the clipboard), watch Kinetic recognize each exercise against the
+ * from the clipboard), watch ALCEDO recognize each exercise against the
  * exercise library, then import the parsed days as a real program blueprint
  * for review.
  */
@@ -114,7 +116,7 @@ export function ImportPlanScreen() {
               placeholder={t(settingsKey('settings.programs.import.placeholder'))}
               placeholderTextColor={theme.isDark ? '#6C6C70' : '#AEAEB2'}
               style={{
-                fontFamily: 'Menlo',
+                fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
                 fontSize: 12,
                 lineHeight: 18,
                 color: theme.isDark ? '#98989F' : '#636366',
@@ -131,6 +133,7 @@ export function ImportPlanScreen() {
             }}
             accessibilityRole="button"
             accessibilityLabel={t(settingsKey('settings.programs.import.paste_button'))}
+            hitSlop={{ top: 4, bottom: 4, left: 8, right: 8 }}
           >
             <PasteButton>
               <Svg width={12} height={12} viewBox="-6 -6 12 12">
@@ -182,6 +185,7 @@ export function ImportPlanScreen() {
             disabled={!hasExercises}
             accessibilityRole="button"
             accessibilityLabel={t(settingsKey('settings.programs.import.submit'))}
+            accessibilityState={{ disabled: !hasExercises }}
             style={{ opacity: hasExercises ? 1 : 0.5 }}
           >
             <SubmitButton>

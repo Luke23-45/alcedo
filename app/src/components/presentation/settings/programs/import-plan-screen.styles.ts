@@ -86,6 +86,7 @@ export const RecognizedRow = styled.View`
 `;
 
 export const RecognizedName = styled.Text`
+  flex: 1;
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: -0.2px;
@@ -100,6 +101,7 @@ export const RecognizedNote = styled.Text<{ $ok: boolean }>`
 `;
 
 export const RecognizedSets = styled.Text`
+  flex-shrink: 0;
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: -0.1px;

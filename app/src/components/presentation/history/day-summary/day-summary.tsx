@@ -244,7 +244,7 @@ export function DaySectionLabel({ date }: { date: LocalDate }) {
           color: theme.color.content.secondary,
         }}
       >
-        {formatDate(date, { weekday: 'long', month: 'long', day: 'numeric' })}
+        {formatDate(date, { weekday: 'long', month: 'long', day: 'numeric' }).toLocaleUpperCase()}
       </HomeText>
     </SectionLabel>
   );
@@ -271,17 +271,17 @@ export function DaySummary({
   const cells: { value: string; label: string }[] = [
     {
       value: sessions.length.toString(),
-      label: t('history.v2.day.aggregate.session'),
+      label: t('history.v2.day.aggregate.session').toLocaleUpperCase(),
     },
     {
       value: formatCount(volume),
-      label: t('history.v2.day.aggregate.volume_kg'),
+      label: t('history.v2.day.aggregate.volume_kg').toLocaleUpperCase(),
     },
     {
       value: formatClockDuration(duration),
-      label: t('history.v2.day.aggregate.duration'),
+      label: t('history.v2.day.aggregate.duration').toLocaleUpperCase(),
     },
-    { value: formatCount(kcal), label: t('history.v2.day.aggregate.kcal_est') },
+    { value: formatCount(kcal), label: t('history.v2.day.aggregate.kcal_est').toLocaleUpperCase() },
   ];
 
   return (

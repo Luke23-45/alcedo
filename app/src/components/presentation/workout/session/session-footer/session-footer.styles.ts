@@ -1,8 +1,9 @@
 import { createElement } from 'react';
-import type { StyleProp, ViewStyle } from 'react-native';
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { type as typeHelper } from '@/styles/theme';
 import { sessionPalette } from '../session-tokens';
 
 export const FooterGradient = styled(LinearGradient)`
@@ -10,7 +11,7 @@ export const FooterGradient = styled(LinearGradient)`
 `;
 
 export const Hairline = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => sessionPalette(theme.isDark).footer.hairline};
 `;
 
@@ -37,17 +38,16 @@ export const IdleTexts = styled.View`
 `;
 
 export const IdleLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9px;
   line-height: 12px;
   font-weight: 700;
   letter-spacing: 1.3px;
-  text-transform: uppercase;
   color: ${({ theme }) => sessionPalette(theme.isDark).footer.idleLabel};
 `;
 
 export const IdleSub = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;
@@ -68,7 +68,7 @@ export const SkipPill = styled.View`
 `;
 
 export const SkipText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;
@@ -92,7 +92,7 @@ export const DisabledFinish = styled.View`
 `;
 
 export const FinishLabel = styled.Text<{ $enabled: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 16px;
   line-height: 22px;
   font-weight: 600;
@@ -102,7 +102,7 @@ export const FinishLabel = styled.Text<{ $enabled: boolean }>`
 `;
 
 export const Hint = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10px;
   line-height: 14px;
   font-weight: 500;

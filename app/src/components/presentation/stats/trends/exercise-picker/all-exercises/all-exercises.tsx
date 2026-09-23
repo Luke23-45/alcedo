@@ -1,6 +1,6 @@
 import { HomeText } from '@/components/presentation/home/shared/home-text';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { fontWeight } from '@/styles/theme';
+import { alpha, fontWeight } from '@/styles/theme';
 import { useTranslate } from '@tolgee/react';
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, Pressable, SectionList } from 'react-native';
@@ -27,19 +27,21 @@ const FIRST_ALPHA_HEADER_H = 64; // ALL EXERCISES label (32) + letter header (32
 const ROW_H = 60; // 52pt card + 8pt gap
 const SCRUBBER_HIT = { top: 13.6, bottom: 13.6, left: 9.5, right: 9.5 }; // 44×44 hit area
 
-/** "ALL EXERCISES" + live count, right-aligned (10/500, #6C6C70). */
+/** "ALL EXERCISES" + live count, right-aligned in the theme secondary. */
 export function AllExercisesHeader({ count }: { count: number }) {
   const { t } = useTranslate();
+  const theme = useAppTheme();
+  const label = theme.isDark ? '#86868B' : '#6C6C70';
   return (
     <SectionHeaderRow>
       <HomeText
         weight={fontWeight.bold}
         tracking={1.35}
-        style={{ fontSize: 10, lineHeight: 12, color: '#86868B' }}
+        style={{ fontSize: 10, lineHeight: 12, color: label }}
       >
         {t('stats.exercise_picker.all.header')}
       </HomeText>
-      <HomeText weight={fontWeight.medium} style={{ fontSize: 10, lineHeight: 12, color: '#6C6C70' }}>
+      <HomeText weight={fontWeight.medium} style={{ fontSize: 10, lineHeight: 12, color: label }}>
         {String(count)}
       </HomeText>
     </SectionHeaderRow>
@@ -48,12 +50,13 @@ export function AllExercisesHeader({ count }: { count: number }) {
 
 /** A-Z section letter header. */
 export function AlphaSectionHeader({ letter }: { letter: string }) {
+  const theme = useAppTheme();
   return (
     <SectionHeaderRow>
       <HomeText
         weight={fontWeight.bold}
         tracking={1.35}
-        style={{ fontSize: 10, lineHeight: 12, color: '#86868B' }}
+        style={{ fontSize: 10, lineHeight: 12, color: theme.isDark ? '#86868B' : '#6C6C70' }}
       >
         {letter}
       </HomeText>
@@ -109,7 +112,9 @@ export function AlphabetScrubber({
 /** 40pt fade so the list dissolves under the sticky confirm. */
 export function ListBottomFade() {
   const theme = useAppTheme();
-  const base = theme.isDark ? 'rgba(5,5,7,0.94)' : 'rgba(243,243,248,0.94)';
+  // The fade must land on the actual screen background (white in light mode),
+  // never a hardcoded grey that bands against it.
+  const base = alpha(theme.color.background.base, 0.94);
   return <BottomFadeGradient colors={['rgba(0,0,0,0)', base] as [string, string]} pointerEvents="none" />;
 }
 

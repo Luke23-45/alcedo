@@ -24,24 +24,24 @@ export const SwatchRow = styled.View`
 `;
 
 export const SwatchPress = styled.Pressable`
-  width: 112px;
+  flex: 1;
   align-items: center;
 `;
 
 export const SwatchHit = styled.View`
-  width: 112px;
+  width: 100%;
   height: 64px;
   align-items: center;
   justify-content: center;
 `;
 
-/** Selected ring: 119×71 at a −3.5pt inset, so it never touches the swatch corner. */
+/** Selected ring: −3.5pt inset fill, so it never touches the swatch corner at any size. */
 export const RingFill = styled.View`
   position: absolute;
   left: -3.5px;
+  right: -3.5px;
   top: -3.5px;
-  width: 119px;
-  height: 71px;
+  bottom: -3.5px;
   border-radius: 23.5px;
   overflow: hidden;
 `;
@@ -56,7 +56,7 @@ export const SwatchShadow = styled.View`
 `;
 
 export const Swatch = styled.View`
-  width: 112px;
+  width: 100%;
   height: 64px;
   border-radius: 20px;
   overflow: hidden;
@@ -95,7 +95,7 @@ export const SwatchValue = styled.Text`
 /** r9 brand check badge pinned to the swatch's top-right. */
 export const CheckBadge = styled.View`
   position: absolute;
-  left: 95px;
+  right: -1px;
   top: -1px;
   width: 18px;
   height: 18px;

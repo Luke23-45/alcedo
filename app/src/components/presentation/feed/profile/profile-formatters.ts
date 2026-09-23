@@ -54,20 +54,24 @@ export function formatGoalPercent(thisWeekKg: number, goalKg: number): number {
 
 const { trackX, trackWidth, min, max, step } = PROFILE.slider;
 
-/** Slider thumb center-x for a goal value, measured off the reference (x=196.5 at 35,000 ✓). */
-export function sliderXForValue(valueKg: number): number {
+/**
+ * Slider thumb center-x for a goal value. The reference geometry (x=196.5 at
+ * 35,000 ✓) is the default; the component passes the measured track so the
+ * thumb lands true on every canvas. Defaults keep the contract specs green.
+ */
+export function sliderXForValue(valueKg: number, tw: number = trackWidth, tx: number = trackX): number {
   const clamped = Math.min(max, Math.max(min, valueKg));
-  return trackX + ((clamped - min) / (max - min)) * trackWidth;
+  return tx + ((clamped - min) / (max - min)) * tw;
 }
 
 /** Goal value for a thumb center-x, clamped to 20k–50k and snapped to 500. */
-export function sliderValueForX(x: number): number {
-  const raw = min + ((x - trackX) / trackWidth) * (max - min);
+export function sliderValueForX(x: number, tw: number = trackWidth, tx: number = trackX): number {
+  const raw = min + ((x - tx) / tw) * (max - min);
   const clamped = Math.min(max, Math.max(min, raw));
   return Math.round(clamped / step) * step;
 }
 
 /** "Now" tick x for this week's volume: x=189.4 at 34,340 ✓. Clamped to the track. */
-export function sliderXForNow(thisWeekKg: number): number {
-  return sliderXForValue(thisWeekKg);
+export function sliderXForNow(thisWeekKg: number, tw: number = trackWidth, tx: number = trackX): number {
+  return sliderXForValue(thisWeekKg, tw, tx);
 }

@@ -36,18 +36,19 @@ function CheckGlyph({ checked, dark }: { checked: boolean; dark: boolean }) {
 }
 
 /** 11×13 lock glyph for the always-applied session-name row. */
-function LockGlyph() {
+function LockGlyph({ dark }: { dark: boolean }) {
+  const color = dark ? '#6C6C70' : '#8E8E93';
   return (
     <Svg width={11} height={13} viewBox="0 0 11 13">
-      <Rect x={1} y={5.5} width={9} height={6.5} rx={1.5} fill="#8E8E93" />
-      <Path d="M3 5.5V4a2.5 2.5 0 015 0v1.5" fill="none" stroke="#8E8E93" strokeWidth={1.6} strokeLinecap="round" />
+      <Rect x={1} y={5.5} width={9} height={6.5} rx={1.5} fill={color} />
+      <Path d="M3 5.5V4a2.5 2.5 0 015 0v1.5" fill="none" stroke={color} strokeWidth={1.6} strokeLinecap="round" />
     </Svg>
   );
 }
 
 /** 12px dumbbell glyph marking each exercise group in the modified card. */
 function DumbbellGlyph({ dark }: { dark: boolean }) {
-  const color = dark ? '#FFB340' : '#B25000';
+  const color = dark ? '#FFB340' : '#C93400';
   return (
     <Svg width={12} height={12} viewBox="0 0 12 12">
       <Rect x={1} y={3.5} width={1.6} height={5} rx={0.8} fill={color} />
@@ -75,6 +76,8 @@ export function DiffReviewCard({ tone, label, countText, children }: DiffReviewC
 
   return (
     <S.Card $tone={tone} $dark={dark} style={{ borderCurve: 'continuous' }}>
+      <S.CardBody />
+      <S.ToneWash $tone={tone} $dark={dark} />
       <S.CardHeader>
         <S.MicroLabel $tone={tone} $dark={dark}>
           {label}
@@ -113,7 +116,7 @@ export function DiffChangeRow({ view, checked, onToggle }: DiffChangeRowProps) {
     >
       {view.locked ? (
         <S.LockedBox $dark={dark}>
-          <LockGlyph />
+          <LockGlyph dark={dark} />
         </S.LockedBox>
       ) : (
         <CheckGlyph checked={checked} dark={dark} />
@@ -137,7 +140,7 @@ export function DiffChangeRow({ view, checked, onToggle }: DiffChangeRowProps) {
       </S.RowTexts>
       {view.locked ? (
         <S.AlwaysTag $dark={dark}>
-          <S.AlwaysText>{t('plan.diff.change.always')}</S.AlwaysText>
+          <S.AlwaysText>{t('plan.diff.change.always').toLocaleUpperCase()}</S.AlwaysText>
         </S.AlwaysTag>
       ) : view.deltaChip ? (
         <S.DeltaChip $tone={view.deltaChip.tone} $dark={dark}>

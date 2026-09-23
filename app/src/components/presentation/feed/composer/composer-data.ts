@@ -27,7 +27,7 @@ export interface ComposerSessionData {
   durationLabel: string;
   /** e.g. "19". */
   setsLabel: string;
-  /** e.g. "KINETIC · MONDAY, JUNE 9". */
+  /** e.g. "ALCEDO · MONDAY, JUNE 9". */
   kicker: string;
   /** e.g. ["SHOULDER PRESS PR", "VOLUME PR", "13-DAY STREAK"]. */
   prPills: string[];
@@ -126,7 +126,7 @@ export function deriveComposerSessionData(
 
   const prPills: string[] = [];
   for (const record of recordsBySession.get(session.id) ?? []) {
-    prPills.push(`${record.exerciseName.toUpperCase()} PR`);
+    prPills.push(`${record.exerciseName.toLocaleUpperCase()} PR`);
   }
 
   const otherMaxVolume = sessions
@@ -146,7 +146,7 @@ export function deriveComposerSessionData(
     weekday: 'long',
     month: 'long',
     day: 'numeric',
-  }).toUpperCase();
+  }).toLocaleUpperCase();
 
   return {
     sessionId: session.id,
@@ -156,7 +156,7 @@ export function deriveComposerSessionData(
     volumeUnit: 'kg',
     durationLabel: formatSessionClock(session.duration),
     setsLabel: String(sets),
-    kicker: `KINETIC · ${kickerDate}`,
+    kicker: `ALCEDO · ${kickerDate}`,
     prPills,
   };
 }

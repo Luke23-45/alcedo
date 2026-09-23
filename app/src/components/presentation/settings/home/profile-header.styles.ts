@@ -1,5 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 // Profile header card: 361×80 rx24 (settings-dark.md Screen 1). Colors are
 // supplied by the wrappers in profile-header.tsx.
@@ -16,9 +17,11 @@ export const HeaderBodyBase = styled(LinearGradient)`
 `;
 
 export const HeaderPressable = styled.Pressable`
-  height: 80px;
+  min-height: 80px;
   flex-direction: row;
   align-items: center;
+  padding-top: 12px;
+  padding-bottom: 12px;
   padding-left: 20px;
   padding-right: 14px;
 `;
@@ -36,9 +39,8 @@ export const AvatarBase = styled(LinearGradient)`
 `;
 
 export const AvatarInitial = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline', { weight: '600' })}
   font-size: 19px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   color: #ffffff;
 `;
 
@@ -49,16 +51,14 @@ export const HeaderText = styled.View`
 `;
 
 export const HeaderName = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline', { weight: '600' })}
   font-size: 15px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.3px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
 export const HeaderSubtitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption1', { weight: '500' })}
   font-size: 11.5px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   color: #86868b;
 `;

@@ -1,6 +1,8 @@
 import { DayOfWeek } from '@js-joda/core';
 import { Pressable } from 'react-native';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { dayLetter } from '../notifications/notification-day-chips';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
 import { useAppSelector } from '@/store';
 import { selectActiveProgram } from '@/store/program';
@@ -19,15 +21,22 @@ import {
   SplitStrip,
 } from './training-days.styles';
 
-const WEEK: { day: DayOfWeek; letter: string }[] = [
-  { day: DayOfWeek.MONDAY, letter: 'M' },
-  { day: DayOfWeek.TUESDAY, letter: 'T' },
-  { day: DayOfWeek.WEDNESDAY, letter: 'W' },
-  { day: DayOfWeek.THURSDAY, letter: 'T' },
-  { day: DayOfWeek.FRIDAY, letter: 'F' },
-  { day: DayOfWeek.SATURDAY, letter: 'S' },
-  { day: DayOfWeek.SUNDAY, letter: 'S' },
+const WEEK: { day: DayOfWeek }[] = [
+  { day: DayOfWeek.MONDAY },
+  { day: DayOfWeek.TUESDAY },
+  { day: DayOfWeek.WEDNESDAY },
+  { day: DayOfWeek.THURSDAY },
+  { day: DayOfWeek.FRIDAY },
+  { day: DayOfWeek.SATURDAY },
+  { day: DayOfWeek.SUNDAY },
 ];
+
+/** Spec circle: 40. Below that the row measures itself and scales the
+ * circles down (28 floor keeps the 12pt initial legible) so 320 never
+ * overlaps — pressable flex alone can't fix 7 × 40 > 246. */
+const SPEC_CIRCLE = 40;
+const MIN_CIRCLE = 28;
+const MIN_GAP_TOTAL = 24;
 
 /**
  * The 7-day training/rest picker. Selected days fill with the brand gradient;
@@ -44,6 +53,11 @@ export function TrainingDays() {
   const selected = new Set(trainingDays.map((d) => d.value()));
   const training = WEEK.filter(({ day }) => selected.has(day.value()));
   const rest = WEEK.filter(({ day }) => !selected.has(day.value()));
+  const [rowWidth, setRowWidth] = useState(0);
+  const circle =
+    rowWidth > 0
+      ? Math.min(SPEC_CIRCLE, Math.max(MIN_CIRCLE, Math.floor((rowWidth - MIN_GAP_TOTAL) / WEEK.length)))
+      : SPEC_CIRCLE;
 
   const toggle = (day: DayOfWeek) => {
     const next = selected.has(day.value())
@@ -64,18 +78,28 @@ export function TrainingDays() {
   return (
     <DaysCard>
       <DaysHeaderRow>
-        <DaysTitle>{t(settingsKey('settings.planner.training_days.summary'), { count: training.length })}</DaysTitle>
+        <DaysTitle numberOfLines={1}>
+          {t(settingsKey('settings.planner.training_days.summary'), { count: training.length })}
+        </DaysTitle>
         {rest.length > 0 && (
-          <DaysRestCaption>
+          <DaysRestCaption numberOfLines={1}>
             {t(settingsKey('settings.planner.training_days.rest'), {
               days: rest.map(({ day }) => weekdayShort(day, locale)).join(' & '),
             })}
           </DaysRestCaption>
         )}
       </DaysHeaderRow>
-      <DayRow>
-        {WEEK.map(({ day, letter }) => {
+      <DayRow
+        onLayout={(e) => {
+          const width = e.nativeEvent.layout.width;
+          setRowWidth((prev) => (prev === width ? prev : width));
+        }}
+      >
+        {WEEK.map(({ day }) => {
           const isSelected = selected.has(day.value());
+          // AP02: visual initials in the app language (Intl narrow), same
+          // pattern the notifications day chips already use.
+          const initial = dayLetter(day, locale ?? undefined);
           return (
             <Pressable
               key={day.value()}
@@ -86,17 +110,23 @@ export function TrainingDays() {
                 day: weekdayShort(day, locale),
               })}
               hitSlop={2}
-              style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}
+              style={{ flex: 1, maxWidth: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}
             >
               {isSelected ? (
-                <HomeGradient variant="brand" style={{ width: 40, height: 40, borderRadius: 20 }}>
-                  <DayCircle $selected>
-                    <DayLetter $selected>{letter}</DayLetter>
+                <HomeGradient
+                  variant="brand"
+                  style={{ width: circle, height: circle, borderRadius: circle / 2 }}
+                >
+                  <DayCircle $selected style={{ width: circle, height: circle, borderRadius: circle / 2 }}>
+                    <DayLetter $selected>{initial}</DayLetter>
                   </DayCircle>
                 </HomeGradient>
               ) : (
-                <DayCircle $selected={false}>
-                  <DayLetter $selected={false}>{letter}</DayLetter>
+                <DayCircle
+                  $selected={false}
+                  style={{ width: circle, height: circle, borderRadius: circle / 2 }}
+                >
+                  <DayLetter $selected={false}>{initial}</DayLetter>
                 </DayCircle>
               )}
             </Pressable>

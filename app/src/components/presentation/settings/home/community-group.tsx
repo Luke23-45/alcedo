@@ -15,8 +15,9 @@ export function CommunityGroup() {
   const { push } = useRouter();
   const visibility = useAppSelector((s) => s.settings.profileVisibility);
   const showPRs = useAppSelector((s) => s.settings.privacyShowPRs);
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
 
-  const visibilityLabel = visibility.charAt(0).toUpperCase() + visibility.slice(1);
+  const visibilityLabel = visibility.charAt(0).toLocaleUpperCase(locale) + visibility.slice(1);
 
   return (
     <SettingsGroup label={t(settingsKey('settings.home.section.community'))}>

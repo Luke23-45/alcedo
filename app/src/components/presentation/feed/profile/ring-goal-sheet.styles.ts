@@ -76,7 +76,6 @@ export const StepValue = styled.Text<{ $color: string }>`
   color: ${({ $color }) => $color};
   min-width: 120px;
   text-align: center;
-  font-variant: tabular-nums;
 `;
 
 export const DoneButton = styled(Pressable)`

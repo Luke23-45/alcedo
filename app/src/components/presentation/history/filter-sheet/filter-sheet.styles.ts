@@ -85,8 +85,18 @@ export const Chip = styled.Pressable<{ $selected: boolean }>`
   border-width: 1px;
   align-items: center;
   justify-content: center;
-  background-color: ${({ $selected }) => ($selected ? 'rgba(255,159,10,0.14)' : 'rgba(255,255,255,0.06)')};
-  border-color: ${({ $selected }) => ($selected ? 'rgba(255,159,10,0.4)' : 'rgba(255,255,255,0.1)')};
+  background-color: ${({ theme, $selected }) =>
+    $selected
+      ? 'rgba(255,159,10,0.14)'
+      : theme.isDark
+        ? 'rgba(255,255,255,0.06)'
+        : 'rgba(120,120,128,0.12)'};
+  border-color: ${({ theme, $selected }) =>
+    $selected
+      ? 'rgba(255,159,10,0.4)'
+      : theme.isDark
+        ? 'rgba(255,255,255,0.1)'
+        : 'rgba(120,120,128,0.18)'};
 `;
 
 export const ToggleRow = styled.View`
@@ -120,7 +130,7 @@ export const DoneButton = styled.Pressable`
   justify-content: center;
   shadow-color: #ff2d55;
   shadow-offset: 0px 7px;
-  shadow-opacity: 0.5;
+  shadow-opacity: ${({ theme }) => (theme.isDark ? 0.5 : 0.35)};
   shadow-radius: 12px;
   elevation: 8;
 `;

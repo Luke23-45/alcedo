@@ -26,7 +26,7 @@ export interface OwnIdentitySource {
 export function ownPersonInitial(name: string | undefined, username: string | undefined): string {
   const source = (name ?? '').trim() || (username ?? '').trim().replace(/^@+/, '');
   const first = source.charAt(0);
-  return /[\p{L}\p{N}]/u.test(first) ? first.toUpperCase() : '•';
+  return /[\p{L}\p{N}]/u.test(first) ? first.toLocaleUpperCase() : '•';
 }
 
 /**

@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 
 export const CardInner = styled.View`
@@ -11,7 +12,7 @@ export const TitleRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  height: 20px;
+  min-height: 20px;
 `;
 
 export const Title = styled.Text`
@@ -38,8 +39,8 @@ export const HeaderRow = styled.View`
   height: 10px;
 `;
 
-export const HCell = styled.Text<{ $w: number; $right?: boolean }>`
-  width: ${({ $w }) => $w}px;
+export const HCell = styled.Text<{ $flex: number; $right?: boolean }>`
+  flex: ${({ $flex }) => $flex};
   font-family: ${({ theme }) => theme.font.text};
   font-size: 8px;
   line-height: 10px;
@@ -51,7 +52,7 @@ export const HCell = styled.Text<{ $w: number; $right?: boolean }>`
 `;
 
 export const HeaderDivider = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-top: 5px;
   background-color: ${({ theme }) =>
     theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(60,60,67,0.12)'};
@@ -64,13 +65,13 @@ export const SetRow = styled.View<{ $first: boolean }>`
   ${({ $first, theme }) =>
     $first
       ? ''
-      : `border-top-width: 1px; border-top-color: ${
-          theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(60,60,67,0.08)'
-        };`}
+      : `border-top-width: ${StyleSheet.hairlineWidth}px; border-top-color: ${
+           theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(60,60,67,0.08)'
+         };`}
 `;
 
-export const SetNum = styled.Text<{ $w: number }>`
-  width: ${({ $w }) => $w}px;
+export const SetNum = styled.Text<{ $flex: number }>`
+  flex: ${({ $flex }) => $flex};
   font-family: ${({ theme }) => theme.font.text};
   font-size: 11px;
   line-height: 14px;
@@ -78,8 +79,8 @@ export const SetNum = styled.Text<{ $w: number }>`
   color: ${({ theme }) => (theme.isDark ? '#8E8E93' : '#636366')};
 `;
 
-export const Cell = styled.Text<{ $w: number }>`
-  width: ${({ $w }) => $w}px;
+export const Cell = styled.Text<{ $flex: number }>`
+  flex: ${({ $flex }) => $flex};
   font-family: ${({ theme }) => theme.font.text};
   font-size: 12px;
   line-height: 15px;
@@ -91,8 +92,8 @@ export const E1rmCell = styled(Cell)`
   font-weight: ${({ theme }) => theme.weight.bold};
 `;
 
-export const RpeCell = styled.Text<{ $w: number }>`
-  width: ${({ $w }) => $w}px;
+export const RpeCell = styled.Text<{ $flex: number }>`
+  flex: ${({ $flex }) => $flex};
   text-align: right;
   font-family: ${({ theme }) => theme.font.text};
   font-size: 11px;

@@ -26,20 +26,24 @@ const MINUS = '−'; // U+2212, the reference's minus
 
 describe('formatDeltaPercent', () => {
   it('signs gains with +', () => {
-    expect(formatDeltaPercent(100, 111.111)).toBe('+11.1%');
+    expect(formatDeltaPercent(100, 111.111, 'en-US')).toBe('+11.1%');
   });
 
   it('uses U+2212 for losses, matching the reference typography', () => {
-    expect(formatDeltaPercent(100, 90)).toBe(`${MINUS}10.0%`);
+    expect(formatDeltaPercent(100, 90, 'en-US')).toBe(`${MINUS}10.0%`);
   });
 
   it('reports a flat delta as 0.0%', () => {
-    expect(formatDeltaPercent(100, 100)).toBe('0.0%');
+    expect(formatDeltaPercent(100, 100, 'en-US')).toBe('0.0%');
+  });
+
+  it('uses the locale decimal separator', () => {
+    expect(formatDeltaPercent(100, 111.111, 'de-DE')).toBe('+11,1%');
   });
 
   it('returns null when the baseline is zero or negative', () => {
-    expect(formatDeltaPercent(0, 50)).toBeNull();
-    expect(formatDeltaPercent(-10, 50)).toBeNull();
+    expect(formatDeltaPercent(0, 50, 'en-US')).toBeNull();
+    expect(formatDeltaPercent(-10, 50, 'en-US')).toBeNull();
   });
 });
 
@@ -59,12 +63,16 @@ describe('formatBare', () => {
 
 describe('formatWeeklyRate', () => {
   it('renders near-integers without decimals', () => {
-    expect(formatWeeklyRate(1)).toBe('1');
-    expect(formatWeeklyRate(1.04)).toBe('1');
+    expect(formatWeeklyRate(1, 'en-US')).toBe('1');
+    expect(formatWeeklyRate(1.04, 'en-US')).toBe('1');
   });
 
   it('keeps one decimal otherwise', () => {
-    expect(formatWeeklyRate(1.5)).toBe('1.5');
+    expect(formatWeeklyRate(1.5, 'en-US')).toBe('1.5');
+  });
+
+  it('uses the locale decimal separator', () => {
+    expect(formatWeeklyRate(1.5, 'de-DE')).toBe('1,5');
   });
 });
 

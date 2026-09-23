@@ -47,8 +47,7 @@ export function editorPalette(isDark: boolean) {
     selectedWell: isDark ? 'rgba(255,106,61,0.10)' : 'rgba(232,84,47,0.08)',
     /** Expanded/active card edge stroke. */
     activeEdge: 'rgba(255,106,61,0.30)',
-    /** Search-result tile accents cycle through these. */
-    tileAccents: ['#FF6B60', '#5EB1EF', '#B48CF2', '#FFB340', '#4ADE80', '#5EDCF0'] as const,
+
     /** Radio outline when unselected. */
     radio: isDark ? '#48484A' : '#C7C7CC',
     /** Focus glow around the Add-mode search field. */

@@ -1,5 +1,5 @@
 import { useTranslate } from '@tolgee/react';
-import { useAppSelectorWithArg } from '@/store';
+import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { selectTopLevelComments } from '@/store/feed/comments';
 import { FeedAvatar } from '../shared/feed-avatar';
@@ -60,6 +60,7 @@ export function PostDetail({
 }: PostDetailProps) {
   const theme = useAppTheme();
   const { t } = useTranslate();
+  const locale = useAppSelector((s) => s.settings.preferredLanguage);
 
   const ownPerson = useOwnPerson();
   // The own post resolves through the user's real identity, not the
@@ -127,14 +128,16 @@ export function PostDetail({
         <FeedAvatar person={author} size={44} ringColor={theme.color.background.base} />
         <S.AuthorText>
           <S.NameRow>
-            <S.Name>{author.name}</S.Name>
+            <S.Name numberOfLines={1} ellipsizeMode="tail">
+              {author.name}
+            </S.Name>
             {model.isOwn ? (
               <S.BadgeSlot>
                 <IdentityBadge variant="you" />
               </S.BadgeSlot>
             ) : null}
           </S.NameRow>
-          <S.Subline>{`${author.handle} · ${relativeAgeLong(model.postedAtMs)}`}</S.Subline>
+          <S.Subline>{`${author.handle} · ${relativeAgeLong(model.postedAtMs, Date.now(), locale)}`}</S.Subline>
         </S.AuthorText>
       </S.AuthorRow>
 

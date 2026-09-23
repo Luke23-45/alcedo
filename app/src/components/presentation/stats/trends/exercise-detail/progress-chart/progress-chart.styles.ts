@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 
 /** Must match PAD_X in progress-chart.tsx: the plot's horizontal inset. */
 const PAD_X = 4;
@@ -132,7 +132,7 @@ export const XLabelEnd = styled(XLabelBase)<{ $current?: boolean }>`
 `;
 
 export const Divider = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-top: 8px;
   margin-horizontal: 20px;
   background-color: ${({ theme }) =>

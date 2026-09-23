@@ -34,7 +34,9 @@ export const CtaShadow = styled.View<{ $dimmed?: boolean }>`
 `;
 
 export const CtaButton = styled.Pressable`
-  height: 54px;
+  min-height: 54px;
+  padding-vertical: 12px;
+  padding-horizontal: 20px;
   border-radius: 27px;
   overflow: hidden;
   align-items: center;
@@ -75,6 +77,7 @@ export const CtaLabel = styled.Text`
   font-size: 16px;
   font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.3px;
+  text-align: center;
   color: #ffffff;
 `;
 
@@ -83,6 +86,7 @@ export const CtaCaption = styled.Text`
   font-size: 10.5px;
   font-weight: ${({ theme }) => theme.weight.medium};
   letter-spacing: -0.1px;
+  text-align: center;
   color: ${({ theme }) => (theme.isDark ? '#6C6C70' : '#8E8E93')};
   margin-top: 10px;
 `;

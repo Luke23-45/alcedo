@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 /** Delivery card (settings-dark.md Screen 3): quiet hours + badge rows. */
 
@@ -9,9 +10,9 @@ export const Block = styled.View`
 
 // Spec: 12.5pt/500 #98989F end-anchored value text.
 export const RowValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '500' })}
   font-size: 12.5px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   color: ${({ theme }) => (theme.isDark ? '#98989F' : '#8E8E93')};
   text-align: right;
+  flex-shrink: 1;
 `;

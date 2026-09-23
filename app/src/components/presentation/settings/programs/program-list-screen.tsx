@@ -124,7 +124,9 @@ export function ProgramListScreen() {
           >
             <ActionButton $kind="neutral">
               <PlusGlyph />
-              <ActionLabel $kind="neutral">{t('plan.add.button')}</ActionLabel>
+              <ActionLabel $kind="neutral" numberOfLines={1}>
+                {t('plan.add.button')}
+              </ActionLabel>
             </ActionButton>
           </Pressable>
           <Pressable
@@ -135,7 +137,9 @@ export function ProgramListScreen() {
           >
             <ActionButton $kind="amber">
               <ImportGlyph />
-              <ActionLabel $kind="amber">{t('plan.import.button')}</ActionLabel>
+              <ActionLabel $kind="amber" numberOfLines={1}>
+                {t('plan.import.button')}
+              </ActionLabel>
             </ActionButton>
           </Pressable>
         </ButtonRow>

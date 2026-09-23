@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { sessionPalette } from '../session-tokens';
 
 export const EmptyWrap = styled.View`
@@ -8,7 +9,7 @@ export const EmptyWrap = styled.View`
 `;
 
 export const Title = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 19px;
   line-height: 24px;
   /* Spec says 650; RN renders non-hundred weights as Regular — 600 is nearest. */
@@ -20,7 +21,7 @@ export const Title = styled.Text`
 `;
 
 export const Body = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12.5px;
   line-height: 18px;
   font-weight: 500;

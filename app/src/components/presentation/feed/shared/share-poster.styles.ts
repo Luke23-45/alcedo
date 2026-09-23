@@ -123,12 +123,15 @@ export const PillRow = styled.View`
   right: 0;
   flex-direction: row;
   gap: 8px;
+  overflow: hidden;
 `;
 
 export const Pill = styled.View`
   height: 22px;
   padding-left: 12px;
   padding-right: 12px;
+  flex-shrink: 1;
+  min-width: 0;
   border-radius: 11px;
   background-color: rgba(255, 255, 255, 0.2);
   border-width: 0.8px;

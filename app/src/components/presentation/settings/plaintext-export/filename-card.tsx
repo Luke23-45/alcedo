@@ -17,7 +17,7 @@ function previewStamp(): string {
 /** Screen 8 of S4: the filename preview — a preview only, the effect names the real file. */
 export function FilenameCard({ format }: { format: PlaintextExportFormat }) {
   const { t } = useTranslate();
-  const filename = `kinetic-export.${previewStamp()}.${format === 'CSV' ? 'csv' : 'json'}`;
+  const filename = `alcedo-export.${previewStamp()}.${format === 'CSV' ? 'csv' : 'json'}`;
   return (
     <S.FilenameWrap>
       <SectionLabel>{t('backup.plaintext_export.filename.title')}</SectionLabel>

@@ -121,7 +121,7 @@ function SearchResults({ results, onSelectResult }: Pick<SearchSectionProps, 're
               accessibilityLabel={result.name}
             >
               <ResultTile $bg={accent.bg}>
-                <ResultTileLetter $fg={accent.fg}>{result.name.charAt(0).toUpperCase()}</ResultTileLetter>
+                <ResultTileLetter $fg={accent.fg}>{result.name.charAt(0).toLocaleUpperCase()}</ResultTileLetter>
               </ResultTile>
               <ResultTextColumn>
                 <ResultName numberOfLines={1} ellipsizeMode="tail">

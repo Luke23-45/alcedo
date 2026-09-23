@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAppSelector } from '@/store';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { StarGlyph } from '../shared/feed-glyphs';
 import { FeedCard } from './feed-card';
@@ -25,6 +26,7 @@ export function ChallengeBanner() {
   const theme = useAppTheme();
   const dark = theme.isDark;
   const t = useTimelineT();
+  const locale = useAppSelector((x) => x.settings.preferredLanguage);
   return (
     <FeedCard radius={24} style={{ marginHorizontal: 16 }}>
       <S.BannerRow
@@ -75,7 +77,7 @@ export function ChallengeBanner() {
               locations={[...CHALLENGE_GRADIENT_LOCATIONS]}
               start={{ x: 0, y: 0 }}
               end={{ x: 0.6, y: 1 }}
-              style={{ width: CHALLENGE.trackFill, height: 3.5, borderRadius: 1.75 }}
+              style={{ width: `${CHALLENGE.trackFillPct}%`, height: 3.5, borderRadius: 1.75 }}
             />
           </S.Track>
         </S.Middle>
@@ -90,7 +92,7 @@ export function ChallengeBanner() {
           </S.Rank>
           <S.Points $dark={dark}>
             {t('feed.timeline.challenge.points', '10,340 PTS', {
-              points: formatChallengePoints(CHALLENGE.titlePoints),
+              points: formatChallengePoints(CHALLENGE.titlePoints, locale),
             })}
           </S.Points>
         </S.RankCol>

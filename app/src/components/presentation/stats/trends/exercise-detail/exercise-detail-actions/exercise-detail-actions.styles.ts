@@ -6,7 +6,9 @@ export const Actions = styled.View`
 `;
 
 export const ctaButton: StyleProp<ViewStyle> = {
-  height: 54,
+  minHeight: 54,
+  paddingVertical: 12,
+  paddingHorizontal: 20,
   borderRadius: 27,
   overflow: 'hidden',
   alignItems: 'center',
@@ -37,6 +39,7 @@ export const CtaLabel = styled.Text`
   line-height: 20px;
   font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.3px;
+  text-align: center;
   color: #ffffff;
 `;
 
@@ -45,7 +48,9 @@ export const secondaryHit: StyleProp<ViewStyle> = {
 };
 
 export const SecondaryButton = styled.View`
-  height: 48px;
+  min-height: 48px;
+  padding-vertical: 12px;
+  padding-horizontal: 20px;
   border-radius: 24px;
   border-width: 1px;
   border-color: ${({ theme }) =>

@@ -9,7 +9,7 @@ import { useTranslate } from '@tolgee/react';
 import { useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 import { ReactNode } from 'react';
-import { chevronColor } from '../shared/grouped-settings-list.styles';
+import { useChevronColor } from '../shared/grouped-settings-list';
 import { lastBackupLabel } from '../shared/backup-status';
 import { settingsKey } from '../shared/settings-i18n';
 import { PreferenceSegmented, SegmentedOption } from '../preferences/preference-segmented';
@@ -65,6 +65,7 @@ export function BackupCard() {
   const use24HourTime = useAppSelector((s) => s.settings.use24HourTime);
   const hasBackend = backupBackend !== undefined;
   const canBackUpNow = backupMode !== 'off' && hasBackend;
+  const chevron = useChevronColor();
 
   const backupTime = lastBackupLabel(
     lastBackup,
@@ -88,7 +89,7 @@ export function BackupCard() {
       <S.BackupHeader>
         <S.BackupHeaderText>
           <S.BackupTitle>{t(settingsKey('settings.backup.mode.title'))}</S.BackupTitle>
-          <S.BackupSubtitle>
+          <S.BackupSubtitle numberOfLines={2}>
             {backupTime
               ? t(settingsKey('settings.backup.cloud.subtitle'), { time: backupTime })
               : t(settingsKey('settings.backup.cloud.never'))}
@@ -111,11 +112,13 @@ export function BackupCard() {
         accessibilityLabel={t(settingsKey('settings.backup.destination.title'))}
         onPress={() => push('/settings/backup-and-restore/remote-backup')}
       >
-        <S.DestinationRowTitle>{t(settingsKey('settings.backup.destination.title'))}</S.DestinationRowTitle>
-        <S.DestinationRowValue>
+        <S.DestinationRowTitle numberOfLines={1}>
+          {t(settingsKey('settings.backup.destination.title'))}
+        </S.DestinationRowTitle>
+        <S.DestinationRowValue numberOfLines={1}>
           {backupBackend?.backend.name ?? t(settingsKey('settings.backup.destination.not_set'))}
         </S.DestinationRowValue>
-        <Icon source="chevronRight" size={18} color={chevronColor} />
+        <Icon source="chevronRight" size={18} color={chevron} />
       </S.DestinationRow>
       {backupMode === 'off' ? undefined : (
         <>
@@ -128,7 +131,7 @@ export function BackupCard() {
               onPress={() => dispatch(executeRemoteBackup({ force: true, reason: 'manual' }))}
             >
               <BackupCtaButton disabled={!canBackUpNow}>
-                <S.BackupCtaText>{t(settingsKey('settings.backup.backup_now'))}</S.BackupCtaText>
+                <S.BackupCtaText numberOfLines={1}>{t(settingsKey('settings.backup.backup_now'))}</S.BackupCtaText>
               </BackupCtaButton>
             </Pressable>
           </S.BackupCtaWrap>

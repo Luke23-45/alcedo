@@ -1,6 +1,6 @@
 import Button from '@/components/presentation/foundation/button';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { type as typeHelper } from '@/styles/theme';
+import { alpha, type as typeHelper } from '@/styles/theme';
 import { T } from '@tolgee/react';
 import { ReactNode, useState } from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
@@ -65,20 +65,29 @@ export function CardioValueTile<T>({
       <Text style={[styles.label, labelType, { color: theme.color.content.secondary }]}>{label}</Text>
     </View>
   );
+  const dark = theme.isDark;
   const tileStyle = [
     styles.tile,
     {
-      backgroundColor: filled ? theme.color.fill.secondary : theme.color.fill.quaternary,
+      // Session-neutral washes with a hairline edge (rx14 tile rhythm), so the
+      // tiles read as session content — not flat Paper. Filled and empty stay
+      // separated by a tonal step rather than by hue.
+      backgroundColor: filled
+        ? dark
+          ? alpha('#FFFFFF', 0.07)
+          : alpha('#000000', 0.05)
+        : dark
+          ? alpha('#FFFFFF', 0.03)
+          : alpha('#000000', 0.03),
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: dark ? alpha('#FFFFFF', 0.1) : alpha('#000000', 0.1),
       minWidth: 80,
       paddingHorizontal: theme.space.md,
       paddingVertical: theme.space.sm,
     },
   ];
-
-  // The seed colour is the user's and can land anywhere on the wheel, so filled and empty are
-  // separated by a tonal step rather than by hue.
   return (
-    <View style={{ borderRadius: theme.radius.md, overflow: 'hidden' }}>
+    <View style={{ borderRadius: theme.radius.xl, overflow: 'hidden' }}>
       {isReadonly ? (
         <View testID={testID} style={tileStyle}>
           {face}

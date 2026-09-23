@@ -2,6 +2,7 @@ import { AccordionItem } from '@/components/presentation/foundation/accordion-it
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { RecordedExercise } from '@/models/session-models';
 import { useAppSelector } from '@/store';
+import { useTranslate } from '@tolgee/react';
 import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 import { Card, Divider, Text } from 'react-native-paper';
@@ -16,10 +17,13 @@ interface ExerciseNotesDisplayProps {
 }
 export default function ExerciseNotesDisplay(props: ExerciseNotesDisplayProps) {
   const theme = useAppTheme();
+  const { t } = useTranslate();
   const expandByDefault = useAppSelector((x) => x.settings.notesExpandedByDefault);
   const notes = props.exercise.notes ?? '';
   const blueprintNotes = props.exercise.blueprint.notes ?? '';
-  const previousNotes = props.previousExercise?.notes ? 'Last time: ' + props.previousExercise.notes : '';
+  const previousNotes = props.previousExercise?.notes
+    ? t('workout.session.last_time.label', { notes: props.previousExercise.notes })
+    : '';
   const [expanded, setExpanded] = useState(expandByDefault);
   const [maxNumberOfLines, setMaxNumberOfLines] = useState(expandByDefault ? undefined : 1);
   const iconButtonHeight = 40;

@@ -1,8 +1,9 @@
 import styled, { css } from 'styled-components/native';
+import { StyleSheet } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { ScrollView as GestureScrollView } from 'react-native-gesture-handler';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
-import type { AppTheme } from '@/styles/theme';
+import { type as typeHelper, type AppTheme } from '@/styles/theme';
 
 /* ------------------------------------------------------------------ *
  * Workout editor, three-canvas redesign (393×852 reference).
@@ -19,8 +20,8 @@ export const Screen = styled.View`
 export const AuraWrap = styled.View`
   position: absolute;
   top: -150px;
-  left: -90px;
-  width: 570px;
+  left: 0;
+  right: 0;
   height: 430px;
 `;
 
@@ -65,11 +66,11 @@ export const NavTitle = styled.Text`
   left: 64px;
   right: 64px;
   text-align: center;
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
@@ -92,7 +93,7 @@ export const DraftDot = styled.View`
 `;
 
 export const DraftText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
@@ -114,20 +115,20 @@ export const SectionHeaderRow = styled.View`
 `;
 
 export const MicroLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9px;
   line-height: 12px;
   font-weight: 700;
   letter-spacing: 1.4px;
-  text-transform: uppercase;
   color: ${({ theme }) => theme.color.content.tertiary};
 `;
 
 export const HeaderHint = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 10.5px;
-  line-height: 14px;
-  font-weight: 500;
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
   color: ${({ theme }) => theme.color.content.tertiary};
 `;
 
@@ -141,7 +142,7 @@ export const PlanNameInput = styled.TextInput.attrs<{ theme: AppTheme }>((props)
   placeholderTextColor: props.theme.isDark ? '#6C6C70' : '#AEAEB2',
   selectionColor: props.theme.home.seeAll,
 }))`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 32px;
   line-height: 40px;
   font-weight: 700;
@@ -178,7 +179,7 @@ export const MetaCol = styled.View`
 `;
 
 export const MetaValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 17px;
   line-height: 22px;
   font-weight: 700;
@@ -187,26 +188,25 @@ export const MetaValue = styled.Text`
 `;
 
 export const MetaLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 7.5px;
   line-height: 10px;
   font-weight: 700;
   letter-spacing: 0.8px;
-  text-transform: uppercase;
   color: ${({ theme }) => theme.color.content.tertiary};
   margin-top: 4px;
   text-align: center;
 `;
 
 export const MetaDivider = styled.View`
-  width: 1px;
+  width: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => theme.color.border.hairline};
   margin-top: 4px;
   margin-bottom: 4px;
 `;
 
 export const MetaFootnote = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 8.5px;
   line-height: 11px;
   font-weight: 600;
@@ -220,7 +220,7 @@ export const MetaFootnote = styled.Text`
 /* --- Notes ---------------------------------------------------------------------- */
 
 export const NotesHint = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9.5px;
   line-height: 12px;
   font-weight: 500;
@@ -232,7 +232,7 @@ export const NotesInput = styled.TextInput.attrs<{ theme: AppTheme }>((props) =>
   selectionColor: props.theme.home.seeAll,
   textAlignVertical: 'top',
 }))`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   line-height: 19px;
   font-weight: 500;
@@ -287,7 +287,7 @@ export const GrabZone = styled.View`
   align-self: stretch;
 `;
 
-export const NumberTile = styled(HomeGradient).attrs({ variant: 'breast' as const })`
+export const NumberTile = styled(HomeGradient).attrs({ variant: 'brand' as const })`
   width: 32px;
   height: 32px;
   border-radius: 10px;
@@ -297,7 +297,7 @@ export const NumberTile = styled(HomeGradient).attrs({ variant: 'breast' as cons
 `;
 
 export const NumberText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 14px;
   line-height: 18px;
   font-weight: 700;
@@ -312,11 +312,11 @@ export const RowTexts = styled.View`
 `;
 
 export const RowName = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 14px;
   line-height: 18px;
   font-weight: 600;
-  letter-spacing: -0.1px;
+  letter-spacing: -0.2px;
   color: ${({ theme }) => theme.color.content.primary};
 `;
 
@@ -326,7 +326,7 @@ export const RowNameEmpty = styled(RowName)`
 `;
 
 export const RowSummary = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 11px;
   line-height: 15px;
   font-weight: 500;
@@ -335,7 +335,7 @@ export const RowSummary = styled.Text`
 `;
 
 export const RowDivider = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => theme.color.border.hairline};
   margin-left: 24px;
   margin-right: 4px;
@@ -344,8 +344,8 @@ export const RowDivider = styled.View`
 /** The dashed drop-target line shown while a row is being reordered. */
 export const DropIndicator = styled(Animated.View)`
   position: absolute;
-  left: 14px;
-  right: 14px;
+  left: 8px;
+  right: 8px;
   top: 0;
   height: 2px;
   flex-direction: row;
@@ -353,9 +353,9 @@ export const DropIndicator = styled(Animated.View)`
 `;
 
 export const DropDot = styled.View`
-  width: 5px;
-  height: 5px;
-  border-radius: 2.5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
   background-color: ${({ theme }) => theme.home.seeAll};
 `;
 
@@ -371,7 +371,7 @@ export const DropDash = styled.View`
 `;
 
 export const ReorderCaption = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9.5px;
   line-height: 13px;
   font-weight: 500;
@@ -396,21 +396,23 @@ export const EmptyIconRing = styled.View`
   align-items: center;
   justify-content: center;
   background-color: ${({ theme }) => theme.color.fill.secondary};
+  border-width: ${StyleSheet.hairlineWidth}px;
+  border-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)')};
   margin-bottom: 18px;
 `;
 
 export const EmptyTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 17px;
   line-height: 22px;
   font-weight: 600;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.4px;
   color: ${({ theme }) => theme.color.content.primary};
   text-align: center;
 `;
 
 export const EmptyBodyText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   line-height: 17px;
   font-weight: 500;
@@ -421,7 +423,7 @@ export const EmptyBodyText = styled.Text`
 
 /** Ghost secondary button per the spec: white 8% fill, amber label and glyph. */
 export const EmptyAddButton = styled.View`
-  border-radius: 22px;
+  border-radius: 19px;
   overflow: hidden;
   margin-top: 20px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)')};
@@ -437,11 +439,11 @@ export const EmptyAddPress = styled.Pressable`
   justify-content: center;
   padding-left: 20px;
   padding-right: 20px;
-  gap: 8px;
+  gap: 10px;
 `;
 
 export const EmptyAddLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   line-height: 18px;
   font-weight: 600;
@@ -463,7 +465,7 @@ export const BehaviorBody = styled.View`
 `;
 
 export const BehaviorKicker = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9px;
   line-height: 12px;
   font-weight: 700;
@@ -473,7 +475,7 @@ export const BehaviorKicker = styled.Text`
 `;
 
 export const BehaviorText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 11.5px;
   line-height: 16px;
   font-weight: 500;
@@ -483,7 +485,7 @@ export const BehaviorText = styled.Text`
 /* --- Footnote ------------------------------------------------------------------------- */
 
 export const Footnote = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9.5px;
   line-height: 13px;
   font-weight: 500;
@@ -497,7 +499,7 @@ export const Footnote = styled.Text`
 /* --- Footer ----------------------------------------------------------------------------- */
 
 export const FooterBar = styled.View`
-  border-top-width: 0.5px;
+  border-top-width: ${StyleSheet.hairlineWidth}px;
   border-top-color: ${({ theme }) => theme.color.border.hairline};
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(11, 11, 14, 0.92)' : 'rgba(248, 248, 252, 0.92)')};
   padding: 12px ${({ theme }) => theme.layout.screenPadding}px 10px ${({ theme }) => theme.layout.screenPadding}px;
@@ -510,25 +512,27 @@ export const FooterRow = styled.View`
 
 export const AddButton = styled.Pressable`
   flex: 1;
-  min-height: 52px;
+  min-height: 54px;
   border-radius: 16px;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.07)' : theme.color.fill.secondary)};
   border-width: 1px;
   border-color: ${({ theme }) => theme.color.border.hairline};
 `;
 
 export const AddButtonLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;
+  letter-spacing: -0.25px;
   color: ${({ theme }) => theme.home.seeAll};
 `;
 
-export const SaveButtonShell = styled(HomeGradient).attrs({ variant: 'breast' as const })`
+export const SaveButtonShell = styled(HomeGradient).attrs({ variant: 'brand' as const })`
   flex: 1;
   border-radius: 16px;
   overflow: hidden;
@@ -551,17 +555,17 @@ export const SaveButtonShell = styled(HomeGradient).attrs({ variant: 'breast' as
 `;
 
 export const SaveButton = styled.Pressable`
-  min-height: 52px;
+  min-height: 54px;
   align-items: center;
   justify-content: center;
 `;
 
 export const SaveButtonLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 16px;
   line-height: 21px;
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
   color: #ffffff;
 `;
 
@@ -570,12 +574,12 @@ export const SaveGloss = styled(HomeGradient).attrs({ variant: 'gloss' as const 
   top: 0;
   right: 0;
   left: 0;
-  height: 26px;
-  opacity: 0.5;
+  height: 27px;
+  opacity: 0.35;
 `;
 
 export const SaveSubcaption = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
@@ -591,7 +595,7 @@ export const CancelButton = styled.Pressable`
 `;
 
 export const CancelLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 16px;
   line-height: 21px;
   font-weight: 600;

@@ -1,9 +1,9 @@
 import styled, { css } from 'styled-components/native';
-import { alpha, fontWeight } from '@/styles/theme';
+import { alpha, type as typeStyle } from '@/styles/theme';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
 
 /* ------------------------------------------------------------------ *
- * Kinetic reference, spec screen 5 (Add Exercise / Search), 393×852.
+ * ALCEDO reference, spec screen 5 (Add Exercise / Search), 393×852.
  * Dark values below; light mode adapts per the home-page token mapping
  * (white cards, black edge strokes, #1C1C1E / #8E8E93 / #AEAEB2 text).
  * ------------------------------------------------------------------ */
@@ -29,8 +29,14 @@ export const SearchRow = styled.View`
   margin-top: 4px;
 `;
 
+// ES01: the spec's 310 is a max, not a fixed width — the field flexes into
+// the row's remainder (307 on 393 EN, shrinking for DE/long locales) so 320
+// never overflows. Cancel keeps its intrinsic width (see the route below).
 export const SearchOuter = styled(HomeGradient).attrs({ variant: 'brand' as const })<{ $focused: boolean }>`
-  width: 310px;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 310px;
   height: 38px;
   border-radius: 12px;
   padding: 1.8px;
@@ -62,17 +68,15 @@ export const SearchInput = styled.TextInput`
   flex: 1;
   margin-left: 11px;
   padding: 0px;
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline')}
   font-size: 15px;
-  font-weight: ${fontWeight.regular};
   letter-spacing: -0.2px;
   color: ${({ theme }) => (theme.isDark ? '#FFFFFF' : '#1C1C1E')};
 `;
 
 export const CancelText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline')}
   font-size: 15.5px;
-  font-weight: ${fontWeight.regular};
   letter-spacing: -0.3px;
   color: ${({ theme }) => theme.home.seeAll};
 `;
@@ -116,11 +120,9 @@ export const Chip = styled.Pressable<{ $active: boolean }>`
 `;
 
 export const ChipText = styled.Text<{ $active: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 12px;
+  ${({ theme, $active }) => typeStyle(theme, 'caption1', { weight: $active ? '600' : '500' })}
   /* Spec: selected chip label is 650, unselected is 500 — but RN renders
      non-hundred weights as Regular, so 600 is the nearest representable. */
-  font-weight: ${({ $active }) => ($active ? fontWeight.semibold : fontWeight.medium)};
   letter-spacing: -0.15px;
   color: ${({ theme, $active }) => ($active ? '#1C1C1E' : theme.isDark ? '#C7C7CC' : '#8E8E93')};
 `;
@@ -140,17 +142,15 @@ export const SectionHeaderRow = styled.View`
 `;
 
 export const SectionLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 10px;
-  font-weight: ${fontWeight.bold};
   letter-spacing: 1.35px;
   color: ${({ theme }) => (theme.isDark ? '#86868B' : '#8E8E93')};
 `;
 
 export const ClearText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '600' })}
   font-size: 11px;
-  font-weight: ${fontWeight.semibold};
   letter-spacing: -0.1px;
   color: #8e8e93;
 `;
@@ -163,7 +163,7 @@ export const RowsList = styled.View`
  * so the body is exactly 52 − 2×1pt edge, never collapsing to content.
  * Spec: tile x=30 (pad-left 14), text x=74, add-button cx=349 (pad-right 13). */
 export const RowPressable = styled.Pressable`
-  height: 50px;
+  min-height: 50px;
   flex-direction: row;
   align-items: center;
   padding-left: 14px;
@@ -185,18 +185,16 @@ export const RowTexts = styled.View`
 `;
 
 export const RowName = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 14px;
-  font-weight: ${fontWeight.semibold};
   letter-spacing: -0.2px;
   line-height: 17px;
   color: ${({ theme }) => (theme.isDark ? '#FFFFFF' : '#1C1C1E')};
 `;
 
 export const RowSub = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   font-size: 10.5px;
-  font-weight: ${fontWeight.medium};
   line-height: 13px;
   margin-top: 3px;
   color: ${({ theme }) => (theme.isDark ? '#86868B' : '#8E8E93')};
@@ -249,19 +247,16 @@ export const CreateTexts = styled.View`
 `;
 
 export const CreateTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   font-size: 14px;
-  /* Spec: 650 — RN falls back to Regular for non-hundred weights, so 600. */
-  font-weight: 600;
   letter-spacing: -0.2px;
   line-height: 17px;
   color: ${({ theme }) => (theme.isDark ? '#FFFFFF' : '#1C1C1E')};
 `;
 
 export const CreateSub = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   font-size: 10.5px;
-  font-weight: ${fontWeight.medium};
   line-height: 13px;
   margin-top: 3px;
   color: ${({ theme }) => (theme.isDark ? '#86868B' : '#8E8E93')};
@@ -274,19 +269,15 @@ export const EmptyWrap = styled.View`
 `;
 
 export const EmptyTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'subheadline', { weight: '600' })}
   font-size: 15px;
-  font-weight: ${fontWeight.semibold};
   letter-spacing: -0.2px;
   text-align: center;
   color: ${({ theme }) => (theme.isDark ? '#F5F5F7' : '#1C1C1E')};
 `;
 
 export const EmptySub = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 13px;
-  font-weight: ${fontWeight.regular};
-  line-height: 18px;
+  ${({ theme }) => typeStyle(theme, 'footnote')}
   text-align: center;
   margin-top: 6px;
   color: ${({ theme }) => (theme.isDark ? '#86868B' : '#8E8E93')};

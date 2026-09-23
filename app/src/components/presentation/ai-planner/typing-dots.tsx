@@ -1,9 +1,9 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useAppReducedMotion } from '@/hooks/useMotionSettings';
 import { useEffect } from 'react';
 import Animated, {
   SharedValue,
   useAnimatedStyle,
-  useReducedMotion,
   useSharedValue,
   withRepeat,
   withTiming,
@@ -17,7 +17,8 @@ import * as S from './typing-dots.styles';
  */
 export function TypingDots({ label = 'Loading' }: { label?: string }) {
   const theme = useAppTheme();
-  const reduceMotion = useReducedMotion();
+  // AC01: the in-app toggle, not just the OS setting (WN01 family).
+  const reduceMotion = useAppReducedMotion();
   const progress = useSharedValue(0);
 
   useEffect(() => {

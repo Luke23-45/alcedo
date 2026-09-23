@@ -151,7 +151,7 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
         >
           <BackChevronGlyph />
         </NavBack>
-        <NavTitle>
+        <NavTitle numberOfLines={1}>
           {isNew ? t('exercise.add.title', 'Add Exercise') : t('exercise.edit.title', 'Edit Exercise')}
         </NavTitle>
         <NavDone
@@ -173,7 +173,7 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
         </DirtyRow>
       ) : null}
 
-      <MicroLabel>{t('exercise.editor.section.exercise', 'Exercise')}</MicroLabel>
+      <MicroLabel>{t('exercise.editor.section.exercise', 'Exercise').toLocaleUpperCase()}</MicroLabel>
       <LabelGap />
       {showAddSearch ? (
         <AddSearchCards {...searchSectionProps} />
@@ -195,15 +195,15 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
       {isWeighted ? (
         <>
           <SectionGap />
-          <MicroLabel>{t('exercise.editor.section.set_config', 'Set Configuration')}</MicroLabel>
+          <MicroLabel>{t('exercise.editor.section.set_config', 'Set Configuration').toLocaleUpperCase()}</MicroLabel>
           <LabelGap />
           <SetConfigCard exercise={exercise} onChange={onExerciseChange} />
           <SectionGap />
-          <MicroLabel>{t('exercise.editor.section.details', 'Detail')}</MicroLabel>
+          <MicroLabel>{t('exercise.editor.section.details', 'Detail').toLocaleUpperCase()}</MicroLabel>
           <LabelGap />
           <DetailCard exercise={exercise} onChange={onExerciseChange} />
           <SectionGap />
-          <MicroLabel>{t('exercise.editor.section.options', 'Workout Options')}</MicroLabel>
+          <MicroLabel>{t('exercise.editor.section.options', 'Workout Options').toLocaleUpperCase()}</MicroLabel>
           <LabelGap />
           <OptionsCard
             exercise={exercise}
@@ -213,7 +213,7 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
             onOpenRestSheet={() => setRestTarget({ kind: 'weighted' })}
           />
           <SectionGap />
-          <MicroLabel>{t('exercise.editor.section.resistance', 'Resistance')}</MicroLabel>
+          <MicroLabel>{t('exercise.editor.section.resistance', 'Resistance').toLocaleUpperCase()}</MicroLabel>
           <LabelGap />
           <ResistanceCard
             exercise={exercise}
@@ -222,14 +222,14 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
             useImperialUnits={props.useImperialUnits}
           />
           <SectionGap />
-          <MicroLabel>{t('exercise.editor.section.progression', 'Progression')}</MicroLabel>
+          <MicroLabel>{t('exercise.editor.section.progression', 'Progression').toLocaleUpperCase()}</MicroLabel>
           <LabelGap />
           <ProgressionCard exercise={exercise} onChange={onExerciseChange} weightSuffix={props.weightSuffix} />
         </>
       ) : (
         <>
           <SectionGap />
-          <MicroLabel>{t('exercise.editor.type.cardio', 'Cardio / Time')}</MicroLabel>
+          <MicroLabel>{t('exercise.editor.type.cardio', 'Cardio / Time').toLocaleUpperCase()}</MicroLabel>
           <LabelGap />
           {exercise.sets.map((set, index) => (
             <CardioSetCard
@@ -264,7 +264,7 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
             </AddSetButton>
           </SetButtonsRow>
           <SectionGap />
-          <MicroLabel>{t('exercise.editor.section.details', 'Detail')}</MicroLabel>
+          <MicroLabel>{t('exercise.editor.section.details', 'Detail').toLocaleUpperCase()}</MicroLabel>
           <LabelGap />
           <DetailCard exercise={exercise} onChange={onExerciseChange} />
         </>

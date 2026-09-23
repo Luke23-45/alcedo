@@ -22,7 +22,7 @@ export const SegmentTrack = styled.View`
   flex-direction: row;
   padding: 2px;
   border-radius: 24px;
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)')};
 `;
 
 export const SegmentButton = styled.Pressable<{ $selected: boolean }>`
@@ -31,13 +31,24 @@ export const SegmentButton = styled.Pressable<{ $selected: boolean }>`
   border-radius: 22px;
   align-items: center;
   justify-content: center;
-  ${({ $selected }) =>
+  ${({ theme, $selected }) =>
     $selected
-      ? css`
-          background-color: rgba(255, 255, 255, 0.13);
-          border-width: 0.8px;
-          border-color: rgba(255, 255, 255, 0.12);
-        `
+      ? theme.isDark
+        ? css`
+            background-color: rgba(255, 255, 255, 0.13);
+            border-width: 0.8px;
+            border-color: rgba(255, 255, 255, 0.12);
+          `
+        : css`
+            background-color: #ffffff;
+            border-width: 0.8px;
+            border-color: transparent;
+            shadow-color: #000;
+            shadow-offset: 0px 2px;
+            shadow-opacity: 0.18;
+            shadow-radius: 4px;
+            elevation: 2;
+          `
       : css`
           border-width: 0.8px;
           border-color: transparent;

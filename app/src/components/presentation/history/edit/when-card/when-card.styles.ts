@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components/native';
-import { alpha, fontWeight } from '@/styles/theme';
+import { StyleSheet } from 'react-native';
+import { alpha, fontWeight, type as typeHelper } from '@/styles/theme';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
 
 /* WHEN card · 361×132 rx28. Three 44pt rows: Start / End / Duration. */
@@ -41,14 +42,14 @@ export const WhenRow = styled.Pressable`
 `;
 
 export const WhenLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   font-weight: ${fontWeight.medium};
   color: #98989f;
 `;
 
 export const WhenValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   font-weight: ${fontWeight.semibold};
   letter-spacing: -0.2px;
@@ -67,7 +68,7 @@ export const WhenDivider = styled.View<{ $top: number }>`
   top: ${({ $top }) => $top}px;
   left: 20px;
   right: 20px;
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.06) : alpha('#000000', 0.06))};
 `;
 
@@ -88,10 +89,9 @@ export const AutoChip = styled.View`
 `;
 
 export const AutoChipText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 7.5px;
   font-weight: ${fontWeight.bold};
   letter-spacing: 0.5px;
-  text-transform: uppercase;
   color: #8e8e93;
 `;

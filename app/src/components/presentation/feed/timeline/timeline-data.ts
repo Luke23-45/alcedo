@@ -189,7 +189,12 @@ export function describeKudosLabel(names: string[], total: number): KudosLabelPa
   return { kind: 'many', first: names[0], second: names[1], others: total - 2 };
 }
 
-/** Weekly-challenge banner contract values (Screen 1 spec). */
+/**
+ * Weekly-challenge banner contract values (Screen 1 spec). The track fills as
+ * a fraction of the leader (10,340 / 12,480 = 82.85%) — a percentage of the
+ * measured track, never the 200pt reference constant (same rule as the trends
+ * muscle-track fix). `trackFill` stays in points for the contract test.
+ */
 export const CHALLENGE = {
   titlePoints: 10_340,
   leaderPoints: 12_480,
@@ -201,8 +206,24 @@ export const CHALLENGE = {
   get trackFill(): number {
     return (this.titlePoints / this.leaderPoints) * this.trackWidth;
   },
+  /** Fill as a percentage of whatever the measured track is. */
+  get trackFillPct(): number {
+    return (this.titlePoints / this.leaderPoints) * 100;
+  },
 } as const;
 
-export function formatChallengePoints(points: number): string {
-  return points.toLocaleString('en-US');
+const pointsFormatters = new Map<string, Intl.NumberFormat>();
+
+/**
+ * Grouped points in the caller's locale. Defaults to en-US (the contract
+ * catalog + its spec expectations are English-pinned); the banner passes
+ * settings.preferredLanguage.
+ */
+export function formatChallengePoints(points: number, locale?: string): string {
+  const key = locale ?? 'en-US';
+  const existing = pointsFormatters.get(key);
+  if (existing) return existing.format(points);
+  const created = new Intl.NumberFormat(key, { maximumFractionDigits: 0 });
+  pointsFormatters.set(key, created);
+  return created.format(points);
 }

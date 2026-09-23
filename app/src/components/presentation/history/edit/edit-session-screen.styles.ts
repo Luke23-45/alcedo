@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components/native';
-import { alpha, fontWeight } from '@/styles/theme';
+import { alpha, fontWeight, type as typeHelper } from '@/styles/theme';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
 
 /* ------------------------------------------------------------------ *
@@ -47,7 +47,7 @@ export const NavCancel = styled.Pressable`
 `;
 
 export const NavCancelText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 16px;
   font-weight: ${fontWeight.regular};
   letter-spacing: -0.3px;
@@ -62,7 +62,7 @@ export const NavTitle = styled.Text`
   bottom: 0;
   text-align: center;
   text-align-vertical: center;
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   font-weight: ${fontWeight.semibold};
   letter-spacing: -0.3px;
@@ -97,7 +97,7 @@ export const DeleteButton = styled.Pressable`
 `;
 
 export const DeleteLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 14.5px;
   font-weight: ${fontWeight.semibold};
   letter-spacing: -0.25px;
@@ -172,7 +172,7 @@ export const SaveGloss = styled(HomeGradient).attrs({
 `;
 
 export const SaveLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 16px;
   font-weight: ${fontWeight.semibold};
   letter-spacing: -0.3px;
@@ -180,7 +180,7 @@ export const SaveLabel = styled.Text`
 `;
 
 export const SaveCaption = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   font-weight: ${fontWeight.medium};
   color: #6c6c70;

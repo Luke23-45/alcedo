@@ -28,7 +28,7 @@ export function PlanDiffBackground() {
 
   return (
     <BackgroundLayer $base={theme.isDark ? '#0B0B0E' : '#F2F2F7'} pointerEvents="none">
-      <Svg width="100%" height="100%" viewBox="0 0 393 1000" preserveAspectRatio="none">
+      <Svg width="100%" height="100%" viewBox="0 0 393 1000" preserveAspectRatio="xMidYMid slice">
         <Defs>
           {auras.map((a) => (
             <RadialGradient key={a.id} id={a.id} cx="50%" cy="50%" r="50%">

@@ -32,14 +32,14 @@ export function ProfileConnected({
           <HeartGlyph size={17} color={palette.healthGlyph} filled />
         </S.IconBox>
         <S.TextCol>
-          <S.Title $color={palette.value}>
+          <S.Title $color={palette.value} numberOfLines={1} ellipsizeMode="tail">
             {t(feedKey("feed.profile.connected.health_title"))}
           </S.Title>
-          <S.Subtitle $color={palette.tertiary}>
+          <S.Subtitle $color={palette.tertiary} numberOfLines={1} ellipsizeMode="tail">
             {t(feedKey("feed.profile.connected.health_subtitle"))}
           </S.Subtitle>
         </S.TextCol>
-        <S.Status $color={healthConnected ? palette.connectedGreen : palette.tertiary}>
+        <S.Status $color={healthConnected ? palette.connectedGreen : palette.tertiary} numberOfLines={1} ellipsizeMode="tail">
           {healthConnected
             ? t(feedKey("feed.profile.connected.health_status"))
             : t(feedKey("feed.profile.connected.health_disconnected"))}
@@ -51,14 +51,14 @@ export function ProfileConnected({
           <WatchGlyph size={17} color={palette.watchGlyph} />
         </S.IconBox>
         <S.TextCol>
-          <S.Title $color={palette.value}>
+          <S.Title $color={palette.value} numberOfLines={1} ellipsizeMode="tail">
             {t(feedKey("feed.profile.connected.watch_title"))}
           </S.Title>
-          <S.Subtitle $color={palette.tertiary}>
+          <S.Subtitle $color={palette.tertiary} numberOfLines={1} ellipsizeMode="tail">
             {t(feedKey("feed.profile.connected.watch_subtitle"))}
           </S.Subtitle>
         </S.TextCol>
-        <S.Status $color={palette.watchStatus}>
+        <S.Status $color={palette.watchStatus} numberOfLines={1} ellipsizeMode="tail">
           {watchName ?? t(feedKey("feed.profile.connected.watch_unpaired"))}
         </S.Status>
       </S.Row>

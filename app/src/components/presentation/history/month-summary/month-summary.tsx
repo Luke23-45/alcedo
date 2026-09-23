@@ -56,19 +56,19 @@ export function MonthSummary({
   const cells: { value: string; label: string }[] = [
     {
       value: sessions.length.toString(),
-      label: t('history.v2.month.aggregate.sessions'),
+      label: t('history.v2.month.aggregate.sessions').toLocaleUpperCase(),
     },
     {
       value: formatCount(volume),
-      label: t('history.v2.month.aggregate.volume_kg'),
+      label: t('history.v2.month.aggregate.volume_kg').toLocaleUpperCase(),
     },
     {
       value: formatClockDuration(time),
-      label: t('history.v2.month.aggregate.time_under_bar'),
+      label: t('history.v2.month.aggregate.time_under_bar').toLocaleUpperCase(),
     },
     {
       value: formatCount(kcal),
-      label: t('history.v2.month.aggregate.kcal_est'),
+      label: t('history.v2.month.aggregate.kcal_est').toLocaleUpperCase(),
     },
   ];
 
@@ -87,7 +87,7 @@ export function MonthSummary({
         >
           {t('history.v2.month.title', {
             month: formatDate(firstOfMonth, { month: 'long' }),
-          })}
+          }).toLocaleUpperCase()}
         </HomeText>
       </SectionLabel>
       <HomeCard radius={30}>

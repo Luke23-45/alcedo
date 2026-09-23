@@ -15,6 +15,7 @@ import { useTranslate } from '@tolgee/react';
 import type { TranslationKey } from '@tolgee/web';
 import { LocalDate } from '@js-joda/core';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
+import { useAppSelector } from '@/store';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { type as typeHelper } from '@/styles/theme';
@@ -118,6 +119,7 @@ export function ProgressChart({
   const theme = useAppTheme();
   const { t } = useTranslate();
   const formatDate = useFormatDate();
+  const locale = useAppSelector((x) => x.settings.preferredLanguage);
   const [mode, setMode] = useState<ChartMode>('weight');
   const { width: windowWidth } = useWindowDimensions();
 
@@ -163,8 +165,14 @@ export function ProgressChart({
   const fontFamily = typeHelper(theme, 'caption2').fontFamily;
   const prLabelX = prCoord ? Math.min(Math.max(prCoord.x, 44), contentWidth - 44) : 0;
 
-  const delta = formatDeltaPercent(values[0]!, values[lastIndex]!);
-  const deltaColor = delta?.startsWith('−') ? '#FF453A' : '#4ADE80';
+  const delta = formatDeltaPercent(values[0]!, values[lastIndex]!, locale);
+  const deltaColor = theme.isDark
+    ? delta?.startsWith('−')
+      ? '#FF453A'
+      : '#4ADE80'
+    : delta?.startsWith('−')
+      ? '#D70015'
+      : '#248A3D';
   const strengthRatio = latestBodyweight && latestBodyweight > 0 ? (bestE1rm / latestBodyweight).toFixed(2) : null;
 
   const selectedIndex = MODES.findIndex((m) => m.key === mode);

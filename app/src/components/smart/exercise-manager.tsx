@@ -50,7 +50,7 @@ function ExerciseListItem({
     rowRef.current?.closeRowWithoutAnimation();
   }, [exerciseId]);
   if (!exercise) {
-    return <View></View>;
+    return null;
   }
 
   return (
@@ -73,6 +73,8 @@ function ExerciseListItem({
             justifyContent: 'center',
             alignItems: 'center',
           }}
+          accessibilityRole="button"
+          accessibilityLabel={t('exercise.delete.label', 'Delete {name}', { name: exercise.name })}
           testID={`exercise-delete-btn-${exerciseId}`}
         >
           <Icon source={'delete'} size={30} color={colors.onError} />
@@ -182,8 +184,10 @@ export default function ExerciseManager() {
       <LegendList
         onScroll={handleScroll}
         contentContainerStyle={{
-          insetBlockStart: topInsetHeight,
-          insetBlockEnd: bottomInsetHeight,
+          // ME01: insetBlockStart/End are web logical props LegendList never
+          // maps — dead on native. Same values, valid properties.
+          paddingTop: topInsetHeight,
+          paddingBottom: bottomInsetHeight,
         }}
         style={{ flex: 1 }}
         data={flatListItems}

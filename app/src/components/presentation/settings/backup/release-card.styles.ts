@@ -1,5 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import styled from 'styled-components/native';
+import { type as typeStyle } from '@/styles/theme';
 
 // Release card (settings-dark.md Screen 6): x16 w361 rx28. Shared by the
 // backup screen and the what's-new route.
@@ -38,17 +39,15 @@ export const ReleaseHeaderText = styled.View`
 `;
 
 export const ReleaseTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 17px;
-  font-weight: ${({ theme }) => theme.weight.bold};
+  ${({ theme }) => typeStyle(theme, 'headline', { weight: '700' })}
   letter-spacing: -0.4px;
-  color: #ffffff;
+  // Fixed white sat unreadably on the pale light card — title ink now follows
+  // the theme (sweep find: white-on-pale in light mode).
+  color: ${({ theme }) => (theme.isDark ? '#ffffff' : '#1C1C1E')};
 `;
 
 export const ReleaseMeta = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 11px;
-  font-weight: ${({ theme }) => theme.weight.medium};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '500' })}
   color: #86868b;
 `;
 
@@ -65,9 +64,8 @@ export const ReleasePill = styled.View`
 `;
 
 export const ReleasePillText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 8px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   letter-spacing: 0.5px;
   color: #ffd84d;
 `;
@@ -97,9 +95,8 @@ export const ReleaseBulletDot = styled.View`
 
 export const ReleaseBulletText = styled.Text`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '500' })}
   font-size: 12.5px;
-  font-weight: ${({ theme }) => theme.weight.medium};
   color: ${({ theme }) => (theme.isDark ? '#E5E5EA' : '#3A3A3C')};
 `;
 
@@ -114,9 +111,7 @@ export const ReleaseMoreRow = styled.Pressable`
 
 export const ReleaseMoreText = styled.Text`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 13px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
+  ${({ theme }) => typeStyle(theme, 'footnote', { weight: '600' })}
   letter-spacing: -0.2px;
   color: ${({ theme }) => theme.home.seeAll};
 `;

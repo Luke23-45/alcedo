@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 export const OptionPad = styled.View`
@@ -45,7 +46,7 @@ export const RestValueChip = styled.View`
 `;
 
 export const RestValueText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 11px;
   line-height: 14px;
   font-weight: 600;

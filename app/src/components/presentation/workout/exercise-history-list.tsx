@@ -120,16 +120,20 @@ function OverflowGlyph() {
 
 export function ExerciseHistoryNavBar({
   title,
+  backLabel,
+  menuLabel,
   onBack,
   menuItems,
 }: {
   title: string;
+  backLabel: string;
+  menuLabel: string;
   onBack: () => void;
   menuItems: MenuItem[];
 }) {
   return (
     <S.NavBar>
-      <S.NavButton onPress={onBack} accessibilityRole="button">
+      <S.NavButton onPress={onBack} accessibilityRole="button" accessibilityLabel={backLabel}>
         <BackChevronGlyph />
       </S.NavButton>
       <S.NavTitleWrap>
@@ -140,7 +144,7 @@ export function ExerciseHistoryNavBar({
       {menuItems.length > 0 ? (
         <Menu
           trigger={(open) => (
-            <S.NavButton onPress={open} accessibilityRole="button">
+            <S.NavButton onPress={open} accessibilityRole="button" accessibilityLabel={menuLabel}>
               <OverflowGlyph />
             </S.NavButton>
           )}
@@ -189,9 +193,9 @@ export function ExerciseHistoryPrBanner({ pr }: { pr: ExerciseHistoryPr | undefi
           </Svg>
         </S.PrMedal>
         <S.PrTexts>
-          <S.PrHeading>{pr.heading}</S.PrHeading>
-          <S.PrValue>{pr.valueLine}</S.PrValue>
-          <S.PrSub>{pr.subLine}</S.PrSub>
+          <S.PrHeading numberOfLines={1}>{pr.heading}</S.PrHeading>
+          <S.PrValue numberOfLines={1}>{pr.valueLine}</S.PrValue>
+          <S.PrSub numberOfLines={2}>{pr.subLine}</S.PrSub>
         </S.PrTexts>
       </S.PrContent>
     </S.PrCard>
@@ -293,12 +297,12 @@ export function ExerciseHistoryChart({
     prCoord && prIndex > 0 && prIndex < lastIndex ? Math.min(Math.max(prCoord.x, 30), contentWidth - 30) : 0;
 
   return (
-    <HomeCard radius={30} pad={0} style={{ height: 184 }}>
+    <HomeCard radius={30} pad={0} style={{ minHeight: 184 }}>
       <S.ChartPad>
         <S.ChartHeader>
           <S.ChartTitleBlock>
-            <S.ChartTitle>{title}</S.ChartTitle>
-            <S.ChartSub>{subtitle}</S.ChartSub>
+            <S.ChartTitle numberOfLines={1}>{title}</S.ChartTitle>
+            <S.ChartSub numberOfLines={2}>{subtitle}</S.ChartSub>
           </S.ChartTitleBlock>
           <S.ChartChip>
             <S.ChartChipText>{sessionsLabel}</S.ChartChipText>
@@ -444,7 +448,12 @@ export function ExerciseHistorySectionHeader({
     <S.SectionHead>
       <S.SectionLabel>{label}</S.SectionLabel>
       {onAction && (
-        <S.SeeAllHit onPress={onAction} accessibilityRole="button">
+        <S.SeeAllHit
+          onPress={onAction}
+          accessibilityRole="button"
+          accessibilityLabel={actionLabel}
+          hitSlop={{ top: 5, bottom: 5 }}
+        >
           <S.SeeAllText>{actionLabel}</S.SeeAllText>
         </S.SeeAllHit>
       )}
@@ -457,7 +466,7 @@ export function ExerciseHistorySectionHeader({
 function HistoryRow({ row, onPress }: { row: ExerciseHistoryRow; onPress: () => void }) {
   const theme = useAppTheme();
   return (
-    <S.RowPress onPress={onPress} accessibilityRole="button">
+    <S.RowPress onPress={onPress} accessibilityRole="button" accessibilityLabel={row.headline}>
       <HomeCard radius={22} pad={0} elev="tile">
         <S.RowInner>
           <S.DateTile $pr={row.isPr}>

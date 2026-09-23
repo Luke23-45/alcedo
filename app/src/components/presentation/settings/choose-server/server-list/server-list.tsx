@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import { Fragment, ReactNode } from 'react';
 import { useDispatch } from 'react-redux';
 import * as GS from '../../shared/grouped-settings-list.styles';
+import { toGroupLabelCase } from '../../shared/grouped-settings-list';
 import * as S from './server-list.styles';
 
 /** Theme-aware card edge: the `ce` gradient stroke (settings-dark.md). */
@@ -55,7 +56,7 @@ function CompleteRow({
     <S.ServerRowPressable
       accessibilityRole="radio"
       accessibilityState={{ selected }}
-      accessibilityLabel={backend.name || t('backends.unnamed.label')}
+      accessibilityLabel={`${backend.name || t('backends.unnamed.label')}, ${backend.url}`}
       onPress={onAssign}
     >
       {({ pressed }: { pressed: boolean }) => (
@@ -77,6 +78,7 @@ function CompleteRow({
 /** An incomplete backend: greyed, red INCOMPLETE tag, tapping does nothing. */
 function IncompleteRow({ backend }: { backend: Backend }) {
   const { t } = useTranslate();
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
   return (
     <S.ServerRowStatic accessibilityRole="text">
       <S.ServerRowText>
@@ -92,7 +94,7 @@ function IncompleteRow({ backend }: { backend: Backend }) {
         )}
       </S.ServerRowText>
       <S.IncompleteTag accessibilityLabel={t('backup.remote.choose_server.incomplete')}>
-        <S.IncompleteTagText>{t('backup.remote.choose_server.incomplete').toUpperCase()}</S.IncompleteTagText>
+        <S.IncompleteTagText>{t('backup.remote.choose_server.incomplete').toLocaleUpperCase(locale)}</S.IncompleteTagText>
       </S.IncompleteTag>
     </S.ServerRowStatic>
   );
@@ -109,6 +111,7 @@ export function ServerList() {
   const { push } = useRouter();
   const backends = useAppSelector(selectUserBackends);
   const assignedBackendId = useAppSelector((s) => selectAssignedBackendId(s, 'backup'));
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
 
   const complete = backends.filter(isBackendComplete);
   const incomplete = backends.filter((backend) => !isBackendComplete(backend));
@@ -126,7 +129,7 @@ export function ServerList() {
       {complete.length > 0 ? (
         <>
           <S.SectionLabelText>
-            {t('backup.remote.choose_server.complete_label')}
+            {toGroupLabelCase(t('backup.remote.choose_server.complete_label'), locale)}
           </S.SectionLabelText>
           <CardEdge>
             <CardBody>
@@ -150,7 +153,7 @@ export function ServerList() {
       {incomplete.length > 0 ? (
         <>
           <S.SectionLabelText>
-            {t('backup.remote.choose_server.incomplete_label')}
+            {toGroupLabelCase(t('backup.remote.choose_server.incomplete_label'), locale)}
           </S.SectionLabelText>
           <CardEdge>
             <CardBody>
@@ -165,7 +168,7 @@ export function ServerList() {
         </>
       ) : undefined}
       <S.SectionLabelText>
-        {t('backup.remote.choose_server.add_label')}
+        {toGroupLabelCase(t('backup.remote.choose_server.add_label'), locale)}
       </S.SectionLabelText>
       <S.AddNewCard
         accessibilityRole="button"

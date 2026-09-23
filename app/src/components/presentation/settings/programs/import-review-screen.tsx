@@ -55,8 +55,10 @@ export function ImportReviewScreen({ importPlanFromPicker }: { importPlanFromPic
         <SectionHeader label={t(settingsKey('settings.programs.review.header'))} />
         {pendingImport ? (
           <ReviewCard>
-            <ReviewTitle>{pendingImport.name}</ReviewTitle>
-            <ReviewMeta>{t(settingsKey('settings.programs.row.sessions'), { count: sessionCount })}</ReviewMeta>
+            <ReviewTitle numberOfLines={1}>{pendingImport.name}</ReviewTitle>
+            <ReviewMeta numberOfLines={1}>
+              {t(settingsKey('settings.programs.row.sessions'), { count: sessionCount })}
+            </ReviewMeta>
             {pendingImport.sessions.map((session, index) => (
               <Fragment key={index}>
                 <SessionSummaryTitle

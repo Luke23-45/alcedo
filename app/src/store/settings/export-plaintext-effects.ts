@@ -18,10 +18,10 @@ export function addExportPlaintextEffects(addEffect: AddEffectFn) {
       .replaceAll('T', '_')
       .replaceAll('-', '');
     const [fileName, bytes, contentType] = await match(format)
-      .with('CSV', async () => [`kinetic-export.${now}.csv`, await exportToCsv(sessions), 'text/csv'] as const)
+      .with('CSV', async () => [`alcedo-export.${now}.csv`, await exportToCsv(sessions), 'text/csv'] as const)
       .with(
         'JSON',
-        async () => [`kinetic-export.${now}.json`, await exportToJson(sessions), 'application/json'] as const,
+        async () => [`alcedo-export.${now}.json`, await exportToJson(sessions), 'application/json'] as const,
       )
       .exhaustive();
 

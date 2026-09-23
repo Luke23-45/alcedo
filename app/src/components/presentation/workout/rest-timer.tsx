@@ -18,11 +18,6 @@ interface RestTimerProps {
   pausedAt: OffsetDateTime | undefined;
   failed: boolean;
   style?: ViewStyle;
-  /**
-   * Retained for the host: the reference control set offers no restart
-   * affordance, so this chrome doesn't call it.
-   */
-  onRestart: () => void;
   onDismiss: () => void;
   onTogglePause: () => void;
   /**
@@ -210,11 +205,16 @@ export function RestTimer({
   const timeColor = paused ? alpha(ink, 0.62) : ink;
 
   const restSeconds = Math.round(windowStart / 1000);
-  const prescription =
+  const range =
     windowEnd !== undefined && windowEnd !== windowStart
-      ? `${restSeconds}–${Math.round(windowEnd / 1000)}S`
-      : `${restSeconds}S`;
-  const restLabel = `${t('rest_timer.label.rest')} · ${prescription} ${t('rest_timer.label.prescribed')}`;
+      ? `${restSeconds}–${Math.round(windowEnd / 1000)}`
+      : `${restSeconds}`;
+  const restLabel = t('rest_timer.label.prescription', {
+    rest: t('rest_timer.label.rest'),
+    range,
+    unit: t('rest_timer.unit.second_short'),
+    prescribed: t('rest_timer.label.prescribed'),
+  });
 
   const completeTitle = nextSetTitle ?? (phase === 'over' ? t('rest_timer.status.over') : t('rest_timer.status.ready'));
 
@@ -283,7 +283,9 @@ export function RestTimer({
                 {viewState === 'paused' && (
                   <>
                     <S.Chip $width={66} $fill={alpha('#FF9F0A', 0.16)}>
-                      <S.ChipLabel $color="#FFB84D">{t('rest_timer.status.paused').toUpperCase()}</S.ChipLabel>
+                      <S.ChipLabel $color={dark ? '#FFB84D' : '#C93400'}>
+                        {t('rest_timer.status.paused').toLocaleUpperCase()}
+                      </S.ChipLabel>
                     </S.Chip>
                     <Jiggler jiggling={jiggling}>
                       <S.TimerText
@@ -303,7 +305,9 @@ export function RestTimer({
                   <>
                     <S.ChipRow>
                       <S.Chip $width={52} $fill={alpha('#A6FF00', 0.16)}>
-                        <S.ChipLabel $color="#C3F53C">{t('rest_timer.status.ready').toUpperCase()}</S.ChipLabel>
+                        <S.ChipLabel $color={dark ? '#C3F53C' : '#248A3D'}>
+                          {t('rest_timer.status.ready').toLocaleUpperCase()}
+                        </S.ChipLabel>
                       </S.Chip>
                       {nextSetDetail !== undefined && <S.ChipDetail $color="#86868B">{nextSetDetail}</S.ChipDetail>}
                     </S.ChipRow>

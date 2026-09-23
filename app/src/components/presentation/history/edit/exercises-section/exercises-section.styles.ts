@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components/native';
+import { StyleSheet } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { alpha, fontWeight } from '@/styles/theme';
+import { alpha, fontWeight, type as typeHelper } from '@/styles/theme';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
 
 /* ------------------------------------------------------------------ *
@@ -18,16 +19,15 @@ export const SectionHeaderRow = styled.View`
 `;
 
 export const SectionLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10px;
   font-weight: ${fontWeight.bold};
   letter-spacing: 1.35px;
-  text-transform: uppercase;
   color: #86868b;
 `;
 
 export const DragHint = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10px;
   font-weight: ${fontWeight.semibold};
   letter-spacing: 0.2px;
@@ -115,7 +115,7 @@ export const RowTexts = styled.View`
 `;
 
 export const RowName = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   font-weight: ${fontWeight.semibold};
   letter-spacing: -0.2px;
@@ -123,7 +123,7 @@ export const RowName = styled.Text`
 `;
 
 export const RowVolume = styled.Text<{ $pr?: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12.5px;
   font-weight: ${fontWeight.bold};
   letter-spacing: -0.25px;
@@ -159,7 +159,7 @@ export const SetChip = styled.Pressable<{ $focused: boolean }>`
 `;
 
 export const SetChipText = styled.Text<{ $focused: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10px;
   font-weight: ${({ $focused }) => ($focused ? fontWeight.bold : fontWeight.semibold)};
   letter-spacing: -0.1px;
@@ -193,7 +193,7 @@ export const PrChip = styled.View`
 `;
 
 export const PrChipText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 7.5px;
   font-weight: ${fontWeight.bold};
   letter-spacing: 0.5px;
@@ -222,11 +222,10 @@ export const EditorHeaderRow = styled.View`
 `;
 
 export const EditorTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 8.5px;
   font-weight: ${fontWeight.bold};
   letter-spacing: 0.9px;
-  text-transform: uppercase;
   color: #86868b;
 `;
 
@@ -236,11 +235,11 @@ export const DeleteSetButton = styled.Pressable`
 `;
 
 export const DeleteSetText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   font-weight: ${fontWeight.semibold};
   letter-spacing: -0.1px;
-  color: #ff6b60;
+  color: ${({ theme }) => (theme.isDark ? '#FF6B60' : '#D70015')};
 `;
 
 export const StepperRow = styled.View`
@@ -250,7 +249,7 @@ export const StepperRow = styled.View`
 `;
 
 export const StepperLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   font-weight: ${fontWeight.medium};
   color: #98989f;
@@ -271,7 +270,7 @@ export const StepperButton = styled.Pressable`
 `;
 
 export const StepperValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   font-weight: ${fontWeight.bold};
   letter-spacing: -0.35px;
@@ -281,7 +280,7 @@ export const StepperValue = styled.Text`
 `;
 
 export const StepperDivider = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => (theme.isDark ? alpha('#FFFFFF', 0.06) : alpha('#000000', 0.06))};
 `;
 
@@ -291,7 +290,7 @@ export const EmptyRows = styled.View`
 `;
 
 export const EmptyRowsText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   font-weight: ${fontWeight.regular};
   color: #86868b;
@@ -314,7 +313,7 @@ export const AddExerciseButton = styled.Pressable`
 `;
 
 export const AddExerciseLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 14.5px;
   font-weight: ${fontWeight.semibold};
   letter-spacing: -0.25px;

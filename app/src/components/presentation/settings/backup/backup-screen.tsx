@@ -2,6 +2,7 @@ import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
 import { useAppSelector } from '@/store';
 import { selectHasUnseenWhatsNew } from '@/store/settings';
 import { useTranslate } from '@tolgee/react';
+import * as Application from 'expo-application';
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { SettingsBackground } from '../shared/settings-background';
@@ -24,6 +25,9 @@ export function BackupScreen() {
   const { push } = useRouter();
   const [feedImportOpen, setFeedImportOpen] = useState(false);
   const hasUnseen = useAppSelector(selectHasUnseenWhatsNew);
+  // Same real-version source as the settings home footer (SH01 class).
+  const version = Application.nativeApplicationVersion ?? '1.0.0';
+  const build = Application.nativeBuildVersion ?? '1';
 
   return (
     <FullHeightScrollView screenBackground={<SettingsBackground variant="backup" />}>
@@ -45,7 +49,7 @@ export function BackupScreen() {
           <GroupLabel>{t(settingsKey('settings.backup.section.about'))}</GroupLabel>
           <AboutCard />
         </View>
-        <ScreenFooter>{t(settingsKey('settings.backup.footer'))}</ScreenFooter>
+        <ScreenFooter>{t(settingsKey('settings.backup.footer'), { version, build })}</ScreenFooter>
       </S.BackupScreenContent>
       <ImportFeedDialog open={feedImportOpen} setOpen={setFeedImportOpen} />
     </FullHeightScrollView>

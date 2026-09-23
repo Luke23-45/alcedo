@@ -93,6 +93,8 @@ export function SessionDetailActions({
           accessibilityRole="button"
           accessibilityLabel={t('history.session_detail.actions.edit', 'Edit Session')}
         >
+          <S.EditFill />
+          <S.EditGloss />
           <PenGlyph />
           <S.EditLabel>{t('history.session_detail.actions.edit', 'Edit Session')}</S.EditLabel>
         </S.EditButton>

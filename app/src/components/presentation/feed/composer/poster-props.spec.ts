@@ -11,7 +11,7 @@ const data: ComposerSessionData = {
   volumeUnit: 'kg',
   durationLabel: '45:12',
   setsLabel: '19',
-  kicker: 'KINETIC · MONDAY, JUNE 9',
+  kicker: 'ALCEDO · MONDAY, JUNE 9',
   prPills: ['SHOULDER PRESS PR', 'VOLUME PR', '13-DAY STREAK'],
 };
 

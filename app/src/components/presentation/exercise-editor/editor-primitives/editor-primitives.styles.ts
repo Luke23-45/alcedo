@@ -1,5 +1,7 @@
 import styled, { css } from 'styled-components/native';
+import { StyleSheet } from 'react-native';
 import { HomeGradient, HomeGradientVariant } from '../../home/shared/home-gradient';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 // ============================================================================
@@ -51,9 +53,9 @@ export const CardPad = styled.View`
 `;
 
 export const Hairline = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-left: 16px;
-  margin-right: 16px;
+  margin-right: 12px;
   background-color: ${({ theme }) => editorPalette(theme.isDark).hairline};
 `;
 
@@ -62,29 +64,27 @@ export const Hairline = styled.View`
 // ============================================================================
 
 export const MicroLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10px;
   line-height: 13px;
   font-weight: 700;
   letter-spacing: 1.35px;
-  text-transform: uppercase;
   color: ${({ theme }) => editorPalette(theme.isDark).text.caption};
   margin-left: 24px;
 `;
 
 /** In-card subhead (NOTES, TRACK, EXTERNAL LINK): 9pt vs the 10pt section label. */
 export const SubHead = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9px;
   line-height: 12px;
   font-weight: 700;
   letter-spacing: 1.2px;
-  text-transform: uppercase;
   color: ${({ theme }) => editorPalette(theme.isDark).text.caption};
 `;
 
 export const RowLabel = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   line-height: 18px;
   font-weight: 600;
@@ -93,7 +93,7 @@ export const RowLabel = styled.Text`
 `;
 
 export const RowCaption = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
@@ -101,7 +101,7 @@ export const RowCaption = styled.Text`
 `;
 
 export const TertiaryCaption = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
@@ -109,7 +109,7 @@ export const TertiaryCaption = styled.Text`
 `;
 
 export const StepperValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 16px;
   line-height: 20px;
   font-weight: 700;
@@ -121,12 +121,12 @@ export const StepperValue = styled.Text`
 `;
 
 export const SmallStepperValue = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13px;
   line-height: 16px;
   font-weight: 700;
   color: ${({ theme }) => editorPalette(theme.isDark).text.primary};
-  min-width: 32px;
+  min-width: 28px;
   text-align: center;
   font-variant: tabular-nums;
 `;
@@ -188,11 +188,11 @@ export const SegmentThumb = styled.View<{ $selected: boolean; $height: number }>
 `;
 
 export const SegmentLabel = styled.Text<{ $selected: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
-  font-size: 12px;
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
+  font-size: 12.5px;
   line-height: 16px;
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.15px;
   color: ${({ theme, $selected }) => ($selected ? editorPalette(theme.isDark).text.primary : '#8E8E93')};
 `;
 
@@ -358,7 +358,7 @@ export const ResultTile = styled.View<{ $bg: string }>`
 `;
 
 export const ResultTileLetter = styled.Text<{ $fg: string }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   line-height: 14px;
   font-weight: 700;
@@ -368,6 +368,7 @@ export const ResultTileLetter = styled.Text<{ $fg: string }>`
 /**
  * Search-result tile accents, cycled by result index. First two match the
  * reference exactly (red, blue); the rest continue the iOS accent ramp.
+ * Single source for tile accents in this feature (no token duplicate).
  */
 const TILE_ACCENTS = [
   { bg: 'rgba(255,45,85,0.15)', fg: '#FF6A88' },
@@ -399,7 +400,7 @@ export const SheetHandle = styled.View`
   width: 36px;
   height: 5px;
   border-radius: 2.5px;
-  background-color: rgba(255, 255, 255, 0.22);
+  background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.22)' : 'rgba(120, 120, 128, 0.35)')};
   align-self: center;
   margin-top: 12px;
   margin-bottom: 12px;

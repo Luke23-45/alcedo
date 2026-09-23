@@ -1,6 +1,8 @@
 import type { ExternalImportFormat } from '@/store/settings';
+import { useAppSelector } from '@/store';
 import { useTranslate } from '@tolgee/react';
 import { Fragment } from 'react';
+import { toGroupLabelCase } from '../shared/grouped-settings-list';
 import { CardShell } from '../backup/card-shell';
 import { SectionLabel } from './section-label';
 import * as S from './format-radio-list.styles';
@@ -33,6 +35,7 @@ export function FormatRadioList({
   onChange: (format: ExternalImportFormat) => void;
 }) {
   const { t } = useTranslate();
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
 
   return (
     <>
@@ -61,7 +64,7 @@ export function FormatRadioList({
                     <S.OptionTitle>{label}</S.OptionTitle>
                     <S.OptionSubtitle>{subtitle}</S.OptionSubtitle>
                     <S.DropsLabel>
-                      {t('backup.import_from_other_apps.format.drops')}
+                      {toGroupLabelCase(t('backup.import_from_other_apps.format.drops'), locale)}
                     </S.DropsLabel>
                     <S.OptionDrops>{drops}</S.OptionDrops>
                   </S.OptionText>

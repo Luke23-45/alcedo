@@ -1,4 +1,6 @@
 import styled from 'styled-components/native';
+import { StyleSheet } from 'react-native';
+import { type as typeHelper } from '@/styles/theme';
 import { sessionPalette } from './session/session-tokens';
 
 export const CardTop = styled.View`
@@ -7,7 +9,7 @@ export const CardTop = styled.View`
 `;
 
 export const CardHeader = styled.View`
-  height: 22px;
+  min-height: 22px;
   flex-direction: row;
   align-items: center;
 `;
@@ -23,7 +25,7 @@ export const IndexTile = styled.View`
 `;
 
 export const IndexNumber = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10px;
   line-height: 14px;
   font-weight: 700;
@@ -33,7 +35,7 @@ export const IndexNumber = styled.Text`
 
 export const ExerciseName = styled.Text<{ $done: boolean }>`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 14.5px;
   line-height: 20px;
   font-weight: 600;
@@ -56,7 +58,7 @@ export const ChipPill = styled.View<{ $done: boolean }>`
 `;
 
 export const ChipText = styled.Text<{ $done: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9.5px;
   line-height: 13px;
   font-weight: 700;
@@ -68,7 +70,7 @@ export const ChipText = styled.Text<{ $done: boolean }>`
 `;
 
 export const DividerLine = styled.View`
-  height: 1px;
+  height: ${StyleSheet.hairlineWidth}px;
   margin-top: 11px;
   margin-horizontal: 14px;
   background-color: ${({ theme }) => sessionPalette(theme.isDark).card.divider};
@@ -80,9 +82,9 @@ export const CardBody = styled.View`
 `;
 
 export const AddSetRow = styled.Pressable`
-  height: 26px;
+  min-height: 26px;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   padding-left: 20px;
   padding-right: 6px;
   margin-top: 8px;
@@ -90,12 +92,10 @@ export const AddSetRow = styled.Pressable`
 
 export const AddSetLabel = styled.Text`
   flex: 1;
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 11.5px;
   line-height: 15px;
   font-weight: 600;
   color: ${({ theme }) => sessionPalette(theme.isDark).card.addLabel};
   margin-left: 9px;
-  /* Optical: pulls the 11.5/15 text block up to the reference baseline. */
-  margin-top: -2px;
 `;

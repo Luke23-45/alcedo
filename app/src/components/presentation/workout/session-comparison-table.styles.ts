@@ -80,7 +80,7 @@ export const HeaderDelta = styled.Text`
 export const DataRow = styled.View<{ $last: boolean }>`
   flex-direction: row;
   align-items: center;
-  height: 28px;
+  min-height: 28px;
   border-bottom-width: ${({ $last }) => ($last ? 0 : 1)}px;
   border-bottom-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)')};
 `;

@@ -30,7 +30,8 @@ import {
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useToday } from '@/hooks/useToday';
 import { MovementKey } from '@/models/blueprint-models';
-import { useAppSelectorWithArg } from '@/store';
+import { toGroupLabelCase } from '@/components/presentation/settings/shared/grouped-settings-list';
+import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { selectExerciseHistoryEntries } from '@/store/stored-sessions';
 
 export function ExerciseHistory(props: { movementKey: MovementKey; exerciseName: string }) {
@@ -38,6 +39,7 @@ export function ExerciseHistory(props: { movementKey: MovementKey; exerciseName:
   const router = useRouter();
   const today = useToday();
   const formatDate = useFormatDate();
+  const locale = useAppSelector((s) => s.settings.preferredLanguage) ?? undefined;
   // No session to exclude: this sheet is opened from an exercise, and shows the whole lineage.
   const entries = useAppSelectorWithArg(selectExerciseHistoryEntries, undefined)(props.movementKey);
   const [expanded, setExpanded] = useState(false);
@@ -49,6 +51,7 @@ export function ExerciseHistory(props: { movementKey: MovementKey; exerciseName:
     today,
     prSessionId: pr?.sessionId,
     bodyweightLabel: t('exercise.short_bodyweight.label'),
+    locale,
   };
   const rows = entries.map((entry, index) => buildRow(entry, index, ctx));
   const visibleRows = expanded ? rows : rows.slice(0, INITIAL_VISIBLE_ROWS);
@@ -56,7 +59,7 @@ export function ExerciseHistory(props: { movementKey: MovementKey; exerciseName:
   const chart = buildChartPoints(entries, ctx);
   const prBanner: ExerciseHistoryPr | undefined = pr
     ? {
-        heading: t('exercise.history.personal_record.label'),
+        heading: toGroupLabelCase(t('exercise.history.personal_record.label'), locale),
         valueLine: `${formatWeight(pr.weight)} × ${pr.reps}`,
         subLine: t('exercise.history.e1rm_on.label', {
           e1rm: formatWeight(pr.e1rm, 1),
@@ -73,7 +76,7 @@ export function ExerciseHistory(props: { movementKey: MovementKey; exerciseName:
   const chartSubtitle =
     chart.first && chart.last
       ? chart.points.length > 1
-        ? buildSubtitle(chart.first, chart.last)
+        ? buildSubtitle(chart.first, chart.last, locale)
         : formatWeight(chart.first)
       : '';
 
@@ -82,7 +85,13 @@ export function ExerciseHistory(props: { movementKey: MovementKey; exerciseName:
   return (
     <S.ScreenRoot edges={{ left: 'additive', right: 'additive', top: 'additive', bottom: 'off' }}>
       <ExerciseHistoryBackground />
-      <ExerciseHistoryNavBar title={props.exerciseName} onBack={() => router.back()} menuItems={menuItems} />
+      <ExerciseHistoryNavBar
+        title={props.exerciseName}
+        backLabel={t('generic.back.button')}
+        menuLabel={t('generic.more_options.label')}
+        onBack={() => router.back()}
+        menuItems={menuItems}
+      />
       <ExerciseHistoryList
         rows={visibleRows}
         onRowPress={(sessionId) => router.push(`/history/edit?sessionId=${encodeURIComponent(sessionId)}` as Href)}
@@ -93,18 +102,21 @@ export function ExerciseHistory(props: { movementKey: MovementKey; exerciseName:
             prSessionId={pr?.sessionId}
             title={t('exercise.history.top_set_weight.title')}
             subtitle={chartSubtitle}
-            sessionsLabel={
+            sessionsLabel={toGroupLabelCase(
               chart.points.length === 1
                 ? t('exercise.history.session_count.one')
-                : t('exercise.history.session_count.other', { count: chart.points.length.toString() })
-            }
+                : t('exercise.history.session_count.other', {
+                    count: chart.points.length.toLocaleString(locale ?? undefined),
+                  }),
+              locale,
+            )}
             todayLabel={t('exercise.history.today.label')}
           />
         }
         sectionHeader={
           rows.length > 0 ? (
             <ExerciseHistorySectionHeader
-              label={t('exercise.history.past_sessions.label')}
+              label={toGroupLabelCase(t('exercise.history.past_sessions.label'), locale)}
               actionLabel={actionLabel}
               onAction={canExpand ? toggleExpanded : undefined}
             />

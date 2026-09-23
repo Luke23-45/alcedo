@@ -47,5 +47,6 @@ export const ActionLabel = styled.Text<{ $kind: 'neutral' | 'amber' }>`
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.2px;
+  flex-shrink: 1;
   color: ${({ theme, $kind }) => ($kind === 'amber' ? '#FFB84D' : theme.color.content.primary)};
 `;

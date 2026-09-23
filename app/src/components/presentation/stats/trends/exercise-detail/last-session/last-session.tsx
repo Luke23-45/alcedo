@@ -54,24 +54,38 @@ export function LastSessionDetail({ session, unitLabel }: { session: DetailSessi
           })}
         </S.Subtitle>
         <S.HeaderRow>
-          <S.HCell $w={104}>{t('stats.exercise_detail.last_session.set')}</S.HCell>
-          <S.HCell $w={82}>{t('stats.exercise_detail.last_session.weight')}</S.HCell>
-          <S.HCell $w={74}>{t('stats.exercise_detail.last_session.reps')}</S.HCell>
-          <S.HCell $w={34}>{t('stats.exercise_detail.last_session.e1rm')}</S.HCell>
-          <S.HCell $w={27} $right>
+          <S.HCell $flex={1.3} numberOfLines={1}>
+            {t('stats.exercise_detail.last_session.set')}
+          </S.HCell>
+          <S.HCell $flex={1.7} numberOfLines={1}>
+            {t('stats.exercise_detail.last_session.weight')}
+          </S.HCell>
+          <S.HCell $flex={1.0} numberOfLines={1}>
+            {t('stats.exercise_detail.last_session.reps')}
+          </S.HCell>
+          <S.HCell $flex={1.2} numberOfLines={1}>
+            {t('stats.exercise_detail.last_session.e1rm')}
+          </S.HCell>
+          <S.HCell $flex={0.8} numberOfLines={1} $right>
             {t('stats.exercise_detail.last_session.rpe')}
           </S.HCell>
         </S.HeaderRow>
         <S.HeaderDivider />
         {sets.map((set, i) => (
           <S.SetRow key={i} $first={i === 0}>
-            <S.SetNum $w={104}>{i + 1}</S.SetNum>
-            <S.Cell $w={82}>
+            <S.SetNum $flex={1.3} numberOfLines={1}>
+              {i + 1}
+            </S.SetNum>
+            <S.Cell $flex={1.7} numberOfLines={1}>
               {formatBare(set.weight)} {unitLabel}
             </S.Cell>
-            <S.Cell $w={74}>{set.reps}</S.Cell>
-            <S.E1rmCell $w={34}>{formatBare(set.e1rm)}</S.E1rmCell>
-            <S.RpeCell $w={27}>
+            <S.Cell $flex={1.0} numberOfLines={1}>
+              {set.reps}
+            </S.Cell>
+            <S.E1rmCell $flex={1.2} numberOfLines={1}>
+              {formatBare(set.e1rm)}
+            </S.E1rmCell>
+            <S.RpeCell $flex={0.8} numberOfLines={1}>
               {(() => {
                 const rpe = sampledRpe(i);
                 return rpe !== null ? rpe.toFixed(1) : '—';

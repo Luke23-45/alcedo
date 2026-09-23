@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { addComment } from '@/store/feed/comments';
 import { FeedAvatar } from '../shared/feed-avatar';
-import { personById } from '../shared/people';
+import { useOwnPerson } from '../shared/use-own-person';
 import { feedKey } from '../shared/feed-i18n';
 import { UpArrowGlyph } from './post-detail-glyphs';
 import * as S from './comment-bar.styles';
@@ -36,10 +36,9 @@ export function CommentBar({ postId, replyTarget, onCancelReply, inputRef }: Com
   const insets = useSafeAreaInsets();
   const [text, setText] = useState('');
 
-  const me = personById('alex');
-  if (!me) {
-    return null;
-  }
+  // The composer's avatar is the user's real identity — never the contract's
+  // fictional person. (The 'alex' authorId below is the local thread key.)
+  const me = useOwnPerson();
 
   const canSend = text.trim().length > 0;
   const placeholder = replyTarget

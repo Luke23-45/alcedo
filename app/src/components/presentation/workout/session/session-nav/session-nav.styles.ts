@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { sessionPalette } from '../session-tokens';
 
 export const NavRow = styled.View`
@@ -24,7 +25,7 @@ export const BackButton = styled.Pressable`
 export const NavTitle = styled.Text`
   flex: 1;
   text-align: center;
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;

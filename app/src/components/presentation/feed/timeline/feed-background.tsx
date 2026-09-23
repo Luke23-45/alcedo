@@ -24,7 +24,7 @@ export function FeedBackground({ contentHeight }: { contentHeight: number }) {
         end={{ x: 0.25, y: 1 }}
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
       />
-      <Svg width="100%" height="100%" viewBox="0 0 393 2313" preserveAspectRatio="none">
+      <Svg width="100%" height="100%" viewBox="0 0 393 2313" preserveAspectRatio="xMidYMid slice">
         <Defs>
           {auras.map((a) => (
             <RadialGradient key={a.id} id={a.id} cx="50%" cy="50%" r="50%">

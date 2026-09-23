@@ -29,13 +29,13 @@ export const ModeBlock = styled.View`
   gap: 6px;
 `;
 
-/** 11pt consequence line under the segmented control. */
+/** 11pt consequence line under the segmented control, left-aligned per spec. */
 export const ConsequenceLine = styled.Text<{ $dark: boolean }>`
   font-size: 11px;
   line-height: 14px;
   font-weight: 500;
   letter-spacing: -0.2px;
-  text-align: center;
+  text-align: left;
   color: ${({ $dark }) => ($dark ? '#86868B' : '#6E6E73')};
 `;
 
@@ -51,7 +51,6 @@ export const ReviewTitle = styled.Text<{ $dark: boolean }>`
   line-height: 13px;
   font-weight: 700;
   letter-spacing: 1.35px;
-  text-transform: uppercase;
   color: ${({ $dark }) => ($dark ? '#86868B' : '#6E6E73')};
 `;
 
@@ -70,8 +69,7 @@ export const SelectedChipText = styled.Text<{ $dark: boolean }>`
   line-height: 13px;
   font-weight: 700;
   letter-spacing: 0.4px;
-  text-transform: uppercase;
-  color: ${({ $dark }) => ($dark ? '#FFB340' : '#B25000')};
+  color: ${({ $dark }) => ($dark ? '#FFB340' : '#C93400')};
 `;
 
 export const CardsWrap = styled.View`

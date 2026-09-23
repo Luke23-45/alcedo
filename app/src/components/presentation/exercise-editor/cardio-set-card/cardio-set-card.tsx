@@ -159,7 +159,7 @@ export function CardioSetCard({
 
   const renderTrackCell = (state: (typeof states)[number], right: boolean) => (
     <TrackCell key={state.key} $right={right}>
-      <TrackLabel>{trackLabel(t, state.key)}</TrackLabel>
+      <TrackLabel numberOfLines={1}>{trackLabel(t, state.key)}</TrackLabel>
       <TrackToggleGroup>
         <Toggle
           on={state.on}
@@ -212,7 +212,7 @@ export function CardioSetCard({
       {target.type === 'distance' && shown ? (
         <TargetRow>
           <TargetLabelWrap>
-            <TargetLabel>{t('exercise.distance.label', 'Distance')}</TargetLabel>
+            <TargetLabel numberOfLines={1}>{t('exercise.distance.label', 'Distance')}</TargetLabel>
           </TargetLabelWrap>
           <DistanceStepperWrap>
             <Stepper
@@ -237,7 +237,7 @@ export function CardioSetCard({
       ) : (
         <TargetRow>
           <TargetLabelWrap>
-            <TargetLabel>{t('exercise.editor.cardio.target_time', 'Time')}</TargetLabel>
+            <TargetLabel numberOfLines={1}>{t('exercise.editor.cardio.target_time', 'Time')}</TargetLabel>
           </TargetLabelWrap>
           <HMSWrap>
             {hmsUnit(
@@ -272,7 +272,7 @@ export function CardioSetCard({
       )}
 
       <TrackHead>
-        <SubHead>{t('exercise.editor.track.label', 'Track')}</SubHead>
+        <SubHead>{t('exercise.editor.track.label', 'Track').toLocaleUpperCase()}</SubHead>
       </TrackHead>
       <TrackGrid>
         <TrackColumnLeft>{leftStates.map((state) => renderTrackCell(state, false))}</TrackColumnLeft>

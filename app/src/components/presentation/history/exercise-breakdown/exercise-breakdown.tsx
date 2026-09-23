@@ -1,4 +1,5 @@
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
+import { localeFormatBigNumber } from '@/utils/locale-bignumber';
 import { Weight } from '@/models/weight';
 import { RecordedCardioExercise, RecordedCardioExerciseSet } from '@/models/session-models/recorded-cardio-exercise';
 import { RecordedExercise, Session } from '@/models/session-models';
@@ -14,7 +15,7 @@ import { formatSessionClock, formatWeightShort } from '../../summary/post-workou
 import * as S from './exercise-breakdown.styles';
 
 function formatChipWeight(weight: Weight): string {
-  return weight.value.isInteger() ? weight.value.toFixed(0) : weight.value.toFixed(1);
+  return localeFormatBigNumber(weight.value, weight.value.isInteger() ? 0 : 1);
 }
 
 function weightedChips(
@@ -110,15 +111,15 @@ export function ExerciseBreakdown({ session }: { session: Session }) {
             <S.SetsChipText>
               {t('history.session_detail.exercises.sets', '{count} sets', {
                 count: totalSets.toString(),
-              })}
+              }).toLocaleUpperCase()}
             </S.SetsChipText>
           </S.SetsChip>
         </S.Header>
         {rows.length > 0 ? (
           <>
             <S.ColumnHeader>
-              <S.ColumnLabel>{t('history.session_detail.exercises.exercise', 'Exercise')}</S.ColumnLabel>
-              <S.ColumnLabel>{t('history.session_detail.exercises.volume', 'Volume')}</S.ColumnLabel>
+              <S.ColumnLabel>{t('history.session_detail.exercises.exercise', 'Exercise').toLocaleUpperCase()}</S.ColumnLabel>
+              <S.ColumnLabel>{t('history.session_detail.exercises.volume', 'Volume').toLocaleUpperCase()}</S.ColumnLabel>
             </S.ColumnHeader>
             <S.HeaderDivider />
             {rows.map((row, rowIndex) => (

@@ -1,9 +1,9 @@
 import styled from 'styled-components/native';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 
-/* Reference: the strip is a fixed 361×68 surface. */
+/* Reference: the strip is a 361×68 surface budget. Grows, never clips. */
 export const StripCard = styled(HomeCard)`
-  height: 68px;
+  min-height: 68px;
 `;
 
 export const StripInner = styled.View`
@@ -39,7 +39,6 @@ export const Label = styled.Text`
   line-height: 10px;
   font-weight: 700;
   letter-spacing: 0.7px;
-  text-transform: uppercase;
   color: ${({ theme }) => theme.color.content.secondary};
 `;
 

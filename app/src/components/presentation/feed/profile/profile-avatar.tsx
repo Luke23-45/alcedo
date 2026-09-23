@@ -1,3 +1,5 @@
+import { useTranslate } from "@tolgee/react";
+import { feedKey } from "../shared/feed-i18n";
 import { PROFILE } from "./profile-tokens";
 import * as S from "./profile-avatar.styles";
 
@@ -8,9 +10,13 @@ import * as S from "./profile-avatar.styles";
  * controls, and dead controls don't ship.
  */
 export function ProfileAvatar({ initial }: { initial: string }) {
+  const { t } = useTranslate();
   return (
     <S.AvatarGlow>
-      <S.AvatarWrap accessibilityRole="image" accessibilityLabel="Profile photo">
+      <S.AvatarWrap
+        accessibilityRole="image"
+        accessibilityLabel={t(feedKey("feed.profile.avatar.photo"), "Profile photo")}
+      >
         <S.AvatarFill
           colors={[PROFILE.avatarGradient[0], PROFILE.avatarGradient[1]]}
           start={{ x: 0, y: 0 }}

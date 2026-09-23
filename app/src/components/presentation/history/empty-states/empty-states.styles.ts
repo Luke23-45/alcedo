@@ -22,7 +22,7 @@ export const CtaButton = styled.Pressable`
   justify-content: center;
   shadow-color: #ff2d55;
   shadow-offset: 0px 7px;
-  shadow-opacity: 0.5;
+  shadow-opacity: ${({ theme }) => (theme.isDark ? 0.5 : 0.35)};
   shadow-radius: 12px;
   elevation: 8;
 `;

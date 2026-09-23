@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { alpha } from '@/styles/theme';
+import { alpha, type as typeStyle } from '@/styles/theme';
 
 /**
  * Workout reminder editor (settings-dark.md Screen 3): 7 day chips
@@ -15,11 +15,16 @@ export const Block = styled.View`
   padding-bottom: 8px;
 `;
 
+// NC01: chips (238) + pill (77) + padding (36) = 351 > 286 inner on 320.
+// The area wraps: 393 keeps one spec-exact row (315 ≤ 323); 320 drops the
+// pill to a second right-aligned line instead of clipping.
 export const ReminderArea = styled.View<{ $dimmed: boolean }>`
   padding-left: 20px;
   padding-right: 16px;
   margin-top: 4px;
   flex-direction: row;
+  flex-wrap: wrap;
+  row-gap: 8px;
   align-items: center;
   opacity: ${({ $dimmed }) => ($dimmed ? 0.45 : 1)};
 `;
@@ -51,9 +56,8 @@ export const DayChip = styled.View<{ $active: boolean }>`
 `;
 
 export const DayLetter = styled.Text<{ $active: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '700' })}
   font-size: 10px;
-  font-weight: ${({ theme }) => theme.weight.bold};
   color: ${({ theme, $active }) => ($active ? (theme.isDark ? '#FFB84D' : '#B26A00') : theme.color.content.tertiary)};
 `;
 
@@ -61,6 +65,7 @@ export const TimeCell = styled.Pressable`
   height: 44px;
   align-items: center;
   justify-content: center;
+  margin-left: auto;
 `;
 
 // 77×22 r11; theme control fill + hairline so the pill reads in both modes.
@@ -76,9 +81,7 @@ export const TimePill = styled.View`
 `;
 
 export const TimeText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  ${({ theme }) => typeStyle(theme, 'caption2', { weight: '600' })}
   font-size: 10.5px;
-  font-weight: ${({ theme }) => theme.weight.semibold};
   color: ${({ theme }) => theme.color.content.primary};
-  font-variant: tabular-nums;
 `;

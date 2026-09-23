@@ -32,10 +32,18 @@ function GoldHero({ milestone }: { milestone: TimelineMilestonePost['milestone']
       <S.Medallion>
         <StarGlyph size={21} color={HERO_INK_UNIT} />
       </S.Medallion>
-      <S.Value>{milestone.value}</S.Value>
-      <S.Unit>{milestone.unit}</S.Unit>
-      <S.Tagline>{milestone.tagline}</S.Tagline>
-      <S.DateRange>{milestone.dateRange}</S.DateRange>
+      <S.Value numberOfLines={1} ellipsizeMode="tail">
+        {milestone.value}
+      </S.Value>
+      <S.Unit numberOfLines={1} ellipsizeMode="tail">
+        {milestone.unit}
+      </S.Unit>
+      <S.Tagline numberOfLines={1} ellipsizeMode="tail">
+        {milestone.tagline}
+      </S.Tagline>
+      <S.DateRange numberOfLines={1} ellipsizeMode="tail">
+        {milestone.dateRange}
+      </S.DateRange>
     </S.Hero>
   );
 }

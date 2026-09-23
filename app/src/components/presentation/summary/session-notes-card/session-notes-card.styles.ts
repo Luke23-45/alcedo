@@ -11,7 +11,6 @@ export const Label = styled.Text`
   line-height: 12px;
   font-weight: 700;
   letter-spacing: 1.3px;
-  text-transform: uppercase;
   color: ${({ theme }) => theme.color.content.secondary};
 `;
 

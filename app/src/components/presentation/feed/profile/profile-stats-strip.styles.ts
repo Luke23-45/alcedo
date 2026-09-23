@@ -1,3 +1,4 @@
+import { StyleSheet } from "react-native";
 import styled from "styled-components/native";
 import { profileFontFamily } from "./profile-tokens";
 
@@ -21,7 +22,7 @@ export const Divider = styled.View<{ $color: string }>`
   position: absolute;
   left: 0;
   top: 14px;
-  width: 1px;
+  width: ${StyleSheet.hairlineWidth}px;
   height: 40px;
   background-color: ${({ $color }) => $color};
 `;

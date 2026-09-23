@@ -289,13 +289,13 @@ export function typeSwitchCopy(
   };
 }
 
-/** "80.6 kg" / "177.7 lbs" from the real session bodyweight; undefined when none. */
+/** "80.6 kg" / "177.7 lb" from the real session bodyweight; undefined when none. */
 export function formatBodyweight(bodyweight: Weight | undefined, useImperialUnits: boolean): string | undefined {
   if (!bodyweight) {
     return undefined;
   }
   const converted = bodyweight.convertTo(useImperialUnits ? 'pounds' : 'kilograms');
-  const suffix = useImperialUnits ? 'lbs' : 'kg';
+  const suffix = useImperialUnits ? 'lb' : 'kg';
   return `${converted.value.toFixed(1)} ${suffix}`;
 }
 

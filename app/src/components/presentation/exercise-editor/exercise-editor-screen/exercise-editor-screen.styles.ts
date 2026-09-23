@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 export const ScreenRoot = styled.View`
@@ -22,12 +23,12 @@ export const NavBack = styled.Pressable`
 `;
 
 export const NavTitle = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   flex: 1;
-  font-size: 17px;
-  line-height: 22px;
+  font-size: 15px;
+  line-height: 20px;
   font-weight: 600;
-  letter-spacing: -0.4px;
+  letter-spacing: -0.3px;
   text-align: center;
   color: ${({ theme }) => editorPalette(theme.isDark).text.primary};
 `;
@@ -42,7 +43,7 @@ export const NavDone = styled.Pressable<{ $disabled: boolean }>`
 `;
 
 export const NavDoneText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 15px;
   line-height: 20px;
   font-weight: 600;
@@ -68,7 +69,7 @@ export const DirtyDot = styled.View`
 `;
 
 export const DirtyText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 10.5px;
   line-height: 14px;
   font-weight: 500;
@@ -117,7 +118,7 @@ export const RemoveSetButton = styled.Pressable<{ $disabled: boolean }>`
 `;
 
 export const RemoveSetText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   line-height: 18px;
   font-weight: 600;
@@ -138,7 +139,7 @@ export const AddSetButton = styled.Pressable`
 `;
 
 export const AddSetText = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 13.5px;
   line-height: 18px;
   font-weight: 600;

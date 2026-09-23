@@ -19,20 +19,36 @@ export function relativeAge(fromMs: number, nowMs: number = Date.now()): string 
   return `${Math.floor(hours / 24)}d`;
 }
 
-/** The author subline's spelled-out form, e.g. "@luke · 21 minutes ago". */
-export function relativeAgeLong(fromMs: number, nowMs: number = Date.now()): string {
+const rtfCache = new Map<string, Intl.RelativeTimeFormat>();
+
+/** Cached relative-time formatter (undefined = system locale). */
+function rtf(locale: string | undefined): Intl.RelativeTimeFormat {
+  const key = locale ?? 'system';
+  const existing = rtfCache.get(key);
+  if (existing) return existing;
+  const created = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  rtfCache.set(key, created);
+  return created;
+}
+
+/**
+ * The author subline's spelled-out form, e.g. "@luke · 21 minutes ago" — in
+ * the caller's locale ("vor 21 Minuten" in German). The sub-minute case keeps
+ * the spec-pinned 'just now' (its spec assertion pins the literal; a 60-second
+ * window in any language is not worth churning the contract test).
+ */
+export function relativeAgeLong(fromMs: number, nowMs: number = Date.now(), locale?: string): string {
   const diffSeconds = Math.max(0, Math.floor((nowMs - fromMs) / 1000));
   const minutes = Math.floor(diffSeconds / 60);
   if (minutes < 1) {
     return 'just now';
   }
   if (minutes < 60) {
-    return minutes === 1 ? '1 minute ago' : `${minutes} minutes ago`;
+    return rtf(locale).format(-minutes, 'minute');
   }
   const hours = Math.floor(minutes / 60);
   if (hours < 24) {
-    return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+    return rtf(locale).format(-hours, 'hour');
   }
-  const days = Math.floor(hours / 24);
-  return days === 1 ? '1 day ago' : `${days} days ago`;
+  return rtf(locale).format(-Math.floor(hours / 24), 'day');
 }

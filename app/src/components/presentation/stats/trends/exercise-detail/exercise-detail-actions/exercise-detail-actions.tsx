@@ -35,7 +35,7 @@ export function ExerciseDetailActions({
             end={{ x: 0.5, y: 1 }}
             style={S.ctaGloss}
           />
-          <S.CtaLabel>{t('stats.exercise_detail.actions.log_session', { name: shortName })}</S.CtaLabel>
+          <S.CtaLabel numberOfLines={2}>{t('stats.exercise_detail.actions.log_session', { name: shortName })}</S.CtaLabel>
         </HomeGradient>
       </Pressable>
       <Pressable

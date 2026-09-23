@@ -13,8 +13,10 @@ export const AttachRow = styled.View`
  * than a missing one.
  */
 export const AttachPill = styled.Pressable`
-  width: 112px;
-  height: 48px;
+  min-width: 112px;
+  min-height: 48px;
+  padding-horizontal: 20px;
+  padding-vertical: 12px;
   border-radius: 24px;
   flex-direction: row;
   align-items: center;

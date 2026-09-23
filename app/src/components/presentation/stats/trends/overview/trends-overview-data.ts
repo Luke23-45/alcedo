@@ -12,6 +12,7 @@ import { RecordedWeightedExercise, Session } from '@/models/session-models';
 import { Weight, shortFormatWeightUnit } from '@/models/weight';
 import { LocalDate } from '@js-joda/core';
 import { useTranslate } from '@tolgee/react';
+import type { TranslationKey } from '@tolgee/web';
 import {
   DEFAULT_MUSCLE_TARGET_BANDS,
   MUSCLE_GROUP_ROWS,
@@ -25,36 +26,97 @@ import {
 /* Small formatting helpers                                            */
 /* ------------------------------------------------------------------ */
 
+/* Locale-aware siblings of useFormatNumber/useFormatDate: cached Intl
+   formatters keyed by settings.preferredLanguage (undefined = system
+   locale), so German devices read "34.340" / "116,7" / "Sep 15" → locale. */
+
 const MINUS = '−'; // U+2212, matches the reference spec's "−1.8 kg"
 
-export function formatInt(value: number): string {
-  return Math.round(value).toLocaleString('en-US');
+type Locale = string | undefined;
+
+const intFormatters = new Map<string, Intl.NumberFormat>();
+const decFormatters = new Map<string, Intl.NumberFormat>();
+const monthDayFormatters = new Map<string, Intl.DateTimeFormat>();
+const monthFormatters = new Map<string, Intl.DateTimeFormat>();
+
+function cached<T>(map: Map<string, T>, locale: Locale, build: () => T): T {
+  const key = locale ?? 'system';
+  const existing = map.get(key);
+  if (existing) return existing;
+  const created = build();
+  map.set(key, created);
+  return created;
 }
 
-/** One decimal, e.g. 116.7 */
-export function format1(value: number): string {
-  return (Math.round(value * 10) / 10).toFixed(1);
+function toJsDate(date: LocalDate): Date {
+  return new Date(date.year(), date.monthValue() - 1, date.dayOfMonth());
+}
+
+export function formatInt(value: number, locale: Locale): string {
+  return cached(intFormatters, locale, () => new Intl.NumberFormat(locale)).format(
+    Math.round(value),
+  );
+}
+
+/** One decimal, e.g. 116.7 / 116,7 */
+export function format1(value: number, locale: Locale): string {
+  const rounded = Math.round(value * 10) / 10;
+  return cached(
+    decFormatters,
+    locale,
+    () => new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+  ).format(rounded);
 }
 
 /** Signed one decimal with U+2212 minus, e.g. "+11.7" / "−1.8" */
-export function formatSigned1(value: number): string {
+export function formatSigned1(value: number, locale: Locale): string {
   const rounded = Math.round(value * 10) / 10;
-  if (rounded === 0) return '0.0';
-  return (rounded < 0 ? MINUS : '+') + Math.abs(rounded).toFixed(1);
+  const magnitude = cached(
+    decFormatters,
+    locale,
+    () => new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+  ).format(Math.abs(rounded));
+  if (rounded === 0) return magnitude;
+  return (rounded < 0 ? MINUS : '+') + magnitude;
 }
 
 /** Signed percent with one decimal, e.g. "+18.0%" / "−2.2%" */
-export function formatSignedPct(fraction: number): string {
+export function formatSignedPct(fraction: number, locale: Locale): string {
   const pct = Math.round(fraction * 1000) / 10;
-  if (pct === 0) return '0.0%';
-  return (pct < 0 ? MINUS : '+') + Math.abs(pct).toFixed(1) + '%';
+  const magnitude = cached(
+    decFormatters,
+    locale,
+    () => new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+  ).format(Math.abs(pct));
+  if (pct === 0) return `${magnitude}%`;
+  return (pct < 0 ? MINUS : '+') + magnitude + '%';
 }
 
 /** Weight magnitude without unit, trimming ".0": 102.5 / 180 */
-export function formatWeightTrim(weight: Weight): string {
+export function formatWeightTrim(weight: Weight, locale: Locale): string {
   const kg = weight.convertTo('kilograms').value.toNumber();
   const rounded = Math.round(kg * 10) / 10;
-  return Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1);
+  return Number.isInteger(rounded)
+    ? formatInt(rounded, locale)
+    : format1(rounded, locale);
+}
+
+/** "Sep 15" in the caller's locale (replaces the hardcoded English array). */
+export function monthDay(date: LocalDate, locale: Locale): string {
+  return cached(
+    monthDayFormatters,
+    locale,
+    () => new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }),
+  ).format(toJsDate(date));
+}
+
+/** "Sep" in the caller's locale, for the heat pill and PR dates. */
+export function monthShort(date: LocalDate, locale: Locale): string {
+  return cached(
+    monthFormatters,
+    locale,
+    () => new Intl.DateTimeFormat(locale, { month: 'short' }),
+  ).format(toJsDate(date));
 }
 
 function kgOf(weight: Weight): number {
@@ -111,25 +173,7 @@ function sessionsOn(sessions: Session[], day: LocalDate): Session[] {
 export interface Bucket {
   start: LocalDate;
   end: LocalDate;
-  label: string; // "Sep 15"
-}
-
-function monthDay(date: LocalDate): string {
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  return `${months[date.monthValue() - 1]} ${date.dayOfMonth()}`;
+  label: string; // "Sep 15" in the caller's locale
 }
 
 /**
@@ -141,13 +185,14 @@ export function bucketsForRange(
   range: TrendRange,
   today: LocalDate,
   earliest: LocalDate | undefined,
+  locale?: Locale,
 ): Bucket[] {
   const buckets: Bucket[] = [];
   const push = (end: LocalDate, days: number) => {
     buckets.unshift({
       start: end.minusDays(days - 1),
       end,
-      label: monthDay(end),
+      label: monthDay(end, locale),
     });
   };
   switch (range) {
@@ -414,6 +459,16 @@ export interface TrendsOverviewData {
 
 const LIFT_ORDER = [/bench/i, /squat/i, /deadlift/i];
 
+/** Insight strings name the muscle in the app language, never raw English. */
+const MUSCLE_GROUP_KEYS: Record<CanonicalMuscleGroup, TranslationKey> = {
+  Chest: 'trends.muscle.group.chest',
+  Back: 'trends.muscle.group.back',
+  Shoulders: 'trends.muscle.group.shoulders',
+  Quads: 'trends.muscle.group.quads',
+  Hamstrings: 'trends.muscle.group.hamstrings',
+  Calves: 'trends.muscle.group.calves',
+};
+
 function orderRecords<T extends { name: string; date: LocalDate }>(
   items: T[],
 ): T[] {
@@ -438,6 +493,9 @@ export function useTrendsOverviewData(
   const { t } = useTranslate();
   const sessions = useAppSelector(selectSessions);
   const historyRecords = useAppSelector(selectHistoryPersonalRecords);
+  // Numbers and month names follow the app language (system locale when unset),
+  // exactly like useFormatNumber/useFormatDate.
+  const locale = useAppSelector((x) => x.settings.preferredLanguage);
 
   const today = LocalDate.now();
   const earliest = sessions.reduce<LocalDate | undefined>(
@@ -458,7 +516,7 @@ export function useTrendsOverviewData(
   const prior7Kg = prior7.reduce((sum, s) => sum + sessionVolumeKg(s), 0);
   const wow = prior7Kg > 0 ? (trailing7Kg - prior7Kg) / prior7Kg : null;
 
-  const buckets = bucketsForRange(range, today, earliest);
+  const buckets = bucketsForRange(range, today, earliest, locale);
   const volumePoints: ChartPoint[] = buckets.map((b) => ({
     label: b.label,
     value: volumeInBucket(sessions, b),
@@ -486,23 +544,23 @@ export function useTrendsOverviewData(
 
   const volume: HeroMetric = {
     points: volumePoints,
-    bigValue: formatInt(trailing7Kg),
+    bigValue: formatInt(trailing7Kg, locale),
     unit: t('trends.unit.kg'),
     caption: t('trends.hero.volume_caption', {
       window: t('trends.window.rolling_7d'),
       span: rangeSpan,
-      avg: `${formatInt(volumeAvg)} ${t('trends.unit.kg')}`,
+      avg: `${formatInt(volumeAvg, locale)} ${t('trends.unit.kg')}`,
     }),
-    deltaText: wow === null ? null : formatSignedPct(wow),
+    deltaText: wow === null ? null : formatSignedPct(wow, locale),
     deltaTone: wow === null ? 'neutral' : wow >= 0 ? 'up' : 'down',
     footer:
       volumeGain === null
         ? ''
         : t('trends.hero.footer_gain', {
-            pct: formatSignedPct(volumeGain),
+            pct: formatSignedPct(volumeGain, locale),
             span: `${volumePoints.length} ${bucketNoun}`,
           }),
-    endLabel: formatInt(volumePoints[volumePoints.length - 1]?.value ?? 0),
+    endLabel: formatInt(volumePoints[volumePoints.length - 1]?.value ?? 0, locale),
   };
 
   /* ---- featured lift e1RM ---- */
@@ -522,7 +580,7 @@ export function useTrendsOverviewData(
 
   const e1rm: HeroMetric = {
     points: e1rmPoints,
-    bigValue: latestE1rm === undefined ? '–' : format1(latestE1rm),
+    bigValue: latestE1rm === undefined ? '–' : format1(latestE1rm, locale),
     unit: latestE1rm === undefined ? '' : t('trends.unit.kg'),
     caption: featured
       ? t('trends.hero.e1rm_caption', { lift: featured.shortName })
@@ -530,17 +588,17 @@ export function useTrendsOverviewData(
     deltaText:
       e1rmGain === null
         ? null
-        : formatSigned1(e1rmGain) + ' ' + t('trends.unit.kg'),
+        : formatSigned1(e1rmGain, locale) + ' ' + t('trends.unit.kg'),
     deltaTone: e1rmGain === null ? 'neutral' : e1rmGain >= 0 ? 'up' : 'down',
     footer:
       e1rmGainPct === null
         ? ''
         : t('trends.hero.footer_gain', {
-            pct: formatSignedPct(e1rmGainPct),
+            pct: formatSignedPct(e1rmGainPct, locale),
             span: `${e1rmPoints.length} ${bucketNoun}`,
           }),
     endLabel: e1rmPoints.length
-      ? format1(e1rmPoints[e1rmPoints.length - 1]!.value)
+      ? format1(e1rmPoints[e1rmPoints.length - 1]!.value, locale)
       : '',
   };
 
@@ -573,7 +631,7 @@ export function useTrendsOverviewData(
 
   const bodyweight: HeroMetric = {
     points: bwPoints,
-    bigValue: latestBw === undefined ? '–' : format1(latestBw.value),
+    bigValue: latestBw === undefined ? '–' : format1(latestBw.value, locale),
     unit: latestBw === undefined ? '' : t('trends.unit.kg'),
     caption:
       latestBw === undefined
@@ -582,17 +640,17 @@ export function useTrendsOverviewData(
     deltaText:
       bwDelta === null
         ? null
-        : `${formatSigned1(bwDelta)} ${t('trends.unit.kg')} · ${bwWeeks} ${t('trends.span.wk')}`,
+        : `${formatSigned1(bwDelta, locale)} ${t('trends.unit.kg')} · ${bwWeeks} ${t('trends.span.wk')}`,
     deltaTone: 'neutral',
     footer:
       bwDeltaPct === null
         ? ''
         : t('trends.hero.footer_gain', {
-            pct: formatSignedPct(bwDeltaPct),
+            pct: formatSignedPct(bwDeltaPct, locale),
             span: `${bwPoints.length} ${bucketNoun}`,
           }),
     endLabel: bwPoints.length
-      ? format1(bwPoints[bwPoints.length - 1]!.value)
+      ? format1(bwPoints[bwPoints.length - 1]!.value, locale)
       : '',
   };
 
@@ -627,33 +685,33 @@ export function useTrendsOverviewData(
   const tiles: [MetricTile, MetricTile, MetricTile] = [
     {
       label: t('trends.tile.volume'),
-      value: formatInt(trailing7Kg),
-      delta: wow === null ? '–' : formatSignedPct(wow),
+      value: formatInt(trailing7Kg, locale),
+      delta: wow === null ? '–' : formatSignedPct(wow, locale),
       deltaTone: wow === null ? 'neutral' : wow >= 0 ? 'up' : 'down',
       spark: weeklyTrailing,
     },
     {
       label: featured
-        ? t('trends.tile.e1rm', { lift: featured.shortName.toUpperCase() })
+        ? t('trends.tile.e1rm', { lift: featured.shortName.toLocaleUpperCase() })
         : t('trends.tile.e1rm_fallback'),
-      value: latestE1rm === undefined ? '–' : format1(latestE1rm),
+      value: latestE1rm === undefined ? '–' : format1(latestE1rm, locale),
       unit: latestE1rm === undefined ? undefined : t('trends.unit.kg'),
       delta:
         e1rmTileGain === null
           ? '–'
-          : `${formatSigned1(e1rmTileGain)} ${t('trends.unit.kg')}`,
+          : `${formatSigned1(e1rmTileGain, locale)} ${t('trends.unit.kg')}`,
       deltaTone:
         e1rmTileGain === null ? 'neutral' : e1rmTileGain >= 0 ? 'up' : 'down',
       spark: e1rmTail,
     },
     {
       label: t('trends.tile.bodyweight'),
-      value: latestBw === undefined ? '–' : format1(latestBw.value),
+      value: latestBw === undefined ? '–' : format1(latestBw.value, locale),
       unit: latestBw === undefined ? undefined : t('trends.unit.kg'),
       delta:
         bwTileDelta === null
           ? '–'
-          : `${formatSigned1(bwTileDelta)} ${t('trends.unit.kg')} · ${bwTileWeeks} ${t('trends.span.wk')}`,
+          : `${formatSigned1(bwTileDelta, locale)} ${t('trends.unit.kg')} · ${bwTileWeeks} ${t('trends.span.wk')}`,
       deltaTone: 'neutral',
       spark: bwTail.map((p) => p.value),
     },
@@ -706,8 +764,8 @@ export function useTrendsOverviewData(
         // Set detail comes from the record's own session — never invented.
         // Without it, fall back to the bare weight (task rule).
         bestSet = best
-          ? `${formatWeightTrim(best.weight)} × ${best.reps}`
-          : formatWeightTrim(record.oneRepMax);
+          ? `${formatWeightTrim(best.weight, locale)} × ${best.reps}`
+          : formatWeightTrim(record.oneRepMax, locale);
       }
       return {
         name: record.exerciseName,
@@ -715,8 +773,8 @@ export function useTrendsOverviewData(
         row: {
           name: record.exerciseName,
           bestSet,
-          e1rm: format1(kgOf(record.oneRepMax)),
-          dateLabel: monthDay(date),
+          e1rm: format1(kgOf(record.oneRepMax), locale),
+          dateLabel: monthDay(date, locale),
         } as PersonalBestRow,
       };
     }),
@@ -845,7 +903,7 @@ export function useTrendsOverviewData(
   const heatElapsed = Number(today.toEpochDay() - firstMonday.toEpochDay()) + 1;
   const heatPct =
     heatElapsed > 0 ? Math.round((heatTrained / heatElapsed) * 100) : 0;
-  const monthName = (d: LocalDate) => monthDay(d).split(' ')[0]!.toUpperCase();
+  const monthName = (d: LocalDate) => monthShort(d, locale).toLocaleUpperCase();
   const heatMonthLabel = `${monthName(firstMonday)} – ${monthName(today)}`;
 
   /* ---- streaks & totals ---- */
@@ -885,7 +943,7 @@ export function useTrendsOverviewData(
     longestStreak > 0 && longestStart && longestEnd
       ? t('trends.streaks.longest', {
           days: longestStreak,
-          range: `${monthDay(longestStart)} – ${monthDay(longestEnd)}`,
+          range: `${monthDay(longestStart, locale)} – ${monthDay(longestEnd, locale)}`,
         })
       : t('trends.streaks.longest_none');
   const sessionsThisYear = sessions.filter(
@@ -893,7 +951,7 @@ export function useTrendsOverviewData(
   ).length;
   const weeksElapsed = today.dayOfYear() / 7;
   const avgPerWeek =
-    weeksElapsed > 0 ? (sessionsThisYear / weeksElapsed).toFixed(1) : '0.0';
+    weeksElapsed > 0 ? format1(sessionsThisYear / weeksElapsed, locale) : format1(0, locale);
 
   /* ---- PR timeline: latest 5 records, newest first ---- */
   const prTimeline: PrTimelineItem[] = [...flatRecords]
@@ -905,7 +963,7 @@ export function useTrendsOverviewData(
       dateLabel: `${monthName(date)} ${date.dayOfMonth()}`,
       name: record.exerciseName,
       value:
-        `${format1(kgOf(record.oneRepMax))} ${shortFormatWeightUnit(record.oneRepMax.unit)}`.trim(),
+        `${format1(kgOf(record.oneRepMax), locale)} ${shortFormatWeightUnit(record.oneRepMax.unit)}`.trim(),
     }));
   const prNewCount = flatRecords.filter(
     (r) => !r.date.isBefore(today.minusDays(6)),
@@ -915,20 +973,21 @@ export function useTrendsOverviewData(
   const insights: { line1: string; line2: string }[] = [];
   if (wow !== null && wow >= 0.15) {
     insights.push({
-      line1: t('trends.insights.deload_1', { pct: formatSignedPct(wow) }),
+      line1: t('trends.insights.deload_1', { pct: formatSignedPct(wow, locale) }),
       line2: t('trends.insights.deload_2'),
     });
   }
   if (muscleCallout && insights.length < 2) {
+    const calloutMuscle = t(MUSCLE_GROUP_KEYS[muscleCallout.muscle]);
     insights.push({
       line1: t('trends.insights.muscle_1', {
-        muscle: muscleCallout.muscle,
+        muscle: calloutMuscle,
         sets: muscleCallout.sets,
         low: muscleCallout.low,
         high: muscleCallout.high,
       }),
       line2: t('trends.insights.muscle_2', {
-        muscle: muscleCallout.muscle.toLowerCase(),
+        muscle: calloutMuscle.toLocaleLowerCase(),
       }),
     });
   }
@@ -952,8 +1011,8 @@ export function useTrendsOverviewData(
 
   return {
     subtitle: t('trends.subtitle', {
-      start: monthDay(today.minusDays(6)),
-      end: monthDay(today),
+      start: monthDay(today.minusDays(6), locale),
+      end: monthDay(today, locale),
     }),
     volume,
     e1rm,

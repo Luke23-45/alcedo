@@ -18,6 +18,7 @@ import { MonthCalendar } from '@/components/presentation/history/month-calendar/
 import { MonthSummary } from '@/components/presentation/history/month-summary/month-summary';
 import { WeekList } from '@/components/presentation/history/week-list/week-list';
 import { HomeGradient } from '@/components/presentation/home/shared/home-gradient';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { useFormatDate } from '@/hooks/useFormatDate';
 import { useToday } from '@/hooks/useToday';
 import { Session } from '@/models/session-models';
@@ -40,8 +41,10 @@ import { CalendarSection, EmptyDayWrap, Page, ScreenRoot, Section } from '@/comp
 
 /** Ambient color fields behind the screen gradient — amber upper right, green lower left. */
 function Aurora() {
-  const amberOpacity = 0.1;
-  const greenOpacity = 0.07;
+  const { isDark } = useAppTheme();
+  const dim = isDark ? 1 : 0.6;
+  const amberOpacity = 0.1 * dim;
+  const greenOpacity = 0.07 * dim;
   return (
     <Svg
       style={StyleSheet.absoluteFill}

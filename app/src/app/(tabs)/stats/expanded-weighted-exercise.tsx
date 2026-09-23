@@ -131,7 +131,7 @@ function LoadedDetail({
   ]
     .filter(Boolean)
     .join(' · ');
-  const typeChip = detail.mechanic ? translateExerciseMeta(t, 'mechanic', detail.mechanic).toUpperCase() : null;
+  const typeChip = detail.mechanic ? translateExerciseMeta(t, 'mechanic', detail.mechanic).toLocaleUpperCase() : null;
   const latest = detail.sessions[0]!;
 
   return (

@@ -11,12 +11,13 @@ import * as S from './session-history.styles';
 const PREVIEW_ROWS = 6;
 
 function RowChevron() {
+  const theme = useAppTheme();
   return (
     <Svg width={8} height={12} viewBox="-4 -6 8 12">
       <Path
         d="M-2 -4 L2 0 L-2 4"
         fill="none"
-        stroke="#48484A"
+        stroke={theme.isDark ? '#48484A' : '#AEAEB2'}
         strokeWidth={1.9}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -86,7 +87,7 @@ export function SessionHistory({
               <S.DateTile $pr={s.holdsWeightPr}>
                 {/* js-joda text patterns (MMM) throw without the locale plugin, which
                     we don't ship — month names go through the cached Intl formatters. */}
-                <S.DateMonth $pr={s.holdsWeightPr}>{formatDate(s.date, { month: 'short' }).toUpperCase()}</S.DateMonth>
+                <S.DateMonth $pr={s.holdsWeightPr}>{formatDate(s.date, { month: 'short' }).toLocaleUpperCase()}</S.DateMonth>
                 <S.DateDay $pr={s.holdsWeightPr}>{formatDate(s.date, { day: '2-digit' })}</S.DateDay>
               </S.DateTile>
               <S.TextBlock>

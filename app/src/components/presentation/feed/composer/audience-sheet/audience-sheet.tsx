@@ -43,7 +43,7 @@ const ROWS: {
 
 const ROW_DETAILS: Record<ComposerAudience, { key: string; fallback: string }> = {
   friends: { key: 'feed.composer.audience.friends.detail', fallback: '{count} mutual friends' },
-  public: { key: 'feed.composer.audience.public.detail', fallback: 'Anyone on Kinetic' },
+  public: { key: 'feed.composer.audience.public.detail', fallback: 'Anyone on Alcedo' },
   private: { key: 'feed.composer.audience.private.detail', fallback: 'Only you' },
 };
 

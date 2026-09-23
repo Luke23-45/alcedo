@@ -1,8 +1,10 @@
 import styled from 'styled-components/native';
+import { StyleSheet } from 'react-native';
+import { type as typeHelper } from '@/styles/theme';
 import { sessionPalette } from '../session-tokens';
 
 export const StripWrap = styled.View`
-  height: 68px;
+  min-height: 68px;
   margin-horizontal: 16px;
 `;
 
@@ -21,13 +23,13 @@ export const Column = styled.View`
 `;
 
 export const DividerLine = styled.View`
-  width: 1px;
+  width: ${StyleSheet.hairlineWidth}px;
   height: 40px;
   background-color: ${({ theme }) => sessionPalette(theme.isDark).stats.divider};
 `;
 
 export const Value = styled.Text<{ $dimmed: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 16px;
   line-height: 20px;
   font-weight: 700;
@@ -40,7 +42,7 @@ export const Value = styled.Text<{ $dimmed: boolean }>`
 `;
 
 export const ValueSuffix = styled.Text<{ $dimmed: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;
@@ -59,12 +61,11 @@ export const LabelRow = styled.View`
 `;
 
 export const Label = styled.Text<{ $dimmed: boolean }>`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 8px;
   line-height: 10px;
   font-weight: 700;
   letter-spacing: 0.8px;
-  text-transform: uppercase;
   color: ${({ theme, $dimmed }) => {
     const c = sessionPalette(theme.isDark).stats;
     return $dimmed ? c.dimLabel : c.label;

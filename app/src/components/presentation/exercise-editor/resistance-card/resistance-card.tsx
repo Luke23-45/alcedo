@@ -1,17 +1,10 @@
 import { View } from 'react-native';
 import { useTranslate } from '@tolgee/react';
 import { Resistance, WeightedExerciseBlueprint } from '@/models/blueprint-models';
-import { Card, Hairline } from '../editor-primitives';
+import { Card, Hairline, RadioDot, RadioRing } from '../editor-primitives';
 import { formatBodyweight } from '../exercise-editor-logic';
 import { Weight } from '@/models/weight';
-import {
-  Radio,
-  RadioDot,
-  ResistanceBody,
-  ResistanceLabel,
-  ResistanceRow,
-  ResistanceTextColumn,
-} from './resistance-card.styles';
+import { ResistanceBody, ResistanceLabel, ResistanceRow, ResistanceTextColumn } from './resistance-card.styles';
 
 const OPTIONS: Resistance[] = ['external', 'bodyweight', 'none'];
 
@@ -74,7 +67,7 @@ export function ResistanceCard({
                   <ResistanceLabel $selected={selected}>{label(option)}</ResistanceLabel>
                   <ResistanceBody $selected={selected}>{explanation(option)}</ResistanceBody>
                 </ResistanceTextColumn>
-                <Radio $selected={selected}>{selected ? <RadioDot /> : null}</Radio>
+                <RadioRing $selected={selected}>{selected ? <RadioDot /> : null}</RadioRing>
               </ResistanceRow>
             </View>
           );

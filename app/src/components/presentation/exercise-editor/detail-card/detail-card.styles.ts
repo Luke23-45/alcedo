@@ -1,5 +1,6 @@
 import styled from 'styled-components/native';
 import { TextInput as RNTextInput } from 'react-native';
+import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
 
 export const DetailPad = styled.View`
@@ -21,7 +22,7 @@ export const SubHeadRow = styled.View`
 `;
 
 export const SubHeadCounter = styled.Text`
-  font-family: ${({ theme }) => theme.font.text};
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
   font-size: 9px;
   line-height: 12px;
   font-weight: 500;

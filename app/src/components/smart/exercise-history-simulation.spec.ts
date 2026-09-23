@@ -74,6 +74,8 @@ const ctx = (prSessionId?: string): RowContext =>
     today: LocalDate.of(2026, 6, 10),
     prSessionId,
     bodyweightLabel: 'BW',
+    // Device-default locale path (undefined), matching the app's unset-language behavior.
+    locale: undefined,
   }) as RowContext;
 
 describe('PR detection', () => {

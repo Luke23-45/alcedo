@@ -76,7 +76,7 @@ export function SetConfigCard({
                 <SetCell key={index}>
                   <SetCellInner>
                     <SetCellLabel>
-                      {t('exercise.editor.set_cell.label', 'Set {number}', { number: index + 1 }).toUpperCase()}
+                      {t('exercise.editor.set_cell.label', 'Set {number}', { number: index + 1 }).toLocaleUpperCase()}
                     </SetCellLabel>
                     <SetCellStepper>
                       <Stepper
