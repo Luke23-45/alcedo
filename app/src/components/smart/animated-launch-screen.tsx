@@ -110,16 +110,18 @@ export function AnimatedLaunchScreen({ reduceMotion }: { reduceMotion: boolean }
       <Animated.View style={[StyleSheet.absoluteFill, dissolveStyle]}>
         <Animated.View style={[StyleSheet.absoluteFill, wakeStyle]}>
           <Image source={SPLASH} style={styles.image} resizeMode="cover" />
-          {/* Diffuse blue bloom warming up around the bird — no ring, no edge. */}
+          {/* Diffuse blue bloom warming up around the bird — fast falloff, no edge. */}
           <Animated.View style={[StyleSheet.absoluteFill, bloomStyle]} pointerEvents="none">
             <Svg style={StyleSheet.absoluteFill}>
               <Defs>
                 <RadialGradient id="launchBloom" cx="50%" cy="50%" r="50%">
-                  <Stop offset="0%" stopColor="#4D8DFF" stopOpacity={0.3} />
+                  <Stop offset="0%" stopColor="#4D8DFF" stopOpacity={0.24} />
+                  <Stop offset="45%" stopColor="#4D8DFF" stopOpacity={0.08} />
+                  <Stop offset="75%" stopColor="#4D8DFF" stopOpacity={0.012} />
                   <Stop offset="100%" stopColor="#4D8DFF" stopOpacity={0} />
                 </RadialGradient>
               </Defs>
-              <Ellipse cx={b.x} cy={b.y} rx={b.rx * 1.6} ry={b.ry * 1.6} fill="url(#launchBloom)" />
+              <Ellipse cx={b.x} cy={b.y} rx={b.rx * 1.3} ry={b.ry * 1.3} fill="url(#launchBloom)" />
             </Svg>
           </Animated.View>
           {/* Sheen: one diagonal sweep, softly masked to the bird — no hard clip. */}
@@ -127,7 +129,7 @@ export function AnimatedLaunchScreen({ reduceMotion }: { reduceMotion: boolean }
             <Svg style={StyleSheet.absoluteFill}>
               <Defs>
                 <RadialGradient id="sheenMaskFade" cx="50%" cy="50%" r="50%">
-                  <Stop offset="70%" stopColor="#FFFFFF" stopOpacity={1} />
+                  <Stop offset="40%" stopColor="#FFFFFF" stopOpacity={1} />
                   <Stop offset="100%" stopColor="#FFFFFF" stopOpacity={0} />
                 </RadialGradient>
                 <Mask
@@ -142,7 +144,7 @@ export function AnimatedLaunchScreen({ reduceMotion }: { reduceMotion: boolean }
                 </Mask>
                 <LinearGradient id="sheenBand" x1="0" y1="0" x2="1" y2="0">
                   <Stop offset="0%" stopColor="#FFFFFF" stopOpacity={0} />
-                  <Stop offset="50%" stopColor="#FFFFFF" stopOpacity={0.28} />
+                  <Stop offset="50%" stopColor="#FFFFFF" stopOpacity={0.22} />
                   <Stop offset="100%" stopColor="#FFFFFF" stopOpacity={0} />
                 </LinearGradient>
               </Defs>
