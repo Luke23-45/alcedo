@@ -32,9 +32,9 @@ const EYE = { x: 726.5, y: 1165 };
  * The launch choreography, in ms — three beats:
  *   0.0–0.4s  Stillness. Pixel-identical to the native PNG; the eye registers
  *             continuity before anything moves.
- *   0.4–1.3s  The wake. The bird rises ~10pt and breathes to 1.045 scale, a
- *             blue bloom warms up around it, a faint sheen sweeps across once,
- *             and a single catchlight glints in the eye around 0.9s.
+ *   0.4–1.3s  The wake. The bird rises ~10pt and breathes to 1.045 scale,
+ *             a faint sheen sweeps across once, and a single catchlight
+ *             glints in the eye around 0.9s.
  *   1.3–2.0s  The reveal. The whole splash dissolves while the app appears
  *             beneath (the launch provider wakes the hero under it at 1.3s).
  */
@@ -59,7 +59,6 @@ function useSplashGeometry() {
 export function AnimatedLaunchScreen({ reduceMotion }: { reduceMotion: boolean }) {
   const rise = useSharedValue(0);
   const breathe = useSharedValue(1);
-  const bloom = useSharedValue(0);
   const sheenP = useSharedValue(0);
   const sheenOpacity = useSharedValue(0);
   const glint = useSharedValue(0);
@@ -73,7 +72,6 @@ export function AnimatedLaunchScreen({ reduceMotion }: { reduceMotion: boolean }
     }
     rise.value = withDelay(STILL_MS, withTiming(-10, { duration: WAKE_MS, easing: Easing.out(Easing.exp) }));
     breathe.value = withDelay(STILL_MS, withTiming(1.045, { duration: WAKE_MS, easing: Easing.inOut(Easing.ease) }));
-    bloom.value = withDelay(STILL_MS, withTiming(0.8, { duration: WAKE_MS, easing: Easing.out(Easing.exp) }));
     sheenP.value = withDelay(STILL_MS, withTiming(1, { duration: WAKE_MS, easing: Easing.linear }));
     sheenOpacity.value = withDelay(
       STILL_MS,
@@ -91,13 +89,12 @@ export function AnimatedLaunchScreen({ reduceMotion }: { reduceMotion: boolean }
       STILL_MS + WAKE_MS,
       withTiming(0, { duration: REVEAL_MS, easing: Easing.inOut(Easing.ease) }),
     );
-  }, [reduceMotion, rise, breathe, bloom, sheenP, sheenOpacity, glint, dissolve]);
+  }, [reduceMotion, rise, breathe, sheenP, sheenOpacity, glint, dissolve]);
 
   const wakeStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: rise.value }, { scale: breathe.value }],
   }));
   const dissolveStyle = useAnimatedStyle(() => ({ opacity: dissolve.value }));
-  const bloomStyle = useAnimatedStyle(() => ({ opacity: bloom.value }));
   const sheenOpacityStyle = useAnimatedStyle(() => ({ opacity: sheenOpacity.value }));
   const glintStyle = useAnimatedStyle(() => ({ opacity: glint.value }));
   const sheenRectProps = useAnimatedProps(() => ({
@@ -110,20 +107,6 @@ export function AnimatedLaunchScreen({ reduceMotion }: { reduceMotion: boolean }
       <Animated.View style={[StyleSheet.absoluteFill, dissolveStyle]}>
         <Animated.View style={[StyleSheet.absoluteFill, wakeStyle]}>
           <Image source={SPLASH} style={styles.image} resizeMode="cover" />
-          {/* Diffuse blue bloom warming up around the bird — fast falloff, no edge. */}
-          <Animated.View style={[StyleSheet.absoluteFill, bloomStyle]} pointerEvents="none">
-            <Svg style={StyleSheet.absoluteFill}>
-              <Defs>
-                <RadialGradient id="launchBloom" cx="50%" cy="50%" r="50%">
-                  <Stop offset="0%" stopColor="#4D8DFF" stopOpacity={0.24} />
-                  <Stop offset="45%" stopColor="#4D8DFF" stopOpacity={0.08} />
-                  <Stop offset="75%" stopColor="#4D8DFF" stopOpacity={0.012} />
-                  <Stop offset="100%" stopColor="#4D8DFF" stopOpacity={0} />
-                </RadialGradient>
-              </Defs>
-              <Ellipse cx={b.x} cy={b.y} rx={b.rx * 1.3} ry={b.ry * 1.3} fill="url(#launchBloom)" />
-            </Svg>
-          </Animated.View>
           {/* Sheen: one diagonal sweep, softly masked to the bird — no hard clip. */}
           <Animated.View style={[StyleSheet.absoluteFill, sheenOpacityStyle]} pointerEvents="none">
             <Svg style={StyleSheet.absoluteFill}>
