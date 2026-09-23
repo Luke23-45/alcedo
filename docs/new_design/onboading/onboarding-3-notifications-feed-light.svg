@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="393" height="852" viewBox="0 0 393 852" role="img" aria-labelledby="ttl dsc"
+     font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+     text-rendering="optimizeLegibility" shape-rendering="geometricPrecision">
+
+<title id="ttl">Alcedo — Onboarding 3 of 3, Notifications and Feed (light)</title>
+<desc id="dsc">Wizard page three in light mode: rest notification toggle, feed visibility and health export rows, pager dots, Previous and Get started actions. Settles in on load with a staggered rise; static after.</desc>
+
+<defs>
+  <clipPath id="frame"><rect x="0" y="0" width="393" height="852"/></clipPath>
+
+  <!-- ══════ ENVIRONMENT ══════ -->
+  <linearGradient id="gBg" x1="0" y1="0" x2="0.25" y2="1">
+    <stop offset="0" stop-color="#F8F8FC"/><stop offset="0.5" stop-color="#F1F1F6"/><stop offset="1" stop-color="#F3F3F8"/>
+  </linearGradient>
+  <radialGradient id="gAuraA" gradientUnits="userSpaceOnUse" cx="60" cy="180" r="280">
+    <stop offset="0" stop-color="#FF3B30" stop-opacity="0.07"/><stop offset="1" stop-color="#FF3B30" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gAuraB" gradientUnits="userSpaceOnUse" cx="360" cy="700" r="300">
+    <stop offset="0" stop-color="#007AFF" stop-opacity="0.075"/><stop offset="1" stop-color="#007AFF" stop-opacity="0"/></radialGradient>
+
+  <!-- ══════ MATERIAL ══════ -->
+  <linearGradient id="gCard" x1="0" y1="0" x2="0.45" y2="1">
+    <stop offset="0" stop-color="#FFFFFF"/><stop offset="0.55" stop-color="#FDFDFF"/><stop offset="1" stop-color="#FAFAFC"/></linearGradient>
+  <linearGradient id="gCardEdge" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#000000" stop-opacity="0.045"/><stop offset="0.4" stop-color="#000000" stop-opacity="0.06"/><stop offset="1" stop-color="#000000" stop-opacity="0.115"/></linearGradient>
+  <linearGradient id="gBrand" x1="0" y1="0" x2="0.6" y2="1">
+    <stop offset="0" stop-color="#FFB03A"/><stop offset="0.45" stop-color="#FF6A3D"/><stop offset="1" stop-color="#FF2D55"/></linearGradient>
+  <linearGradient id="gGloss" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.30"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+
+  <!-- ══════ FILTERS ══════ -->
+  <filter id="fCard" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#14142B" flood-opacity="0.075"/></filter>
+  <filter id="fBrand" x="-80%" y="-80%" width="260%" height="260%"><feDropShadow dx="0" dy="7" stdDeviation="11" flood-color="#FF2D55" flood-opacity="0.50"/></filter>
+  <filter id="fKnob" x="-60%" y="-80%" width="220%" height="280%"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.18"/></filter>
+
+  <!-- ══════ ICONS ══════ -->
+  <g id="ic-bell" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 -8 C3.6 -8 5.6 -5.4 5.6 -2 V1.5 L7.4 4 H-7.4 L-5.6 1.5 V-2 C-5.6 -5.4 -3.6 -8 0 -8 Z"/>
+    <path d="M-2 6.2 A2 2 0 0 0 2 6.2"/>
+  </g>
+  <g id="ic-chat" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-8 -6 H8 V4 H0 L-4 8 V4 H-8 Z"/>
+  </g>
+  <g id="ic-heart" fill="currentColor">
+    <path d="M0 6.4 C-7.2 1.7 -8.6 -2.7 -6.3 -5.3 C-4.5 -7.2 -1.6 -6.9 0 -4.6 C1.6 -6.9 4.5 -7.2 6.3 -5.3 C8.6 -2.7 7.2 1.7 0 6.4 Z"/>
+  </g>
+</defs>
+
+<g clip-path="url(#frame)">
+
+<!-- ░░ BACKGROUND ░░ -->
+<rect width="393" height="852" fill="url(#gBg)"/>
+<rect width="393" height="852" fill="url(#gAuraA)"/>
+<rect width="393" height="852" fill="url(#gAuraB)"/>
+
+<!-- ═══════════ 01 · STATUS BAR ═══════════ -->
+<text x="66" y="36" font-size="16" font-weight="600" letter-spacing="-0.35" fill="#1C1C1E" text-anchor="middle">9:41</text>
+<g fill="#1C1C1E">
+  <rect x="281" y="27" width="3" height="4.5" rx="1.5"/><rect x="286" y="25" width="3" height="6.5" rx="1.5"/>
+  <rect x="291" y="23" width="3" height="8.5" rx="1.5"/><rect x="296" y="20.5" width="3" height="11" rx="1.5"/>
+</g>
+<g fill="none" stroke="#1C1C1E" stroke-width="1.6" stroke-linecap="round">
+  <path d="M306.28 23.78 A9.5 9.5 0 0 1 319.72 23.78"/><path d="M308.55 26.05 A6.3 6.3 0 0 1 317.45 26.05"/>
+  <path d="M310.81 28.31 A3.1 3.1 0 0 1 315.19 28.31"/>
+</g>
+<circle cx="313" cy="30.8" r="1.3" fill="#1C1C1E"/>
+<rect x="328" y="23" width="24" height="11" rx="3.2" fill="none" stroke="#1C1C1E" stroke-opacity="0.38"/>
+<rect x="329.8" y="24.8" width="18" height="7.4" rx="2" fill="#1C1C1E"/>
+<path d="M353.6 26.4 C354.9 26.8 354.9 30.2 353.6 30.6 Z" fill="#1C1C1E" fill-opacity="0.42"/>
+<rect x="133.5" y="11" width="126" height="37" rx="18.5" fill="#000000"/>
+<circle cx="245.5" cy="29.5" r="6.2" fill="#0A0C10"/><circle cx="245.5" cy="29.5" r="3.1" fill="#121A24"/>
+<circle cx="244.2" cy="28.2" r="1.05" fill="#3E6E9E" opacity="0.75"/>
+
+<!-- ═══════════ 02 · HEADER ═══════════ -->
+<g opacity="1">
+  <animate attributeName="opacity" values="0;1" keyTimes="0;1" dur="1.2s" fill="freeze"/>
+  <animateTransform attributeName="transform" type="translate" values="0 18;0 0" keyTimes="0;1" dur="1.2s"
+           calcMode="spline" keySplines="0.16 0.84 0.24 1" fill="freeze"/>
+  <text x="196.5" y="112" font-size="24" font-weight="700" letter-spacing="-0.55" fill="#1C1C1E" text-anchor="middle">Notifications &amp; Feed</text>
+  <text x="196.5" y="138" font-size="13" font-weight="500" letter-spacing="0" fill="#636366" text-anchor="middle">Manage some other miscellaneous settings</text>
+</g>
+
+<!-- ═══════════ 03 · NOTIFICATIONS CARD ═══════════ -->
+<!-- 3-line wrap keeps every glyph clear of the switch (313). Icon + control share the row centre (240). -->
+<g opacity="1" transform="translate(0,0)">
+  <animate attributeName="opacity" values="0;1" keyTimes="0;1" dur="1.2s" begin="0.12s" fill="freeze"/>
+  <animateTransform attributeName="transform" type="translate" values="0 18;0 0" keyTimes="0;1" dur="1.2s" begin="0.12s"
+           calcMode="spline" keySplines="0.16 0.84 0.24 1" fill="freeze"/>
+<text x="24" y="173" font-size="10" font-weight="700" letter-spacing="1.35" fill="#8E8E93">REST AND NOTIFICATIONS</text>
+<g filter="url(#fCard)"><rect x="16" y="188" width="361" height="100" rx="28" fill="url(#gCard)"/></g>
+<rect x="16.5" y="188.5" width="360" height="99" rx="27.5" fill="none" stroke="url(#gCardEdge)"/>
+<rect x="32" y="223" width="34" height="34" rx="10" fill="#FF3B30" fill-opacity="0.12"/>
+<use xlink:href="#ic-bell" href="#ic-bell" transform="translate(49,240) scale(0.85)" color="#E8003F"/>
+<text x="78" y="217" font-size="13.5" font-weight="600" letter-spacing="-0.2" fill="#1C1C1E">Rest notifications</text>
+<text x="78" y="237" font-size="10.5" font-weight="500" fill="#8E8E93">Show a notification when the rest</text>
+<text x="78" y="253" font-size="10.5" font-weight="500" fill="#8E8E93">timer finishes, even if the app is</text>
+<text x="78" y="269" font-size="10.5" font-weight="500" fill="#8E8E93">in the background</text>
+<rect x="313" y="227" width="44" height="26" rx="13" fill="#34C759"/>
+<g filter="url(#fKnob)"><circle cx="344" cy="240" r="11" fill="#FFFFFF"/></g>
+</g>
+
+<!-- ═══════════ 04 · FEED CARD ═══════════ -->
+<!-- 58-pitch rows. HealthKit subtitle restored in full (was truncated). -->
+<g opacity="1" transform="translate(0,0)">
+  <animate attributeName="opacity" values="0;1" keyTimes="0;1" dur="1.2s" begin="0.24s" fill="freeze"/>
+  <animateTransform attributeName="transform" type="translate" values="0 18;0 0" keyTimes="0;1" dur="1.2s" begin="0.24s"
+           calcMode="spline" keySplines="0.16 0.84 0.24 1" fill="freeze"/>
+<text x="24" y="304" font-size="10" font-weight="700" letter-spacing="1.35" fill="#8E8E93">FEED</text>
+<g filter="url(#fCard)"><rect x="16" y="319" width="361" height="142" rx="28" fill="url(#gCard)"/></g>
+<rect x="16.5" y="319.5" width="360" height="141" rx="27.5" fill="none" stroke="url(#gCardEdge)"/>
+<rect x="32" y="335" width="34" height="34" rx="10" fill="#0A84FF" fill-opacity="0.12"/>
+<use xlink:href="#ic-chat" href="#ic-chat" transform="translate(49,352) scale(0.85)" color="#0A84FF"/>
+<text x="78" y="348" font-size="13.5" font-weight="600" letter-spacing="-0.2" fill="#1C1C1E">Show feed</text>
+<text x="78" y="368" font-size="10.5" font-weight="500" fill="#8E8E93">Display the feed in the navigation bar</text>
+<rect x="313" y="339" width="44" height="26" rx="13" fill="#34C759"/>
+<g filter="url(#fKnob)"><circle cx="344" cy="352" r="11" fill="#FFFFFF"/></g>
+<line x1="78" y1="381" x2="357" y2="381" stroke="#3C3C43" stroke-opacity="0.12"/>
+<rect x="32" y="393" width="34" height="34" rx="10" fill="#FF2D55" fill-opacity="0.12"/>
+<use xlink:href="#ic-heart" href="#ic-heart" transform="translate(49,410) scale(0.85)" fill="#E8003F"/>
+<text x="78" y="406" font-size="13.5" font-weight="600" letter-spacing="-0.2" fill="#1C1C1E">Publish to Apple Fitness</text>
+<text x="78" y="426" font-size="10.5" font-weight="500" fill="#8E8E93">Exports future workouts and bodyweight</text>
+<text x="78" y="442" font-size="10.5" font-weight="500" fill="#8E8E93">into the Apple Fitness app</text>
+<rect x="313" y="397" width="44" height="26" rx="13" fill="#787880" fill-opacity="0.16"/>
+<g filter="url(#fKnob)"><circle cx="326" cy="410" r="11" fill="#FFFFFF"/></g>
+</g>
+
+<!-- ═══════════ 05 · PAGER DOTS ═══════════ -->
+<!-- Pinned chrome (y620 all pages). 56-wide row centred on 196.5: halves are exact centring, not slop. -->
+<circle cx="172.5" cy="624" r="4" fill="#1C1C1E" fill-opacity="0.18"/>
+<circle cx="188.5" cy="624" r="4" fill="#1C1C1E" fill-opacity="0.18"/>
+<rect x="200.5" y="620" width="24" height="8" rx="4" fill="#1C1C1E" fill-opacity="0.8"/>
+
+<!-- ═══════════ 06 · FOOTER ═══════════ -->
+<text x="66" y="762" font-size="15" font-weight="600" letter-spacing="-0.3" fill="#636366" text-anchor="middle">Previous</text>
+<g filter="url(#fBrand)"><rect x="200" y="736" width="177" height="50" rx="25" fill="url(#gBrand)"/></g>
+<rect x="200" y="736" width="177" height="25" rx="25" fill="url(#gGloss)"/>
+<rect x="200.5" y="736.5" width="176" height="49" rx="24.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.22"/>
+<text x="288.5" y="767" font-size="15" font-weight="600" letter-spacing="-0.3" fill="#FFFFFF" text-anchor="middle">Get started</text>
+
+<rect x="129.5" y="839" width="134" height="5" rx="2.5" fill="#1C1C1E" fill-opacity="0.88"/>
+</g>
+<rect x="0.5" y="0.5" width="392" height="851" fill="none" stroke="#000000" stroke-opacity="0.08"/>
+</svg>

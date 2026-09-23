@@ -28,6 +28,12 @@ doc is added, removed, renamed, or repurposed, update this index in the same cha
 - [new_design/diff-save-dark.svg](new_design/diff-save-dark.svg) — /diff-save reference mockup (dark).
 - [new_design/backend-editor-dark.svg](new_design/backend-editor-dark.svg) — backend editor (/settings/backends/[id]) redesign mockup (dark).
 - [new_design/planner-chat-dark.svg](new_design/planner-chat-dark.svg) — AI planner chat redesign mockup (dark).
+- [new_design/onboading/onboarding-1-welcome.svg](new_design/onboading/onboarding-1-welcome.svg) — onboarding reference mockup 1 of 3, welcome (dark).
+- [new_design/onboading/onboarding-1-welcome-light.svg](new_design/onboading/onboarding-1-welcome-light.svg) — onboarding reference mockup 1 of 3, welcome (light).
+- [new_design/onboading/onboarding-2-localisation.svg](new_design/onboading/onboarding-2-localisation.svg) — onboarding reference mockup 2 of 3, localisation (dark).
+- [new_design/onboading/onboarding-2-localisation-light.svg](new_design/onboading/onboarding-2-localisation-light.svg) — onboarding reference mockup 2 of 3, localisation (light).
+- [new_design/onboading/onboarding-3-notifications-feed.svg](new_design/onboading/onboarding-3-notifications-feed.svg) — onboarding reference mockup 3 of 3, notifications & feed (dark).
+- [new_design/onboading/onboarding-3-notifications-feed-light.svg](new_design/onboading/onboarding-3-notifications-feed-light.svg) — onboarding reference mockup 3 of 3, notifications & feed (light).
 
 ## Working notes
 
