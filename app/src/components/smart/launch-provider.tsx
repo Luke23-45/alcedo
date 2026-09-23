@@ -1,22 +1,25 @@
 import { useAssets } from 'expo-asset';
 import * as SplashScreen from 'expo-splash-screen';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Image, StyleSheet, useColorScheme, View } from 'react-native';
+import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
+import { AnimatedLaunchScreen } from './animated-launch-screen';
 
-const SPLASH_DARK = require('../../../assets/splash-dark.png') as number;
-const SPLASH_LIGHT = require('../../../assets/splash-light.png') as number;
-
-/** Matches the `backgroundColor` values in app.json so letterbox bands agree. */
-const OVERLAY_BG = { dark: '#07080B', light: '#F4F4F8' } as const;
-
-const OVERLAY_FADE_MS = 450;
-/** Absolute ceiling: never leave the user staring at the splash. */
-const HIDE_TIMEOUT_MS = 6000;
+const SPLASH = require('../../../assets/splash.png') as number;
 
 const EASE_OUT_EXPO = Easing.bezier(0.16, 0.84, 0.24, 1);
 
-/** True once the native splash has hidden and the app is waking up. */
+/**
+ * Minimum time the branded launch screen stays up: the brand beat. The lockup
+ * pushes in and the loading dots run while the app finishes preparing.
+ */
+const MIN_BRAND_MS = 1700;
+/** Dismiss crossfade from the branded splash into the app. */
+const DISMISS_MS = 450;
+/** Absolute ceiling: never leave the user staring at the splash. */
+const HIDE_TIMEOUT_MS = 6000;
+
+/** True once the branded splash has started dismissing and the app is waking up. */
 const LaunchHiddenContext = createContext(false);
 
 export function useSplashHidden() {
@@ -24,30 +27,50 @@ export function useSplashHidden() {
 }
 
 /**
- * Owns the launch handoff. The native splash (a still of the welcome hero)
- * stays up until the first frame is laid out and the overlay artwork is
- * decoded; then the native splash hides, this provider renders the identical
- * image as a JS overlay, and the overlay dissolves — over the welcome hero on
- * first launch (invisible), over the tabs on later launches (a soft brand beat).
+ * Owns the launch handoff. The native splash (a still of the branded lockup)
+ * stays up until the first frame is laid out and the artwork is decoded; then
+ * the native splash hides and this provider mounts the animated launch screen
+ * — its first frame is pixel-identical to the still, so the handoff is
+ * invisible — which plays the brand beat (slow push-in, breathing lockup,
+ * loading dots). Once the app is ready and the beat has played, the screen
+ * crossfades into the app and the welcome hero wakes up underneath.
  */
 export function LaunchProvider({ children }: { children: ReactNode }) {
-  const colorScheme = useColorScheme();
   const reduceMotion = useReducedMotion();
-  const [assets] = useAssets([SPLASH_DARK, SPLASH_LIGHT]);
+  const [assets] = useAssets([SPLASH]);
   const [splashHidden, setSplashHidden] = useState(false);
+  const [branded, setBranded] = useState(false);
   const [overlayRemoved, setOverlayRemoved] = useState(false);
   const opacity = useRef(new Animated.Value(1)).current;
-  const hideStarted = useRef(false);
-  const laidOut = useRef(false);
+  const state = useRef({ hideStarted: false, laidOut: false, brandShownAt: 0, dismissed: false });
 
-  const dark = colorScheme !== 'light';
+  const dismiss = useCallback(() => {
+    const s = state.current;
+    if (s.dismissed) {
+      return;
+    }
+    s.dismissed = true;
+    setSplashHidden(true);
+    if (reduceMotion) {
+      opacity.setValue(0);
+      setOverlayRemoved(true);
+      return;
+    }
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: DISMISS_MS,
+      easing: EASE_OUT_EXPO,
+      useNativeDriver: true,
+    }).start(() => setOverlayRemoved(true));
+  }, [opacity, reduceMotion]);
 
-  const hide = useCallback(
+  const showBranded = useCallback(
     (force: boolean) => {
-      if (hideStarted.current || (!force && !assets) || !laidOut.current) {
+      const s = state.current;
+      if (s.hideStarted || (!force && !assets) || !s.laidOut) {
         return;
       }
-      hideStarted.current = true;
+      s.hideStarted = true;
       // Two frames: let the first painted frame land before hiding, so there
       // is never a flash of an intermediate state.
       requestAnimationFrame(() => {
@@ -58,50 +81,52 @@ export function LaunchProvider({ children }: { children: ReactNode }) {
             } catch {
               // Already hidden or never shown; continue with the reveal.
             }
-            setSplashHidden(true);
-            if (reduceMotion || force) {
-              opacity.setValue(0);
-              setOverlayRemoved(true);
-              return;
-            }
-            Animated.timing(opacity, {
-              toValue: 0,
-              duration: OVERLAY_FADE_MS,
-              easing: EASE_OUT_EXPO,
-              useNativeDriver: true,
-            }).start(() => setOverlayRemoved(true));
+            s.brandShownAt = Date.now();
+            setBranded(true);
           })();
         });
       });
     },
-    [assets, opacity, reduceMotion],
+    [assets],
   );
 
   const onLayout = useCallback(() => {
-    laidOut.current = true;
-    hide(false);
-  }, [hide]);
+    state.current.laidOut = true;
+    showBranded(false);
+  }, [showBranded]);
 
   useEffect(() => {
-    hide(false);
-  }, [hide]);
+    showBranded(false);
+  }, [showBranded]);
 
+  // Once the branded screen is up, hold the brand beat, then dismiss.
   useEffect(() => {
-    const timer = setTimeout(() => hide(true), HIDE_TIMEOUT_MS);
+    if (!branded) {
+      return;
+    }
+    const elapsed = Date.now() - state.current.brandShownAt;
+    const wait = reduceMotion ? 400 : Math.max(0, MIN_BRAND_MS - elapsed);
+    const timer = setTimeout(dismiss, wait);
     return () => clearTimeout(timer);
-  }, [hide]);
+  }, [branded, dismiss, reduceMotion]);
+
+  // Absolute ceiling: force the handoff even if readiness never signals.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      showBranded(true);
+      setTimeout(dismiss, 400);
+    }, HIDE_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [showBranded, dismiss]);
 
   return (
     <LaunchHiddenContext.Provider value={splashHidden}>
       <View style={styles.fill} onLayout={onLayout}>
         {children}
       </View>
-      {!overlayRemoved && (
-        <Animated.View
-          style={[styles.overlay, { opacity, backgroundColor: dark ? OVERLAY_BG.dark : OVERLAY_BG.light }]}
-          pointerEvents="none"
-        >
-          {assets && <Image source={dark ? SPLASH_DARK : SPLASH_LIGHT} style={styles.image} resizeMode="contain" />}
+      {branded && !overlayRemoved && (
+        <Animated.View style={[styles.overlay, { opacity }]} pointerEvents="none">
+          <AnimatedLaunchScreen reduceMotion={reduceMotion} />
         </Animated.View>
       )}
     </LaunchHiddenContext.Provider>
@@ -114,11 +139,5 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
   },
 });
