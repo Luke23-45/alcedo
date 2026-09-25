@@ -35,7 +35,6 @@
     "@kingstinct/react-native-healthkit": "^14.0.2",
     "@legendapp/list": "^2.0.19",
     "@material-symbols-react-native/outlined-400": "^1.0.0",
-    "@microsoft/signalr": "^10.0.0",
     "@react-native-google-signin/google-signin": "^16.1.5",
     "@react-native-vector-icons/material-design-icons": "^13.1.2",
     "@reduxjs/toolkit": "^2.11.2",

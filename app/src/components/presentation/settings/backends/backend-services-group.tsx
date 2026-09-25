@@ -5,8 +5,9 @@ import { settingsKey } from '../shared/settings-i18n';
 
 /**
  * Backend feature assignments (settings-dark.md Screen 6 family). The feed
- * picker confirms before the switch lands (the account is re-issued); the AI
- * planner and backup pickers assign immediately.
+ * picker confirms before the switch lands (the account is re-issued); the
+ * backup picker assigns immediately. The AI coach is served by the built-in
+ * backend-v2 natively and is not assignable.
  */
 export function BackendServicesGroup({ onFeedChange }: { onFeedChange: (backendId: string | undefined) => void }) {
   const { t } = useTranslate();
@@ -19,13 +20,6 @@ export function BackendServicesGroup({ onFeedChange }: { onFeedChange: (backendI
         iconColor="#5EB0FF"
         title={t('backends.feed.label')}
         trailing={<BackendPicker feature="feed" onChange={onFeedChange} />}
-      />
-      <SettingsRow
-        icon="bolt"
-        wellHue="#AF52DE"
-        iconColor="#C77DFF"
-        title={t('backends.ai_planner.label')}
-        trailing={<BackendPicker feature="aiPlanner" />}
       />
       <SettingsRow
         icon="cloudUpload"

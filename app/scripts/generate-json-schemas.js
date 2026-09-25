@@ -19,10 +19,16 @@ createSplitSchemas(
 );
 
 // Create schema for the AI plan generator - a single self-contained file
-// rooted at AiPlan, with referenced types under `definitions`.
+// rooted at AiPlan, with referenced types under `definitions`. The backend-v2
+// copy is bundled so the coach can serve the create_workout_plan tool from
+// its own tree (backend-v2 is self-contained at runtime and cannot reach
+// docs/).
 createSingleSchema(
   join(modelsDir, 'storage/versions/latest/ai-plan.ts'),
-  join(docsSchemasPath, 'ai-plan/AiPlan.json'),
+  [
+    join(docsSchemasPath, 'ai-plan/AiPlan.json'),
+    join(__dirname, '../../backend-v2/src/ai/plan-tool.schema.json'),
+  ],
   'AiPlan',
 );
 

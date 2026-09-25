@@ -13,6 +13,12 @@ import { COACH_SYSTEM_PROMPT } from './guardrails/system-prompt';
 import { ModerationService } from './guardrails/moderation.service';
 import { OutputCheckService, SELF_HARM_COMPLETION } from './guardrails/output-check.service';
 import { TopicGuard } from './guardrails/topic-guard.interface';
+import {
+  AI_PLAN_VERSION,
+  CREATE_WORKOUT_PLAN_TOOL,
+  PlanPayload,
+  tryParsePlanPayload,
+} from './plan-tool';
 import { SelectedSkill } from './skills/skill.interface';
 import { SkillRegistry } from './skills/skill-registry.service';
 import { LiteLLMClient, LiteLLMError, LiteLlmMessage, LiteLlmUsage } from './litellm.client';
@@ -37,17 +43,23 @@ export interface PostMessageResult {
   messageId: string;
   /** Id of the assistant reply — fixed redirect or model output (uuid). */
   replyMessageId: string;
+  /** Present when the turn produced a workout plan via the create_workout_plan tool. */
+  plan?: PlanPayload;
 }
 
 export type CoachStreamEvent =
   | { type: 'start'; conversationId: string; messageId: string }
   | { type: 'token'; delta: string }
+  | { type: 'plan'; plan: PlanPayload }
+  | { type: 'updateRequired'; requiredVersion: number }
   | { type: 'done'; replyMessageId: string; usage?: LiteLlmUsage };
 
 /** Callbacks the pipeline uses to feed the SSE layer; unused by the non-streaming path. */
 interface TurnListener {
   onUserMessagePersisted?(messageId: string): void;
   onToken?(delta: string): void;
+  onPlan?(plan: PlanPayload): void;
+  onUpdateRequired?(requiredVersion: number): void;
 }
 
 @Injectable()
@@ -110,7 +122,18 @@ export class ConversationsService {
     userId: string,
     conversationId: string,
     content: string,
+    clientAiPlanVersion?: number,
   ): Promise<PostMessageResult> {
+    if (clientAiPlanVersion !== undefined && clientAiPlanVersion < AI_PLAN_VERSION) {
+      throw new HttpException(
+        {
+          code: 'AI_CLIENT_UPDATE_REQUIRED',
+          message: 'This app version cannot read the workout plans this server produces. Please update the app.',
+          requiredVersion: AI_PLAN_VERSION,
+        },
+        426,
+      );
+    }
     const outcome = await this.runCoachTurn({
       content,
       conversationId,
@@ -120,6 +143,7 @@ export class ConversationsService {
     return {
       conversationId: outcome.conversationId,
       messageId: outcome.messageId,
+      plan: outcome.plan,
       replyMessageId: outcome.replyMessageId,
     };
   }
@@ -128,13 +152,20 @@ export class ConversationsService {
     userId: string,
     conversationId: string,
     content: string,
-    opts: { signal?: AbortSignal; onEvent: (event: CoachStreamEvent) => void },
+    opts: { signal?: AbortSignal; clientAiPlanVersion?: number; onEvent: (event: CoachStreamEvent) => void },
   ): Promise<void> {
+    if (opts.clientAiPlanVersion !== undefined && opts.clientAiPlanVersion < AI_PLAN_VERSION) {
+      // The client cannot understand the plans this server produces: tell it
+      // to update instead of running a turn whose plan it could never render.
+      opts.onEvent({ requiredVersion: AI_PLAN_VERSION, type: 'updateRequired' });
+      return;
+    }
     const outcome = await this.runCoachTurn({
       content,
       conversationId,
       googleSub: userId,
       listener: {
+        onPlan: (plan) => opts.onEvent({ plan, type: 'plan' }),
         onToken: (delta) => opts.onEvent({ delta, type: 'token' }),
         onUserMessagePersisted: (messageId) =>
           opts.onEvent({ conversationId, messageId, type: 'start' }),
@@ -157,7 +188,8 @@ export class ConversationsService {
    *  5. premium stream gating
    *  6. quota — reserved only when the model is actually about to be called
    *  7. prompt assembly (server-owned system prompt, delimited user data)
-   *  8. model call (streamed or not), output checks, persist, usage log
+   *  8. model call (streamed or not) with the create_workout_plan tool,
+   *     output checks, persist, usage log
    *  9. fire-and-forget memory extraction
    */
   private async runCoachTurn(args: {
@@ -233,22 +265,56 @@ export class ConversationsService {
     const selectedSkills = this.skills.select(content, topic);
     const prompt = await this.buildPrompt(googleSub, conversationId, content, selectedSkills);
 
-    // 8. Model call.
+    // 8. Model call. The coach may call create_workout_plan; tool-call
+    // arguments stream in as deltas and are parsed progressively so the
+    // client sees the plan refine live, mirroring the legacy hub.
     let fullText = '';
+    let plan: PlanPayload | undefined;
     const usage: LiteLlmUsage = {};
+    const toolArgs = new Map<number, { name: string; args: string }>();
+    const lastEmittedPlanJson = new Map<number, string>();
+    const emitPlanDelta = (index: number): void => {
+      const call = toolArgs.get(index);
+      if (!call) return;
+      const parsed = tryParsePlanPayload(call.name, call.args);
+      if (!parsed) return;
+      const json = JSON.stringify(parsed);
+      if (lastEmittedPlanJson.get(index) === json) return;
+      lastEmittedPlanJson.set(index, json);
+      plan = parsed;
+      listener?.onPlan?.(parsed);
+    };
     try {
       if (stream) {
-        for await (const chunk of this.litellm.streamChat(prompt, { signal })) {
+        for await (const chunk of this.litellm.streamChat(prompt, {
+          signal,
+          tools: [CREATE_WORKOUT_PLAN_TOOL],
+        })) {
           if (chunk.content) {
             fullText += chunk.content;
             listener?.onToken?.(chunk.content);
           }
+          if (chunk.toolCall) {
+            const tc = chunk.toolCall;
+            const call = toolArgs.get(tc.index) ?? { args: '', name: '' };
+            if (tc.name) call.name = tc.name;
+            if (tc.argumentsDelta) call.args += tc.argumentsDelta;
+            toolArgs.set(tc.index, call);
+            emitPlanDelta(tc.index);
+          }
           if (chunk.usage) Object.assign(usage, chunk.usage);
         }
       } else {
-        const result = await this.litellm.chat(prompt, { signal });
+        const result = await this.litellm.chat(prompt, {
+          signal,
+          tools: [CREATE_WORKOUT_PLAN_TOOL],
+        });
         fullText = result.content;
         Object.assign(usage, result.usage);
+        for (const tc of result.toolCalls) {
+          const parsed = tryParsePlanPayload(tc.name, tc.arguments);
+          if (parsed) plan = parsed;
+        }
       }
     } catch (err) {
       if (signal?.aborted) throw err;
@@ -274,8 +340,15 @@ export class ConversationsService {
       );
     }
 
+    // When the turn produced a plan, record it in the persisted assistant
+    // message inside delimiters (mirroring <user_message>) so follow-up
+    // turns can iterate on the plan the model actually created.
+    const assistantContent = plan
+      ? `${checked.sanitized}${checked.sanitized ? '\n' : ''}<created_plan>\n${JSON.stringify(plan)}\n</created_plan>`
+      : checked.sanitized;
+
     const assistant = await this.messages.create({
-      content: checked.sanitized,
+      content: assistantContent,
       conversationId,
       flagged: !checked.safe || checked.findings.length > 0,
       role: 'assistant',
@@ -311,6 +384,7 @@ export class ConversationsService {
     return {
       conversationId,
       messageId: userMessage.id,
+      plan,
       replyMessageId: assistant.id,
       usage,
     };

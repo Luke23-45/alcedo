@@ -34,21 +34,21 @@ describe('selectResolvedBackend', () => {
     expect(selectBackendForFeature(state, 'feed')).toBeUndefined();
   });
 
-  // Nothing is implied by a missing assignment - `seedBackendAssignments` writes the rows that put
-  // feed and the AI planner on ours, so an unassigned feature genuinely has nowhere to go.
+  // Nothing is implied by a missing assignment — an unassigned feature genuinely has nowhere to go.
   it('leaves every feature unresolved until it is assigned', () => {
     const state = stateWith();
 
     expect(selectBackendForFeature(state, 'feed')).toBeUndefined();
-    expect(selectBackendForFeature(state, 'aiPlanner')).toBeUndefined();
     expect(selectBackendForFeature(state, 'backup')).toBeUndefined();
   });
 
-  it('resolves a feature assigned to the built-in backend', () => {
+  // backend-v2 serves auth, sync, and the AI coach natively; it does not
+  // serve feed or backup through the assignment model, so a feature pointed
+  // at it resolves nowhere.
+  it('does not resolve feed on the built-in backend', () => {
     const state = stateWith({ assignments: { feed: builtInBackend.id } });
 
-    expect(selectBackendForFeature(state, 'feed')?.backend.id).toBe(builtInBackend.id);
-    expect(selectBackendForFeature(state, 'feed')?.isBuiltIn).toBe(true);
+    expect(selectBackendForFeature(state, 'feed')).toBeUndefined();
   });
 
   // We do not hold anyone's backup, so ours is not somewhere a backup can be pointed.
@@ -67,19 +67,12 @@ describe('selectResolvedBackend', () => {
     expect(selectBackendForFeature(state, 'feed')?.headers).toEqual({ 'X-Api-Key': 'secret' });
   });
 
-  it('sends the pro token to the built-in planner in the format the server parses', () => {
-    const state = stateWith({ assignments: { aiPlanner: builtInBackend.id } });
+  it('carries only the backend headers on an assignment, never a pro token', () => {
+    const state = stateWith({ backends: [selfHosted], assignments: { feed: 'self' } });
 
-    const resolved = selectBackendForFeature(state, 'aiPlanner');
+    const resolved = selectBackendForFeature(state, 'feed');
 
-    expect(resolved?.headers).toEqual({ Authorization: 'Bearer RevenueCat hi' });
-    expect(resolved?.requiresPro).toBe(false);
-  });
-
-  it('keeps the pro token off a self-hosted planner', () => {
-    const state = stateWith({ backends: [selfHosted], assignments: { aiPlanner: 'self' } });
-
-    expect(selectBackendForFeature(state, 'aiPlanner')?.headers).toEqual({ 'X-Api-Key': 'secret' });
+    expect(resolved?.headers).toEqual({ 'X-Api-Key': 'secret' });
   });
 
   it('resolves nothing when an assignment dangles', () => {

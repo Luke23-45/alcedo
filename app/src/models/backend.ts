@@ -10,7 +10,7 @@ export type BackendId = string;
  */
 export type BackendKind = 'liftlog' | 'backupEndpoint';
 
-export type BackendFeature = 'feed' | 'aiPlanner' | 'backup';
+export type BackendFeature = 'feed' | 'backup';
 
 /** Everything `/features` can report, including `sharing`, which no app feature is assigned to. */
 export type ReportedBackendFeature = BackendFeature | 'sharing';
@@ -18,11 +18,10 @@ export type ReportedBackendFeature = BackendFeature | 'sharing';
 export const backendFeatureNameKey: Record<ReportedBackendFeature, TranslationKey> = {
   feed: 'backends.feature.feed',
   sharing: 'backends.feature.sharing',
-  aiPlanner: 'backends.feature.ai_planner',
   backup: 'backends.feature.backup',
 };
 
-export const backendFeatures: BackendFeature[] = ['feed', 'aiPlanner', 'backup'];
+export const backendFeatures: BackendFeature[] = ['feed', 'backup'];
 
 export function canBeSetToNoBackend(feature: BackendFeature): boolean {
   return feature === 'backup';
@@ -46,21 +45,22 @@ export type BackendAssignments = Partial<Record<BackendFeature, BackendId>>;
 export interface ResolvedBackendForFeature {
   backend: Backend;
   url: string;
-  // Contains the headers for the backend, plus the pro token header if necessary
+  // Contains the headers for the backend
   headers: Record<string, string>;
   isBuiltIn: boolean;
-  requiresPro: boolean;
 }
 
 export const builtInBackendId = 'liftlog';
 
 /**
- * We do not hold anyone's backup - ours serves the features we run, and a backup goes somewhere the
- * user controls. A self-hosted Alcedo server serves everything; a bare endpoint serves only backup.
+ * The built-in backend is backend-v2, which serves auth, sync, and the AI
+ * coach natively — outside the backend-assignment model. Feed and backup are
+ * served only by backends the user adds themselves, so the built-in backend
+ * never appears as a candidate for an assignment.
  */
 export function backendSupportsFeature(backend: Backend, feature: BackendFeature): boolean {
   if (backend.id === builtInBackendId) {
-    return feature !== 'backup';
+    return false;
   }
   return backend.kind === 'liftlog' || feature === 'backup';
 }

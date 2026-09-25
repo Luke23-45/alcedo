@@ -13,7 +13,6 @@ async function* scriptedResponses(): AsyncIterableIterator<AiChatResponseV2> {
     message: "That hello was from me locally, not the coach: I can't connect right now.",
     appendAsNew: true,
   };
-  yield { type: 'purchasePro', appendAsNew: true };
 }
 
 function makeTestBed() {
@@ -40,14 +39,13 @@ describe('offline greeting bubbles', () => {
     await testBed.dispatchHandled(addMessage(userMessage));
 
     const chat = testBed.getState().aiPlanner.plannerChat;
-    // Newest first: the Pro CTA, then the local explanation, then the greeting.
+    // Newest first: the local explanation, then the greeting.
     const agentMessages = chat.filter((m) => m.from === 'Agent');
-    expect(agentMessages).toHaveLength(3);
-    expect(agentMessages[2]).toMatchObject({ type: 'messageResponse', message: 'Hey — good to see you.' });
-    expect(agentMessages[1]).toMatchObject({ type: 'messageResponse' });
-    expect((agentMessages[1] as { message: string }).message).toContain('locally');
-    expect(agentMessages[0]).toMatchObject({ type: 'purchasePro' });
-    // None of the three bubbles is still a loading placeholder.
+    expect(agentMessages).toHaveLength(2);
+    expect(agentMessages[1]).toMatchObject({ type: 'messageResponse', message: 'Hey — good to see you.' });
+    expect(agentMessages[0]).toMatchObject({ type: 'messageResponse' });
+    expect((agentMessages[0] as { message: string }).message).toContain('locally');
+    // Neither bubble is still a loading placeholder.
     for (const bubble of agentMessages) {
       expect(bubble.isLoading).toBe(false);
     }

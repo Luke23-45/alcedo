@@ -2,7 +2,6 @@ import {
   Backend,
   BackendAssignments,
   BackendFeature,
-  BackendHeader,
   backendHeaderRecord,
   BackendId,
   backendSupportsFeature,
@@ -10,15 +9,14 @@ import {
   isBackendComplete,
   ResolvedBackendForFeature,
 } from '@/models/backend';
-import { apiBaseUrl } from '@/services/api-consts';
-import { SettingsRootState } from '@/store/settings';
+import { alcedoApiBaseUrl } from '@/services/api-consts';
 import { createAction, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 /** Not stored in the slice - it is not something the user created, and it cannot be edited away. */
 export const builtInBackend: Backend = {
   id: builtInBackendId,
   name: 'Alcedo',
-  url: apiBaseUrl,
+  url: alcedoApiBaseUrl,
   kind: 'liftlog',
   headers: [],
 };
@@ -134,37 +132,19 @@ export const selectBackendForFeature = createSelector(
   selectAllBackends,
   selectBackendAssignments,
   selectBackendsAreHydrated,
-  (state: SettingsRootState) => state.settings.proToken,
   (_: BackendsRootState, feature: BackendFeature) => feature,
-  (backends, assignments, isHydrated, proToken, feature): ResolvedBackendForFeature | undefined => {
+  (backends, assignments, isHydrated, feature): ResolvedBackendForFeature | undefined => {
     const backend = isHydrated ? backendFor(backends, assignments, feature) : undefined;
     if (!backend) {
       return undefined;
     }
-    const isBuiltIn = backend.id === builtInBackendId;
-    const usesProToken = isBuiltIn && feature === 'aiPlanner';
-    const requiresProToken = usesProToken && !proToken;
     return {
       backend,
       url: backend.url,
-      requiresPro: requiresProToken,
-      headers: backendHeaderRecord({
-        ...backend,
-        headers: [...backend.headers, ...(usesProToken ? getProTokenHeaders(proToken) : [])],
-      }),
+      headers: backendHeaderRecord(backend),
       isBuiltIn: backend.id === builtInBackendId,
     };
   },
 );
 
 export const backendsReducer = backendsSlice.reducer;
-
-function getProTokenHeaders(proToken: string | undefined): BackendHeader[] {
-  if (!proToken) {
-    return [];
-  }
-  if (__DEV__) {
-    return [{ name: 'X-API-Key', value: proToken }];
-  }
-  return [{ name: 'Authorization', value: `Bearer RevenueCat ${proToken}` }];
-}

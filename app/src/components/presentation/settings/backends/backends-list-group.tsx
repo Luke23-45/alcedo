@@ -53,7 +53,7 @@ export function BackendsListGroup() {
             wellHue="#30D158"
             iconColor="#4ADE80"
             title={backend.name}
-            subtitle={describe(backend)}
+            subtitle={t('backends.built_in.subtitle')}
             hideChevron
           />
         ) : (

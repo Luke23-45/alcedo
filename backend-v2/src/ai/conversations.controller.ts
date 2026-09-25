@@ -105,15 +105,27 @@ export class ConversationsController {
     @Param('id') id: string,
     @Body() dto: PostMessageDto,
   ) {
-    return this.conversationsService.postMessage(googleSub, id, dto.content);
+    return this.conversationsService.postMessage(
+      googleSub,
+      id,
+      dto.content,
+      dto.clientAiPlanVersion,
+    );
   }
 
   /**
    * Streams the assistant reply as Server-Sent Events:
-   * `event: start` { conversationId, messageId }
-   * `event: token` { delta }
-   * `event: done`  { replyMessageId, usage }
-   * `event: error` { code, message }
+   * `event: start`          { conversationId, messageId }
+   * `event: token`          { delta }
+   * `event: plan`           { type: 'chatPlan', name, description, blueprint, version }
+   * `event: updateRequired` { requiredVersion }
+   * `event: done`           { replyMessageId, usage }
+   * `event: error`          { code, message }
+   *
+   * `plan` events arrive progressively as the model streams the
+   * create_workout_plan tool arguments; each is a refinement of the last.
+   * `updateRequired` is sent instead of running the turn when the client's
+   * AI plan version is behind the server's.
    *
    * Stricter throttle (20/min): streams hold a connection open.
    * A client disconnect aborts the upstream LiteLLM request.
@@ -149,6 +161,10 @@ export class ConversationsController {
         send('start', { conversationId: evt.conversationId, messageId: evt.messageId });
       } else if (evt.type === 'token') {
         send('token', { delta: evt.delta });
+      } else if (evt.type === 'plan') {
+        send('plan', evt.plan);
+      } else if (evt.type === 'updateRequired') {
+        send('updateRequired', { requiredVersion: evt.requiredVersion });
       } else {
         send('done', { replyMessageId: evt.replyMessageId, usage: evt.usage });
       }
@@ -156,6 +172,7 @@ export class ConversationsController {
 
     try {
       await this.conversationsService.streamMessage(googleSub, id, dto.content, {
+        clientAiPlanVersion: dto.clientAiPlanVersion,
         onEvent: forward,
         signal: aborter.signal,
       });

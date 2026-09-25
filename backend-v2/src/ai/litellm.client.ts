@@ -17,13 +17,41 @@ export interface LiteLlmUsage {
 
 export interface ChatResult {
   content: string;
+  /** Tool calls the model made (non-streaming only); arguments arrive as raw JSON text. */
+  toolCalls: ChatToolCall[];
   usage: LiteLlmUsage;
   model?: string;
 }
 
-/** Yielded by streamChat: text deltas, then one final usage payload. */
+/** One model tool call in a non-streaming response. */
+export interface ChatToolCall {
+  id: string;
+  name: string;
+  arguments: string;
+}
+
+/** OpenAI-compatible tool definition, as served to the model via LiteLLM. */
+export interface LiteLlmTool {
+  type: 'function';
+  function: {
+    name: string;
+    description?: string;
+    parameters?: unknown;
+  };
+}
+
+/** One streamed tool-call delta: the start carries id/name, later chunks carry argument text. */
+export interface ToolCallDelta {
+  index: number;
+  id?: string;
+  name?: string;
+  argumentsDelta?: string;
+}
+
+/** Yielded by streamChat: text deltas, tool-call deltas, then one final usage payload. */
 export interface StreamYield {
   content?: string;
+  toolCall?: ToolCallDelta;
   usage?: LiteLlmUsage;
 }
 
@@ -32,6 +60,9 @@ export interface ChatCallOptions {
   signal?: AbortSignal;
   temperature?: number;
   maxTokens?: number;
+  /** Tools the model may call; when present the request uses tool_choice auto unless overridden. */
+  tools?: LiteLlmTool[];
+  toolChoice?: 'auto' | 'none';
 }
 
 /** Transport/upstream failure. Callers map this to a coded API error. */
@@ -143,6 +174,9 @@ export class LiteLLMClient {
       model: modelAlias,
       stream,
       temperature: opts.temperature ?? 0.7,
+      ...(opts.tools && opts.tools.length > 0
+        ? { tool_choice: opts.toolChoice ?? 'auto', tools: opts.tools }
+        : {}),
     });
   }
 
@@ -213,13 +247,31 @@ export class LiteLLMClient {
       opts,
     );
     const json = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string | null } }>;
+      choices?: Array<{
+        message?: {
+          content?: string | null;
+          tool_calls?: Array<{
+            id?: string;
+            function?: { name?: string; arguments?: string };
+            type?: string;
+          }>;
+        };
+      }>;
       model?: string;
       usage?: { completion_tokens?: number; prompt_tokens?: number };
     };
+    const message = json.choices?.[0]?.message;
+    const toolCalls: ChatToolCall[] = (message?.tool_calls ?? [])
+      .filter((tc) => typeof tc.function?.name === 'string')
+      .map((tc) => ({
+        arguments: typeof tc.function?.arguments === 'string' ? tc.function.arguments : '',
+        id: typeof tc.id === 'string' ? tc.id : '',
+        name: tc.function!.name as string,
+      }));
     return {
-      content: json.choices?.[0]?.message?.content ?? '',
+      content: message?.content ?? '',
       model: json.model,
+      toolCalls,
       usage: {
         completionTokens: json.usage?.completion_tokens,
         costUsd: parseCostHeader(res.headers.get('x-litellm-cost')),
@@ -232,7 +284,7 @@ export class LiteLLMClient {
    * Streams the completion as Server-Sent Events. Lines are split on '\n';
    * only `data: ` lines are parsed, `data: [DONE]` ends the stream, and
    * malformed lines are skipped (and counted) without killing the stream.
-   * Emits content deltas, then one final usage payload.
+   * Emits content deltas and tool-call deltas, then one final usage payload.
    */
   async *streamChat(
     messages: LiteLlmMessage[],
@@ -264,7 +316,16 @@ export class LiteLLMClient {
           const payload = trimmed.slice('data:'.length).trim();
           if (payload === '[DONE]') break outer;
           let json: {
-            choices?: Array<{ delta?: { content?: string | null } }>;
+            choices?: Array<{
+              delta?: {
+                content?: string | null;
+                tool_calls?: Array<{
+                  id?: string;
+                  index?: number;
+                  function?: { name?: string; arguments?: string };
+                }>;
+              };
+            }>;
             usage?: { completion_tokens?: number; prompt_tokens?: number };
           };
           try {
@@ -273,8 +334,22 @@ export class LiteLLMClient {
             malformed += 1;
             continue;
           }
-          const delta = json.choices?.[0]?.delta?.content;
-          if (typeof delta === 'string' && delta.length > 0) yield { content: delta };
+          const delta = json.choices?.[0]?.delta;
+          const text = delta?.content;
+          if (typeof text === 'string' && text.length > 0) yield { content: text };
+          for (const tc of delta?.tool_calls ?? []) {
+            const index = typeof tc.index === 'number' ? tc.index : 0;
+            const toolCall: ToolCallDelta = { index };
+            if (typeof tc.id === 'string') toolCall.id = tc.id;
+            if (typeof tc.function?.name === 'string') toolCall.name = tc.function.name;
+            if (typeof tc.function?.arguments === 'string' && tc.function.arguments.length > 0) {
+              toolCall.argumentsDelta = tc.function.arguments;
+            }
+            // Skip chunks that carry nothing (some proxies emit empty tool_calls entries).
+            if (toolCall.id !== undefined || toolCall.name !== undefined || toolCall.argumentsDelta !== undefined) {
+              yield { toolCall };
+            }
+          }
           const u = json.usage;
           if (u) {
             if (typeof u.prompt_tokens === 'number') usage.promptTokens = u.prompt_tokens;

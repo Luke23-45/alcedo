@@ -1,5 +1,4 @@
 import { useAppSelector } from '@/store';
-import { selectBackendForFeature } from '@/store/backends';
 import { selectActiveProgram } from '@/store/program';
 import { useTranslate } from '@tolgee/react';
 import { useRouter } from 'expo-router';
@@ -12,7 +11,8 @@ import { settingsKey } from '../shared/settings-i18n';
  * Honest state mapping:
  * - Program: the real active program name. The program model tracks no week
  *   state, so the contract's "Week 3 of 6" sample is not shown.
- * - AI Planner: "on" iff a backend can actually serve the planner feature.
+ * - AI Planner: the coach is served by backend-v2 natively, so there is
+ *   nothing to configure — it is always on.
  * - Exercise Library: real built-in + custom counts from the exercise store.
  * - Rest: no global preset model exists (rest durations are per-exercise), so
  *   the row reflects the real rest-timers switch and opens the Notifications
@@ -23,7 +23,6 @@ export function TrainingGroup() {
   const { push } = useRouter();
 
   const program = useAppSelector((s) => (s.program.isHydrated ? selectActiveProgram(s) : undefined));
-  const plannerBackend = useAppSelector((s) => selectBackendForFeature(s, 'aiPlanner'));
   const restTimersOn = useAppSelector((s) => s.settings.restTimersEnabled);
 
   const storedSessions = useAppSelector((s) => s.storedSessions);
@@ -47,7 +46,7 @@ export function TrainingGroup() {
         wellHue="#AF52DE"
         iconColor="#C77DFF"
         title={t(settingsKey('settings.home.ai_planner.title'))}
-        subtitle={t(settingsKey(plannerBackend ? 'settings.home.ai_planner.subtitle' : 'settings.home.ai_planner.off'))}
+        subtitle={t(settingsKey('settings.home.ai_planner.subtitle'))}
         badge={t(settingsKey('settings.home.ai_planner.badge'))}
         onPress={() => push('/settings/ai/planner')}
       />

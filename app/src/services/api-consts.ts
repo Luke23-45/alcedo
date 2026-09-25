@@ -1,15 +1,8 @@
 import { Platform } from 'react-native';
 
-export const apiBaseUrl = __DEV__
-  ? Platform.OS === 'android'
-    ? 'http://10.0.2.2:5264'
-    : 'http://127.0.0.1:5264'
-  : 'https://api.liftlog.online';
-
 /**
- * Base URL of the Alcedo backend v2 (NestJS). This is intentionally separate
- * from `apiBaseUrl` (the legacy .NET backend): auth, sync and the AI coach
- * talk only to backend-v2 and never depend on the .NET backend.
+ * Base URL of the Alcedo backend (v2, NestJS) — the only backend the app
+ * talks to. Auth, sync, and the AI coach all go through {@link authenticatedFetch}.
  *
  * backend-v2 serves every route under the global `/api` prefix
  * (`app.setGlobalPrefix('api')`), so the prefix is part of this constant —

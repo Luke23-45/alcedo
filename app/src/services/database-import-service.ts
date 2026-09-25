@@ -21,9 +21,9 @@ import {
 } from '@/services/data-migrations/dedupe-builtin-exercises';
 import { importBackends, importBackendsDataMigration } from '@/services/data-migrations/import-backends';
 import {
-  seedBackendAssignments,
-  seedBackendAssignmentsDataMigration,
-} from '@/services/data-migrations/seed-backend-assignments';
+  migrateAiPlannerToV2,
+  migrateAiPlannerToV2DataMigration,
+} from '@/services/data-migrations/migrate-ai-planner-to-v2';
 
 export interface DatabaseImporter {
   importOldData(): Promise<void>;
@@ -65,8 +65,8 @@ export class DatabaseImportService implements DatabaseImporter {
     if (!dataMigrationsRun.includes(importBackendsDataMigration)) {
       await importBackends(this.db, this.preferenceService);
     }
-    if (!dataMigrationsRun.includes(seedBackendAssignmentsDataMigration)) {
-      await seedBackendAssignments(this.db);
+    if (!dataMigrationsRun.includes(migrateAiPlannerToV2DataMigration)) {
+      await migrateAiPlannerToV2(this.db);
     }
 
     console.info('Imported old data to DB in ' + (performance.now() - now) + 'ms');

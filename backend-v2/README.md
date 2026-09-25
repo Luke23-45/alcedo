@@ -190,7 +190,8 @@ Single model route: the self-hosted LiteLLM alias **`coach-primary`** (see
    memory facts + last 20 history turns, with the fresh user turn wrapped in
    `<user_message>` delimiters.
 7. Model call via `LiteLLMClient` (timeout via `AbortController`, exponential backoff on
-   429/5xx only — never on 4xx).
+   429/5xx only — never on 4xx), offering the `create_workout_plan` tool; tool-call
+   arguments stream in as deltas and are parsed progressively into `plan` events.
 8. **Output check**: prompt-leakage, PED-dosage, self-harm, and email/phone PII patterns;
    blocking findings replace the tail with a safe completion.
 9. Persist the assistant turn with token usage; log per-message usage (cost comes from
@@ -199,9 +200,22 @@ Single model route: the self-hosted LiteLLM alias **`coach-primary`** (see
 
 ### Streaming
 
-`POST …/messages/stream` emits SSE events `start` / `token` / `done` / `error` with
-`X-Accel-Buffering: no`. Streaming is premium-gated when `AI_STREAM_PREMIUM_ONLY=true`
-(`402 AI_STREAM_PREMIUM_ONLY`). Client disconnect aborts the upstream LiteLLM request.
+`POST …/messages/stream` emits SSE events `start` / `token` / `plan` /
+`updateRequired` / `done` / `error` with `X-Accel-Buffering: no`. Streaming is
+premium-gated when `AI_STREAM_PREMIUM_ONLY=true` (`402 AI_STREAM_PREMIUM_ONLY`).
+Client disconnect aborts the upstream LiteLLM request.
+
+`plan` events carry `{ type: 'chatPlan', name, description, blueprint, version }`
+and arrive progressively as the model streams the `create_workout_plan` tool
+arguments — each event refines the last. The tool's input schema is the generated
+AI plan schema (`src/ai/plan-tool.schema.json`, regenerated from the app's
+`ai-plan.ts` via `npm run json-schema` in `app/`); its `version` const is the
+plan contract version. Clients send their plan version as `clientAiPlanVersion`;
+when it is behind the server's, the turn is rejected with `updateRequired`
+(`{ requiredVersion }`) on the stream — or `426 AI_CLIENT_UPDATE_REQUIRED` on
+the non-streaming endpoint — instead of running. Plans are recorded in the
+persisted assistant message inside a `<created_plan>` block so follow-up turns
+can iterate on them.
 
 ### Coach skills (`src/ai/skills/`)
 

@@ -1,16 +1,13 @@
 import type { AiChatResponseV2 } from '@/models/ai-models';
-import { selectBackendForFeature } from '@/store/backends';
-import type { RootState } from '@/store/store';
 
 /**
  * Deterministic local script for greetings the coach cannot answer.
  *
- * When the AI coach is unreachable — no backend assigned, or the built-in
- * backend without a Pro token — a greeting like "hi" gets a brief natural
- * reply, immediately labeled as a local fallback (it must never pretend a
- * remote AI answered), followed by the honest reason and the real Pro
- * upgrade response. Anything else (non-greetings, or a reachable backend)
- * returns undefined so the existing service paths run untouched.
+ * When the coach is unreachable — signed out, or the network is down — a
+ * greeting like "hi" gets a brief natural reply, immediately labeled as a
+ * local fallback (it must never pretend a remote AI answered), followed by
+ * the honest reason. Anything the coach *can* answer goes to the server, so
+ * this script only fires on the failure paths the service detects.
  */
 
 const GREETINGS = new Set([
@@ -38,22 +35,18 @@ export function isGreeting(text: string): boolean {
   return GREETINGS.has(normalized);
 }
 
-export function offlineCoachScript(state: RootState, message: string): AiChatResponseV2[] | undefined {
-  if (!isGreeting(message)) {
-    return undefined;
-  }
-  const backend = selectBackendForFeature(state, 'aiPlanner');
-  if (backend && !backend.requiresPro) {
-    return undefined;
-  }
+export type OfflineCoachReason = 'session-expired' | 'network';
+
+export function offlineCoachScript(reason: OfflineCoachReason): AiChatResponseV2[] {
   return [
     { type: 'messageResponse', message: 'Hey — good to see you.' },
     {
       type: 'messageResponse',
       message:
-        "That hello was from me locally, not the coach: I can't connect right now. The AI coach needs Pro — upgrading unlocks the built-in coach.",
+        reason === 'session-expired'
+          ? "That hello was from me locally, not the coach: you're signed out. Sign in to chat with your Alcedo coach."
+          : "That hello was from me locally, not the coach: I can't reach the servers right now. Check your connection and try again.",
       appendAsNew: true,
     },
-    { type: 'purchasePro', appendAsNew: true },
   ];
 }

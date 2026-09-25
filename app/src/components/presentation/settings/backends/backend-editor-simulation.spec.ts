@@ -95,12 +95,14 @@ describe('backend deletion contract', () => {
 });
 
 describe('built-in backend contract', () => {
-  it('is virtual, never stored, and never serves backup', () => {
+  it('is virtual, never stored, and serves nothing through the assignment model', () => {
     expect(builtInBackendId).toBe('liftlog');
     expect(builtInBackend.id).toBe(builtInBackendId);
     expect(builtInBackend.headers).toEqual([]);
+    // backend-v2 serves auth, sync, and the AI coach natively — feed and
+    // backup need a backend the user adds themselves.
     expect(backendSupportsFeature(builtInBackend, 'backup')).toBe(false);
-    expect(backendSupportsFeature(builtInBackend, 'feed')).toBe(true);
+    expect(backendSupportsFeature(builtInBackend, 'feed')).toBe(false);
     expect(backendSupportsFeature(backend({ kind: 'backupEndpoint' }), 'feed')).toBe(false);
     expect(backendSupportsFeature(backend({ kind: 'backupEndpoint' }), 'backup')).toBe(true);
   });
