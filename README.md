@@ -43,7 +43,7 @@ npm run ios       # For iOS (macOS only)
 
 ### Run the Backend API
 
-See [`backend/README.md`](./backend/README.md) for more information on running the backend.
+See [`backend-v2/README.md`](./backend-v2/README.md) for more information on running the backend.
 
 ---
 
@@ -61,13 +61,13 @@ Alcedo is organized into several projects:
 - **Translations**: `i18n/` (Tolgee)
 - **Navigation**: Expo Router
 
-### Backend ([backend/](./backend/))
+### Backend ([backend-v2/](./backend-v2/))
 
-For documentation on running the backend for local development, see [the README](./backend/README.md)
+For documentation on running the backend for local development, see [the README](./backend-v2/README.md)
 
-- **Dotnet WebAPI** for feeds, AI plans, and backups
-- **End-to-end encrypted feeds** (AES)
-- **Claude integration** for workout plans
+- **NestJS + TypeScript + MongoDB** API for auth, workout sync, AI coach, and social
+- **Google-only OAuth** identity; premium via RevenueCat and website checkout
+- The legacy .NET backend in `backend/` is no longer used
 
 ### RevenueCat ([RevenueCat/](./backend/RevenueCat/))
 
