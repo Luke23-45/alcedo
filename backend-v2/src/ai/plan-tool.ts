@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import Ajv, { type ValidateFunction } from 'ajv';
 import planSchema from './plan-tool.schema.json';
 
 /**
@@ -102,10 +103,72 @@ export function balanceJson(partial: string): string {
 }
 
 /**
+ * Compiled once: strict JSON-schema validation of complete plan arguments.
+ * `strict: false` because the schema is machine-generated (it carries the
+ * OpenAPI `discriminator` keyword, which is not JSON Schema) — validation
+ * itself is unaffected. `format` assertions (date, duration, decimal) stay
+ * annotation-only, as Ajv does not enforce them by default.
+ */
+let validatePlanArgs: ValidateFunction | undefined;
+function getPlanValidator(): ValidateFunction {
+  if (!validatePlanArgs) {
+    // logger: false silences "unknown format" notices for the schema's
+    // date/duration/decimal formats, which stay annotation-only.
+    const ajv = new Ajv({ allErrors: true, logger: false, strict: false });
+    validatePlanArgs = ajv.compile(planSchema as Record<string, unknown>);
+  }
+  return validatePlanArgs;
+}
+
+/**
+ * Strictly validates complete `create_workout_plan` arguments against the
+ * generated plan JSON schema — including nested blueprint fields, the
+ * version const, and required properties. Unlike {@link tryParsePlanPayload}
+ * (which tolerates partial streaming JSON for progressive previews), this
+ * requires the arguments to be complete and fully schema-valid, with no
+ * JSON balancing. Returns the plan payload, or null — logging the schema
+ * errors — when the arguments are not a valid plan.
+ *
+ * Use this for the final plan a turn produces: only a strictly valid plan
+ * is recorded in history and surfaced as the turn's canonical result.
+ * Progressive previews keep using {@link tryParsePlanPayload}; they are
+ * explicitly partial (the app fills missing trailing fields by design).
+ */
+export function validatePlanPayload(toolName: string, argsText: string): PlanPayload | null {
+  if (toolName !== CREATE_WORKOUT_PLAN_TOOL_NAME || argsText.length === 0) {
+    return null;
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(argsText);
+  } catch (err) {
+    logger.debug(`Plan arguments are not complete JSON: ${(err as Error)?.message ?? err}`);
+    return null;
+  }
+  const validate = getPlanValidator();
+  if (!validate(parsed)) {
+    logger.warn(`Plan arguments failed schema validation: ${JSON.stringify(validate.errors)}`);
+    return null;
+  }
+  const obj = parsed as Record<string, unknown>;
+  return {
+    blueprint: obj['blueprint'],
+    description: obj['description'] as string,
+    name: obj['name'] as string,
+    type: 'chatPlan',
+    version: obj['version'] as number,
+  };
+}
+
+/**
  * Parses accumulated `create_workout_plan` arguments into a plan payload.
  * Returns null until the arguments parse to a plan-shaped object — the
  * caller retries on every arguments delta, so plans surface progressively
  * as the model streams them. Tool calls for any other tool are ignored.
+ *
+ * This is intentionally lenient (top-level shape only): progressive
+ * previews are partial by design. The turn's final plan goes through
+ * {@link validatePlanPayload} instead.
  */
 export function tryParsePlanPayload(toolName: string, argsText: string): PlanPayload | null {
   if (toolName !== CREATE_WORKOUT_PLAN_TOOL_NAME || argsText.length === 0) {

@@ -18,6 +18,7 @@ import {
   CREATE_WORKOUT_PLAN_TOOL,
   PlanPayload,
   tryParsePlanPayload,
+  validatePlanPayload,
 } from './plan-tool';
 import { SelectedSkill } from './skills/skill.interface';
 import { SkillRegistry } from './skills/skill-registry.service';
@@ -267,7 +268,9 @@ export class ConversationsService {
 
     // 8. Model call. The coach may call create_workout_plan; tool-call
     // arguments stream in as deltas and are parsed progressively so the
-    // client sees the plan refine live, mirroring the legacy hub.
+    // client sees the plan refine live, mirroring the legacy hub. The
+    // turn's canonical plan is then strictly validated against the plan
+    // JSON schema — invalid plans are logged and dropped, never recorded.
     let fullText = '';
     let plan: PlanPayload | undefined;
     const usage: LiteLlmUsage = {};
@@ -276,12 +279,13 @@ export class ConversationsService {
     const emitPlanDelta = (index: number): void => {
       const call = toolArgs.get(index);
       if (!call) return;
+      // Progressive previews only — intentionally lenient about partial
+      // JSON. The turn's canonical plan is strictly validated below.
       const parsed = tryParsePlanPayload(call.name, call.args);
       if (!parsed) return;
       const json = JSON.stringify(parsed);
       if (lastEmittedPlanJson.get(index) === json) return;
       lastEmittedPlanJson.set(index, json);
-      plan = parsed;
       listener?.onPlan?.(parsed);
     };
     try {
@@ -304,6 +308,21 @@ export class ConversationsService {
           }
           if (chunk.usage) Object.assign(usage, chunk.usage);
         }
+        // Strict gate for the turn's canonical plan: the progressive
+        // previews above are best-effort partials, but only a fully
+        // schema-valid plan is recorded in history and surfaced as the
+        // result. An invalid final plan is logged and dropped — the text
+        // reply still goes through.
+        for (const [index, call] of toolArgs) {
+          const valid = validatePlanPayload(call.name, call.args);
+          if (!valid) continue;
+          plan = valid;
+          const json = JSON.stringify(valid);
+          if (lastEmittedPlanJson.get(index) !== json) {
+            lastEmittedPlanJson.set(index, json);
+            listener?.onPlan?.(valid);
+          }
+        }
       } else {
         const result = await this.litellm.chat(prompt, {
           signal,
@@ -312,8 +331,11 @@ export class ConversationsService {
         fullText = result.content;
         Object.assign(usage, result.usage);
         for (const tc of result.toolCalls) {
-          const parsed = tryParsePlanPayload(tc.name, tc.arguments);
-          if (parsed) plan = parsed;
+          const valid = validatePlanPayload(tc.name, tc.arguments);
+          if (valid) {
+            plan = valid;
+            listener?.onPlan?.(valid);
+          }
         }
       }
     } catch (err) {

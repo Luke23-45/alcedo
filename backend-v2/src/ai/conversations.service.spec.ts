@@ -65,6 +65,41 @@ describe('ConversationsService workout plans', () => {
     });
 
     it('passes the create_workout_plan tool and emits plan events as arguments stream in', async () => {
+      // Fully schema-valid plan: the strict gate must accept it.
+      const planArgs = JSON.stringify({
+        blueprint: {
+          lastEdited: '2026-09-25',
+          name: 'Push Program',
+          sessions: [
+            {
+              exercises: [
+                {
+                  link: '',
+                  name: 'Bench Press',
+                  notes: '',
+                  plannedSets: [{ reps: { max: 10, min: 8 } }],
+                  progression: [],
+                  resistance: 'external',
+                  restBetweenSets: {
+                    failureRest: 'PT5M',
+                    maxRest: 'PT3M',
+                    minRest: 'PT2M',
+                  },
+                  supersetWithNext: false,
+                  type: 'WeightedExerciseBlueprint',
+                },
+              ],
+              name: 'Day 1',
+              notes: '',
+              version: 6,
+            },
+          ],
+          version: 3,
+        },
+        description: 'Chest',
+        name: 'Push Day',
+        version: 3,
+      });
       const { createdMessages, litellm, service } = makeService({
         streamChunks: [
           {
@@ -76,13 +111,19 @@ describe('ConversationsService workout plans', () => {
           },
           {
             toolCall: {
-              argumentsDelta: '{"version":3,"name":"Push Day","descrip',
+              argumentsDelta: planArgs.slice(0, 60),
               index: 0,
             },
           },
           {
             toolCall: {
-              argumentsDelta: 'tion":"Chest","blueprint":{"sessions":[]}}',
+              argumentsDelta: planArgs.slice(60, 240),
+              index: 0,
+            },
+          },
+          {
+            toolCall: {
+              argumentsDelta: planArgs.slice(240),
               index: 0,
             },
           },
@@ -107,7 +148,7 @@ describe('ConversationsService workout plans', () => {
       const lastPlan = plans[plans.length - 1];
       expect(lastPlan).toEqual({
         plan: {
-          blueprint: { sessions: [] },
+          blueprint: JSON.parse(planArgs).blueprint,
           description: 'Chest',
           name: 'Push Day',
           type: 'chatPlan',
@@ -122,6 +163,45 @@ describe('ConversationsService workout plans', () => {
       expect(assistant?.content).toContain('"name":"Push Day"');
 
       // The stream still completes normally.
+      expect(events[events.length - 1].type).toBe('done');
+    });
+
+    it('drops a streamed plan whose final arguments fail schema validation', async () => {
+      // Light-valid (so progressive previews surface) but missing the
+      // required nested blueprint fields, so the strict gate rejects it.
+      const { createdMessages, service } = makeService({
+        streamChunks: [
+          {
+            toolCall: {
+              id: 'call_1',
+              index: 0,
+              name: 'create_workout_plan',
+            },
+          },
+          {
+            toolCall: {
+              argumentsDelta:
+                '{"version":3,"name":"Push Day","description":"Chest","blueprint":{"sessions":[]}}',
+              index: 0,
+            },
+          },
+          { content: 'Here is your plan.' },
+        ],
+      });
+      const events: CoachStreamEvent[] = [];
+      await service.streamMessage('u1', 'c1', 'make me a plan', {
+        clientAiPlanVersion: AI_PLAN_VERSION,
+        onEvent: (e) => events.push(e),
+      });
+
+      // Best-effort progressive previews still surface...
+      expect(events.some((e) => e.type === 'plan')).toBe(true);
+
+      // ...but the invalid plan is never recorded in history for follow-ups.
+      const assistant = createdMessages.find((m) => m.role === 'assistant');
+      expect(assistant?.content).not.toContain('<created_plan>');
+
+      // The stream still completes normally with the text reply.
       expect(events[events.length - 1].type).toBe('done');
     });
 

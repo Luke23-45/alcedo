@@ -207,15 +207,19 @@ Client disconnect aborts the upstream LiteLLM request.
 
 `plan` events carry `{ type: 'chatPlan', name, description, blueprint, version }`
 and arrive progressively as the model streams the `create_workout_plan` tool
-arguments — each event refines the last. The tool's input schema is the generated
-AI plan schema (`src/ai/plan-tool.schema.json`, regenerated from the app's
-`ai-plan.ts` via `npm run json-schema` in `app/`); its `version` const is the
-plan contract version. Clients send their plan version as `clientAiPlanVersion`;
-when it is behind the server's, the turn is rejected with `updateRequired`
-(`{ requiredVersion }`) on the stream — or `426 AI_CLIENT_UPDATE_REQUIRED` on
-the non-streaming endpoint — instead of running. Plans are recorded in the
-persisted assistant message inside a `<created_plan>` block so follow-up turns
-can iterate on them.
+arguments — each event refines the last. These previews are best-effort
+partials; the turn's canonical plan is strictly validated with Ajv against the
+full schema (including nested blueprint fields and version consts) once the
+tool call completes. An invalid plan is logged and dropped — never emitted as
+final, never recorded — while the text reply still goes through. The tool's
+input schema is the generated AI plan schema (`src/ai/plan-tool.schema.json`,
+regenerated from the app's `ai-plan.ts` via `npm run json-schema` in `app/`);
+its `version` const is the plan contract version. Clients send their plan
+version as `clientAiPlanVersion`; when it is behind the server's, the turn is
+rejected with `updateRequired` (`{ requiredVersion }`) on the stream — or
+`426 AI_CLIENT_UPDATE_REQUIRED` on the non-streaming endpoint — instead of
+running. Valid plans are recorded in the persisted assistant message inside a
+`<created_plan>` block so follow-up turns can iterate on them.
 
 ### Coach skills (`src/ai/skills/`)
 
