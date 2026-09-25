@@ -1,4 +1,4 @@
-import { LiftLog } from '@/gen/proto';
+import { Alcedo } from '@/gen/proto';
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { KeyValueStore } from '../key-value-store';
 import { dataMigrationsSchema, sessionsSchema } from '@/db/schema';
@@ -16,7 +16,7 @@ export async function importSessions(
   preferenceService: PreferenceService,
 ) {
   const preferredUnit = (await preferenceService.getUseImperialUnits()) ? 'pounds' : 'kilograms';
-  const storedData = LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2.decode(
+  const storedData = Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2.decode(
     (await keyValueStore.getItemBytes(storageKey)) ?? Uint8Array.from([]),
   );
   // Convert old bodyweights with nil to be the set weight

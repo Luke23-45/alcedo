@@ -34,7 +34,7 @@ describe("backup handler", () => {
     assert.deepEqual(uploads, [
       {
         Bucket: "backup-bucket",
-        Key: "example-user/2026/06/12/2026-06-12-09-08-liftlogbackup.gz",
+        Key: "example-user/2026/06/12/2026-06-12-09-08-alcedobackup.gz",
         Body: gzipBody,
         ContentType: "application/octet-stream",
       },

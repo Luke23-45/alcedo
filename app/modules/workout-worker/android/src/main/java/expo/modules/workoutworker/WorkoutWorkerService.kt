@@ -12,7 +12,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
-import com.limajuice.liftlog.WorkoutMessage
+import com.powergym.alcedo.WorkoutMessage
 import expo.modules.workoutworker.handlers.WorkoutEndedHandler
 import expo.modules.workoutworker.handlers.WorkoutMessageHandler
 import expo.modules.workoutworker.handlers.WorkoutStartedHandler

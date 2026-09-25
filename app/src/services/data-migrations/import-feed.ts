@@ -10,7 +10,7 @@ import {
   feedPendingUsersSchema,
   feedRevokedFollowSecretsSchema,
 } from '@/db/schema';
-import { LiftLog } from '@/gen/proto';
+import { Alcedo } from '@/gen/proto';
 import { ProtobufToJsonV1Migrator } from '@/models/storage/versions/initial/protobuf-migrator';
 import { SessionUserEvent } from '@/models/feed-models';
 import {
@@ -30,7 +30,7 @@ export async function importFeed(db: ExpoSQLiteDatabase, keyValueStore: KeyValue
   if (!feedStateBytes) {
     return;
   }
-  const decoded = LiftLog.Ui.Models.FeedStateDaoV1.decode(feedStateBytes);
+  const decoded = Alcedo.Ui.Models.FeedStateDaoV1.decode(feedStateBytes);
   const convertedIdentity = getIdentity(decoded);
   const convertedFollowers = getFollowers(decoded);
   const convertedPending = getPendingUsers(decoded);
@@ -64,7 +64,7 @@ export async function importFeed(db: ExpoSQLiteDatabase, keyValueStore: KeyValue
   });
 }
 
-function getIdentity(decoded: LiftLog.Ui.Models.FeedStateDaoV1) {
+function getIdentity(decoded: Alcedo.Ui.Models.FeedStateDaoV1) {
   return (
     decoded.identity && {
       id: 0,
@@ -73,14 +73,14 @@ function getIdentity(decoded: LiftLog.Ui.Models.FeedStateDaoV1) {
   );
 }
 
-function getFollowers(decoded: LiftLog.Ui.Models.FeedStateDaoV1): (typeof feedFollowerUsersSchema.$inferInsert)[] {
+function getFollowers(decoded: Alcedo.Ui.Models.FeedStateDaoV1): (typeof feedFollowerUsersSchema.$inferInsert)[] {
   return decoded.followers.map((x) => ({
     id: ProtobufToJsonV1Migrator.migrateUuid(x.id),
     payload: followerFeedUserMigrations.migrate(ProtobufToJsonV1Migrator.migrateFollowerUser(x)),
   }));
 }
 
-function getFollowedUsers(decoded: LiftLog.Ui.Models.FeedStateDaoV1) {
+function getFollowedUsers(decoded: Alcedo.Ui.Models.FeedStateDaoV1) {
   return decoded.followedUsers
     .map((x) => ProtobufToJsonV1Migrator.migrateFollowedUser(x))
     .map((x) =>
@@ -93,7 +93,7 @@ function getFollowedUsers(decoded: LiftLog.Ui.Models.FeedStateDaoV1) {
     )
     .filter((x): x is NonNullable<typeof x> => !!x);
 }
-function getPendingUsers(decoded: LiftLog.Ui.Models.FeedStateDaoV1) {
+function getPendingUsers(decoded: Alcedo.Ui.Models.FeedStateDaoV1) {
   return decoded.followedUsers
     .map((x) => ProtobufToJsonV1Migrator.migrateFollowedUser(x))
     .map((x) =>
@@ -107,14 +107,14 @@ function getPendingUsers(decoded: LiftLog.Ui.Models.FeedStateDaoV1) {
     .filter((x): x is NonNullable<typeof x> => !!x);
 }
 
-function getFollowRequests(decoded: LiftLog.Ui.Models.FeedStateDaoV1) {
+function getFollowRequests(decoded: Alcedo.Ui.Models.FeedStateDaoV1) {
   return decoded.followRequests.map((x) => ({
     id: ProtobufToJsonV1Migrator.migrateUuid(x.fromUserId),
     payload: followRequestInboxMessageMigrations.migrate(ProtobufToJsonV1Migrator.migrateFollowRequest(x)),
   }));
 }
 
-function getFeedItems(decoded: LiftLog.Ui.Models.FeedStateDaoV1) {
+function getFeedItems(decoded: Alcedo.Ui.Models.FeedStateDaoV1) {
   return decoded.feedItems.map((x) => {
     const payload = sessionUserEventMigrations.migrate(ProtobufToJsonV1Migrator.migrateSessionUserEvent(x));
 

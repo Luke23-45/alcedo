@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parse as uuidParse } from 'uuid';
-import { LiftLog } from '@/gen/proto';
+import { Alcedo } from '@/gen/proto';
 import { ProtobufToJsonV1Migrator } from '@/models/storage/versions/initial/protobuf-migrator';
 import { RecordedCardioExerciseJSON, RecordedWeightedExerciseJSON } from '@/models/storage/versions/initial/session';
 
@@ -76,7 +76,7 @@ describe('ProtobufToJsonV1Migrator.migrateSession', () => {
       sessionName: 'Leg Day',
       blueprintNotes: 'notes',
       bodyweightValue: dec(80),
-      bodyweightUnit: LiftLog.Ui.Models.WeightUnit.KILOGRAMS,
+      bodyweightUnit: Alcedo.Ui.Models.WeightUnit.KILOGRAMS,
       date: dateOnly(2025, 4, 5),
       recordedExercises: [
         {
@@ -98,11 +98,11 @@ describe('ProtobufToJsonV1Migrator.migrateSession', () => {
                 repsCompleted: 10,
               },
               weightValue: dec(100),
-              weightUnit: LiftLog.Ui.Models.WeightUnit.KILOGRAMS,
+              weightUnit: Alcedo.Ui.Models.WeightUnit.KILOGRAMS,
             },
             {
               weightValue: dec(60),
-              weightUnit: LiftLog.Ui.Models.WeightUnit.POUNDS,
+              weightUnit: Alcedo.Ui.Models.WeightUnit.POUNDS,
             },
           ],
         },
@@ -112,7 +112,7 @@ describe('ProtobufToJsonV1Migrator.migrateSession', () => {
 
   it('migrates a weighted session with its blueprint and sets', () => {
     const result = ProtobufToJsonV1Migrator.migrateSession(
-      weightedSessionDao() as unknown as LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2,
+      weightedSessionDao() as unknown as Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2,
     );
 
     expect(result.id).toBe(sessionId);
@@ -134,7 +134,7 @@ describe('ProtobufToJsonV1Migrator.migrateSession', () => {
 });
 
 describe('ProtobufToJsonV1Migrator.migrateSessionBlueprint', () => {
-  const cardioType = LiftLog.Ui.Models.SessionBlueprintDao.ExerciseType.CARDIO;
+  const cardioType = Alcedo.Ui.Models.SessionBlueprintDao.ExerciseType.CARDIO;
 
   function blueprintDao() {
     return {
@@ -183,7 +183,7 @@ describe('ProtobufToJsonV1Migrator.migrateSessionBlueprint', () => {
 
   it('migrates weighted and cardio exercises with both target types', () => {
     const result = ProtobufToJsonV1Migrator.migrateSessionBlueprint(
-      blueprintDao() as unknown as LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2,
+      blueprintDao() as unknown as Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2,
     );
 
     expect(result.name).toBe('Mixed');
@@ -227,7 +227,7 @@ describe('ProtobufToJsonV1Migrator.migrateProgramBlueprint', () => {
     };
 
     const result = ProtobufToJsonV1Migrator.migrateProgramBlueprint(
-      dao as unknown as LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1,
+      dao as unknown as Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1,
     );
 
     expect(result.name).toBe('My Program');

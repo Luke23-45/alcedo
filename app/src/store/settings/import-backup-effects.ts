@@ -1,4 +1,4 @@
-import { LiftLog } from '@/gen/proto';
+import { Alcedo } from '@/gen/proto';
 import { Logger } from '@/services/logger';
 import { showSnackbar } from '@/store/app';
 import { AddEffectFn } from '@/store/store';
@@ -329,9 +329,9 @@ export function addImportBackupEffects(addEffect: AddEffectFn) {
 function tryParseProto(
   bytes: Uint8Array,
   logger: Logger,
-): LiftLog.Ui.Models.ExportedDataDao.ExportedDataDaoV2 | undefined {
+): Alcedo.Ui.Models.ExportedDataDao.ExportedDataDaoV2 | undefined {
   try {
-    return LiftLog.Ui.Models.ExportedDataDao.ExportedDataDaoV2.decode(bytes);
+    return Alcedo.Ui.Models.ExportedDataDao.ExportedDataDaoV2.decode(bytes);
   } catch (e) {
     logger.warn('Could not parse bytes as proto', e);
     return undefined;

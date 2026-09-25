@@ -4,7 +4,7 @@
  * Setup (one time, in Google Cloud Console):
  * 1. Create OAuth 2.0 client IDs: one "Web application" (used as
  *    `webClientId`) and one "iOS" (used as `iosClientId`) for the bundle id
- *    `com.limajuice.liftlog`. Android uses the app's SHA-1 fingerprint —
+ *    `com.powergym.alcedo`. Android uses the app's SHA-1 fingerprint —
  *    no client id is pasted here.
  * 2. Copy the iOS client's *reversed* client id
  *    (`com.googleusercontent.apps.<id>`) into the expo config plugin

@@ -1,4 +1,4 @@
-variable "liftlog_backup_bucket_name" {
+variable "alcedo_backup_bucket_name" {
   description = "The name of the S3 bucket to store the backups in"
   type        = string
 }

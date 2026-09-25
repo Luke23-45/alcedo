@@ -3,9 +3,9 @@ package expo.modules.nativelib
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
-class LiftLogHapticsModule : Module() {
+class AlcedoHapticsModule : Module() {
     override fun definition() = ModuleDefinition {
-        Name("LiftLogHaptics")
+        Name("AlcedoHaptics")
 
         AsyncFunction("triggerClickHaptic") {
             val context = appContext.reactContext

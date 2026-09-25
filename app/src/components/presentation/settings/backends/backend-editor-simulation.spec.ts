@@ -43,8 +43,8 @@ const editorSource = () =>
 const backend = (overrides: Partial<Backend> = {}): Backend => ({
   id: 'b1',
   name: 'Home server',
-  url: 'https://liftlog.example.com',
-  kind: 'liftlog',
+  url: 'https://alcedo.example.com',
+  kind: 'alcedo',
   headers: [],
   ...overrides,
 });
@@ -55,7 +55,7 @@ describe('backend completeness contract', () => {
     expect(isBackendComplete(backend({ name: '  ' }))).toBe(false);
     expect(isBackendComplete(backend({ url: '  ' }))).toBe(false);
     expect(isBackendComplete(backend({ url: 'ftp://x.example.com' }))).toBe(false);
-    expect(isBackendComplete(backend({ url: 'liftlog.example.com' }))).toBe(false);
+    expect(isBackendComplete(backend({ url: 'alcedo.example.com' }))).toBe(false);
     expect(isBackendComplete(backend({ url: 'http://x.example.com' }))).toBe(true);
     expect(isBackendComplete(backend({ url: '  https://x.example.com  ' }))).toBe(true);
   });
@@ -96,7 +96,7 @@ describe('backend deletion contract', () => {
 
 describe('built-in backend contract', () => {
   it('is virtual, never stored, and serves nothing through the assignment model', () => {
-    expect(builtInBackendId).toBe('liftlog');
+    expect(builtInBackendId).toBe('alcedo');
     expect(builtInBackend.id).toBe(builtInBackendId);
     expect(builtInBackend.headers).toEqual([]);
     // backend-v2 serves auth, sync, and the AI coach natively — feed and

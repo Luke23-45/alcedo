@@ -30,7 +30,7 @@ import { useDispatch } from 'react-redux';
 import * as S from '@/components/presentation/backends/backend-editor.styles';
 
 const kindOptions = [
-  { value: 'liftlog', label: 'backends.kind.liftlog.label', body: 'backends.kind.liftlog.body' },
+  { value: 'alcedo', label: 'backends.kind.alcedo.label', body: 'backends.kind.alcedo.body' },
   {
     value: 'backupEndpoint',
     label: 'backends.kind.backup_endpoint.label',
@@ -123,11 +123,11 @@ function BackendEditor({ backend }: { backend: Backend }) {
     switch (result.status) {
       case 'ok':
         return t('backends.test.offers', { features: result.features.map(featureName).join(', ') });
-      case 'notLiftLog':
+      case 'notAlcedo':
         return lines(
           describeFailure(result.failure),
           describeBody(result.failure.body),
-          t('backends.test.not_liftlog'),
+          t('backends.test.not_alcedo'),
         );
       case 'unreachable':
         return describeUnreachable(result.error);
@@ -211,7 +211,7 @@ function BackendEditor({ backend }: { backend: Backend }) {
           label: t('backends.url.label'),
           value: backend.url,
           error: urlError,
-          placeholder: 'https://liftlog.example.com',
+          placeholder: 'https://alcedo.example.com',
           autoCapitalize: 'none',
           keyboardType: 'url',
           onChange: (url) => update({ url }),

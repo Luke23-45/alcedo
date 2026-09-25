@@ -47,7 +47,7 @@ app.MapPost(
             Path.Combine(
                 backupDirectory ?? "./",
                 user ?? "",
-                $"{DateTimeOffset.UtcNow:O}.liftlogbackup.gz"
+                $"{DateTimeOffset.UtcNow:O}.alcedobackup.gz"
             )
         );
 

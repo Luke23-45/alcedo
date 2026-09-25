@@ -3,6 +3,6 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ContainerRepository>liftlog-backupserver</ContainerRepository>
+    <ContainerRepository>alcedo-backupserver</ContainerRepository>
   </PropertyGroup>
 </Project>

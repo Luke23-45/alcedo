@@ -28,7 +28,7 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const schemaPath = join(scriptDir, '../src/models/generated/program-blueprint.schema.json');
 const outputPath = join(
   scriptDir,
-  '../../plugins/liftlog-plan-builder/skills/create-liftlog-plan/scripts/validate-plan.mjs',
+  '../../plugins/alcedo-plan-builder/skills/create-alcedo-plan/scripts/validate-plan.mjs',
 );
 
 /** Matches the `BigNumber` decimal strings the app parses with `BigNumber(...)`. */

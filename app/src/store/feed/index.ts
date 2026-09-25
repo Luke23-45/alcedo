@@ -261,7 +261,7 @@ export const selectMutualFriends = createSelector(
 );
 
 export function getFeedShareUrl(identity: FeedIdentity) {
-  return `https://app.liftlog.online/feed/share?id=${identity.lookup}${
+  return `https://app.alcedo.app/feed/share?id=${identity.lookup}${
     identity.name ? `&name=${encodeURIComponent(identity.name)}` : ''
   }`;
 }

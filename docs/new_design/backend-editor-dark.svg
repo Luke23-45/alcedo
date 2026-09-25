@@ -116,15 +116,15 @@
 <text x="32" y="203" font-size="17" font-weight="400" letter-spacing="-0.3" fill="#F5F5F7">Home Server</text>
 <line x1="32" y1="218.5" x2="377" y2="218.5" stroke="#FFFFFF" stroke-opacity="0.08"/>
 <text x="32" y="243" font-size="13" font-weight="600" letter-spacing="-0.1" fill="#98989F">Server URL</text>
-<text x="32" y="268" font-size="17" font-weight="400" letter-spacing="-0.3" fill="#F5F5F7">https://liftlog.home.arpa</text>
+<text x="32" y="268" font-size="17" font-weight="400" letter-spacing="-0.3" fill="#F5F5F7">https://alcedo.home.arpa</text>
 
 <!-- ═══════════ 04 · SECTION — SERVER TYPE ═══════════ -->
 <text x="24" y="326" font-size="10" font-weight="700" letter-spacing="1.35" fill="#86868B">SERVER TYPE</text>
 <rect x="16" y="340" width="361" height="48" rx="14" fill="#FFFFFF" fill-opacity="0.08"/>
 <rect x="20" y="344" width="176.5" height="40" rx="10" fill="#FFFFFF" fill-opacity="0.16" filter="url(#fSoft)"/>
-<text x="108.25" y="369" font-size="15" font-weight="600" letter-spacing="-0.2" fill="#FFFFFF" text-anchor="middle">Liftlog server</text>
+<text x="108.25" y="369" font-size="15" font-weight="600" letter-spacing="-0.2" fill="#FFFFFF" text-anchor="middle">Alcedo server</text>
 <text x="284.75" y="369" font-size="15" font-weight="500" letter-spacing="-0.2" fill="#98989F" text-anchor="middle">Backup endpoint</text>
-<text x="24" y="408" font-size="13" font-weight="400" letter-spacing="-0.1" fill="#98989F">A Liftlog server hosts your full account — workouts,</text>
+<text x="24" y="408" font-size="13" font-weight="400" letter-spacing="-0.1" fill="#98989F">An Alcedo server hosts your full account — workouts,</text>
 <text x="24" y="426" font-size="13" font-weight="400" letter-spacing="-0.1" fill="#98989F">programs and feed. A backup endpoint only stores files.</text>
 
 <!-- ═══════════ 05 · SECTION — HTTP HEADERS ═══════════ -->

@@ -170,7 +170,7 @@ describe('plan-file', () => {
   it.each(['push-pull-legs', 'couch-to-5k'])('imports the published %s example', (name) => {
     const path = join(
       __dirname,
-      `../../../plugins/liftlog-plan-builder/skills/create-liftlog-plan/examples/${name}.liftlogplan`,
+      `../../../plugins/alcedo-plan-builder/skills/create-alcedo-plan/examples/${name}.liftlogplan`,
     );
     const result = parseProgramBlueprintFile(readFileSync(path));
     expect(result.ok).toBe(true);

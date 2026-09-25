@@ -30,7 +30,7 @@ function getFileName(coords: string, device: string) {
 }
 
 function getScreenshotUrl(coords: string) {
-  return `liftlog://screenshot-collection\?type=${coords}`;
+  return `alcedo://screenshot-collection\?type=${coords}`;
 }
 
 async function goToScreenshotUrlIos(coords: string, simulatorId: string) {

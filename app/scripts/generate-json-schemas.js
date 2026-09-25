@@ -6,7 +6,7 @@ const { join, dirname } = require('node:path');
 
 const modelsDir = join(__dirname, '../src/models');
 const docsSchemasPath = join(__dirname, '../../docs/schemas/');
-const planBuilderSkillDir = join(__dirname, '../../plugins/liftlog-plan-builder/skills/create-liftlog-plan');
+const planBuilderSkillDir = join(__dirname, '../../plugins/alcedo-plan-builder/skills/create-alcedo-plan');
 // Create schemas for storage
 
 // Create schema for workout-worker - one file per definition

@@ -10,7 +10,7 @@ description: >-
 
 # Adding / changing a storage migration
 
-LiftLog persists everything on-device as JSON. Stored data does not change when the app's types do, so
+Alcedo persists everything on-device as JSON. Stored data does not change when the app's types do, so
 every model has a **migration chain** that brings any previously-persisted shape up to the current one.
 Full reference: `docs/Migrations.md`. Code: `app/src/models/storage/versions/`.
 

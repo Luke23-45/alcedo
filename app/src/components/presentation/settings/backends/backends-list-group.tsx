@@ -39,7 +39,7 @@ export function BackendsListGroup() {
 
   const addBackend = () => {
     const id = uuid();
-    dispatch(putBackend({ id, name: '', url: '', kind: 'liftlog', headers: [] }));
+    dispatch(putBackend({ id, name: '', url: '', kind: 'alcedo', headers: [] }));
     push(`/settings/backends/${id}`);
   };
 

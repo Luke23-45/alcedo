@@ -8,9 +8,9 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import com.limajuice.liftlog.WorkoutEndedEvent
-import com.limajuice.liftlog.WorkoutMessage
-import com.limajuice.liftlog.WorkoutStartedEvent
+import com.powergym.alcedo.WorkoutEndedEvent
+import com.powergym.alcedo.WorkoutMessage
+import com.powergym.alcedo.WorkoutStartedEvent
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.workoutworker.utils.Json

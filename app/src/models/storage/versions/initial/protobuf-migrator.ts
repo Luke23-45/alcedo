@@ -1,4 +1,4 @@
-import { LiftLog } from '@/gen/proto';
+import { Alcedo } from '@/gen/proto';
 import {
   CardioExerciseBlueprintJSON,
   CardioExerciseSetBlueprintJSON,
@@ -48,22 +48,22 @@ import {
 
 export class ProtobufToJsonV1Migrator {
   static migrateProgramBlueprint(
-    value: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1,
+    value: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1,
   ): ProgramBlueprintJSON {
     return fromProgramBlueprint(value);
   }
 
-  static migrateSession(value: LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2): SessionJSON {
+  static migrateSession(value: Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2): SessionJSON {
     return fromSessionDao(value);
   }
 
   static migrateSessionBlueprint(
-    value: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2,
+    value: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2,
   ): SessionBlueprintJSON {
     return fromSessionBlueprintDao(value);
   }
 
-  static migrateFeedIdentity(dao: LiftLog.Ui.Models.IFeedIdentityDaoV1): FeedIdentityJSON {
+  static migrateFeedIdentity(dao: Alcedo.Ui.Models.IFeedIdentityDaoV1): FeedIdentityJSON {
     return {
       id: fromUuidDao(dao.id),
       lookup: dao.lookup?.value ?? '',
@@ -84,7 +84,7 @@ export class ProtobufToJsonV1Migrator {
     };
   }
 
-  static migrateFollowedUser(dao: LiftLog.Ui.Models.IFeedUserDaoV1): FollowedFeedUserJSON | PendingFeedUserJSON {
+  static migrateFollowedUser(dao: Alcedo.Ui.Models.IFeedUserDaoV1): FollowedFeedUserJSON | PendingFeedUserJSON {
     const publicKey = {
       spkiPublicKeyBytes: toBase64Uint8ArrayJSON(Uint8Array.from(dao.publicKey!)),
     };
@@ -111,7 +111,7 @@ export class ProtobufToJsonV1Migrator {
     };
   }
 
-  static migrateUuid(dao: LiftLog.Ui.Models.IUuidDao | null | undefined) {
+  static migrateUuid(dao: Alcedo.Ui.Models.IUuidDao | null | undefined) {
     if (!dao?.value) {
       throw new Error('UUID dao cannot be null');
     }
@@ -137,7 +137,7 @@ export class ProtobufToJsonV1Migrator {
     }
   }
 
-  static migrateFollowerUser(dao: LiftLog.Ui.Models.IFeedUserDaoV1): FollowerFeedUserJSON {
+  static migrateFollowerUser(dao: Alcedo.Ui.Models.IFeedUserDaoV1): FollowerFeedUserJSON {
     return {
       id: fromUuidDao(dao.id),
       publicKey: {
@@ -148,7 +148,7 @@ export class ProtobufToJsonV1Migrator {
       type: 'FollowerFeedUser',
     };
   }
-  static migratePendingFeedUser(dao: LiftLog.Ui.Models.IFeedUserDaoV1): PendingFeedUserJSON {
+  static migratePendingFeedUser(dao: Alcedo.Ui.Models.IFeedUserDaoV1): PendingFeedUserJSON {
     return {
       id: fromUuidDao(dao.id),
       publicKey: {
@@ -159,7 +159,7 @@ export class ProtobufToJsonV1Migrator {
     };
   }
 
-  static migrateFollowRequest(dao: LiftLog.Ui.Models.IInboxMessageDao): FollowRequestInboxMessageJSON {
+  static migrateFollowRequest(dao: Alcedo.Ui.Models.IInboxMessageDao): FollowRequestInboxMessageJSON {
     return {
       type: 'FollowRequest',
       payloadJson: toJsonString<FollowRequestJSON>({
@@ -170,7 +170,7 @@ export class ProtobufToJsonV1Migrator {
     };
   }
 
-  static migrateSessionUserEvent(dao: LiftLog.Ui.Models.IFeedItemDaoV1): SessionUserEventJSON {
+  static migrateSessionUserEvent(dao: Alcedo.Ui.Models.IFeedItemDaoV1): SessionUserEventJSON {
     return {
       type: 'SessionUserEvent',
       eventId: fromUuidDao(dao.eventId),
@@ -182,7 +182,7 @@ export class ProtobufToJsonV1Migrator {
   }
 }
 
-function fromUuidDao(dao: LiftLog.Ui.Models.IUuidDao | null | undefined): string {
+function fromUuidDao(dao: Alcedo.Ui.Models.IUuidDao | null | undefined): string {
   if (!dao?.value) {
     throw new Error('UUID dao cannot be null');
   }
@@ -211,16 +211,16 @@ function fromUuidDao(dao: LiftLog.Ui.Models.IUuidDao | null | undefined): string
 const nanoFactor = BigNumber('1000000000');
 
 // Converts a DecimalValue DAO to a BigNumber
-function fromDecimalDao(dao: LiftLog.Ui.Models.IDecimalValue): BigNumber;
-function fromDecimalDao(dao: LiftLog.Ui.Models.IDecimalValue | null | undefined): BigNumber | undefined;
-function fromDecimalDao(dao: LiftLog.Ui.Models.IDecimalValue | null | undefined): BigNumber | undefined {
+function fromDecimalDao(dao: Alcedo.Ui.Models.IDecimalValue): BigNumber;
+function fromDecimalDao(dao: Alcedo.Ui.Models.IDecimalValue | null | undefined): BigNumber | undefined;
+function fromDecimalDao(dao: Alcedo.Ui.Models.IDecimalValue | null | undefined): BigNumber | undefined {
   if (dao?.nanos == null || dao?.units == null) {
     return undefined;
   }
   return BigNumber(dao.units.toString()).plus(BigNumber(dao.nanos).div(nanoFactor));
 }
 
-function fromTimeOnlyDao(dao: LiftLog.Ui.Models.ITimeOnlyDao | null | undefined): LocalTime {
+function fromTimeOnlyDao(dao: Alcedo.Ui.Models.ITimeOnlyDao | null | undefined): LocalTime {
   if (!dao) {
     throw new Error('TimeOnlyDao cannot be null');
   }
@@ -230,14 +230,14 @@ function fromTimeOnlyDao(dao: LiftLog.Ui.Models.ITimeOnlyDao | null | undefined)
   return LocalTime.of(dao.hour!, dao.minute!, dao.second!, nano);
 }
 
-function fromDateOnlyDao(dao: LiftLog.Ui.Models.IDateOnlyDao | null | undefined): LocalDate {
+function fromDateOnlyDao(dao: Alcedo.Ui.Models.IDateOnlyDao | null | undefined): LocalDate {
   if (!dao) {
     throw new Error('DateOnlyDao cannot be null');
   }
   return LocalDate.of(dao.year!, dao.month!, dao.day!);
 }
 
-function fromDateTimeDao(dao: LiftLog.Ui.Models.IDateTimeDao | null | undefined): OffsetDateTime | undefined {
+function fromDateTimeDao(dao: Alcedo.Ui.Models.IDateTimeDao | null | undefined): OffsetDateTime | undefined {
   if (!dao) {
     return undefined;
   }
@@ -258,7 +258,7 @@ function fromDurationDao(duration: google.protobuf.IDuration | null | undefined)
   );
 }
 
-function fromProgramBlueprint(dao: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1): ProgramBlueprintJSON {
+function fromProgramBlueprint(dao: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1): ProgramBlueprintJSON {
   return {
     name: dao.name ?? '',
     sessions: dao.sessions!.map((x) => fromSessionBlueprintDao(x)),
@@ -267,7 +267,7 @@ function fromProgramBlueprint(dao: LiftLog.Ui.Models.ProgramBlueprintDao.IProgra
 }
 
 function fromSessionBlueprintDao(
-  dao: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2,
+  dao: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2,
 ): SessionBlueprintJSON {
   return {
     name: dao.name ?? '',
@@ -277,19 +277,19 @@ function fromSessionBlueprintDao(
 }
 
 function fromExerciseBlueprintDao(
-  dao: LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2 | null | undefined,
+  dao: Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2 | null | undefined,
 ): ExerciseBlueprintJSON {
   if (!dao) {
     throw new Error('ExerciseBlueprint dao should not be null');
   }
-  if (dao.type === LiftLog.Ui.Models.SessionBlueprintDao.ExerciseType.CARDIO) {
+  if (dao.type === Alcedo.Ui.Models.SessionBlueprintDao.ExerciseType.CARDIO) {
     return fromCardioExerciseBlueprintDao(dao);
   }
   return fromWeightedExerciseBlueprintDao(dao);
 }
 
 function fromCardioExerciseBlueprintDao(
-  dao: LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2,
+  dao: Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2,
 ): CardioExerciseBlueprintJSON {
   const sets = dao.cardioSets!.map((x) => fromCardioExerciseSetBlueprintDao(x));
   return {
@@ -302,7 +302,7 @@ function fromCardioExerciseBlueprintDao(
 }
 
 function getCardioBlueprintSetFromDeprecatedFields(
-  dao: LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2,
+  dao: Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2,
 ): CardioExerciseSetBlueprintJSON {
   return {
     target: fromCardioTargetDao(dao.deprecatedCardioTarget),
@@ -316,7 +316,7 @@ function getCardioBlueprintSetFromDeprecatedFields(
 }
 
 function fromCardioExerciseSetBlueprintDao(
-  dao: LiftLog.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao,
+  dao: Alcedo.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao,
 ): CardioExerciseSetBlueprintJSON {
   return {
     target: fromCardioTargetDao(dao.cardioTarget),
@@ -330,7 +330,7 @@ function fromCardioExerciseSetBlueprintDao(
 }
 
 function fromCardioTargetDao(
-  dao: LiftLog.Ui.Models.SessionBlueprintDao.ICardioTarget | null | undefined,
+  dao: Alcedo.Ui.Models.SessionBlueprintDao.ICardioTarget | null | undefined,
 ): CardioTargetJSON {
   if (!dao) {
     throw new Error('Expected a non null cardio target');
@@ -352,7 +352,7 @@ function fromCardioTargetDao(
 }
 
 function fromWeightedExerciseBlueprintDao(
-  dao: LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2,
+  dao: Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2,
 ): WeightedExerciseBlueprintJSON {
   return {
     type: 'WeightedExerciseBlueprint',
@@ -367,7 +367,7 @@ function fromWeightedExerciseBlueprintDao(
   };
 }
 
-function fromRestDao(dao: LiftLog.Ui.Models.SessionBlueprintDao.IRestDaoV2 | null | undefined): RestJSON {
+function fromRestDao(dao: Alcedo.Ui.Models.SessionBlueprintDao.IRestDaoV2 | null | undefined): RestJSON {
   return {
     minRest: toDurationJSON(fromDurationDao(dao?.minRest) ?? Duration.ZERO),
     maxRest: toDurationJSON(fromDurationDao(dao?.maxRest) ?? Duration.ZERO),
@@ -375,7 +375,7 @@ function fromRestDao(dao: LiftLog.Ui.Models.SessionBlueprintDao.IRestDaoV2 | nul
   };
 }
 
-function fromSessionDao(dao: LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2 | null | undefined): SessionJSON {
+function fromSessionDao(dao: Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2 | null | undefined): SessionJSON {
   if (!dao) {
     throw new Error('Session dao cannot be null');
   }
@@ -399,20 +399,20 @@ function fromSessionDao(dao: LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2 |
 }
 
 function fromRecordedExerciseDao(
-  sessionDate: LiftLog.Ui.Models.IDateOnlyDao,
-  dao: LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2 | null | undefined,
+  sessionDate: Alcedo.Ui.Models.IDateOnlyDao,
+  dao: Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2 | null | undefined,
 ): RecordedExerciseJSON {
   if (!dao) {
     throw new Error('Recorded exercise DAO cannot be null');
   }
-  if (dao.type === LiftLog.Ui.Models.SessionBlueprintDao.ExerciseType.CARDIO) {
+  if (dao.type === Alcedo.Ui.Models.SessionBlueprintDao.ExerciseType.CARDIO) {
     return fromRecordedCardioExerciseDao(dao);
   }
   return fromRecordedWeightedExerciseDao(sessionDate, dao);
 }
 
 function fromRecordedCardioExerciseSetDao(
-  dao: LiftLog.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao,
+  dao: Alcedo.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao,
 ): RecordedCardioExerciseSetJSON {
   return {
     blueprint: fromCardioExerciseSetBlueprintDao(dao.blueprint!),
@@ -435,7 +435,7 @@ function fromRecordedCardioExerciseSetDao(
 }
 
 function fromRecordedCardioExerciseDao(
-  dao: LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2,
+  dao: Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2,
 ): RecordedCardioExerciseJSON {
   const sets = dao.cardioSets!.map((x) => fromRecordedCardioExerciseSetDao(x));
   return {
@@ -447,8 +447,8 @@ function fromRecordedCardioExerciseDao(
 }
 
 function fromRecordedWeightedExerciseDao(
-  sessionDate: LiftLog.Ui.Models.IDateOnlyDao,
-  dao: LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2,
+  sessionDate: Alcedo.Ui.Models.IDateOnlyDao,
+  dao: Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2,
 ): RecordedWeightedExerciseJSON {
   return {
     type: 'RecordedWeightedExercise',
@@ -459,8 +459,8 @@ function fromRecordedWeightedExerciseDao(
 }
 
 function fromRecordedSetDao(
-  sessionDate: LiftLog.Ui.Models.IDateOnlyDao,
-  recordedSetDao: LiftLog.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2,
+  sessionDate: Alcedo.Ui.Models.IDateOnlyDao,
+  recordedSetDao: Alcedo.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2,
 ): RecordedSetJSON {
   const dateCompleted = recordedSetDao.completionDate ?? sessionDate;
   const completionLocalDateTime = fromDateOnlyDao(dateCompleted).atTime(fromTimeOnlyDao(recordedSetDao.completionTime));
@@ -478,8 +478,8 @@ function fromRecordedSetDao(
   };
 }
 function fromPotentialSetDao(
-  sessionDate: LiftLog.Ui.Models.IDateOnlyDao,
-  dao: LiftLog.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2 | null | undefined,
+  sessionDate: Alcedo.Ui.Models.IDateOnlyDao,
+  dao: Alcedo.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2 | null | undefined,
 ): PotentialSetJSON {
   if (!dao) {
     throw new Error('PotentialSetDao cannot be null');
@@ -493,7 +493,7 @@ function fromPotentialSetDao(
   };
 }
 function getRecordedCardioSetFromDeprecatedFields(
-  dao: LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2,
+  dao: Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2,
 ): RecordedCardioExerciseSetJSON {
   return {
     blueprint: getCardioBlueprintSetFromDeprecatedFields(dao.exerciseBlueprint!),
@@ -515,16 +515,16 @@ function getRecordedCardioSetFromDeprecatedFields(
   };
 }
 
-function fromWeightUnitDao(daoUnit: LiftLog.Ui.Models.WeightUnit | null | undefined): WeightUnitJSON {
+function fromWeightUnitDao(daoUnit: Alcedo.Ui.Models.WeightUnit | null | undefined): WeightUnitJSON {
   return match(daoUnit)
     .returnType<WeightUnitJSON>()
     .with(P.nullish, () => 'nil')
-    .with(LiftLog.Ui.Models.WeightUnit.NIL satisfies 0 as 0, () => 'nil')
-    .with(LiftLog.Ui.Models.WeightUnit.KILOGRAMS satisfies 1 as 1, () => 'kilograms')
-    .with(LiftLog.Ui.Models.WeightUnit.POUNDS satisfies 2 as 2, () => 'pounds')
+    .with(Alcedo.Ui.Models.WeightUnit.NIL satisfies 0 as 0, () => 'nil')
+    .with(Alcedo.Ui.Models.WeightUnit.KILOGRAMS satisfies 1 as 1, () => 'kilograms')
+    .with(Alcedo.Ui.Models.WeightUnit.POUNDS satisfies 2 as 2, () => 'pounds')
     .exhaustive();
 }
-function fromWeightDao(value: LiftLog.Ui.Models.IWeight): WeightJSON {
+function fromWeightDao(value: Alcedo.Ui.Models.IWeight): WeightJSON {
   return {
     value: toBigNumberJSON(fromDecimalDao(value.value!)),
     unit: fromWeightUnitDao(value.unit),

@@ -1,11 +1,11 @@
 ---
-name: create-liftlog-plan
-description: Create a LiftLog workout plan (.liftlogplan file) that can be imported into the LiftLog app. Use when the user asks for a workout program, training split, lifting routine, or running plan, or asks to build/edit/convert a plan for LiftLog.
+name: create-alcedo-plan
+description: Create a Alcedo workout plan (.alcedoplan file) that can be imported into the Alcedo app. Use when the user asks for a workout program, training split, lifting routine, or running plan, or asks to build/edit/convert a plan for Alcedo.
 ---
 
-# Create a LiftLog plan
+# Create a Alcedo plan
 
-Turn a training goal into a `.liftlogplan` file the user can import into LiftLog.
+Turn a training goal into a `.alcedoplan` file the user can import into Alcedo.
 
 ## Workflow
 
@@ -25,7 +25,7 @@ If the user has given you enough to work with, skip the interview and build the 
 
 Read `reference/format.md` before writing any JSON. It is the field-by-field guide, and it lists the mistakes that make a file fail to import. `reference/ProgramBlueprint.json` is the authoritative JSON Schema if you need to check something exactly.
 
-`examples/push-pull-legs.liftlogplan` is a complete weighted-training plan; `examples/couch-to-5k.liftlogplan` covers cardio. Read whichever is closer to what you're building.
+`examples/push-pull-legs.alcedoplan` is a complete weighted-training plan; `examples/couch-to-5k.alcedoplan` covers cardio. Read whichever is closer to what you're building.
 
 ### 3. Write the plan
 
@@ -43,24 +43,24 @@ It needs nothing installed and no network. It prints every problem with the path
 
 ### 5. Deliver it
 
-Name the file after the plan: `Push Pull Legs.liftlogplan`.
+Name the file after the plan: `Push Pull Legs.alcedoplan`.
 
 - **In Claude Code**, save it in the working directory and tell them where it is.
 - **In Claude chat**, write the file and give them the download link.
 
 Then tell them how to import it, since it isn't obvious:
 
-> Get the file onto your phone (AirDrop, email, or save it to Files/Drive), then tap it - LiftLog will open it. Or open LiftLog and go to Plans → Import.
+> Get the file onto your phone (AirDrop, email, or save it to Files/Drive), then tap it - Alcedo will open it. Or open Alcedo and go to Plans → Import.
 
 If the user says that the app says the plan isn't valid, or the app says they need to update, let them know that they may need to wait for the app store release to roll out.
 
 ## Editing an existing plan
 
-If the user gives you a `.liftlogplan` file to change, read it, modify it, validate it, and hand it back. Keep the fields you weren't asked to touch exactly as they were.
+If the user gives you a `.alcedoplan` file to change, read it, modify it, validate it, and hand it back. Keep the fields you weren't asked to touch exactly as they were.
 
 If they want to change a plan they're already running but haven't given you the file, ask them to export it out of the app:
 
-> In LiftLog, open **Plans**, tap the `⋮` next to the plan and choose **Export to file**. That opens the share sheet - save it to Files/Drive, or mail it to yourself - then send me the `.liftlogplan`.
+> In Alcedo, open **Plans**, tap the `⋮` next to the plan and choose **Export to file**. That opens the share sheet - save it to Files/Drive, or mail it to yourself - then send me the `.alcedoplan`.
 
 Don't rebuild their plan from a verbal description when they could just export it - the file has their real exercise names, rest times, and progressive overload settings, and anything you reconstruct will quietly differ.
 

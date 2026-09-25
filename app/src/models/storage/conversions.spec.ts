@@ -5,7 +5,7 @@ import {
   SessionGenerator,
   WeightGenerator,
 } from '@/models/storage/generators';
-import { LiftLog } from '@/gen/proto';
+import { Alcedo } from '@/gen/proto';
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { gunzipSync } from 'zlib';
@@ -48,7 +48,7 @@ describe('conversions', () => {
    */
   describe('a backup from the original liftlog', () => {
     const sessions = fromSessionHistoryDao(
-      LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2.decode(
+      Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2.decode(
         gunzipSync(readFileSync(__dirname + '/' + 'export.liftlogbackup.gz')),
       ),
     );
@@ -107,7 +107,7 @@ function toJSONEquals(a: ToJSON, b: ToJSON) {
 }
 
 function fromSessionHistoryDao(
-  sessionHistoryModel: LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2,
+  sessionHistoryModel: Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2,
 ): Session[] {
   return sessionHistoryModel.completedSessions.map((item) =>
     Session.fromJSON(sessionMigrations.migrate(ProtobufToJsonV1Migrator.migrateSession(item))),

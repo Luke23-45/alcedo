@@ -24,6 +24,10 @@ import {
   migrateAiPlannerToV2,
   migrateAiPlannerToV2DataMigration,
 } from '@/services/data-migrations/migrate-ai-planner-to-v2';
+import {
+  migrateBackendKindToAlcedo,
+  migrateBackendKindToAlcedoDataMigration,
+} from '@/services/data-migrations/migrate-backend-kind-to-alcedo';
 
 export interface DatabaseImporter {
   importOldData(): Promise<void>;
@@ -64,6 +68,9 @@ export class DatabaseImportService implements DatabaseImporter {
     }
     if (!dataMigrationsRun.includes(importBackendsDataMigration)) {
       await importBackends(this.db, this.preferenceService);
+    }
+    if (!dataMigrationsRun.includes(migrateBackendKindToAlcedoDataMigration)) {
+      await migrateBackendKindToAlcedo(this.db);
     }
     if (!dataMigrationsRun.includes(migrateAiPlannerToV2DataMigration)) {
       await migrateAiPlannerToV2(this.db);

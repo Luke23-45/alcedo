@@ -17,7 +17,7 @@ export const builtInBackend: Backend = {
   id: builtInBackendId,
   name: 'Alcedo',
   url: alcedoApiBaseUrl,
-  kind: 'liftlog',
+  kind: 'alcedo',
   headers: [],
 };
 

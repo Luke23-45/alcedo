@@ -1,4 +1,4 @@
-# LiftLog React
+# Alcedo React
 
 ## 🚀 How to use
 

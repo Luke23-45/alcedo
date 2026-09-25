@@ -1,8 +1,8 @@
 package expo.modules.workoutworker.handlers
 
 
-import com.limajuice.liftlog.WorkoutEndedEvent
-import com.limajuice.liftlog.WorkoutMessage
+import com.powergym.alcedo.WorkoutEndedEvent
+import com.powergym.alcedo.WorkoutMessage
 import expo.modules.workoutworker.utils.WorkoutNotificationManager
 
 

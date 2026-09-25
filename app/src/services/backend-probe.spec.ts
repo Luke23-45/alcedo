@@ -10,8 +10,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 const backend: Backend = {
   id: 'self',
   name: 'Home server',
-  url: 'https://liftlog.example.com',
-  kind: 'liftlog',
+  url: 'https://alcedo.example.com',
+  kind: 'alcedo',
   headers: [{ name: 'X-Api-Key', value: 'secret' }],
 };
 
@@ -47,7 +47,7 @@ describe('probeBackendFeatures', () => {
 
     await probeBackendFeatures(backend);
 
-    expect(fetchMock).toHaveBeenCalledWith('https://liftlog.example.com/features', {
+    expect(fetchMock).toHaveBeenCalledWith('https://alcedo.example.com/features', {
       headers: { 'X-Api-Key': 'secret' },
     });
   });
@@ -78,7 +78,7 @@ describe('probeBackendFeatures', () => {
     );
 
     expect(await probeBackendFeatures(backend)).toEqual({
-      status: 'notLiftLog',
+      status: 'notAlcedo',
       failure: {
         kind: 'httpError',
         statusCode: 401,
@@ -93,7 +93,7 @@ describe('probeBackendFeatures', () => {
     respondWith(responded('<!doctype html>\n<html>\n  <body>Hello</body>\n</html>', { contentType: 'text/html' }));
 
     expect(await probeBackendFeatures(backend)).toEqual({
-      status: 'notLiftLog',
+      status: 'notAlcedo',
       failure: {
         kind: 'notJson',
         contentType: 'text/html',
@@ -105,13 +105,13 @@ describe('probeBackendFeatures', () => {
   it('reports the body when the answer is JSON but not a feature object', async () => {
     respondWith(ok(['feed']));
     expect(await probeBackendFeatures(backend)).toEqual({
-      status: 'notLiftLog',
+      status: 'notAlcedo',
       failure: { kind: 'notFeatureObject', body: '["feed"]' },
     });
 
     respondWith(ok(null));
     expect(await probeBackendFeatures(backend)).toEqual({
-      status: 'notLiftLog',
+      status: 'notAlcedo',
       failure: { kind: 'notFeatureObject', body: 'null' },
     });
   });
@@ -121,8 +121,8 @@ describe('probeBackendFeatures', () => {
 
     const result = await probeBackendFeatures(backend);
 
-    expect(result).toMatchObject({ status: 'notLiftLog' });
-    expect(result.status === 'notLiftLog' && result.failure.body).toBe(`${'x'.repeat(200)}...`);
+    expect(result).toMatchObject({ status: 'notAlcedo' });
+    expect(result.status === 'notAlcedo' && result.failure.body).toBe(`${'x'.repeat(200)}...`);
   });
 });
 
@@ -150,7 +150,7 @@ describe('probeBackupEndpoint', () => {
 
     await probeBackupEndpoint(backend);
 
-    expect(fetchMock).toHaveBeenCalledWith('https://liftlog.example.com/backup', expect.anything());
+    expect(fetchMock).toHaveBeenCalledWith('https://alcedo.example.com/backup', expect.anything());
   });
 
   it('reports the status and the body when the endpoint refuses', async () => {

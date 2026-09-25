@@ -5,7 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import com.limajuice.liftlog.WorkoutMessage
+import com.powergym.alcedo.WorkoutMessage
 import expo.modules.core.interfaces.ReactActivityLifecycleListener
 import expo.modules.workoutworker.utils.Json
 

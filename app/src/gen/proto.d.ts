@@ -1,7 +1,7 @@
 import * as $protobuf from "protobufjs";
 import Long = require("long");
-/** Namespace LiftLog. */
-export namespace LiftLog {
+/** Namespace Alcedo. */
+export namespace Alcedo {
 
     /** Namespace Ui. */
     namespace Ui {
@@ -16,7 +16,7 @@ export namespace LiftLog {
                 interface ISessionHistoryDaoV2 {
 
                     /** SessionHistoryDaoV2 completedSessions */
-                    completedSessions?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2[]|null);
+                    completedSessions?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2[]|null);
                 }
 
                 /** Represents a SessionHistoryDaoV2. */
@@ -26,33 +26,33 @@ export namespace LiftLog {
                      * Constructs a new SessionHistoryDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionHistoryDao.ISessionHistoryDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.SessionHistoryDao.ISessionHistoryDaoV2);
 
                     /** SessionHistoryDaoV2 completedSessions. */
-                    public completedSessions: LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2[];
+                    public completedSessions: Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2[];
 
                     /**
                      * Creates a new SessionHistoryDaoV2 instance using the specified properties.
                      * @param [properties] Properties to set
                      * @returns SessionHistoryDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionHistoryDao.ISessionHistoryDaoV2): LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.SessionHistoryDao.ISessionHistoryDaoV2): Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2;
 
                     /**
-                     * Encodes the specified SessionHistoryDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2.verify|verify} messages.
+                     * Encodes the specified SessionHistoryDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2.verify|verify} messages.
                      * @param message SessionHistoryDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionHistoryDao.ISessionHistoryDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionHistoryDao.ISessionHistoryDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified SessionHistoryDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2.verify|verify} messages.
+                     * Encodes the specified SessionHistoryDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2.verify|verify} messages.
                      * @param message SessionHistoryDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionHistoryDao.ISessionHistoryDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionHistoryDao.ISessionHistoryDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a SessionHistoryDaoV2 message from the specified reader or buffer.
@@ -62,7 +62,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2;
 
                     /**
                      * Decodes a SessionHistoryDaoV2 message from the specified reader or buffer, length delimited.
@@ -71,7 +71,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2;
 
                     /**
                      * Verifies a SessionHistoryDaoV2 message.
@@ -85,7 +85,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns SessionHistoryDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2;
 
                     /**
                      * Creates a plain object from a SessionHistoryDaoV2 message. Also converts values to other types if specified.
@@ -93,7 +93,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionHistoryDao.SessionHistoryDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this SessionHistoryDaoV2 to JSON.
@@ -113,22 +113,22 @@ export namespace LiftLog {
                 interface ISessionDaoV2 {
 
                     /** SessionDaoV2 id */
-                    id?: (LiftLog.Ui.Models.IUuidDao|null);
+                    id?: (Alcedo.Ui.Models.IUuidDao|null);
 
                     /** SessionDaoV2 sessionName */
                     sessionName?: (string|null);
 
                     /** SessionDaoV2 recordedExercises */
-                    recordedExercises?: (LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2[]|null);
+                    recordedExercises?: (Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2[]|null);
 
                     /** SessionDaoV2 date */
-                    date?: (LiftLog.Ui.Models.IDateOnlyDao|null);
+                    date?: (Alcedo.Ui.Models.IDateOnlyDao|null);
 
                     /** SessionDaoV2 bodyweightValue */
-                    bodyweightValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    bodyweightValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** SessionDaoV2 bodyweightUnit */
-                    bodyweightUnit?: (LiftLog.Ui.Models.WeightUnit|null);
+                    bodyweightUnit?: (Alcedo.Ui.Models.WeightUnit|null);
 
                     /** SessionDaoV2 blueprintNotes */
                     blueprintNotes?: (string|null);
@@ -141,25 +141,25 @@ export namespace LiftLog {
                      * Constructs a new SessionDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2);
 
                     /** SessionDaoV2 id. */
-                    public id?: (LiftLog.Ui.Models.IUuidDao|null);
+                    public id?: (Alcedo.Ui.Models.IUuidDao|null);
 
                     /** SessionDaoV2 sessionName. */
                     public sessionName: string;
 
                     /** SessionDaoV2 recordedExercises. */
-                    public recordedExercises: LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2[];
+                    public recordedExercises: Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2[];
 
                     /** SessionDaoV2 date. */
-                    public date?: (LiftLog.Ui.Models.IDateOnlyDao|null);
+                    public date?: (Alcedo.Ui.Models.IDateOnlyDao|null);
 
                     /** SessionDaoV2 bodyweightValue. */
-                    public bodyweightValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public bodyweightValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** SessionDaoV2 bodyweightUnit. */
-                    public bodyweightUnit: LiftLog.Ui.Models.WeightUnit;
+                    public bodyweightUnit: Alcedo.Ui.Models.WeightUnit;
 
                     /** SessionDaoV2 blueprintNotes. */
                     public blueprintNotes: string;
@@ -172,23 +172,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns SessionDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2): LiftLog.Ui.Models.SessionHistoryDao.SessionDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2): Alcedo.Ui.Models.SessionHistoryDao.SessionDaoV2;
 
                     /**
-                     * Encodes the specified SessionDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.SessionDaoV2.verify|verify} messages.
+                     * Encodes the specified SessionDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.SessionDaoV2.verify|verify} messages.
                      * @param message SessionDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified SessionDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.SessionDaoV2.verify|verify} messages.
+                     * Encodes the specified SessionDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.SessionDaoV2.verify|verify} messages.
                      * @param message SessionDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a SessionDaoV2 message from the specified reader or buffer.
@@ -198,7 +198,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionHistoryDao.SessionDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionHistoryDao.SessionDaoV2;
 
                     /**
                      * Decodes a SessionDaoV2 message from the specified reader or buffer, length delimited.
@@ -207,7 +207,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionHistoryDao.SessionDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionHistoryDao.SessionDaoV2;
 
                     /**
                      * Verifies a SessionDaoV2 message.
@@ -221,7 +221,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns SessionDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionHistoryDao.SessionDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionHistoryDao.SessionDaoV2;
 
                     /**
                      * Creates a plain object from a SessionDaoV2 message. Also converts values to other types if specified.
@@ -229,7 +229,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionHistoryDao.SessionDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionHistoryDao.SessionDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this SessionDaoV2 to JSON.
@@ -249,37 +249,37 @@ export namespace LiftLog {
                 interface IRecordedExerciseDaoV2 {
 
                     /** RecordedExerciseDaoV2 exerciseBlueprint */
-                    exerciseBlueprint?: (LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2|null);
+                    exerciseBlueprint?: (Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2|null);
 
                     /** RecordedExerciseDaoV2 type */
-                    type?: (LiftLog.Ui.Models.SessionBlueprintDao.ExerciseType|null);
+                    type?: (Alcedo.Ui.Models.SessionBlueprintDao.ExerciseType|null);
 
                     /** RecordedExerciseDaoV2 notes */
                     notes?: (google.protobuf.IStringValue|null);
 
                     /** RecordedExerciseDaoV2 potentialSets */
-                    potentialSets?: (LiftLog.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2[]|null);
+                    potentialSets?: (Alcedo.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2[]|null);
 
                     /** RecordedExerciseDaoV2 deprecatedCompletionDateTime */
-                    deprecatedCompletionDateTime?: (LiftLog.Ui.Models.IDateTimeDao|null);
+                    deprecatedCompletionDateTime?: (Alcedo.Ui.Models.IDateTimeDao|null);
 
                     /** RecordedExerciseDaoV2 deprecatedDuration */
                     deprecatedDuration?: (google.protobuf.IDuration|null);
 
                     /** RecordedExerciseDaoV2 deprecatedDistanceValue */
-                    deprecatedDistanceValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    deprecatedDistanceValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedExerciseDaoV2 deprecatedDistanceUnit */
                     deprecatedDistanceUnit?: (google.protobuf.IStringValue|null);
 
                     /** RecordedExerciseDaoV2 deprecatedResistance */
-                    deprecatedResistance?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    deprecatedResistance?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedExerciseDaoV2 deprecatedIncline */
-                    deprecatedIncline?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    deprecatedIncline?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedExerciseDaoV2 cardioSets */
-                    cardioSets?: (LiftLog.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao[]|null);
+                    cardioSets?: (Alcedo.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao[]|null);
                 }
 
                 /** Represents a RecordedExerciseDaoV2. */
@@ -289,40 +289,40 @@ export namespace LiftLog {
                      * Constructs a new RecordedExerciseDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2);
 
                     /** RecordedExerciseDaoV2 exerciseBlueprint. */
-                    public exerciseBlueprint?: (LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2|null);
+                    public exerciseBlueprint?: (Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2|null);
 
                     /** RecordedExerciseDaoV2 type. */
-                    public type: LiftLog.Ui.Models.SessionBlueprintDao.ExerciseType;
+                    public type: Alcedo.Ui.Models.SessionBlueprintDao.ExerciseType;
 
                     /** RecordedExerciseDaoV2 notes. */
                     public notes?: (google.protobuf.IStringValue|null);
 
                     /** RecordedExerciseDaoV2 potentialSets. */
-                    public potentialSets: LiftLog.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2[];
+                    public potentialSets: Alcedo.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2[];
 
                     /** RecordedExerciseDaoV2 deprecatedCompletionDateTime. */
-                    public deprecatedCompletionDateTime?: (LiftLog.Ui.Models.IDateTimeDao|null);
+                    public deprecatedCompletionDateTime?: (Alcedo.Ui.Models.IDateTimeDao|null);
 
                     /** RecordedExerciseDaoV2 deprecatedDuration. */
                     public deprecatedDuration?: (google.protobuf.IDuration|null);
 
                     /** RecordedExerciseDaoV2 deprecatedDistanceValue. */
-                    public deprecatedDistanceValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public deprecatedDistanceValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedExerciseDaoV2 deprecatedDistanceUnit. */
                     public deprecatedDistanceUnit?: (google.protobuf.IStringValue|null);
 
                     /** RecordedExerciseDaoV2 deprecatedResistance. */
-                    public deprecatedResistance?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public deprecatedResistance?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedExerciseDaoV2 deprecatedIncline. */
-                    public deprecatedIncline?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public deprecatedIncline?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedExerciseDaoV2 cardioSets. */
-                    public cardioSets: LiftLog.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao[];
+                    public cardioSets: Alcedo.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao[];
 
                     /** RecordedExerciseDaoV2 _notes. */
                     public _notes?: "notes";
@@ -350,23 +350,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns RecordedExerciseDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2): LiftLog.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2): Alcedo.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2;
 
                     /**
-                     * Encodes the specified RecordedExerciseDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2.verify|verify} messages.
+                     * Encodes the specified RecordedExerciseDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2.verify|verify} messages.
                      * @param message RecordedExerciseDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified RecordedExerciseDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2.verify|verify} messages.
+                     * Encodes the specified RecordedExerciseDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2.verify|verify} messages.
                      * @param message RecordedExerciseDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionHistoryDao.IRecordedExerciseDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a RecordedExerciseDaoV2 message from the specified reader or buffer.
@@ -376,7 +376,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2;
 
                     /**
                      * Decodes a RecordedExerciseDaoV2 message from the specified reader or buffer, length delimited.
@@ -385,7 +385,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2;
 
                     /**
                      * Verifies a RecordedExerciseDaoV2 message.
@@ -399,7 +399,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns RecordedExerciseDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2;
 
                     /**
                      * Creates a plain object from a RecordedExerciseDaoV2 message. Also converts values to other types if specified.
@@ -407,7 +407,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionHistoryDao.RecordedExerciseDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this RecordedExerciseDaoV2 to JSON.
@@ -427,28 +427,28 @@ export namespace LiftLog {
                 interface IRecordedCardioExerciseSetDao {
 
                     /** RecordedCardioExerciseSetDao blueprint */
-                    blueprint?: (LiftLog.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao|null);
+                    blueprint?: (Alcedo.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao|null);
 
                     /** RecordedCardioExerciseSetDao completionDateTime */
-                    completionDateTime?: (LiftLog.Ui.Models.IDateTimeDao|null);
+                    completionDateTime?: (Alcedo.Ui.Models.IDateTimeDao|null);
 
                     /** RecordedCardioExerciseSetDao duration */
                     duration?: (google.protobuf.IDuration|null);
 
                     /** RecordedCardioExerciseSetDao distanceValue */
-                    distanceValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    distanceValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedCardioExerciseSetDao distanceUnit */
                     distanceUnit?: (google.protobuf.IStringValue|null);
 
                     /** RecordedCardioExerciseSetDao resistance */
-                    resistance?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    resistance?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedCardioExerciseSetDao incline */
-                    incline?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    incline?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedCardioExerciseSetDao weight */
-                    weight?: (LiftLog.Ui.Models.IWeight|null);
+                    weight?: (Alcedo.Ui.Models.IWeight|null);
 
                     /** RecordedCardioExerciseSetDao steps */
                     steps?: (google.protobuf.IInt32Value|null);
@@ -461,31 +461,31 @@ export namespace LiftLog {
                      * Constructs a new RecordedCardioExerciseSetDao.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao);
+                    constructor(properties?: Alcedo.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao);
 
                     /** RecordedCardioExerciseSetDao blueprint. */
-                    public blueprint?: (LiftLog.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao|null);
+                    public blueprint?: (Alcedo.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao|null);
 
                     /** RecordedCardioExerciseSetDao completionDateTime. */
-                    public completionDateTime?: (LiftLog.Ui.Models.IDateTimeDao|null);
+                    public completionDateTime?: (Alcedo.Ui.Models.IDateTimeDao|null);
 
                     /** RecordedCardioExerciseSetDao duration. */
                     public duration?: (google.protobuf.IDuration|null);
 
                     /** RecordedCardioExerciseSetDao distanceValue. */
-                    public distanceValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public distanceValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedCardioExerciseSetDao distanceUnit. */
                     public distanceUnit?: (google.protobuf.IStringValue|null);
 
                     /** RecordedCardioExerciseSetDao resistance. */
-                    public resistance?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public resistance?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedCardioExerciseSetDao incline. */
-                    public incline?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public incline?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** RecordedCardioExerciseSetDao weight. */
-                    public weight?: (LiftLog.Ui.Models.IWeight|null);
+                    public weight?: (Alcedo.Ui.Models.IWeight|null);
 
                     /** RecordedCardioExerciseSetDao steps. */
                     public steps?: (google.protobuf.IInt32Value|null);
@@ -519,23 +519,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns RecordedCardioExerciseSetDao instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao): LiftLog.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao;
+                    public static create(properties?: Alcedo.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao): Alcedo.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao;
 
                     /**
-                     * Encodes the specified RecordedCardioExerciseSetDao message. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao.verify|verify} messages.
+                     * Encodes the specified RecordedCardioExerciseSetDao message. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao.verify|verify} messages.
                      * @param message RecordedCardioExerciseSetDao message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified RecordedCardioExerciseSetDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao.verify|verify} messages.
+                     * Encodes the specified RecordedCardioExerciseSetDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao.verify|verify} messages.
                      * @param message RecordedCardioExerciseSetDao message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionHistoryDao.IRecordedCardioExerciseSetDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a RecordedCardioExerciseSetDao message from the specified reader or buffer.
@@ -545,7 +545,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao;
 
                     /**
                      * Decodes a RecordedCardioExerciseSetDao message from the specified reader or buffer, length delimited.
@@ -554,7 +554,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao;
 
                     /**
                      * Verifies a RecordedCardioExerciseSetDao message.
@@ -568,7 +568,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns RecordedCardioExerciseSetDao
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao;
 
                     /**
                      * Creates a plain object from a RecordedCardioExerciseSetDao message. Also converts values to other types if specified.
@@ -576,7 +576,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionHistoryDao.RecordedCardioExerciseSetDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this RecordedCardioExerciseSetDao to JSON.
@@ -596,13 +596,13 @@ export namespace LiftLog {
                 interface IPotentialSetDaoV2 {
 
                     /** PotentialSetDaoV2 recordedSet */
-                    recordedSet?: (LiftLog.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2|null);
+                    recordedSet?: (Alcedo.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2|null);
 
                     /** PotentialSetDaoV2 weightValue */
-                    weightValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    weightValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** PotentialSetDaoV2 weightUnit */
-                    weightUnit?: (LiftLog.Ui.Models.WeightUnit|null);
+                    weightUnit?: (Alcedo.Ui.Models.WeightUnit|null);
                 }
 
                 /** Represents a PotentialSetDaoV2. */
@@ -612,16 +612,16 @@ export namespace LiftLog {
                      * Constructs a new PotentialSetDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2);
 
                     /** PotentialSetDaoV2 recordedSet. */
-                    public recordedSet?: (LiftLog.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2|null);
+                    public recordedSet?: (Alcedo.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2|null);
 
                     /** PotentialSetDaoV2 weightValue. */
-                    public weightValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public weightValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** PotentialSetDaoV2 weightUnit. */
-                    public weightUnit: LiftLog.Ui.Models.WeightUnit;
+                    public weightUnit: Alcedo.Ui.Models.WeightUnit;
 
                     /** PotentialSetDaoV2 _recordedSet. */
                     public _recordedSet?: "recordedSet";
@@ -631,23 +631,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns PotentialSetDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2): LiftLog.Ui.Models.SessionHistoryDao.PotentialSetDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2): Alcedo.Ui.Models.SessionHistoryDao.PotentialSetDaoV2;
 
                     /**
-                     * Encodes the specified PotentialSetDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.PotentialSetDaoV2.verify|verify} messages.
+                     * Encodes the specified PotentialSetDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.PotentialSetDaoV2.verify|verify} messages.
                      * @param message PotentialSetDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified PotentialSetDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.PotentialSetDaoV2.verify|verify} messages.
+                     * Encodes the specified PotentialSetDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.PotentialSetDaoV2.verify|verify} messages.
                      * @param message PotentialSetDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionHistoryDao.IPotentialSetDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a PotentialSetDaoV2 message from the specified reader or buffer.
@@ -657,7 +657,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionHistoryDao.PotentialSetDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionHistoryDao.PotentialSetDaoV2;
 
                     /**
                      * Decodes a PotentialSetDaoV2 message from the specified reader or buffer, length delimited.
@@ -666,7 +666,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionHistoryDao.PotentialSetDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionHistoryDao.PotentialSetDaoV2;
 
                     /**
                      * Verifies a PotentialSetDaoV2 message.
@@ -680,7 +680,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns PotentialSetDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionHistoryDao.PotentialSetDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionHistoryDao.PotentialSetDaoV2;
 
                     /**
                      * Creates a plain object from a PotentialSetDaoV2 message. Also converts values to other types if specified.
@@ -688,7 +688,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionHistoryDao.PotentialSetDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionHistoryDao.PotentialSetDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this PotentialSetDaoV2 to JSON.
@@ -711,13 +711,13 @@ export namespace LiftLog {
                     repsCompleted?: (number|null);
 
                     /** RecordedSetDaoV2 completionTime */
-                    completionTime?: (LiftLog.Ui.Models.ITimeOnlyDao|null);
+                    completionTime?: (Alcedo.Ui.Models.ITimeOnlyDao|null);
 
                     /** RecordedSetDaoV2 completionDate */
-                    completionDate?: (LiftLog.Ui.Models.IDateOnlyDao|null);
+                    completionDate?: (Alcedo.Ui.Models.IDateOnlyDao|null);
 
                     /** RecordedSetDaoV2 completionOffset */
-                    completionOffset?: (LiftLog.Ui.Models.IZoneOffsetDao|null);
+                    completionOffset?: (Alcedo.Ui.Models.IZoneOffsetDao|null);
                 }
 
                 /** Represents a RecordedSetDaoV2. */
@@ -727,19 +727,19 @@ export namespace LiftLog {
                      * Constructs a new RecordedSetDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2);
 
                     /** RecordedSetDaoV2 repsCompleted. */
                     public repsCompleted: number;
 
                     /** RecordedSetDaoV2 completionTime. */
-                    public completionTime?: (LiftLog.Ui.Models.ITimeOnlyDao|null);
+                    public completionTime?: (Alcedo.Ui.Models.ITimeOnlyDao|null);
 
                     /** RecordedSetDaoV2 completionDate. */
-                    public completionDate?: (LiftLog.Ui.Models.IDateOnlyDao|null);
+                    public completionDate?: (Alcedo.Ui.Models.IDateOnlyDao|null);
 
                     /** RecordedSetDaoV2 completionOffset. */
-                    public completionOffset?: (LiftLog.Ui.Models.IZoneOffsetDao|null);
+                    public completionOffset?: (Alcedo.Ui.Models.IZoneOffsetDao|null);
 
                     /** RecordedSetDaoV2 _completionDate. */
                     public _completionDate?: "completionDate";
@@ -752,23 +752,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns RecordedSetDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2): LiftLog.Ui.Models.SessionHistoryDao.RecordedSetDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2): Alcedo.Ui.Models.SessionHistoryDao.RecordedSetDaoV2;
 
                     /**
-                     * Encodes the specified RecordedSetDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.RecordedSetDaoV2.verify|verify} messages.
+                     * Encodes the specified RecordedSetDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.RecordedSetDaoV2.verify|verify} messages.
                      * @param message RecordedSetDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified RecordedSetDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionHistoryDao.RecordedSetDaoV2.verify|verify} messages.
+                     * Encodes the specified RecordedSetDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionHistoryDao.RecordedSetDaoV2.verify|verify} messages.
                      * @param message RecordedSetDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionHistoryDao.IRecordedSetDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a RecordedSetDaoV2 message from the specified reader or buffer.
@@ -778,7 +778,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionHistoryDao.RecordedSetDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionHistoryDao.RecordedSetDaoV2;
 
                     /**
                      * Decodes a RecordedSetDaoV2 message from the specified reader or buffer, length delimited.
@@ -787,7 +787,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionHistoryDao.RecordedSetDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionHistoryDao.RecordedSetDaoV2;
 
                     /**
                      * Verifies a RecordedSetDaoV2 message.
@@ -801,7 +801,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns RecordedSetDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionHistoryDao.RecordedSetDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionHistoryDao.RecordedSetDaoV2;
 
                     /**
                      * Creates a plain object from a RecordedSetDaoV2 message. Also converts values to other types if specified.
@@ -809,7 +809,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionHistoryDao.RecordedSetDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionHistoryDao.RecordedSetDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this RecordedSetDaoV2 to JSON.
@@ -833,7 +833,7 @@ export namespace LiftLog {
                 interface ISessionBlueprintContainerDaoV2 {
 
                     /** SessionBlueprintContainerDaoV2 sessionBlueprints */
-                    sessionBlueprints?: (LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[]|null);
+                    sessionBlueprints?: (Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[]|null);
                 }
 
                 /** Represents a SessionBlueprintContainerDaoV2. */
@@ -843,33 +843,33 @@ export namespace LiftLog {
                      * Constructs a new SessionBlueprintContainerDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintContainerDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintContainerDaoV2);
 
                     /** SessionBlueprintContainerDaoV2 sessionBlueprints. */
-                    public sessionBlueprints: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[];
+                    public sessionBlueprints: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[];
 
                     /**
                      * Creates a new SessionBlueprintContainerDaoV2 instance using the specified properties.
                      * @param [properties] Properties to set
                      * @returns SessionBlueprintContainerDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintContainerDaoV2): LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintContainerDaoV2): Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2;
 
                     /**
-                     * Encodes the specified SessionBlueprintContainerDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2.verify|verify} messages.
+                     * Encodes the specified SessionBlueprintContainerDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2.verify|verify} messages.
                      * @param message SessionBlueprintContainerDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintContainerDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintContainerDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified SessionBlueprintContainerDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2.verify|verify} messages.
+                     * Encodes the specified SessionBlueprintContainerDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2.verify|verify} messages.
                      * @param message SessionBlueprintContainerDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintContainerDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintContainerDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a SessionBlueprintContainerDaoV2 message from the specified reader or buffer.
@@ -879,7 +879,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2;
 
                     /**
                      * Decodes a SessionBlueprintContainerDaoV2 message from the specified reader or buffer, length delimited.
@@ -888,7 +888,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2;
 
                     /**
                      * Verifies a SessionBlueprintContainerDaoV2 message.
@@ -902,7 +902,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns SessionBlueprintContainerDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2;
 
                     /**
                      * Creates a plain object from a SessionBlueprintContainerDaoV2 message. Also converts values to other types if specified.
@@ -910,7 +910,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintContainerDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this SessionBlueprintContainerDaoV2 to JSON.
@@ -933,7 +933,7 @@ export namespace LiftLog {
                     name?: (string|null);
 
                     /** SessionBlueprintDaoV2 exerciseBlueprints */
-                    exerciseBlueprints?: (LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2[]|null);
+                    exerciseBlueprints?: (Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2[]|null);
 
                     /** SessionBlueprintDaoV2 notes */
                     notes?: (string|null);
@@ -946,13 +946,13 @@ export namespace LiftLog {
                      * Constructs a new SessionBlueprintDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2);
 
                     /** SessionBlueprintDaoV2 name. */
                     public name: string;
 
                     /** SessionBlueprintDaoV2 exerciseBlueprints. */
-                    public exerciseBlueprints: LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2[];
+                    public exerciseBlueprints: Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2[];
 
                     /** SessionBlueprintDaoV2 notes. */
                     public notes: string;
@@ -962,23 +962,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns SessionBlueprintDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2): LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2): Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2;
 
                     /**
-                     * Encodes the specified SessionBlueprintDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2.verify|verify} messages.
+                     * Encodes the specified SessionBlueprintDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2.verify|verify} messages.
                      * @param message SessionBlueprintDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified SessionBlueprintDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2.verify|verify} messages.
+                     * Encodes the specified SessionBlueprintDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2.verify|verify} messages.
                      * @param message SessionBlueprintDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a SessionBlueprintDaoV2 message from the specified reader or buffer.
@@ -988,7 +988,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2;
 
                     /**
                      * Decodes a SessionBlueprintDaoV2 message from the specified reader or buffer, length delimited.
@@ -997,7 +997,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2;
 
                     /**
                      * Verifies a SessionBlueprintDaoV2 message.
@@ -1011,7 +1011,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns SessionBlueprintDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2;
 
                     /**
                      * Creates a plain object from a SessionBlueprintDaoV2 message. Also converts values to other types if specified.
@@ -1019,7 +1019,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionBlueprintDao.SessionBlueprintDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this SessionBlueprintDaoV2 to JSON.
@@ -1051,7 +1051,7 @@ export namespace LiftLog {
                     timeValue?: (google.protobuf.IDuration|null);
 
                     /** CardioTarget distanceValue */
-                    distanceValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    distanceValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** CardioTarget distanceUnit */
                     distanceUnit?: (string|null);
@@ -1064,7 +1064,7 @@ export namespace LiftLog {
                      * Constructs a new CardioTarget.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionBlueprintDao.ICardioTarget);
+                    constructor(properties?: Alcedo.Ui.Models.SessionBlueprintDao.ICardioTarget);
 
                     /** CardioTarget type. */
                     public type: string;
@@ -1073,7 +1073,7 @@ export namespace LiftLog {
                     public timeValue?: (google.protobuf.IDuration|null);
 
                     /** CardioTarget distanceValue. */
-                    public distanceValue?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public distanceValue?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** CardioTarget distanceUnit. */
                     public distanceUnit?: (string|null);
@@ -1086,23 +1086,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns CardioTarget instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionBlueprintDao.ICardioTarget): LiftLog.Ui.Models.SessionBlueprintDao.CardioTarget;
+                    public static create(properties?: Alcedo.Ui.Models.SessionBlueprintDao.ICardioTarget): Alcedo.Ui.Models.SessionBlueprintDao.CardioTarget;
 
                     /**
-                     * Encodes the specified CardioTarget message. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.CardioTarget.verify|verify} messages.
+                     * Encodes the specified CardioTarget message. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.CardioTarget.verify|verify} messages.
                      * @param message CardioTarget message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionBlueprintDao.ICardioTarget, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionBlueprintDao.ICardioTarget, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified CardioTarget message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.CardioTarget.verify|verify} messages.
+                     * Encodes the specified CardioTarget message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.CardioTarget.verify|verify} messages.
                      * @param message CardioTarget message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionBlueprintDao.ICardioTarget, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionBlueprintDao.ICardioTarget, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a CardioTarget message from the specified reader or buffer.
@@ -1112,7 +1112,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionBlueprintDao.CardioTarget;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionBlueprintDao.CardioTarget;
 
                     /**
                      * Decodes a CardioTarget message from the specified reader or buffer, length delimited.
@@ -1121,7 +1121,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionBlueprintDao.CardioTarget;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionBlueprintDao.CardioTarget;
 
                     /**
                      * Verifies a CardioTarget message.
@@ -1135,7 +1135,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns CardioTarget
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionBlueprintDao.CardioTarget;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionBlueprintDao.CardioTarget;
 
                     /**
                      * Creates a plain object from a CardioTarget message. Also converts values to other types if specified.
@@ -1143,7 +1143,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionBlueprintDao.CardioTarget, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionBlueprintDao.CardioTarget, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this CardioTarget to JSON.
@@ -1172,7 +1172,7 @@ export namespace LiftLog {
                     link?: (string|null);
 
                     /** ExerciseBlueprintDaoV2 type */
-                    type?: (LiftLog.Ui.Models.SessionBlueprintDao.ExerciseType|null);
+                    type?: (Alcedo.Ui.Models.SessionBlueprintDao.ExerciseType|null);
 
                     /** ExerciseBlueprintDaoV2 sets */
                     sets?: (number|null);
@@ -1181,16 +1181,16 @@ export namespace LiftLog {
                     repsPerSet?: (number|null);
 
                     /** ExerciseBlueprintDaoV2 weightIncreaseOnSuccess */
-                    weightIncreaseOnSuccess?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    weightIncreaseOnSuccess?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** ExerciseBlueprintDaoV2 restBetweenSets */
-                    restBetweenSets?: (LiftLog.Ui.Models.SessionBlueprintDao.IRestDaoV2|null);
+                    restBetweenSets?: (Alcedo.Ui.Models.SessionBlueprintDao.IRestDaoV2|null);
 
                     /** ExerciseBlueprintDaoV2 supersetWithNext */
                     supersetWithNext?: (boolean|null);
 
                     /** ExerciseBlueprintDaoV2 deprecatedCardioTarget */
-                    deprecatedCardioTarget?: (LiftLog.Ui.Models.SessionBlueprintDao.ICardioTarget|null);
+                    deprecatedCardioTarget?: (Alcedo.Ui.Models.SessionBlueprintDao.ICardioTarget|null);
 
                     /** ExerciseBlueprintDaoV2 deprecatedTrackDuration */
                     deprecatedTrackDuration?: (boolean|null);
@@ -1205,7 +1205,7 @@ export namespace LiftLog {
                     deprecatedTrackIncline?: (boolean|null);
 
                     /** ExerciseBlueprintDaoV2 cardioSets */
-                    cardioSets?: (LiftLog.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao[]|null);
+                    cardioSets?: (Alcedo.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao[]|null);
                 }
 
                 /** Represents an ExerciseBlueprintDaoV2. */
@@ -1215,7 +1215,7 @@ export namespace LiftLog {
                      * Constructs a new ExerciseBlueprintDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2);
 
                     /** ExerciseBlueprintDaoV2 name. */
                     public name: string;
@@ -1227,7 +1227,7 @@ export namespace LiftLog {
                     public link: string;
 
                     /** ExerciseBlueprintDaoV2 type. */
-                    public type: LiftLog.Ui.Models.SessionBlueprintDao.ExerciseType;
+                    public type: Alcedo.Ui.Models.SessionBlueprintDao.ExerciseType;
 
                     /** ExerciseBlueprintDaoV2 sets. */
                     public sets: number;
@@ -1236,16 +1236,16 @@ export namespace LiftLog {
                     public repsPerSet: number;
 
                     /** ExerciseBlueprintDaoV2 weightIncreaseOnSuccess. */
-                    public weightIncreaseOnSuccess?: (LiftLog.Ui.Models.IDecimalValue|null);
+                    public weightIncreaseOnSuccess?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                     /** ExerciseBlueprintDaoV2 restBetweenSets. */
-                    public restBetweenSets?: (LiftLog.Ui.Models.SessionBlueprintDao.IRestDaoV2|null);
+                    public restBetweenSets?: (Alcedo.Ui.Models.SessionBlueprintDao.IRestDaoV2|null);
 
                     /** ExerciseBlueprintDaoV2 supersetWithNext. */
                     public supersetWithNext: boolean;
 
                     /** ExerciseBlueprintDaoV2 deprecatedCardioTarget. */
-                    public deprecatedCardioTarget?: (LiftLog.Ui.Models.SessionBlueprintDao.ICardioTarget|null);
+                    public deprecatedCardioTarget?: (Alcedo.Ui.Models.SessionBlueprintDao.ICardioTarget|null);
 
                     /** ExerciseBlueprintDaoV2 deprecatedTrackDuration. */
                     public deprecatedTrackDuration: boolean;
@@ -1260,30 +1260,30 @@ export namespace LiftLog {
                     public deprecatedTrackIncline: boolean;
 
                     /** ExerciseBlueprintDaoV2 cardioSets. */
-                    public cardioSets: LiftLog.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao[];
+                    public cardioSets: Alcedo.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao[];
 
                     /**
                      * Creates a new ExerciseBlueprintDaoV2 instance using the specified properties.
                      * @param [properties] Properties to set
                      * @returns ExerciseBlueprintDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2): LiftLog.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2): Alcedo.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2;
 
                     /**
-                     * Encodes the specified ExerciseBlueprintDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2.verify|verify} messages.
+                     * Encodes the specified ExerciseBlueprintDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2.verify|verify} messages.
                      * @param message ExerciseBlueprintDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified ExerciseBlueprintDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2.verify|verify} messages.
+                     * Encodes the specified ExerciseBlueprintDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2.verify|verify} messages.
                      * @param message ExerciseBlueprintDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionBlueprintDao.IExerciseBlueprintDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes an ExerciseBlueprintDaoV2 message from the specified reader or buffer.
@@ -1293,7 +1293,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2;
 
                     /**
                      * Decodes an ExerciseBlueprintDaoV2 message from the specified reader or buffer, length delimited.
@@ -1302,7 +1302,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2;
 
                     /**
                      * Verifies an ExerciseBlueprintDaoV2 message.
@@ -1316,7 +1316,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns ExerciseBlueprintDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2;
 
                     /**
                      * Creates a plain object from an ExerciseBlueprintDaoV2 message. Also converts values to other types if specified.
@@ -1324,7 +1324,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionBlueprintDao.ExerciseBlueprintDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this ExerciseBlueprintDaoV2 to JSON.
@@ -1344,7 +1344,7 @@ export namespace LiftLog {
                 interface ICardioExerciseSetBlueprintDao {
 
                     /** CardioExerciseSetBlueprintDao cardioTarget */
-                    cardioTarget?: (LiftLog.Ui.Models.SessionBlueprintDao.ICardioTarget|null);
+                    cardioTarget?: (Alcedo.Ui.Models.SessionBlueprintDao.ICardioTarget|null);
 
                     /** CardioExerciseSetBlueprintDao trackDuration */
                     trackDuration?: (boolean|null);
@@ -1372,10 +1372,10 @@ export namespace LiftLog {
                      * Constructs a new CardioExerciseSetBlueprintDao.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao);
+                    constructor(properties?: Alcedo.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao);
 
                     /** CardioExerciseSetBlueprintDao cardioTarget. */
-                    public cardioTarget?: (LiftLog.Ui.Models.SessionBlueprintDao.ICardioTarget|null);
+                    public cardioTarget?: (Alcedo.Ui.Models.SessionBlueprintDao.ICardioTarget|null);
 
                     /** CardioExerciseSetBlueprintDao trackDuration. */
                     public trackDuration: boolean;
@@ -1400,23 +1400,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns CardioExerciseSetBlueprintDao instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao): LiftLog.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao;
+                    public static create(properties?: Alcedo.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao): Alcedo.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao;
 
                     /**
-                     * Encodes the specified CardioExerciseSetBlueprintDao message. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao.verify|verify} messages.
+                     * Encodes the specified CardioExerciseSetBlueprintDao message. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao.verify|verify} messages.
                      * @param message CardioExerciseSetBlueprintDao message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified CardioExerciseSetBlueprintDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao.verify|verify} messages.
+                     * Encodes the specified CardioExerciseSetBlueprintDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao.verify|verify} messages.
                      * @param message CardioExerciseSetBlueprintDao message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionBlueprintDao.ICardioExerciseSetBlueprintDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a CardioExerciseSetBlueprintDao message from the specified reader or buffer.
@@ -1426,7 +1426,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao;
 
                     /**
                      * Decodes a CardioExerciseSetBlueprintDao message from the specified reader or buffer, length delimited.
@@ -1435,7 +1435,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao;
 
                     /**
                      * Verifies a CardioExerciseSetBlueprintDao message.
@@ -1449,7 +1449,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns CardioExerciseSetBlueprintDao
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao;
 
                     /**
                      * Creates a plain object from a CardioExerciseSetBlueprintDao message. Also converts values to other types if specified.
@@ -1457,7 +1457,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionBlueprintDao.CardioExerciseSetBlueprintDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this CardioExerciseSetBlueprintDao to JSON.
@@ -1493,7 +1493,7 @@ export namespace LiftLog {
                      * Constructs a new RestDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.SessionBlueprintDao.IRestDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.SessionBlueprintDao.IRestDaoV2);
 
                     /** RestDaoV2 minRest. */
                     public minRest?: (google.protobuf.IDuration|null);
@@ -1509,23 +1509,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns RestDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.SessionBlueprintDao.IRestDaoV2): LiftLog.Ui.Models.SessionBlueprintDao.RestDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.SessionBlueprintDao.IRestDaoV2): Alcedo.Ui.Models.SessionBlueprintDao.RestDaoV2;
 
                     /**
-                     * Encodes the specified RestDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.RestDaoV2.verify|verify} messages.
+                     * Encodes the specified RestDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.RestDaoV2.verify|verify} messages.
                      * @param message RestDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.SessionBlueprintDao.IRestDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.SessionBlueprintDao.IRestDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified RestDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionBlueprintDao.RestDaoV2.verify|verify} messages.
+                     * Encodes the specified RestDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionBlueprintDao.RestDaoV2.verify|verify} messages.
                      * @param message RestDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.SessionBlueprintDao.IRestDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.SessionBlueprintDao.IRestDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a RestDaoV2 message from the specified reader or buffer.
@@ -1535,7 +1535,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionBlueprintDao.RestDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionBlueprintDao.RestDaoV2;
 
                     /**
                      * Decodes a RestDaoV2 message from the specified reader or buffer, length delimited.
@@ -1544,7 +1544,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionBlueprintDao.RestDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionBlueprintDao.RestDaoV2;
 
                     /**
                      * Verifies a RestDaoV2 message.
@@ -1558,7 +1558,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns RestDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionBlueprintDao.RestDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionBlueprintDao.RestDaoV2;
 
                     /**
                      * Creates a plain object from a RestDaoV2 message. Also converts values to other types if specified.
@@ -1566,7 +1566,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.SessionBlueprintDao.RestDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.SessionBlueprintDao.RestDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this RestDaoV2 to JSON.
@@ -1597,7 +1597,7 @@ export namespace LiftLog {
                  * Constructs a new UuidDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IUuidDao);
+                constructor(properties?: Alcedo.Ui.Models.IUuidDao);
 
                 /** UuidDao value. */
                 public value: Uint8Array;
@@ -1607,23 +1607,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns UuidDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IUuidDao): LiftLog.Ui.Models.UuidDao;
+                public static create(properties?: Alcedo.Ui.Models.IUuidDao): Alcedo.Ui.Models.UuidDao;
 
                 /**
-                 * Encodes the specified UuidDao message. Does not implicitly {@link LiftLog.Ui.Models.UuidDao.verify|verify} messages.
+                 * Encodes the specified UuidDao message. Does not implicitly {@link Alcedo.Ui.Models.UuidDao.verify|verify} messages.
                  * @param message UuidDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IUuidDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IUuidDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified UuidDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.UuidDao.verify|verify} messages.
+                 * Encodes the specified UuidDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.UuidDao.verify|verify} messages.
                  * @param message UuidDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IUuidDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IUuidDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes an UuidDao message from the specified reader or buffer.
@@ -1633,7 +1633,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.UuidDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.UuidDao;
 
                 /**
                  * Decodes an UuidDao message from the specified reader or buffer, length delimited.
@@ -1642,7 +1642,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.UuidDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.UuidDao;
 
                 /**
                  * Verifies an UuidDao message.
@@ -1656,7 +1656,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns UuidDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.UuidDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.UuidDao;
 
                 /**
                  * Creates a plain object from an UuidDao message. Also converts values to other types if specified.
@@ -1664,7 +1664,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.UuidDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.UuidDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this UuidDao to JSON.
@@ -1700,7 +1700,7 @@ export namespace LiftLog {
                  * Constructs a new DateOnlyDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IDateOnlyDao);
+                constructor(properties?: Alcedo.Ui.Models.IDateOnlyDao);
 
                 /** DateOnlyDao year. */
                 public year: number;
@@ -1716,23 +1716,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns DateOnlyDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IDateOnlyDao): LiftLog.Ui.Models.DateOnlyDao;
+                public static create(properties?: Alcedo.Ui.Models.IDateOnlyDao): Alcedo.Ui.Models.DateOnlyDao;
 
                 /**
-                 * Encodes the specified DateOnlyDao message. Does not implicitly {@link LiftLog.Ui.Models.DateOnlyDao.verify|verify} messages.
+                 * Encodes the specified DateOnlyDao message. Does not implicitly {@link Alcedo.Ui.Models.DateOnlyDao.verify|verify} messages.
                  * @param message DateOnlyDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IDateOnlyDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IDateOnlyDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified DateOnlyDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.DateOnlyDao.verify|verify} messages.
+                 * Encodes the specified DateOnlyDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.DateOnlyDao.verify|verify} messages.
                  * @param message DateOnlyDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IDateOnlyDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IDateOnlyDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a DateOnlyDao message from the specified reader or buffer.
@@ -1742,7 +1742,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.DateOnlyDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.DateOnlyDao;
 
                 /**
                  * Decodes a DateOnlyDao message from the specified reader or buffer, length delimited.
@@ -1751,7 +1751,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.DateOnlyDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.DateOnlyDao;
 
                 /**
                  * Verifies a DateOnlyDao message.
@@ -1765,7 +1765,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns DateOnlyDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.DateOnlyDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.DateOnlyDao;
 
                 /**
                  * Creates a plain object from a DateOnlyDao message. Also converts values to other types if specified.
@@ -1773,7 +1773,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.DateOnlyDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.DateOnlyDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this DateOnlyDao to JSON.
@@ -1806,7 +1806,7 @@ export namespace LiftLog {
                  * Constructs a new DecimalValue.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IDecimalValue);
+                constructor(properties?: Alcedo.Ui.Models.IDecimalValue);
 
                 /** DecimalValue units. */
                 public units: Long;
@@ -1819,23 +1819,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns DecimalValue instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IDecimalValue): LiftLog.Ui.Models.DecimalValue;
+                public static create(properties?: Alcedo.Ui.Models.IDecimalValue): Alcedo.Ui.Models.DecimalValue;
 
                 /**
-                 * Encodes the specified DecimalValue message. Does not implicitly {@link LiftLog.Ui.Models.DecimalValue.verify|verify} messages.
+                 * Encodes the specified DecimalValue message. Does not implicitly {@link Alcedo.Ui.Models.DecimalValue.verify|verify} messages.
                  * @param message DecimalValue message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IDecimalValue, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IDecimalValue, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified DecimalValue message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.DecimalValue.verify|verify} messages.
+                 * Encodes the specified DecimalValue message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.DecimalValue.verify|verify} messages.
                  * @param message DecimalValue message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IDecimalValue, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IDecimalValue, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a DecimalValue message from the specified reader or buffer.
@@ -1845,7 +1845,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.DecimalValue;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.DecimalValue;
 
                 /**
                  * Decodes a DecimalValue message from the specified reader or buffer, length delimited.
@@ -1854,7 +1854,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.DecimalValue;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.DecimalValue;
 
                 /**
                  * Verifies a DecimalValue message.
@@ -1868,7 +1868,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns DecimalValue
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.DecimalValue;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.DecimalValue;
 
                 /**
                  * Creates a plain object from a DecimalValue message. Also converts values to other types if specified.
@@ -1876,7 +1876,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.DecimalValue, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.DecimalValue, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this DecimalValue to JSON.
@@ -1918,7 +1918,7 @@ export namespace LiftLog {
                  * Constructs a new TimeOnlyDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.ITimeOnlyDao);
+                constructor(properties?: Alcedo.Ui.Models.ITimeOnlyDao);
 
                 /** TimeOnlyDao hour. */
                 public hour: number;
@@ -1940,23 +1940,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns TimeOnlyDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.ITimeOnlyDao): LiftLog.Ui.Models.TimeOnlyDao;
+                public static create(properties?: Alcedo.Ui.Models.ITimeOnlyDao): Alcedo.Ui.Models.TimeOnlyDao;
 
                 /**
-                 * Encodes the specified TimeOnlyDao message. Does not implicitly {@link LiftLog.Ui.Models.TimeOnlyDao.verify|verify} messages.
+                 * Encodes the specified TimeOnlyDao message. Does not implicitly {@link Alcedo.Ui.Models.TimeOnlyDao.verify|verify} messages.
                  * @param message TimeOnlyDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.ITimeOnlyDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.ITimeOnlyDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified TimeOnlyDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.TimeOnlyDao.verify|verify} messages.
+                 * Encodes the specified TimeOnlyDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.TimeOnlyDao.verify|verify} messages.
                  * @param message TimeOnlyDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.ITimeOnlyDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.ITimeOnlyDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a TimeOnlyDao message from the specified reader or buffer.
@@ -1966,7 +1966,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.TimeOnlyDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.TimeOnlyDao;
 
                 /**
                  * Decodes a TimeOnlyDao message from the specified reader or buffer, length delimited.
@@ -1975,7 +1975,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.TimeOnlyDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.TimeOnlyDao;
 
                 /**
                  * Verifies a TimeOnlyDao message.
@@ -1989,7 +1989,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns TimeOnlyDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.TimeOnlyDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.TimeOnlyDao;
 
                 /**
                  * Creates a plain object from a TimeOnlyDao message. Also converts values to other types if specified.
@@ -1997,7 +1997,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.TimeOnlyDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.TimeOnlyDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this TimeOnlyDao to JSON.
@@ -2017,13 +2017,13 @@ export namespace LiftLog {
             interface IDateTimeDao {
 
                 /** DateTimeDao date */
-                date?: (LiftLog.Ui.Models.IDateOnlyDao|null);
+                date?: (Alcedo.Ui.Models.IDateOnlyDao|null);
 
                 /** DateTimeDao time */
-                time?: (LiftLog.Ui.Models.ITimeOnlyDao|null);
+                time?: (Alcedo.Ui.Models.ITimeOnlyDao|null);
 
                 /** DateTimeDao offset */
-                offset?: (LiftLog.Ui.Models.IZoneOffsetDao|null);
+                offset?: (Alcedo.Ui.Models.IZoneOffsetDao|null);
             }
 
             /** Represents a DateTimeDao. */
@@ -2033,16 +2033,16 @@ export namespace LiftLog {
                  * Constructs a new DateTimeDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IDateTimeDao);
+                constructor(properties?: Alcedo.Ui.Models.IDateTimeDao);
 
                 /** DateTimeDao date. */
-                public date?: (LiftLog.Ui.Models.IDateOnlyDao|null);
+                public date?: (Alcedo.Ui.Models.IDateOnlyDao|null);
 
                 /** DateTimeDao time. */
-                public time?: (LiftLog.Ui.Models.ITimeOnlyDao|null);
+                public time?: (Alcedo.Ui.Models.ITimeOnlyDao|null);
 
                 /** DateTimeDao offset. */
-                public offset?: (LiftLog.Ui.Models.IZoneOffsetDao|null);
+                public offset?: (Alcedo.Ui.Models.IZoneOffsetDao|null);
 
                 /** DateTimeDao _offset. */
                 public _offset?: "offset";
@@ -2052,23 +2052,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns DateTimeDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IDateTimeDao): LiftLog.Ui.Models.DateTimeDao;
+                public static create(properties?: Alcedo.Ui.Models.IDateTimeDao): Alcedo.Ui.Models.DateTimeDao;
 
                 /**
-                 * Encodes the specified DateTimeDao message. Does not implicitly {@link LiftLog.Ui.Models.DateTimeDao.verify|verify} messages.
+                 * Encodes the specified DateTimeDao message. Does not implicitly {@link Alcedo.Ui.Models.DateTimeDao.verify|verify} messages.
                  * @param message DateTimeDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IDateTimeDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IDateTimeDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified DateTimeDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.DateTimeDao.verify|verify} messages.
+                 * Encodes the specified DateTimeDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.DateTimeDao.verify|verify} messages.
                  * @param message DateTimeDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IDateTimeDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IDateTimeDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a DateTimeDao message from the specified reader or buffer.
@@ -2078,7 +2078,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.DateTimeDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.DateTimeDao;
 
                 /**
                  * Decodes a DateTimeDao message from the specified reader or buffer, length delimited.
@@ -2087,7 +2087,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.DateTimeDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.DateTimeDao;
 
                 /**
                  * Verifies a DateTimeDao message.
@@ -2101,7 +2101,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns DateTimeDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.DateTimeDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.DateTimeDao;
 
                 /**
                  * Creates a plain object from a DateTimeDao message. Also converts values to other types if specified.
@@ -2109,7 +2109,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.DateTimeDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.DateTimeDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this DateTimeDao to JSON.
@@ -2139,7 +2139,7 @@ export namespace LiftLog {
                  * Constructs a new ZoneOffsetDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IZoneOffsetDao);
+                constructor(properties?: Alcedo.Ui.Models.IZoneOffsetDao);
 
                 /** ZoneOffsetDao totalSeconds. */
                 public totalSeconds: number;
@@ -2149,23 +2149,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns ZoneOffsetDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IZoneOffsetDao): LiftLog.Ui.Models.ZoneOffsetDao;
+                public static create(properties?: Alcedo.Ui.Models.IZoneOffsetDao): Alcedo.Ui.Models.ZoneOffsetDao;
 
                 /**
-                 * Encodes the specified ZoneOffsetDao message. Does not implicitly {@link LiftLog.Ui.Models.ZoneOffsetDao.verify|verify} messages.
+                 * Encodes the specified ZoneOffsetDao message. Does not implicitly {@link Alcedo.Ui.Models.ZoneOffsetDao.verify|verify} messages.
                  * @param message ZoneOffsetDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IZoneOffsetDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IZoneOffsetDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified ZoneOffsetDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.ZoneOffsetDao.verify|verify} messages.
+                 * Encodes the specified ZoneOffsetDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.ZoneOffsetDao.verify|verify} messages.
                  * @param message ZoneOffsetDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IZoneOffsetDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IZoneOffsetDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a ZoneOffsetDao message from the specified reader or buffer.
@@ -2175,7 +2175,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.ZoneOffsetDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.ZoneOffsetDao;
 
                 /**
                  * Decodes a ZoneOffsetDao message from the specified reader or buffer, length delimited.
@@ -2184,7 +2184,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.ZoneOffsetDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.ZoneOffsetDao;
 
                 /**
                  * Verifies a ZoneOffsetDao message.
@@ -2198,7 +2198,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns ZoneOffsetDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.ZoneOffsetDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.ZoneOffsetDao;
 
                 /**
                  * Creates a plain object from a ZoneOffsetDao message. Also converts values to other types if specified.
@@ -2206,7 +2206,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.ZoneOffsetDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.ZoneOffsetDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this ZoneOffsetDao to JSON.
@@ -2233,10 +2233,10 @@ export namespace LiftLog {
             interface IWeight {
 
                 /** Weight value */
-                value?: (LiftLog.Ui.Models.IDecimalValue|null);
+                value?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                 /** Weight unit */
-                unit?: (LiftLog.Ui.Models.WeightUnit|null);
+                unit?: (Alcedo.Ui.Models.WeightUnit|null);
             }
 
             /** Represents a Weight. */
@@ -2246,36 +2246,36 @@ export namespace LiftLog {
                  * Constructs a new Weight.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IWeight);
+                constructor(properties?: Alcedo.Ui.Models.IWeight);
 
                 /** Weight value. */
-                public value?: (LiftLog.Ui.Models.IDecimalValue|null);
+                public value?: (Alcedo.Ui.Models.IDecimalValue|null);
 
                 /** Weight unit. */
-                public unit: LiftLog.Ui.Models.WeightUnit;
+                public unit: Alcedo.Ui.Models.WeightUnit;
 
                 /**
                  * Creates a new Weight instance using the specified properties.
                  * @param [properties] Properties to set
                  * @returns Weight instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IWeight): LiftLog.Ui.Models.Weight;
+                public static create(properties?: Alcedo.Ui.Models.IWeight): Alcedo.Ui.Models.Weight;
 
                 /**
-                 * Encodes the specified Weight message. Does not implicitly {@link LiftLog.Ui.Models.Weight.verify|verify} messages.
+                 * Encodes the specified Weight message. Does not implicitly {@link Alcedo.Ui.Models.Weight.verify|verify} messages.
                  * @param message Weight message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IWeight, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IWeight, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified Weight message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.Weight.verify|verify} messages.
+                 * Encodes the specified Weight message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.Weight.verify|verify} messages.
                  * @param message Weight message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IWeight, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IWeight, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a Weight message from the specified reader or buffer.
@@ -2285,7 +2285,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.Weight;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.Weight;
 
                 /**
                  * Decodes a Weight message from the specified reader or buffer, length delimited.
@@ -2294,7 +2294,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.Weight;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.Weight;
 
                 /**
                  * Verifies a Weight message.
@@ -2308,7 +2308,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns Weight
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.Weight;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.Weight;
 
                 /**
                  * Creates a plain object from a Weight message. Also converts values to other types if specified.
@@ -2316,7 +2316,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.Weight, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.Weight, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this Weight to JSON.
@@ -2336,10 +2336,10 @@ export namespace LiftLog {
             interface IUserEventPayload {
 
                 /** UserEventPayload sessionPayload */
-                sessionPayload?: (LiftLog.Ui.Models.ISessionUserEvent|null);
+                sessionPayload?: (Alcedo.Ui.Models.ISessionUserEvent|null);
 
                 /** UserEventPayload removedSessionPayload */
-                removedSessionPayload?: (LiftLog.Ui.Models.IRemovedSessionUserEvent|null);
+                removedSessionPayload?: (Alcedo.Ui.Models.IRemovedSessionUserEvent|null);
             }
 
             /** Represents a UserEventPayload. */
@@ -2349,13 +2349,13 @@ export namespace LiftLog {
                  * Constructs a new UserEventPayload.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IUserEventPayload);
+                constructor(properties?: Alcedo.Ui.Models.IUserEventPayload);
 
                 /** UserEventPayload sessionPayload. */
-                public sessionPayload?: (LiftLog.Ui.Models.ISessionUserEvent|null);
+                public sessionPayload?: (Alcedo.Ui.Models.ISessionUserEvent|null);
 
                 /** UserEventPayload removedSessionPayload. */
-                public removedSessionPayload?: (LiftLog.Ui.Models.IRemovedSessionUserEvent|null);
+                public removedSessionPayload?: (Alcedo.Ui.Models.IRemovedSessionUserEvent|null);
 
                 /** UserEventPayload eventPayload. */
                 public eventPayload?: ("sessionPayload"|"removedSessionPayload");
@@ -2365,23 +2365,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns UserEventPayload instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IUserEventPayload): LiftLog.Ui.Models.UserEventPayload;
+                public static create(properties?: Alcedo.Ui.Models.IUserEventPayload): Alcedo.Ui.Models.UserEventPayload;
 
                 /**
-                 * Encodes the specified UserEventPayload message. Does not implicitly {@link LiftLog.Ui.Models.UserEventPayload.verify|verify} messages.
+                 * Encodes the specified UserEventPayload message. Does not implicitly {@link Alcedo.Ui.Models.UserEventPayload.verify|verify} messages.
                  * @param message UserEventPayload message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IUserEventPayload, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IUserEventPayload, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified UserEventPayload message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.UserEventPayload.verify|verify} messages.
+                 * Encodes the specified UserEventPayload message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.UserEventPayload.verify|verify} messages.
                  * @param message UserEventPayload message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IUserEventPayload, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IUserEventPayload, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a UserEventPayload message from the specified reader or buffer.
@@ -2391,7 +2391,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.UserEventPayload;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.UserEventPayload;
 
                 /**
                  * Decodes a UserEventPayload message from the specified reader or buffer, length delimited.
@@ -2400,7 +2400,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.UserEventPayload;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.UserEventPayload;
 
                 /**
                  * Verifies a UserEventPayload message.
@@ -2414,7 +2414,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns UserEventPayload
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.UserEventPayload;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.UserEventPayload;
 
                 /**
                  * Creates a plain object from a UserEventPayload message. Also converts values to other types if specified.
@@ -2422,7 +2422,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.UserEventPayload, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.UserEventPayload, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this UserEventPayload to JSON.
@@ -2442,7 +2442,7 @@ export namespace LiftLog {
             interface ISessionUserEvent {
 
                 /** SessionUserEvent session */
-                session?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                session?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
             }
 
             /** Represents a SessionUserEvent. */
@@ -2452,33 +2452,33 @@ export namespace LiftLog {
                  * Constructs a new SessionUserEvent.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.ISessionUserEvent);
+                constructor(properties?: Alcedo.Ui.Models.ISessionUserEvent);
 
                 /** SessionUserEvent session. */
-                public session?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                public session?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
 
                 /**
                  * Creates a new SessionUserEvent instance using the specified properties.
                  * @param [properties] Properties to set
                  * @returns SessionUserEvent instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.ISessionUserEvent): LiftLog.Ui.Models.SessionUserEvent;
+                public static create(properties?: Alcedo.Ui.Models.ISessionUserEvent): Alcedo.Ui.Models.SessionUserEvent;
 
                 /**
-                 * Encodes the specified SessionUserEvent message. Does not implicitly {@link LiftLog.Ui.Models.SessionUserEvent.verify|verify} messages.
+                 * Encodes the specified SessionUserEvent message. Does not implicitly {@link Alcedo.Ui.Models.SessionUserEvent.verify|verify} messages.
                  * @param message SessionUserEvent message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.ISessionUserEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.ISessionUserEvent, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified SessionUserEvent message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SessionUserEvent.verify|verify} messages.
+                 * Encodes the specified SessionUserEvent message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SessionUserEvent.verify|verify} messages.
                  * @param message SessionUserEvent message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.ISessionUserEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.ISessionUserEvent, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a SessionUserEvent message from the specified reader or buffer.
@@ -2488,7 +2488,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SessionUserEvent;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SessionUserEvent;
 
                 /**
                  * Decodes a SessionUserEvent message from the specified reader or buffer, length delimited.
@@ -2497,7 +2497,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SessionUserEvent;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SessionUserEvent;
 
                 /**
                  * Verifies a SessionUserEvent message.
@@ -2511,7 +2511,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns SessionUserEvent
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SessionUserEvent;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SessionUserEvent;
 
                 /**
                  * Creates a plain object from a SessionUserEvent message. Also converts values to other types if specified.
@@ -2519,7 +2519,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.SessionUserEvent, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.SessionUserEvent, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this SessionUserEvent to JSON.
@@ -2539,7 +2539,7 @@ export namespace LiftLog {
             interface IRemovedSessionUserEvent {
 
                 /** RemovedSessionUserEvent sessionId */
-                sessionId?: (LiftLog.Ui.Models.IUuidDao|null);
+                sessionId?: (Alcedo.Ui.Models.IUuidDao|null);
             }
 
             /** Represents a RemovedSessionUserEvent. */
@@ -2549,33 +2549,33 @@ export namespace LiftLog {
                  * Constructs a new RemovedSessionUserEvent.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IRemovedSessionUserEvent);
+                constructor(properties?: Alcedo.Ui.Models.IRemovedSessionUserEvent);
 
                 /** RemovedSessionUserEvent sessionId. */
-                public sessionId?: (LiftLog.Ui.Models.IUuidDao|null);
+                public sessionId?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /**
                  * Creates a new RemovedSessionUserEvent instance using the specified properties.
                  * @param [properties] Properties to set
                  * @returns RemovedSessionUserEvent instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IRemovedSessionUserEvent): LiftLog.Ui.Models.RemovedSessionUserEvent;
+                public static create(properties?: Alcedo.Ui.Models.IRemovedSessionUserEvent): Alcedo.Ui.Models.RemovedSessionUserEvent;
 
                 /**
-                 * Encodes the specified RemovedSessionUserEvent message. Does not implicitly {@link LiftLog.Ui.Models.RemovedSessionUserEvent.verify|verify} messages.
+                 * Encodes the specified RemovedSessionUserEvent message. Does not implicitly {@link Alcedo.Ui.Models.RemovedSessionUserEvent.verify|verify} messages.
                  * @param message RemovedSessionUserEvent message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IRemovedSessionUserEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IRemovedSessionUserEvent, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified RemovedSessionUserEvent message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.RemovedSessionUserEvent.verify|verify} messages.
+                 * Encodes the specified RemovedSessionUserEvent message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.RemovedSessionUserEvent.verify|verify} messages.
                  * @param message RemovedSessionUserEvent message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IRemovedSessionUserEvent, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IRemovedSessionUserEvent, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a RemovedSessionUserEvent message from the specified reader or buffer.
@@ -2585,7 +2585,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.RemovedSessionUserEvent;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.RemovedSessionUserEvent;
 
                 /**
                  * Decodes a RemovedSessionUserEvent message from the specified reader or buffer, length delimited.
@@ -2594,7 +2594,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.RemovedSessionUserEvent;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.RemovedSessionUserEvent;
 
                 /**
                  * Verifies a RemovedSessionUserEvent message.
@@ -2608,7 +2608,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns RemovedSessionUserEvent
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.RemovedSessionUserEvent;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.RemovedSessionUserEvent;
 
                 /**
                  * Creates a plain object from a RemovedSessionUserEvent message. Also converts values to other types if specified.
@@ -2616,7 +2616,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.RemovedSessionUserEvent, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.RemovedSessionUserEvent, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this RemovedSessionUserEvent to JSON.
@@ -2636,16 +2636,16 @@ export namespace LiftLog {
             interface IInboxMessageDao {
 
                 /** InboxMessageDao fromUserId */
-                fromUserId?: (LiftLog.Ui.Models.IUuidDao|null);
+                fromUserId?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** InboxMessageDao followRequest */
-                followRequest?: (LiftLog.Ui.Models.IFollowRequestDao|null);
+                followRequest?: (Alcedo.Ui.Models.IFollowRequestDao|null);
 
                 /** InboxMessageDao followResponse */
-                followResponse?: (LiftLog.Ui.Models.IFollowResponseDao|null);
+                followResponse?: (Alcedo.Ui.Models.IFollowResponseDao|null);
 
                 /** InboxMessageDao unfollowNotification */
-                unfollowNotification?: (LiftLog.Ui.Models.IUnFollowNotification|null);
+                unfollowNotification?: (Alcedo.Ui.Models.IUnFollowNotification|null);
 
                 /** InboxMessageDao signature */
                 signature?: (Uint8Array|null);
@@ -2658,19 +2658,19 @@ export namespace LiftLog {
                  * Constructs a new InboxMessageDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IInboxMessageDao);
+                constructor(properties?: Alcedo.Ui.Models.IInboxMessageDao);
 
                 /** InboxMessageDao fromUserId. */
-                public fromUserId?: (LiftLog.Ui.Models.IUuidDao|null);
+                public fromUserId?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** InboxMessageDao followRequest. */
-                public followRequest?: (LiftLog.Ui.Models.IFollowRequestDao|null);
+                public followRequest?: (Alcedo.Ui.Models.IFollowRequestDao|null);
 
                 /** InboxMessageDao followResponse. */
-                public followResponse?: (LiftLog.Ui.Models.IFollowResponseDao|null);
+                public followResponse?: (Alcedo.Ui.Models.IFollowResponseDao|null);
 
                 /** InboxMessageDao unfollowNotification. */
-                public unfollowNotification?: (LiftLog.Ui.Models.IUnFollowNotification|null);
+                public unfollowNotification?: (Alcedo.Ui.Models.IUnFollowNotification|null);
 
                 /** InboxMessageDao signature. */
                 public signature: Uint8Array;
@@ -2683,23 +2683,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns InboxMessageDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IInboxMessageDao): LiftLog.Ui.Models.InboxMessageDao;
+                public static create(properties?: Alcedo.Ui.Models.IInboxMessageDao): Alcedo.Ui.Models.InboxMessageDao;
 
                 /**
-                 * Encodes the specified InboxMessageDao message. Does not implicitly {@link LiftLog.Ui.Models.InboxMessageDao.verify|verify} messages.
+                 * Encodes the specified InboxMessageDao message. Does not implicitly {@link Alcedo.Ui.Models.InboxMessageDao.verify|verify} messages.
                  * @param message InboxMessageDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IInboxMessageDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IInboxMessageDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified InboxMessageDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.InboxMessageDao.verify|verify} messages.
+                 * Encodes the specified InboxMessageDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.InboxMessageDao.verify|verify} messages.
                  * @param message InboxMessageDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IInboxMessageDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IInboxMessageDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes an InboxMessageDao message from the specified reader or buffer.
@@ -2709,7 +2709,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.InboxMessageDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.InboxMessageDao;
 
                 /**
                  * Decodes an InboxMessageDao message from the specified reader or buffer, length delimited.
@@ -2718,7 +2718,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.InboxMessageDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.InboxMessageDao;
 
                 /**
                  * Verifies an InboxMessageDao message.
@@ -2732,7 +2732,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns InboxMessageDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.InboxMessageDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.InboxMessageDao;
 
                 /**
                  * Creates a plain object from an InboxMessageDao message. Also converts values to other types if specified.
@@ -2740,7 +2740,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.InboxMessageDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.InboxMessageDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this InboxMessageDao to JSON.
@@ -2770,7 +2770,7 @@ export namespace LiftLog {
                  * Constructs a new FollowRequestDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IFollowRequestDao);
+                constructor(properties?: Alcedo.Ui.Models.IFollowRequestDao);
 
                 /** FollowRequestDao name. */
                 public name?: (google.protobuf.IStringValue|null);
@@ -2783,23 +2783,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns FollowRequestDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IFollowRequestDao): LiftLog.Ui.Models.FollowRequestDao;
+                public static create(properties?: Alcedo.Ui.Models.IFollowRequestDao): Alcedo.Ui.Models.FollowRequestDao;
 
                 /**
-                 * Encodes the specified FollowRequestDao message. Does not implicitly {@link LiftLog.Ui.Models.FollowRequestDao.verify|verify} messages.
+                 * Encodes the specified FollowRequestDao message. Does not implicitly {@link Alcedo.Ui.Models.FollowRequestDao.verify|verify} messages.
                  * @param message FollowRequestDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IFollowRequestDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IFollowRequestDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified FollowRequestDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.FollowRequestDao.verify|verify} messages.
+                 * Encodes the specified FollowRequestDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.FollowRequestDao.verify|verify} messages.
                  * @param message FollowRequestDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IFollowRequestDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IFollowRequestDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a FollowRequestDao message from the specified reader or buffer.
@@ -2809,7 +2809,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.FollowRequestDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.FollowRequestDao;
 
                 /**
                  * Decodes a FollowRequestDao message from the specified reader or buffer, length delimited.
@@ -2818,7 +2818,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.FollowRequestDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.FollowRequestDao;
 
                 /**
                  * Verifies a FollowRequestDao message.
@@ -2832,7 +2832,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns FollowRequestDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.FollowRequestDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.FollowRequestDao;
 
                 /**
                  * Creates a plain object from a FollowRequestDao message. Also converts values to other types if specified.
@@ -2840,7 +2840,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.FollowRequestDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.FollowRequestDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this FollowRequestDao to JSON.
@@ -2860,10 +2860,10 @@ export namespace LiftLog {
             interface IFollowResponseDao {
 
                 /** FollowResponseDao accepted */
-                accepted?: (LiftLog.Ui.Models.IFollowResponseAcceptedDao|null);
+                accepted?: (Alcedo.Ui.Models.IFollowResponseAcceptedDao|null);
 
                 /** FollowResponseDao rejected */
-                rejected?: (LiftLog.Ui.Models.IFollowResponseRejectedDao|null);
+                rejected?: (Alcedo.Ui.Models.IFollowResponseRejectedDao|null);
             }
 
             /** Represents a FollowResponseDao. */
@@ -2873,13 +2873,13 @@ export namespace LiftLog {
                  * Constructs a new FollowResponseDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IFollowResponseDao);
+                constructor(properties?: Alcedo.Ui.Models.IFollowResponseDao);
 
                 /** FollowResponseDao accepted. */
-                public accepted?: (LiftLog.Ui.Models.IFollowResponseAcceptedDao|null);
+                public accepted?: (Alcedo.Ui.Models.IFollowResponseAcceptedDao|null);
 
                 /** FollowResponseDao rejected. */
-                public rejected?: (LiftLog.Ui.Models.IFollowResponseRejectedDao|null);
+                public rejected?: (Alcedo.Ui.Models.IFollowResponseRejectedDao|null);
 
                 /** FollowResponseDao responsePayload. */
                 public responsePayload?: ("accepted"|"rejected");
@@ -2889,23 +2889,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns FollowResponseDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IFollowResponseDao): LiftLog.Ui.Models.FollowResponseDao;
+                public static create(properties?: Alcedo.Ui.Models.IFollowResponseDao): Alcedo.Ui.Models.FollowResponseDao;
 
                 /**
-                 * Encodes the specified FollowResponseDao message. Does not implicitly {@link LiftLog.Ui.Models.FollowResponseDao.verify|verify} messages.
+                 * Encodes the specified FollowResponseDao message. Does not implicitly {@link Alcedo.Ui.Models.FollowResponseDao.verify|verify} messages.
                  * @param message FollowResponseDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IFollowResponseDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IFollowResponseDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified FollowResponseDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.FollowResponseDao.verify|verify} messages.
+                 * Encodes the specified FollowResponseDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.FollowResponseDao.verify|verify} messages.
                  * @param message FollowResponseDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IFollowResponseDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IFollowResponseDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a FollowResponseDao message from the specified reader or buffer.
@@ -2915,7 +2915,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.FollowResponseDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.FollowResponseDao;
 
                 /**
                  * Decodes a FollowResponseDao message from the specified reader or buffer, length delimited.
@@ -2924,7 +2924,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.FollowResponseDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.FollowResponseDao;
 
                 /**
                  * Verifies a FollowResponseDao message.
@@ -2938,7 +2938,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns FollowResponseDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.FollowResponseDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.FollowResponseDao;
 
                 /**
                  * Creates a plain object from a FollowResponseDao message. Also converts values to other types if specified.
@@ -2946,7 +2946,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.FollowResponseDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.FollowResponseDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this FollowResponseDao to JSON.
@@ -2979,7 +2979,7 @@ export namespace LiftLog {
                  * Constructs a new FollowResponseAcceptedDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IFollowResponseAcceptedDao);
+                constructor(properties?: Alcedo.Ui.Models.IFollowResponseAcceptedDao);
 
                 /** FollowResponseAcceptedDao aesKey. */
                 public aesKey: Uint8Array;
@@ -2992,23 +2992,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns FollowResponseAcceptedDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IFollowResponseAcceptedDao): LiftLog.Ui.Models.FollowResponseAcceptedDao;
+                public static create(properties?: Alcedo.Ui.Models.IFollowResponseAcceptedDao): Alcedo.Ui.Models.FollowResponseAcceptedDao;
 
                 /**
-                 * Encodes the specified FollowResponseAcceptedDao message. Does not implicitly {@link LiftLog.Ui.Models.FollowResponseAcceptedDao.verify|verify} messages.
+                 * Encodes the specified FollowResponseAcceptedDao message. Does not implicitly {@link Alcedo.Ui.Models.FollowResponseAcceptedDao.verify|verify} messages.
                  * @param message FollowResponseAcceptedDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IFollowResponseAcceptedDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IFollowResponseAcceptedDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified FollowResponseAcceptedDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.FollowResponseAcceptedDao.verify|verify} messages.
+                 * Encodes the specified FollowResponseAcceptedDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.FollowResponseAcceptedDao.verify|verify} messages.
                  * @param message FollowResponseAcceptedDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IFollowResponseAcceptedDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IFollowResponseAcceptedDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a FollowResponseAcceptedDao message from the specified reader or buffer.
@@ -3018,7 +3018,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.FollowResponseAcceptedDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.FollowResponseAcceptedDao;
 
                 /**
                  * Decodes a FollowResponseAcceptedDao message from the specified reader or buffer, length delimited.
@@ -3027,7 +3027,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.FollowResponseAcceptedDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.FollowResponseAcceptedDao;
 
                 /**
                  * Verifies a FollowResponseAcceptedDao message.
@@ -3041,7 +3041,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns FollowResponseAcceptedDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.FollowResponseAcceptedDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.FollowResponseAcceptedDao;
 
                 /**
                  * Creates a plain object from a FollowResponseAcceptedDao message. Also converts values to other types if specified.
@@ -3049,7 +3049,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.FollowResponseAcceptedDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.FollowResponseAcceptedDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this FollowResponseAcceptedDao to JSON.
@@ -3076,30 +3076,30 @@ export namespace LiftLog {
                  * Constructs a new FollowResponseRejectedDao.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IFollowResponseRejectedDao);
+                constructor(properties?: Alcedo.Ui.Models.IFollowResponseRejectedDao);
 
                 /**
                  * Creates a new FollowResponseRejectedDao instance using the specified properties.
                  * @param [properties] Properties to set
                  * @returns FollowResponseRejectedDao instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IFollowResponseRejectedDao): LiftLog.Ui.Models.FollowResponseRejectedDao;
+                public static create(properties?: Alcedo.Ui.Models.IFollowResponseRejectedDao): Alcedo.Ui.Models.FollowResponseRejectedDao;
 
                 /**
-                 * Encodes the specified FollowResponseRejectedDao message. Does not implicitly {@link LiftLog.Ui.Models.FollowResponseRejectedDao.verify|verify} messages.
+                 * Encodes the specified FollowResponseRejectedDao message. Does not implicitly {@link Alcedo.Ui.Models.FollowResponseRejectedDao.verify|verify} messages.
                  * @param message FollowResponseRejectedDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IFollowResponseRejectedDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IFollowResponseRejectedDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified FollowResponseRejectedDao message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.FollowResponseRejectedDao.verify|verify} messages.
+                 * Encodes the specified FollowResponseRejectedDao message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.FollowResponseRejectedDao.verify|verify} messages.
                  * @param message FollowResponseRejectedDao message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IFollowResponseRejectedDao, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IFollowResponseRejectedDao, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a FollowResponseRejectedDao message from the specified reader or buffer.
@@ -3109,7 +3109,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.FollowResponseRejectedDao;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.FollowResponseRejectedDao;
 
                 /**
                  * Decodes a FollowResponseRejectedDao message from the specified reader or buffer, length delimited.
@@ -3118,7 +3118,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.FollowResponseRejectedDao;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.FollowResponseRejectedDao;
 
                 /**
                  * Verifies a FollowResponseRejectedDao message.
@@ -3132,7 +3132,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns FollowResponseRejectedDao
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.FollowResponseRejectedDao;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.FollowResponseRejectedDao;
 
                 /**
                  * Creates a plain object from a FollowResponseRejectedDao message. Also converts values to other types if specified.
@@ -3140,7 +3140,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.FollowResponseRejectedDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.FollowResponseRejectedDao, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this FollowResponseRejectedDao to JSON.
@@ -3170,7 +3170,7 @@ export namespace LiftLog {
                  * Constructs a new UnFollowNotification.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IUnFollowNotification);
+                constructor(properties?: Alcedo.Ui.Models.IUnFollowNotification);
 
                 /** UnFollowNotification followSecret. */
                 public followSecret: string;
@@ -3180,23 +3180,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns UnFollowNotification instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IUnFollowNotification): LiftLog.Ui.Models.UnFollowNotification;
+                public static create(properties?: Alcedo.Ui.Models.IUnFollowNotification): Alcedo.Ui.Models.UnFollowNotification;
 
                 /**
-                 * Encodes the specified UnFollowNotification message. Does not implicitly {@link LiftLog.Ui.Models.UnFollowNotification.verify|verify} messages.
+                 * Encodes the specified UnFollowNotification message. Does not implicitly {@link Alcedo.Ui.Models.UnFollowNotification.verify|verify} messages.
                  * @param message UnFollowNotification message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IUnFollowNotification, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IUnFollowNotification, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified UnFollowNotification message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.UnFollowNotification.verify|verify} messages.
+                 * Encodes the specified UnFollowNotification message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.UnFollowNotification.verify|verify} messages.
                  * @param message UnFollowNotification message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IUnFollowNotification, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IUnFollowNotification, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes an UnFollowNotification message from the specified reader or buffer.
@@ -3206,7 +3206,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.UnFollowNotification;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.UnFollowNotification;
 
                 /**
                  * Decodes an UnFollowNotification message from the specified reader or buffer, length delimited.
@@ -3215,7 +3215,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.UnFollowNotification;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.UnFollowNotification;
 
                 /**
                  * Verifies an UnFollowNotification message.
@@ -3229,7 +3229,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns UnFollowNotification
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.UnFollowNotification;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.UnFollowNotification;
 
                 /**
                  * Creates a plain object from an UnFollowNotification message. Also converts values to other types if specified.
@@ -3237,7 +3237,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.UnFollowNotification, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.UnFollowNotification, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this UnFollowNotification to JSON.
@@ -3260,10 +3260,10 @@ export namespace LiftLog {
                 interface ICurrentSessionStateDaoV2 {
 
                     /** CurrentSessionStateDaoV2 workoutSession */
-                    workoutSession?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                    workoutSession?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
 
                     /** CurrentSessionStateDaoV2 historySession */
-                    historySession?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                    historySession?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
                 }
 
                 /** Represents a CurrentSessionStateDaoV2. */
@@ -3273,13 +3273,13 @@ export namespace LiftLog {
                      * Constructs a new CurrentSessionStateDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.CurrentSessionStateDao.ICurrentSessionStateDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.CurrentSessionStateDao.ICurrentSessionStateDaoV2);
 
                     /** CurrentSessionStateDaoV2 workoutSession. */
-                    public workoutSession?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                    public workoutSession?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
 
                     /** CurrentSessionStateDaoV2 historySession. */
-                    public historySession?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                    public historySession?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
 
                     /** CurrentSessionStateDaoV2 _workoutSession. */
                     public _workoutSession?: "workoutSession";
@@ -3292,23 +3292,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns CurrentSessionStateDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.CurrentSessionStateDao.ICurrentSessionStateDaoV2): LiftLog.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.CurrentSessionStateDao.ICurrentSessionStateDaoV2): Alcedo.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2;
 
                     /**
-                     * Encodes the specified CurrentSessionStateDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2.verify|verify} messages.
+                     * Encodes the specified CurrentSessionStateDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2.verify|verify} messages.
                      * @param message CurrentSessionStateDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.CurrentSessionStateDao.ICurrentSessionStateDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.CurrentSessionStateDao.ICurrentSessionStateDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified CurrentSessionStateDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2.verify|verify} messages.
+                     * Encodes the specified CurrentSessionStateDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2.verify|verify} messages.
                      * @param message CurrentSessionStateDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.CurrentSessionStateDao.ICurrentSessionStateDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.CurrentSessionStateDao.ICurrentSessionStateDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a CurrentSessionStateDaoV2 message from the specified reader or buffer.
@@ -3318,7 +3318,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2;
 
                     /**
                      * Decodes a CurrentSessionStateDaoV2 message from the specified reader or buffer, length delimited.
@@ -3327,7 +3327,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2;
 
                     /**
                      * Verifies a CurrentSessionStateDaoV2 message.
@@ -3341,7 +3341,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns CurrentSessionStateDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2;
 
                     /**
                      * Creates a plain object from a CurrentSessionStateDaoV2 message. Also converts values to other types if specified.
@@ -3349,7 +3349,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this CurrentSessionStateDaoV2 to JSON.
@@ -3370,10 +3370,10 @@ export namespace LiftLog {
             interface ISharedItemPayload {
 
                 /** SharedItemPayload sharedProgramBlueprint */
-                sharedProgramBlueprint?: (LiftLog.Ui.Models.ISharedProgramBlueprintPayload|null);
+                sharedProgramBlueprint?: (Alcedo.Ui.Models.ISharedProgramBlueprintPayload|null);
 
                 /** SharedItemPayload sharedSession */
-                sharedSession?: (LiftLog.Ui.Models.ISharedSessionPayload|null);
+                sharedSession?: (Alcedo.Ui.Models.ISharedSessionPayload|null);
             }
 
             /** Represents a SharedItemPayload. */
@@ -3383,13 +3383,13 @@ export namespace LiftLog {
                  * Constructs a new SharedItemPayload.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.ISharedItemPayload);
+                constructor(properties?: Alcedo.Ui.Models.ISharedItemPayload);
 
                 /** SharedItemPayload sharedProgramBlueprint. */
-                public sharedProgramBlueprint?: (LiftLog.Ui.Models.ISharedProgramBlueprintPayload|null);
+                public sharedProgramBlueprint?: (Alcedo.Ui.Models.ISharedProgramBlueprintPayload|null);
 
                 /** SharedItemPayload sharedSession. */
-                public sharedSession?: (LiftLog.Ui.Models.ISharedSessionPayload|null);
+                public sharedSession?: (Alcedo.Ui.Models.ISharedSessionPayload|null);
 
                 /** SharedItemPayload payload. */
                 public payload?: ("sharedProgramBlueprint"|"sharedSession");
@@ -3399,23 +3399,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns SharedItemPayload instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.ISharedItemPayload): LiftLog.Ui.Models.SharedItemPayload;
+                public static create(properties?: Alcedo.Ui.Models.ISharedItemPayload): Alcedo.Ui.Models.SharedItemPayload;
 
                 /**
-                 * Encodes the specified SharedItemPayload message. Does not implicitly {@link LiftLog.Ui.Models.SharedItemPayload.verify|verify} messages.
+                 * Encodes the specified SharedItemPayload message. Does not implicitly {@link Alcedo.Ui.Models.SharedItemPayload.verify|verify} messages.
                  * @param message SharedItemPayload message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.ISharedItemPayload, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.ISharedItemPayload, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified SharedItemPayload message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SharedItemPayload.verify|verify} messages.
+                 * Encodes the specified SharedItemPayload message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SharedItemPayload.verify|verify} messages.
                  * @param message SharedItemPayload message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.ISharedItemPayload, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.ISharedItemPayload, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a SharedItemPayload message from the specified reader or buffer.
@@ -3425,7 +3425,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SharedItemPayload;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SharedItemPayload;
 
                 /**
                  * Decodes a SharedItemPayload message from the specified reader or buffer, length delimited.
@@ -3434,7 +3434,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SharedItemPayload;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SharedItemPayload;
 
                 /**
                  * Verifies a SharedItemPayload message.
@@ -3448,7 +3448,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns SharedItemPayload
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SharedItemPayload;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SharedItemPayload;
 
                 /**
                  * Creates a plain object from a SharedItemPayload message. Also converts values to other types if specified.
@@ -3456,7 +3456,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.SharedItemPayload, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.SharedItemPayload, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this SharedItemPayload to JSON.
@@ -3476,7 +3476,7 @@ export namespace LiftLog {
             interface ISharedProgramBlueprintPayload {
 
                 /** SharedProgramBlueprintPayload programBlueprint */
-                programBlueprint?: (LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1|null);
+                programBlueprint?: (Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1|null);
             }
 
             /** Represents a SharedProgramBlueprintPayload. */
@@ -3486,33 +3486,33 @@ export namespace LiftLog {
                  * Constructs a new SharedProgramBlueprintPayload.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.ISharedProgramBlueprintPayload);
+                constructor(properties?: Alcedo.Ui.Models.ISharedProgramBlueprintPayload);
 
                 /** SharedProgramBlueprintPayload programBlueprint. */
-                public programBlueprint?: (LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1|null);
+                public programBlueprint?: (Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1|null);
 
                 /**
                  * Creates a new SharedProgramBlueprintPayload instance using the specified properties.
                  * @param [properties] Properties to set
                  * @returns SharedProgramBlueprintPayload instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.ISharedProgramBlueprintPayload): LiftLog.Ui.Models.SharedProgramBlueprintPayload;
+                public static create(properties?: Alcedo.Ui.Models.ISharedProgramBlueprintPayload): Alcedo.Ui.Models.SharedProgramBlueprintPayload;
 
                 /**
-                 * Encodes the specified SharedProgramBlueprintPayload message. Does not implicitly {@link LiftLog.Ui.Models.SharedProgramBlueprintPayload.verify|verify} messages.
+                 * Encodes the specified SharedProgramBlueprintPayload message. Does not implicitly {@link Alcedo.Ui.Models.SharedProgramBlueprintPayload.verify|verify} messages.
                  * @param message SharedProgramBlueprintPayload message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.ISharedProgramBlueprintPayload, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.ISharedProgramBlueprintPayload, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified SharedProgramBlueprintPayload message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SharedProgramBlueprintPayload.verify|verify} messages.
+                 * Encodes the specified SharedProgramBlueprintPayload message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SharedProgramBlueprintPayload.verify|verify} messages.
                  * @param message SharedProgramBlueprintPayload message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.ISharedProgramBlueprintPayload, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.ISharedProgramBlueprintPayload, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a SharedProgramBlueprintPayload message from the specified reader or buffer.
@@ -3522,7 +3522,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SharedProgramBlueprintPayload;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SharedProgramBlueprintPayload;
 
                 /**
                  * Decodes a SharedProgramBlueprintPayload message from the specified reader or buffer, length delimited.
@@ -3531,7 +3531,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SharedProgramBlueprintPayload;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SharedProgramBlueprintPayload;
 
                 /**
                  * Verifies a SharedProgramBlueprintPayload message.
@@ -3545,7 +3545,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns SharedProgramBlueprintPayload
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SharedProgramBlueprintPayload;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SharedProgramBlueprintPayload;
 
                 /**
                  * Creates a plain object from a SharedProgramBlueprintPayload message. Also converts values to other types if specified.
@@ -3553,7 +3553,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.SharedProgramBlueprintPayload, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.SharedProgramBlueprintPayload, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this SharedProgramBlueprintPayload to JSON.
@@ -3573,7 +3573,7 @@ export namespace LiftLog {
             interface ISharedSessionPayload {
 
                 /** SharedSessionPayload session */
-                session?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                session?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
             }
 
             /** Represents a SharedSessionPayload. */
@@ -3583,33 +3583,33 @@ export namespace LiftLog {
                  * Constructs a new SharedSessionPayload.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.ISharedSessionPayload);
+                constructor(properties?: Alcedo.Ui.Models.ISharedSessionPayload);
 
                 /** SharedSessionPayload session. */
-                public session?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                public session?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
 
                 /**
                  * Creates a new SharedSessionPayload instance using the specified properties.
                  * @param [properties] Properties to set
                  * @returns SharedSessionPayload instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.ISharedSessionPayload): LiftLog.Ui.Models.SharedSessionPayload;
+                public static create(properties?: Alcedo.Ui.Models.ISharedSessionPayload): Alcedo.Ui.Models.SharedSessionPayload;
 
                 /**
-                 * Encodes the specified SharedSessionPayload message. Does not implicitly {@link LiftLog.Ui.Models.SharedSessionPayload.verify|verify} messages.
+                 * Encodes the specified SharedSessionPayload message. Does not implicitly {@link Alcedo.Ui.Models.SharedSessionPayload.verify|verify} messages.
                  * @param message SharedSessionPayload message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.ISharedSessionPayload, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.ISharedSessionPayload, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified SharedSessionPayload message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.SharedSessionPayload.verify|verify} messages.
+                 * Encodes the specified SharedSessionPayload message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.SharedSessionPayload.verify|verify} messages.
                  * @param message SharedSessionPayload message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.ISharedSessionPayload, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.ISharedSessionPayload, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a SharedSessionPayload message from the specified reader or buffer.
@@ -3619,7 +3619,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.SharedSessionPayload;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.SharedSessionPayload;
 
                 /**
                  * Decodes a SharedSessionPayload message from the specified reader or buffer, length delimited.
@@ -3628,7 +3628,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.SharedSessionPayload;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.SharedSessionPayload;
 
                 /**
                  * Verifies a SharedSessionPayload message.
@@ -3642,7 +3642,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns SharedSessionPayload
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.SharedSessionPayload;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.SharedSessionPayload;
 
                 /**
                  * Creates a plain object from a SharedSessionPayload message. Also converts values to other types if specified.
@@ -3650,7 +3650,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.SharedSessionPayload, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.SharedSessionPayload, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this SharedSessionPayload to JSON.
@@ -3673,7 +3673,7 @@ export namespace LiftLog {
                 interface IProgramBlueprintDaoContainerV1 {
 
                     /** ProgramBlueprintDaoContainerV1 programBlueprints */
-                    programBlueprints?: ({ [k: string]: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1 }|null);
+                    programBlueprints?: ({ [k: string]: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1 }|null);
 
                     /** ProgramBlueprintDaoContainerV1 activeProgramId */
                     activeProgramId?: (google.protobuf.IStringValue|null);
@@ -3686,10 +3686,10 @@ export namespace LiftLog {
                      * Constructs a new ProgramBlueprintDaoContainerV1.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoContainerV1);
+                    constructor(properties?: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoContainerV1);
 
                     /** ProgramBlueprintDaoContainerV1 programBlueprints. */
-                    public programBlueprints: { [k: string]: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1 };
+                    public programBlueprints: { [k: string]: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1 };
 
                     /** ProgramBlueprintDaoContainerV1 activeProgramId. */
                     public activeProgramId?: (google.protobuf.IStringValue|null);
@@ -3702,23 +3702,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns ProgramBlueprintDaoContainerV1 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoContainerV1): LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1;
+                    public static create(properties?: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoContainerV1): Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1;
 
                     /**
-                     * Encodes the specified ProgramBlueprintDaoContainerV1 message. Does not implicitly {@link LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1.verify|verify} messages.
+                     * Encodes the specified ProgramBlueprintDaoContainerV1 message. Does not implicitly {@link Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1.verify|verify} messages.
                      * @param message ProgramBlueprintDaoContainerV1 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoContainerV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoContainerV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified ProgramBlueprintDaoContainerV1 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1.verify|verify} messages.
+                     * Encodes the specified ProgramBlueprintDaoContainerV1 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1.verify|verify} messages.
                      * @param message ProgramBlueprintDaoContainerV1 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoContainerV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoContainerV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a ProgramBlueprintDaoContainerV1 message from the specified reader or buffer.
@@ -3728,7 +3728,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1;
 
                     /**
                      * Decodes a ProgramBlueprintDaoContainerV1 message from the specified reader or buffer, length delimited.
@@ -3737,7 +3737,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1;
 
                     /**
                      * Verifies a ProgramBlueprintDaoContainerV1 message.
@@ -3751,7 +3751,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns ProgramBlueprintDaoContainerV1
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1;
 
                     /**
                      * Creates a plain object from a ProgramBlueprintDaoContainerV1 message. Also converts values to other types if specified.
@@ -3759,7 +3759,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this ProgramBlueprintDaoContainerV1 to JSON.
@@ -3782,10 +3782,10 @@ export namespace LiftLog {
                     name?: (string|null);
 
                     /** ProgramBlueprintDaoV1 sessions */
-                    sessions?: (LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[]|null);
+                    sessions?: (Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[]|null);
 
                     /** ProgramBlueprintDaoV1 lastEdited */
-                    lastEdited?: (LiftLog.Ui.Models.IDateOnlyDao|null);
+                    lastEdited?: (Alcedo.Ui.Models.IDateOnlyDao|null);
                 }
 
                 /** Represents a ProgramBlueprintDaoV1. */
@@ -3795,16 +3795,16 @@ export namespace LiftLog {
                      * Constructs a new ProgramBlueprintDaoV1.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1);
+                    constructor(properties?: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1);
 
                     /** ProgramBlueprintDaoV1 name. */
                     public name: string;
 
                     /** ProgramBlueprintDaoV1 sessions. */
-                    public sessions: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[];
+                    public sessions: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[];
 
                     /** ProgramBlueprintDaoV1 lastEdited. */
-                    public lastEdited?: (LiftLog.Ui.Models.IDateOnlyDao|null);
+                    public lastEdited?: (Alcedo.Ui.Models.IDateOnlyDao|null);
 
                     /** ProgramBlueprintDaoV1 _lastEdited. */
                     public _lastEdited?: "lastEdited";
@@ -3814,23 +3814,23 @@ export namespace LiftLog {
                      * @param [properties] Properties to set
                      * @returns ProgramBlueprintDaoV1 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1): LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1;
+                    public static create(properties?: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1): Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1;
 
                     /**
-                     * Encodes the specified ProgramBlueprintDaoV1 message. Does not implicitly {@link LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1.verify|verify} messages.
+                     * Encodes the specified ProgramBlueprintDaoV1 message. Does not implicitly {@link Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1.verify|verify} messages.
                      * @param message ProgramBlueprintDaoV1 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified ProgramBlueprintDaoV1 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1.verify|verify} messages.
+                     * Encodes the specified ProgramBlueprintDaoV1 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1.verify|verify} messages.
                      * @param message ProgramBlueprintDaoV1 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes a ProgramBlueprintDaoV1 message from the specified reader or buffer.
@@ -3840,7 +3840,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1;
 
                     /**
                      * Decodes a ProgramBlueprintDaoV1 message from the specified reader or buffer, length delimited.
@@ -3849,7 +3849,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1;
 
                     /**
                      * Verifies a ProgramBlueprintDaoV1 message.
@@ -3863,7 +3863,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns ProgramBlueprintDaoV1
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1;
 
                     /**
                      * Creates a plain object from a ProgramBlueprintDaoV1 message. Also converts values to other types if specified.
@@ -3871,7 +3871,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this ProgramBlueprintDaoV1 to JSON.
@@ -3895,19 +3895,19 @@ export namespace LiftLog {
                 interface IExportedDataDaoV2 {
 
                     /** ExportedDataDaoV2 sessions */
-                    sessions?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2[]|null);
+                    sessions?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2[]|null);
 
                     /** ExportedDataDaoV2 program */
-                    program?: (LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[]|null);
+                    program?: (Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[]|null);
 
                     /** ExportedDataDaoV2 savedPrograms */
-                    savedPrograms?: ({ [k: string]: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1 }|null);
+                    savedPrograms?: ({ [k: string]: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1 }|null);
 
                     /** ExportedDataDaoV2 activeProgramId */
                     activeProgramId?: (google.protobuf.IStringValue|null);
 
                     /** ExportedDataDaoV2 feedState */
-                    feedState?: (LiftLog.Ui.Models.IFeedStateDaoV1|null);
+                    feedState?: (Alcedo.Ui.Models.IFeedStateDaoV1|null);
                 }
 
                 /** Represents an ExportedDataDaoV2. */
@@ -3917,45 +3917,45 @@ export namespace LiftLog {
                      * Constructs a new ExportedDataDaoV2.
                      * @param [properties] Properties to set
                      */
-                    constructor(properties?: LiftLog.Ui.Models.ExportedDataDao.IExportedDataDaoV2);
+                    constructor(properties?: Alcedo.Ui.Models.ExportedDataDao.IExportedDataDaoV2);
 
                     /** ExportedDataDaoV2 sessions. */
-                    public sessions: LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2[];
+                    public sessions: Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2[];
 
                     /** ExportedDataDaoV2 program. */
-                    public program: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[];
+                    public program: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[];
 
                     /** ExportedDataDaoV2 savedPrograms. */
-                    public savedPrograms: { [k: string]: LiftLog.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1 };
+                    public savedPrograms: { [k: string]: Alcedo.Ui.Models.ProgramBlueprintDao.IProgramBlueprintDaoV1 };
 
                     /** ExportedDataDaoV2 activeProgramId. */
                     public activeProgramId?: (google.protobuf.IStringValue|null);
 
                     /** ExportedDataDaoV2 feedState. */
-                    public feedState?: (LiftLog.Ui.Models.IFeedStateDaoV1|null);
+                    public feedState?: (Alcedo.Ui.Models.IFeedStateDaoV1|null);
 
                     /**
                      * Creates a new ExportedDataDaoV2 instance using the specified properties.
                      * @param [properties] Properties to set
                      * @returns ExportedDataDaoV2 instance
                      */
-                    public static create(properties?: LiftLog.Ui.Models.ExportedDataDao.IExportedDataDaoV2): LiftLog.Ui.Models.ExportedDataDao.ExportedDataDaoV2;
+                    public static create(properties?: Alcedo.Ui.Models.ExportedDataDao.IExportedDataDaoV2): Alcedo.Ui.Models.ExportedDataDao.ExportedDataDaoV2;
 
                     /**
-                     * Encodes the specified ExportedDataDaoV2 message. Does not implicitly {@link LiftLog.Ui.Models.ExportedDataDao.ExportedDataDaoV2.verify|verify} messages.
+                     * Encodes the specified ExportedDataDaoV2 message. Does not implicitly {@link Alcedo.Ui.Models.ExportedDataDao.ExportedDataDaoV2.verify|verify} messages.
                      * @param message ExportedDataDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encode(message: LiftLog.Ui.Models.ExportedDataDao.IExportedDataDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encode(message: Alcedo.Ui.Models.ExportedDataDao.IExportedDataDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
-                     * Encodes the specified ExportedDataDaoV2 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.ExportedDataDao.ExportedDataDaoV2.verify|verify} messages.
+                     * Encodes the specified ExportedDataDaoV2 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.ExportedDataDao.ExportedDataDaoV2.verify|verify} messages.
                      * @param message ExportedDataDaoV2 message or plain object to encode
                      * @param [writer] Writer to encode to
                      * @returns Writer
                      */
-                    public static encodeDelimited(message: LiftLog.Ui.Models.ExportedDataDao.IExportedDataDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
+                    public static encodeDelimited(message: Alcedo.Ui.Models.ExportedDataDao.IExportedDataDaoV2, writer?: $protobuf.Writer): $protobuf.Writer;
 
                     /**
                      * Decodes an ExportedDataDaoV2 message from the specified reader or buffer.
@@ -3965,7 +3965,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.ExportedDataDao.ExportedDataDaoV2;
+                    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.ExportedDataDao.ExportedDataDaoV2;
 
                     /**
                      * Decodes an ExportedDataDaoV2 message from the specified reader or buffer, length delimited.
@@ -3974,7 +3974,7 @@ export namespace LiftLog {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.ExportedDataDao.ExportedDataDaoV2;
+                    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.ExportedDataDao.ExportedDataDaoV2;
 
                     /**
                      * Verifies an ExportedDataDaoV2 message.
@@ -3988,7 +3988,7 @@ export namespace LiftLog {
                      * @param object Plain object
                      * @returns ExportedDataDaoV2
                      */
-                    public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.ExportedDataDao.ExportedDataDaoV2;
+                    public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.ExportedDataDao.ExportedDataDaoV2;
 
                     /**
                      * Creates a plain object from an ExportedDataDaoV2 message. Also converts values to other types if specified.
@@ -3996,7 +3996,7 @@ export namespace LiftLog {
                      * @param [options] Conversion options
                      * @returns Plain object
                      */
-                    public static toObject(message: LiftLog.Ui.Models.ExportedDataDao.ExportedDataDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                    public static toObject(message: Alcedo.Ui.Models.ExportedDataDao.ExportedDataDaoV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                     /**
                      * Converts this ExportedDataDaoV2 to JSON.
@@ -4017,7 +4017,7 @@ export namespace LiftLog {
             interface IFeedIdentityDaoV1 {
 
                 /** FeedIdentityDaoV1 id */
-                id?: (LiftLog.Ui.Models.IUuidDao|null);
+                id?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** FeedIdentityDaoV1 lookup */
                 lookup?: (google.protobuf.IStringValue|null);
@@ -4057,10 +4057,10 @@ export namespace LiftLog {
                  * Constructs a new FeedIdentityDaoV1.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IFeedIdentityDaoV1);
+                constructor(properties?: Alcedo.Ui.Models.IFeedIdentityDaoV1);
 
                 /** FeedIdentityDaoV1 id. */
-                public id?: (LiftLog.Ui.Models.IUuidDao|null);
+                public id?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** FeedIdentityDaoV1 lookup. */
                 public lookup?: (google.protobuf.IStringValue|null);
@@ -4103,23 +4103,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns FeedIdentityDaoV1 instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IFeedIdentityDaoV1): LiftLog.Ui.Models.FeedIdentityDaoV1;
+                public static create(properties?: Alcedo.Ui.Models.IFeedIdentityDaoV1): Alcedo.Ui.Models.FeedIdentityDaoV1;
 
                 /**
-                 * Encodes the specified FeedIdentityDaoV1 message. Does not implicitly {@link LiftLog.Ui.Models.FeedIdentityDaoV1.verify|verify} messages.
+                 * Encodes the specified FeedIdentityDaoV1 message. Does not implicitly {@link Alcedo.Ui.Models.FeedIdentityDaoV1.verify|verify} messages.
                  * @param message FeedIdentityDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IFeedIdentityDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IFeedIdentityDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified FeedIdentityDaoV1 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.FeedIdentityDaoV1.verify|verify} messages.
+                 * Encodes the specified FeedIdentityDaoV1 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.FeedIdentityDaoV1.verify|verify} messages.
                  * @param message FeedIdentityDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IFeedIdentityDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IFeedIdentityDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a FeedIdentityDaoV1 message from the specified reader or buffer.
@@ -4129,7 +4129,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.FeedIdentityDaoV1;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.FeedIdentityDaoV1;
 
                 /**
                  * Decodes a FeedIdentityDaoV1 message from the specified reader or buffer, length delimited.
@@ -4138,7 +4138,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.FeedIdentityDaoV1;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.FeedIdentityDaoV1;
 
                 /**
                  * Verifies a FeedIdentityDaoV1 message.
@@ -4152,7 +4152,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns FeedIdentityDaoV1
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.FeedIdentityDaoV1;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.FeedIdentityDaoV1;
 
                 /**
                  * Creates a plain object from a FeedIdentityDaoV1 message. Also converts values to other types if specified.
@@ -4160,7 +4160,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.FeedIdentityDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.FeedIdentityDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this FeedIdentityDaoV1 to JSON.
@@ -4180,7 +4180,7 @@ export namespace LiftLog {
             interface IFeedUserDaoV1 {
 
                 /** FeedUserDaoV1 id */
-                id?: (LiftLog.Ui.Models.IUuidDao|null);
+                id?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** FeedUserDaoV1 lookup */
                 lookup?: (google.protobuf.IStringValue|null);
@@ -4195,7 +4195,7 @@ export namespace LiftLog {
                 nickname?: (google.protobuf.IStringValue|null);
 
                 /** FeedUserDaoV1 currentPlan */
-                currentPlan?: (LiftLog.Ui.Models.ICurrentPlanDaoV1|null);
+                currentPlan?: (Alcedo.Ui.Models.ICurrentPlanDaoV1|null);
 
                 /** FeedUserDaoV1 profilePicture */
                 profilePicture?: (Uint8Array|null);
@@ -4214,10 +4214,10 @@ export namespace LiftLog {
                  * Constructs a new FeedUserDaoV1.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IFeedUserDaoV1);
+                constructor(properties?: Alcedo.Ui.Models.IFeedUserDaoV1);
 
                 /** FeedUserDaoV1 id. */
-                public id?: (LiftLog.Ui.Models.IUuidDao|null);
+                public id?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** FeedUserDaoV1 lookup. */
                 public lookup?: (google.protobuf.IStringValue|null);
@@ -4232,7 +4232,7 @@ export namespace LiftLog {
                 public nickname?: (google.protobuf.IStringValue|null);
 
                 /** FeedUserDaoV1 currentPlan. */
-                public currentPlan?: (LiftLog.Ui.Models.ICurrentPlanDaoV1|null);
+                public currentPlan?: (Alcedo.Ui.Models.ICurrentPlanDaoV1|null);
 
                 /** FeedUserDaoV1 profilePicture. */
                 public profilePicture?: (Uint8Array|null);
@@ -4266,23 +4266,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns FeedUserDaoV1 instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IFeedUserDaoV1): LiftLog.Ui.Models.FeedUserDaoV1;
+                public static create(properties?: Alcedo.Ui.Models.IFeedUserDaoV1): Alcedo.Ui.Models.FeedUserDaoV1;
 
                 /**
-                 * Encodes the specified FeedUserDaoV1 message. Does not implicitly {@link LiftLog.Ui.Models.FeedUserDaoV1.verify|verify} messages.
+                 * Encodes the specified FeedUserDaoV1 message. Does not implicitly {@link Alcedo.Ui.Models.FeedUserDaoV1.verify|verify} messages.
                  * @param message FeedUserDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IFeedUserDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IFeedUserDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified FeedUserDaoV1 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.FeedUserDaoV1.verify|verify} messages.
+                 * Encodes the specified FeedUserDaoV1 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.FeedUserDaoV1.verify|verify} messages.
                  * @param message FeedUserDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IFeedUserDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IFeedUserDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a FeedUserDaoV1 message from the specified reader or buffer.
@@ -4292,7 +4292,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.FeedUserDaoV1;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.FeedUserDaoV1;
 
                 /**
                  * Decodes a FeedUserDaoV1 message from the specified reader or buffer, length delimited.
@@ -4301,7 +4301,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.FeedUserDaoV1;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.FeedUserDaoV1;
 
                 /**
                  * Verifies a FeedUserDaoV1 message.
@@ -4315,7 +4315,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns FeedUserDaoV1
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.FeedUserDaoV1;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.FeedUserDaoV1;
 
                 /**
                  * Creates a plain object from a FeedUserDaoV1 message. Also converts values to other types if specified.
@@ -4323,7 +4323,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.FeedUserDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.FeedUserDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this FeedUserDaoV1 to JSON.
@@ -4343,7 +4343,7 @@ export namespace LiftLog {
             interface ICurrentPlanDaoV1 {
 
                 /** CurrentPlanDaoV1 sessions */
-                sessions?: (LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[]|null);
+                sessions?: (Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[]|null);
             }
 
             /** Represents a CurrentPlanDaoV1. */
@@ -4353,33 +4353,33 @@ export namespace LiftLog {
                  * Constructs a new CurrentPlanDaoV1.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.ICurrentPlanDaoV1);
+                constructor(properties?: Alcedo.Ui.Models.ICurrentPlanDaoV1);
 
                 /** CurrentPlanDaoV1 sessions. */
-                public sessions: LiftLog.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[];
+                public sessions: Alcedo.Ui.Models.SessionBlueprintDao.ISessionBlueprintDaoV2[];
 
                 /**
                  * Creates a new CurrentPlanDaoV1 instance using the specified properties.
                  * @param [properties] Properties to set
                  * @returns CurrentPlanDaoV1 instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.ICurrentPlanDaoV1): LiftLog.Ui.Models.CurrentPlanDaoV1;
+                public static create(properties?: Alcedo.Ui.Models.ICurrentPlanDaoV1): Alcedo.Ui.Models.CurrentPlanDaoV1;
 
                 /**
-                 * Encodes the specified CurrentPlanDaoV1 message. Does not implicitly {@link LiftLog.Ui.Models.CurrentPlanDaoV1.verify|verify} messages.
+                 * Encodes the specified CurrentPlanDaoV1 message. Does not implicitly {@link Alcedo.Ui.Models.CurrentPlanDaoV1.verify|verify} messages.
                  * @param message CurrentPlanDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.ICurrentPlanDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.ICurrentPlanDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified CurrentPlanDaoV1 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.CurrentPlanDaoV1.verify|verify} messages.
+                 * Encodes the specified CurrentPlanDaoV1 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.CurrentPlanDaoV1.verify|verify} messages.
                  * @param message CurrentPlanDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.ICurrentPlanDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.ICurrentPlanDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a CurrentPlanDaoV1 message from the specified reader or buffer.
@@ -4389,7 +4389,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.CurrentPlanDaoV1;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.CurrentPlanDaoV1;
 
                 /**
                  * Decodes a CurrentPlanDaoV1 message from the specified reader or buffer, length delimited.
@@ -4398,7 +4398,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.CurrentPlanDaoV1;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.CurrentPlanDaoV1;
 
                 /**
                  * Verifies a CurrentPlanDaoV1 message.
@@ -4412,7 +4412,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns CurrentPlanDaoV1
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.CurrentPlanDaoV1;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.CurrentPlanDaoV1;
 
                 /**
                  * Creates a plain object from a CurrentPlanDaoV1 message. Also converts values to other types if specified.
@@ -4420,7 +4420,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.CurrentPlanDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.CurrentPlanDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this CurrentPlanDaoV1 to JSON.
@@ -4440,10 +4440,10 @@ export namespace LiftLog {
             interface IFeedItemDaoV1 {
 
                 /** FeedItemDaoV1 userId */
-                userId?: (LiftLog.Ui.Models.IUuidDao|null);
+                userId?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** FeedItemDaoV1 eventId */
-                eventId?: (LiftLog.Ui.Models.IUuidDao|null);
+                eventId?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** FeedItemDaoV1 timestamp */
                 timestamp?: (google.protobuf.ITimestamp|null);
@@ -4452,7 +4452,7 @@ export namespace LiftLog {
                 expiry?: (google.protobuf.ITimestamp|null);
 
                 /** FeedItemDaoV1 session */
-                session?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                session?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
             }
 
             /** Represents a FeedItemDaoV1. */
@@ -4462,13 +4462,13 @@ export namespace LiftLog {
                  * Constructs a new FeedItemDaoV1.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IFeedItemDaoV1);
+                constructor(properties?: Alcedo.Ui.Models.IFeedItemDaoV1);
 
                 /** FeedItemDaoV1 userId. */
-                public userId?: (LiftLog.Ui.Models.IUuidDao|null);
+                public userId?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** FeedItemDaoV1 eventId. */
-                public eventId?: (LiftLog.Ui.Models.IUuidDao|null);
+                public eventId?: (Alcedo.Ui.Models.IUuidDao|null);
 
                 /** FeedItemDaoV1 timestamp. */
                 public timestamp?: (google.protobuf.ITimestamp|null);
@@ -4477,7 +4477,7 @@ export namespace LiftLog {
                 public expiry?: (google.protobuf.ITimestamp|null);
 
                 /** FeedItemDaoV1 session. */
-                public session?: (LiftLog.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
+                public session?: (Alcedo.Ui.Models.SessionHistoryDao.ISessionDaoV2|null);
 
                 /** FeedItemDaoV1 payload. */
                 public payload?: "session";
@@ -4487,23 +4487,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns FeedItemDaoV1 instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IFeedItemDaoV1): LiftLog.Ui.Models.FeedItemDaoV1;
+                public static create(properties?: Alcedo.Ui.Models.IFeedItemDaoV1): Alcedo.Ui.Models.FeedItemDaoV1;
 
                 /**
-                 * Encodes the specified FeedItemDaoV1 message. Does not implicitly {@link LiftLog.Ui.Models.FeedItemDaoV1.verify|verify} messages.
+                 * Encodes the specified FeedItemDaoV1 message. Does not implicitly {@link Alcedo.Ui.Models.FeedItemDaoV1.verify|verify} messages.
                  * @param message FeedItemDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IFeedItemDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IFeedItemDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified FeedItemDaoV1 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.FeedItemDaoV1.verify|verify} messages.
+                 * Encodes the specified FeedItemDaoV1 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.FeedItemDaoV1.verify|verify} messages.
                  * @param message FeedItemDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IFeedItemDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IFeedItemDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a FeedItemDaoV1 message from the specified reader or buffer.
@@ -4513,7 +4513,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.FeedItemDaoV1;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.FeedItemDaoV1;
 
                 /**
                  * Decodes a FeedItemDaoV1 message from the specified reader or buffer, length delimited.
@@ -4522,7 +4522,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.FeedItemDaoV1;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.FeedItemDaoV1;
 
                 /**
                  * Verifies a FeedItemDaoV1 message.
@@ -4536,7 +4536,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns FeedItemDaoV1
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.FeedItemDaoV1;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.FeedItemDaoV1;
 
                 /**
                  * Creates a plain object from a FeedItemDaoV1 message. Also converts values to other types if specified.
@@ -4544,7 +4544,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.FeedItemDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.FeedItemDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this FeedItemDaoV1 to JSON.
@@ -4564,22 +4564,22 @@ export namespace LiftLog {
             interface IFeedStateDaoV1 {
 
                 /** FeedStateDaoV1 feedItems */
-                feedItems?: (LiftLog.Ui.Models.IFeedItemDaoV1[]|null);
+                feedItems?: (Alcedo.Ui.Models.IFeedItemDaoV1[]|null);
 
                 /** FeedStateDaoV1 followedUsers */
-                followedUsers?: (LiftLog.Ui.Models.IFeedUserDaoV1[]|null);
+                followedUsers?: (Alcedo.Ui.Models.IFeedUserDaoV1[]|null);
 
                 /** FeedStateDaoV1 identity */
-                identity?: (LiftLog.Ui.Models.IFeedIdentityDaoV1|null);
+                identity?: (Alcedo.Ui.Models.IFeedIdentityDaoV1|null);
 
                 /** FeedStateDaoV1 followRequests */
-                followRequests?: (LiftLog.Ui.Models.IInboxMessageDao[]|null);
+                followRequests?: (Alcedo.Ui.Models.IInboxMessageDao[]|null);
 
                 /** FeedStateDaoV1 followers */
-                followers?: (LiftLog.Ui.Models.IFeedUserDaoV1[]|null);
+                followers?: (Alcedo.Ui.Models.IFeedUserDaoV1[]|null);
 
                 /** FeedStateDaoV1 unpublishedSessionIds */
-                unpublishedSessionIds?: (LiftLog.Ui.Models.IUuidDao[]|null);
+                unpublishedSessionIds?: (Alcedo.Ui.Models.IUuidDao[]|null);
 
                 /** FeedStateDaoV1 revokedFollowSecrets */
                 revokedFollowSecrets?: (string[]|null);
@@ -4592,25 +4592,25 @@ export namespace LiftLog {
                  * Constructs a new FeedStateDaoV1.
                  * @param [properties] Properties to set
                  */
-                constructor(properties?: LiftLog.Ui.Models.IFeedStateDaoV1);
+                constructor(properties?: Alcedo.Ui.Models.IFeedStateDaoV1);
 
                 /** FeedStateDaoV1 feedItems. */
-                public feedItems: LiftLog.Ui.Models.IFeedItemDaoV1[];
+                public feedItems: Alcedo.Ui.Models.IFeedItemDaoV1[];
 
                 /** FeedStateDaoV1 followedUsers. */
-                public followedUsers: LiftLog.Ui.Models.IFeedUserDaoV1[];
+                public followedUsers: Alcedo.Ui.Models.IFeedUserDaoV1[];
 
                 /** FeedStateDaoV1 identity. */
-                public identity?: (LiftLog.Ui.Models.IFeedIdentityDaoV1|null);
+                public identity?: (Alcedo.Ui.Models.IFeedIdentityDaoV1|null);
 
                 /** FeedStateDaoV1 followRequests. */
-                public followRequests: LiftLog.Ui.Models.IInboxMessageDao[];
+                public followRequests: Alcedo.Ui.Models.IInboxMessageDao[];
 
                 /** FeedStateDaoV1 followers. */
-                public followers: LiftLog.Ui.Models.IFeedUserDaoV1[];
+                public followers: Alcedo.Ui.Models.IFeedUserDaoV1[];
 
                 /** FeedStateDaoV1 unpublishedSessionIds. */
-                public unpublishedSessionIds: LiftLog.Ui.Models.IUuidDao[];
+                public unpublishedSessionIds: Alcedo.Ui.Models.IUuidDao[];
 
                 /** FeedStateDaoV1 revokedFollowSecrets. */
                 public revokedFollowSecrets: string[];
@@ -4623,23 +4623,23 @@ export namespace LiftLog {
                  * @param [properties] Properties to set
                  * @returns FeedStateDaoV1 instance
                  */
-                public static create(properties?: LiftLog.Ui.Models.IFeedStateDaoV1): LiftLog.Ui.Models.FeedStateDaoV1;
+                public static create(properties?: Alcedo.Ui.Models.IFeedStateDaoV1): Alcedo.Ui.Models.FeedStateDaoV1;
 
                 /**
-                 * Encodes the specified FeedStateDaoV1 message. Does not implicitly {@link LiftLog.Ui.Models.FeedStateDaoV1.verify|verify} messages.
+                 * Encodes the specified FeedStateDaoV1 message. Does not implicitly {@link Alcedo.Ui.Models.FeedStateDaoV1.verify|verify} messages.
                  * @param message FeedStateDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encode(message: LiftLog.Ui.Models.IFeedStateDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encode(message: Alcedo.Ui.Models.IFeedStateDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
-                 * Encodes the specified FeedStateDaoV1 message, length delimited. Does not implicitly {@link LiftLog.Ui.Models.FeedStateDaoV1.verify|verify} messages.
+                 * Encodes the specified FeedStateDaoV1 message, length delimited. Does not implicitly {@link Alcedo.Ui.Models.FeedStateDaoV1.verify|verify} messages.
                  * @param message FeedStateDaoV1 message or plain object to encode
                  * @param [writer] Writer to encode to
                  * @returns Writer
                  */
-                public static encodeDelimited(message: LiftLog.Ui.Models.IFeedStateDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
+                public static encodeDelimited(message: Alcedo.Ui.Models.IFeedStateDaoV1, writer?: $protobuf.Writer): $protobuf.Writer;
 
                 /**
                  * Decodes a FeedStateDaoV1 message from the specified reader or buffer.
@@ -4649,7 +4649,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): LiftLog.Ui.Models.FeedStateDaoV1;
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Alcedo.Ui.Models.FeedStateDaoV1;
 
                 /**
                  * Decodes a FeedStateDaoV1 message from the specified reader or buffer, length delimited.
@@ -4658,7 +4658,7 @@ export namespace LiftLog {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): LiftLog.Ui.Models.FeedStateDaoV1;
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Alcedo.Ui.Models.FeedStateDaoV1;
 
                 /**
                  * Verifies a FeedStateDaoV1 message.
@@ -4672,7 +4672,7 @@ export namespace LiftLog {
                  * @param object Plain object
                  * @returns FeedStateDaoV1
                  */
-                public static fromObject(object: { [k: string]: any }): LiftLog.Ui.Models.FeedStateDaoV1;
+                public static fromObject(object: { [k: string]: any }): Alcedo.Ui.Models.FeedStateDaoV1;
 
                 /**
                  * Creates a plain object from a FeedStateDaoV1 message. Also converts values to other types if specified.
@@ -4680,7 +4680,7 @@ export namespace LiftLog {
                  * @param [options] Conversion options
                  * @returns Plain object
                  */
-                public static toObject(message: LiftLog.Ui.Models.FeedStateDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
+                public static toObject(message: Alcedo.Ui.Models.FeedStateDaoV1, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
                 /**
                  * Converts this FeedStateDaoV1 to JSON.

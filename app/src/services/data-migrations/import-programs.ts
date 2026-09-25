@@ -1,7 +1,7 @@
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { KeyValueStore } from '../key-value-store';
 import { dataMigrationsSchema, programsSchema } from '@/db/schema';
-import { LiftLog } from '@/gen/proto';
+import { Alcedo } from '@/gen/proto';
 import { ProtobufToJsonV1Migrator } from '@/models/storage/versions/initial/protobuf-migrator';
 import { programBlueprintMigrations } from '@/models/storage/versions/migrations';
 
@@ -13,7 +13,7 @@ export async function importPrograms(db: ExpoSQLiteDatabase, keyValueStore: KeyV
   if (!programBytes) {
     return;
   }
-  const decoded = LiftLog.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1.decode(programBytes);
+  const decoded = Alcedo.Ui.Models.ProgramBlueprintDao.ProgramBlueprintDaoContainerV1.decode(programBytes);
   const converted: (typeof programsSchema.$inferInsert)[] = Object.entries(decoded.programBlueprints).map(
     ([id, pojo]) =>
       ({

@@ -6,7 +6,7 @@ To install dependencies:
 npm install
 ```
 
-This directory contains general scripts which LiftLog uses. Each is an executable zx
+This directory contains general scripts which Alcedo uses. Each is an executable zx
 script run directly under Node - the shebang handles TypeScript, so there is no build step.
 
 ## Collecting Screenshots For App Store

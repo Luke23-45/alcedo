@@ -29,7 +29,7 @@ export function createHandler(
       logEverything(event);
     }
 
-    // LiftLog may pass in a user name so we will prefix the S3 object with this, if it is supplied
+    // Alcedo may pass in a user name so we will prefix the S3 object with this, if it is supplied
     const user = event.queryStringParameters?.user || "";
     const s3Key = getS3Key(user, now());
 
@@ -62,7 +62,7 @@ export function createHandler(
       event.headers["Content-Type"] || event.headers["content-type"] || "";
     const contentType = rawContentType.toLowerCase();
 
-    // LiftLog sends a gzipped SQLite database using a content type that API
+    // Alcedo sends a gzipped SQLite database using a content type that API
     // Gateway would normally treat as text. Binary media types keep it intact.
 
     if (isBase64Encoded) {
@@ -133,7 +133,7 @@ function getS3Key(user: string, now: Date): string {
   const hour = String(now.getUTCHours()).padStart(2, "0");
   const minute = String(now.getUTCMinutes()).padStart(2, "0");
 
-  return `${userPath}${year}/${month}/${day}/${year}-${month}-${day}-${hour}-${minute}-liftlogbackup.gz`;
+  return `${userPath}${year}/${month}/${day}/${year}-${month}-${day}-${hour}-${minute}-alcedobackup.gz`;
 }
 
 function stringToHex(str: string) {

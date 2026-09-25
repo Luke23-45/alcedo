@@ -27,7 +27,7 @@ Model: `app/src/models/backend.ts`.
 - **Fresh installs assign `feed` and `aiPlanner` to the built-in backend; `backup` gets no assignment** (`app/src/services/data-migrations/seed-backend-assignments.ts:11-18`). Only `backup` may be set to "no backend" (`canBeSetToNoBackend`, `models/backend.ts:27-29`) — feed/aiPlanner always point somewhere.
 - Assignment storage: `backend_assignment` table, `feature` (text PK) → `backendId` (`app/src/db/schema.ts:126-130`). "A missing row means the feature has no backend and does not run" — backup silently no-ops; feed throws `NoFeedBackendError` on first request (`app/src/services/feed-api.ts:47-50`); AI planner posts a "No backend is configured" chat message (`app/src/services/ai-chat-service-v2.ts:92-99`).
 
-**The LiftLog backend speaks three protocols:**
+**The Alcedo backend speaks three protocols:**
 1. **Feed — REST + E2E encryption, bidirectional.** `POST /events` (pull), `PUT /event` (publish own sessions), `POST /users`, `PUT /user`, inbox/follow-secret endpoints (`app/src/services/feed-api.ts:66-181`). Payloads carry `encryptedEventPayload`/`encryptedEventIV`; the server holds ciphertext only.
 2. **AI planner — SignalR realtime chat** at `{base}/ai-chat-v2` (`app/src/services/ai-chat-service-v2.ts:17,105`). Server-side generation.
 3. **Backup — upload-only.** `POST {base}/backup`, `Content-Type: application/octet-stream` (`app/src/store/settings/remote-backup-effects.ts:250-254`).

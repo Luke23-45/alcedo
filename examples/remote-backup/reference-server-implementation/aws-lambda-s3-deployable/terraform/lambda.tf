@@ -1,6 +1,6 @@
 # IAM Role for Lambda Execution
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "liftlog-lambda-exec-role"
+  name = "alcedo-lambda-exec-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -31,8 +31,8 @@ resource "aws_iam_role_policy_attachment" "lambda_exec_policy" {
 }
 
 # Lambda Function
-resource "aws_lambda_function" "liftlog_lambda" {
-  function_name = "liftlog-lambda"
+resource "aws_lambda_function" "alcedo_lambda" {
+  function_name = "alcedo-lambda"
   role          = aws_iam_role.lambda_exec_role.arn
   runtime       = "nodejs24.x"
   handler       = "index.handler"
@@ -51,9 +51,9 @@ resource "aws_lambda_function" "liftlog_lambda" {
 resource "aws_lambda_permission" "apigw_invoke_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.liftlog_lambda.function_name
+  function_name = aws_lambda_function.alcedo_lambda.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.liftlog_api.execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.alcedo_api.execution_arn}/*/*"
 }
 
 resource "aws_iam_policy" "lambda_s3_policy" {

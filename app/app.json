@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Alcedo",
-    "slug": "liftlog",
+    "slug": "alcedo",
     "version": "1.0.0",
     "userInterfaceStyle": "automatic",
     "web": {
@@ -69,11 +69,11 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
-    "scheme": ["alcedo", "liftlog"],
+    "scheme": "alcedo",
     "android": {
       "versionCode": 1,
       "version": "1.0.0",
-      "package": "com.limajuice.liftlog",
+      "package": "com.powergym.alcedo",
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [
         "com.android.vending.BILLING",
@@ -88,7 +88,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "app.liftlog.online"
+              "host": "app.alcedo.app"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
@@ -161,8 +161,8 @@
       }
     },
     "ios": {
-      "bundleIdentifier": "com.limajuice.liftlog",
-      "associatedDomains": ["applinks:app.liftlog.online"],
+      "bundleIdentifier": "com.powergym.alcedo",
+      "associatedDomains": ["applinks:app.alcedo.app"],
       "supportsTablet": true,
       "infoPlist": {
         "UIViewControllerBasedStatusBarAppearance": true,
@@ -170,15 +170,15 @@
         "LSSupportsOpeningDocumentsInPlace": true,
         "CFBundleDocumentTypes": [
           {
-            "CFBundleTypeName": "LiftLog Plan",
+            "CFBundleTypeName": "Alcedo Plan",
             "LSHandlerRank": "Owner",
-            "LSItemContentTypes": ["com.limajuice.liftlog.plan"]
+            "LSItemContentTypes": ["com.powergym.alcedo.plan"]
           }
         ],
         "UTExportedTypeDeclarations": [
           {
-            "UTTypeIdentifier": "com.limajuice.liftlog.plan",
-            "UTTypeDescription": "LiftLog Plan",
+            "UTTypeIdentifier": "com.powergym.alcedo.plan",
+            "UTTypeDescription": "Alcedo Plan",
             "UTTypeConformsTo": ["public.json"],
             "UTTypeTagSpecification": {
               "public.filename-extension": ["liftlogplan", "alcedoplan"]

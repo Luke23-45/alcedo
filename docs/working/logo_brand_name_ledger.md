@@ -26,9 +26,9 @@
 
 | # | Decision | Proposed default | Status | Notes |
 |---|----------|------------------|--------|-------|
-| D1 | Android `package` / iOS `bundleIdentifier` | `com.powergym.alcedo` | ☐ Deferred | Irrevocable — new Play/App Store listings; keep `com.limajuice.liftlog` on current listing if you want to defer |
-| D2 | Hosts | `app.alcedo.app` + `api.alcedo.app` with 301 from `app.liftlog.online` kept 12mo | ☐ Deferred | Keep old DNS 12mo for existing `https://app.liftlog.online/feed/share…` links |
-| D3 | Slug / EAS project | `alcedo` creates new EAS project; current `83fbb14a-2940-4b8e-894a-170eb1e23fa3` in `app/app.json:208` + `updates.url https://u.expo.dev/…` | ☐ Deferred | Flip only after `eas project:create` + OTA channel cutover |
+| D1 | Android `package` / iOS `bundleIdentifier` | `com.powergym.alcedo` | ☑ Done 2026-09-25 | Irrevocable — new Play/App Store listings; keep `com.limajuice.liftlog` on current listing if you want to defer |
+| D2 | Hosts | `app.alcedo.app` + `api.alcedo.app` with 301 from `app.liftlog.online` kept 12mo | ☑ Done 2026-09-25 (code; DNS/redirect still needs deployment) | Keep old DNS 12mo for existing `https://app.liftlog.online/feed/share…` links |
+| D3 | Slug / EAS project | `alcedo` creates new EAS project; current `83fbb14a-2940-4b8e-894a-170eb1e23fa3` in `app/app.json:208` + `updates.url https://u.expo.dev/…` | ☑ Done 2026-09-25 (slug; new EAS project + OTA cutover still needs `eas project:create`) |
 | D4 | Colors | `splash/backgroundColor #02040A`, `adaptiveIcon.backgroundColor #02040A`, `primaryColor #0B2CC8` | ☑ Done | Applied at `app/app.json:12,13,48,142` — replaces `#fcfdf6`/`#046F03`/`#dfedda` |
 | D5 | `Power Gym` placement | Splash footer `Alcedo — by Power Gym`, `onboarding.welcome.subtitle` suffix, `Settings → About` footer `© 2026 Power Gym — Alcedo v{version}` | ☑ Done | `en.json:337-338` welcome + `settings/index.tsx:132-138` About |
 | D6 | Ship strategy | **Phase 1+2 as display-only rebrand** (name + assets), defer D1–D3 to separate store cutover PR | ☑ Done | Phase 1 shipped display-only |
@@ -140,13 +140,13 @@ Single source is `en.json:20-538`; replicate to `ar,cs,de,es,fi,fr,hu,it,ko,nl,p
 
 | # | File | Line | Current | Target | Migration | Status |
 |---|------|------|---------|--------|-----------|--------|
-| T1 | `app/src/models/backend.ts` | 7,11,55 | `BackendKind='liftlog'`, `builtInBackendId='liftlog'` | keep literal `liftlog` for Phase 1, display `Alcedo`; later `createMigrations()` mapping `liftlog→alcedo` with `dependsOn` | `models/storage/versions/` `createMigrations()` | ☐ Deferred — keep literal |
+| T1 | `app/src/models/backend.ts` | 7,11,55 | `BackendKind='liftlog'`, `builtInBackendId='liftlog'` | renamed to `alcedo` + data migration `migrate-backend-kind-to-alcedo` | `models/storage/versions/` `createMigrations()` | ☑ Done 2026-09-25 |
 | T2 | `app/src/store/backends/index.ts` | 20-22 | `builtInBackend: {name:'LiftLog', id:'liftlog', kind:'liftlog'}` | `name:'Alcedo'` keep `id` until T1 migration | — | ☑ Done — name Alcedo |
 | T3 | `app/src/models/plan-file.ts` | 8 | `PLAN_FILE_EXTENSION='liftlogplan'` | `'alcedoplan'` + accept both | `parseProgramBlueprintFile` | ☑ Done — see H19 |
 | T4 | `app/src/services/backend-probe.ts` | 86 | `X-LiftLog-Probe` server contract | `X-Alcedo-Probe` + send both | server must accept both headers | ☑ Done — dual |
-| T5 | `modules/workout-worker/android/build.gradle` | 56 | `packageName='com.limajuice.liftlog'` | `com.powergym.alcedo` | proto re-emit | ☐ Deferred |
-| T6 | `modules/workout-worker/android/proguard-rules.pro` | 1,8 | `com.limajuice.liftlog.**` | new namespace | — | ☐ Deferred |
-| T7 | `modules/workout-worker/android/src/main/java/expo/modules/workoutworker/*.kt` (7 files) | 15 | `import com.limajuice.liftlog.*` DTOs | new package after proto re-emit | `npm run json-schema` | ☐ Deferred (KEEP phase 1) |
+| T5 | `modules/workout-worker/android/build.gradle` | 56 | `packageName='com.limajuice.liftlog'` | `com.powergym.alcedo` | proto re-emit | ☑ Done 2026-09-25 |
+| T6 | `modules/workout-worker/android/proguard-rules.pro` | 1,8 | `com.limajuice.liftlog.**` | new namespace | — | ☑ Done 2026-09-25 |
+| T7 | `modules/workout-worker/android/src/main/java/expo/modules/workoutworker/*.kt` (7 files) | 15 | `import com.limajuice.liftlog.*` DTOs | new package after proto re-emit | `npm run json-schema` | ☑ Done 2026-09-25 |
 | T8 | `app/scripts/build-plan-validator.mjs` | 4 | Builds `.liftlogplan` validator | dual `.alcedoplan` | tooling | ☑ Done |
 | T9 | `app/package.json` | 2 | `name: "liftlog-react"` | `alcedo-react` (or `alcedo`) | — | ☑ Done — `alcedo-react` |
 
@@ -172,9 +172,9 @@ Out of scope for minimal display rebrand; track here so nothing slips if you exp
 | D7 | `README.md` | 1,4-6,10-12,19,25,37-39,71,83,97,103-107,122,124,132,136 | `LiftLog`, screenshots `AppScreens-LiftLog…`, Play `id=com.limajuice.liftlog`, `translate.liftlog.online` | `Alcedo by Power Gym` | ☐ Pending — out of scope Phase 1 |
 | D8 | `docs/*` `PlanFileFormat.md:3,5,7,13`, `SelfHosting.md:1,10,14,19`, `RemoteBackup.md:3,13`, `FeedProcess.md:3,21`, `Backends.md:3-4,17`, `CsvImport.md:3-4` | — | `.liftlogplan` narrative, `liftlog:api`, `app.liftlog.online` | dual / new hosts | ☐ Pending |
 | D9 | `site/index.html` | 6,752,759,762,777,801,824,932,957,984,1044,1060,1091,1099,1140 | `<title>LiftLog`, Play `com.limajuice.liftlog`, footer `© LiftLog` | `Alcedo` / `© 2026 Power Gym` | ☐ Pending |
-| D10 | `site/privacy.html` | 18,25,48,54,67 | `Liam Morrow built the LiftLog app`, `support@liftlog.online` | `Power Gym builds Alcedo`, `support@alcedo.app` | ☐ Pending |
-| D11 | `plugins/liftlog-plan-builder/README.md`, `skills/create-liftlog-plan/SKILL.md` | 1-48 | `liftlog-plan-builder` | `alcedo-plan-builder` + keep alias | ☐ Pending |
-| D12 | `.maestro/config.yaml:1` + 5 flows | 1 | `appId: com.limajuice.liftlog` | `com.powergym.alcedo` after D1 | ☐ Deferred |
+| D10 | `site/privacy.html` | 18,25,48,54,67 | `Liam Morrow built the LiftLog app`, `support@liftlog.online` | `Power Gym builds Alcedo`, `support@alcedo.app` | ☑ Done 2026-09-25 |
+| D11 | `plugins/alcedo-plan-builder/README.md`, `skills/create-alcedo-plan/SKILL.md` | 1-48 | `liftlog-plan-builder` | `alcedo-plan-builder` + keep alias | ☑ Done 2026-09-25 |
+| D12 | `.maestro/config.yaml:1` + 5 flows | 1 | `appId: com.limajuice.liftlog` | `com.powergym.alcedo` after D1 | ☑ Done 2026-09-25 |
 | D13 | `.github/workflows/android-publish.yml:72,90-91,113`, `ios-publish.yml:127-128,159` | — | `liftlog.keystore`, `alias liftlog`, `LiftLog.xcworkspace` | `alcedo.*` | ☐ Deferred |
 
 ---

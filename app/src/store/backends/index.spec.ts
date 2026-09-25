@@ -6,8 +6,8 @@ import type { RootState } from '@/store/store';
 const selfHosted: Backend = {
   id: 'self',
   name: 'Home server',
-  url: 'https://liftlog.example.com',
-  kind: 'liftlog',
+  url: 'https://alcedo.example.com',
+  kind: 'alcedo',
   headers: [{ name: 'X-Api-Key', value: 'secret' }],
 };
 

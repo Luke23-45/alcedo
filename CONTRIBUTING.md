@@ -1,6 +1,6 @@
-# Contributing to LiftLog
+# Contributing to Alcedo
 
-Thank you for your interest in contributing to LiftLog! We welcome all contributions, whether you're fixing bugs, adding features, improving documentation, or suggesting ideas.
+Thank you for your interest in contributing to Alcedo! We welcome all contributions, whether you're fixing bugs, adding features, improving documentation, or suggesting ideas.
 
 ## Code Style & Guidelines
 
@@ -64,4 +64,4 @@ By contributing, you agree that your contributions will be licensed under the [A
 
 ---
 
-Thank you for helping make LiftLog better!
+Thank you for helping make Alcedo better!

@@ -98,5 +98,5 @@ export function addSharedItemEffects(addEffect: AddEffectFn) {
 }
 
 function getShareUrl(sharedItemId: string, aesKey: AesKey) {
-  return `https://app.liftlog.online/feed/shared-item/${sharedItemId}?k=${toUrlSafeHexString(aesKey.value)}`;
+  return `https://app.alcedo.app/feed/shared-item/${sharedItemId}?k=${toUrlSafeHexString(aesKey.value)}`;
 }

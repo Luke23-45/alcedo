@@ -62,7 +62,7 @@ const testBackend: Backend = {
   id: 'backup-1',
   name: 'Home server',
   url: 'https://backup.example.com',
-  kind: 'liftlog',
+  kind: 'alcedo',
   headers: [],
 };
 

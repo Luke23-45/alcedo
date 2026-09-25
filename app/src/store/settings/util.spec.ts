@@ -21,8 +21,8 @@ async function createSeededDb(): Promise<SQLiteDatabase> {
   await db.insert(backendsSchema).values({
     id: "self",
     name: "Home server",
-    url: "https://liftlog.example.com",
-    kind: "liftlog",
+    url: "https://alcedo.example.com",
+    kind: "alcedo",
   });
   await db
     .insert(backendHeadersSchema)

@@ -11,7 +11,7 @@ export function isFileUri(url: string): boolean {
 /**
  * Ingests a `.alcedoplan` file (and legacy `.liftlogplan`) the OS handed us - either the URL the app was
  * launched with, or one received while already running. HTTPS app links and the
- * `alcedo://` / `liftlog://` schemes are left for expo-router; we only handle file/content URIs.
+ * `alcedo://` scheme URLs are left for expo-router; we only handle file/content URIs.
  */
 export function useIncomingPlanFile() {
   const dispatch = useDispatch();

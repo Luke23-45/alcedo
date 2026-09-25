@@ -1,6 +1,6 @@
-# The `.liftlogplan` format
+# The `.alcedoplan` format
 
-A `.liftlogplan` file is a single JSON object. `ProgramBlueprint.json` in this directory is the authoritative JSON Schema; this page explains it.
+A `.alcedoplan` file is a single JSON object. `ProgramBlueprint.json` in this directory is the authoritative JSON Schema; this page explains it.
 
 ## Rules that catch everyone
 
@@ -253,7 +253,7 @@ Note the lowercase `type`. `unit` must be one of `"metre"`, `"yard"`, `"mile"`, 
 ## Validate before you hand it over
 
 ```bash
-node scripts/validate-plan.mjs "My Plan.liftlogplan"
+node scripts/validate-plan.mjs "My Plan.alcedoplan"
 ```
 
 No install, no network. It lists every problem with the path to the field, e.g.:

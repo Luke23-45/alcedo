@@ -4,11 +4,11 @@ import type { TranslationKey } from '@tolgee/web';
 export type BackendId = string;
 
 /**
- * `liftlog` - a full Alcedo backend. `url` is a base; each feature appends its own path.
+ * `alcedo` - a full Alcedo backend. `url` is a base; each feature appends its own path.
  * `backupEndpoint` - a bare implementation of the backup protocol (see docs/RemoteBackup.md).
  * `url` is the literal POST target, and backup is the only feature it can serve.
  */
-export type BackendKind = 'liftlog' | 'backupEndpoint';
+export type BackendKind = 'alcedo' | 'backupEndpoint';
 
 export type BackendFeature = 'feed' | 'backup';
 
@@ -50,7 +50,7 @@ export interface ResolvedBackendForFeature {
   isBuiltIn: boolean;
 }
 
-export const builtInBackendId = 'liftlog';
+export const builtInBackendId = 'alcedo';
 
 /**
  * The built-in backend is backend-v2, which serves auth, sync, and the AI
@@ -62,7 +62,7 @@ export function backendSupportsFeature(backend: Backend, feature: BackendFeature
   if (backend.id === builtInBackendId) {
     return false;
   }
-  return backend.kind === 'liftlog' || feature === 'backup';
+  return backend.kind === 'alcedo' || feature === 'backup';
 }
 
 export function backendHeaderRecord(backend: Backend): Record<string, string> {

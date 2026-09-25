@@ -53,7 +53,7 @@ if (useManagedAndroidSdkVersions) {
 jsonSchemaCodegen {
     inputFile = file('src/main/resources/schema')
     configFile = file('src/main/resources/schema-codegen-config.json')
-    packageName = 'com.limajuice.liftlog'
+    packageName = 'com.powergym.alcedo'
     outputDir = file('./build/generated-sources/kotlin')
 }
 

@@ -51,7 +51,7 @@ function CompleteRow({
   onAssign: () => void;
 }) {
   const { t } = useTranslate();
-  const kind = backend.kind === 'liftlog' ? t('backends.kind.liftlog.label') : t('backends.kind.backup_endpoint.label');
+  const kind = backend.kind === 'alcedo' ? t('backends.kind.alcedo.label') : t('backends.kind.backup_endpoint.label');
   return (
     <S.ServerRowPressable
       accessibilityRole="radio"
@@ -120,7 +120,7 @@ export function ServerList() {
   // An editor left empty removes it — unchanged behavior.
   const addBackend = () => {
     const id = uuid();
-    dispatch(putBackend({ id, name: '', url: '', kind: 'liftlog', headers: [] }));
+    dispatch(putBackend({ id, name: '', url: '', kind: 'alcedo', headers: [] }));
     push(`/settings/backends/${id}`);
   };
 

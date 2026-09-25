@@ -1,4 +1,4 @@
-import { LiftLog } from '@/gen/proto';
+import { Alcedo } from '@/gen/proto';
 import { Session } from '@/models/session-models';
 import { ProtobufToJsonV1Migrator } from '@/models/storage/versions/initial/protobuf-migrator';
 import { fromJsonString, JsonString } from '@/models/storage/versions/latest';
@@ -60,7 +60,7 @@ export async function migrateLegacyCurrentSession(
 
 async function readV2Proto(keyValueStore: KeyValueStore, getState: () => RootState) {
   const bytes = (await keyValueStore.getItemBytes(storageKey)) ?? Uint8Array.from([]);
-  const dao = LiftLog.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2.decode(bytes);
+  const dao = Alcedo.Ui.Models.CurrentSessionStateDao.CurrentSessionStateDaoV2.decode(bytes);
   const preferredWeightUnit = selectPreferredWeightUnit(getState());
   const restore = (session: typeof dao.workoutSession) =>
     session

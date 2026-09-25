@@ -8,7 +8,7 @@ export type BackendProbeFailure =
 
 export type BackendProbeResult =
   | { status: 'ok'; features: string[] }
-  | { status: 'notLiftLog'; failure: BackendProbeFailure }
+  | { status: 'notAlcedo'; failure: BackendProbeFailure }
   | { status: 'unreachable'; error: string };
 
 /** Long enough to recognise a login page or an error payload, short enough to sit under a text field. */
@@ -49,7 +49,7 @@ export async function probeBackendFeatures(backend: Backend): Promise<BackendPro
   const body = await readBody(response);
   if (!response.ok) {
     return {
-      status: 'notLiftLog',
+      status: 'notAlcedo',
       failure: {
         kind: 'httpError',
         statusCode: response.status,
@@ -63,7 +63,7 @@ export async function probeBackendFeatures(backend: Backend): Promise<BackendPro
     features = JSON.parse(body);
   } catch {
     return {
-      status: 'notLiftLog',
+      status: 'notAlcedo',
       failure: {
         kind: 'notJson',
         contentType: response.headers.get('content-type') ?? '',
@@ -72,7 +72,7 @@ export async function probeBackendFeatures(backend: Backend): Promise<BackendPro
     };
   }
   if (typeof features !== 'object' || features === null || Array.isArray(features)) {
-    return { status: 'notLiftLog', failure: { kind: 'notFeatureObject', body: snippet(body) } };
+    return { status: 'notAlcedo', failure: { kind: 'notFeatureObject', body: snippet(body) } };
   }
   return {
     status: 'ok',

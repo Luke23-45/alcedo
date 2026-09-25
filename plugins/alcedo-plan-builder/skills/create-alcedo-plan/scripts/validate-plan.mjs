@@ -1853,7 +1853,7 @@ var import_validate_schema = __toESM(require_validate_schema(), 1);
 import { readFileSync } from "node:fs";
 var file = process.argv[2];
 if (!file) {
-  console.error("usage: node validate-plan.mjs <plan.liftlogplan>");
+  console.error("usage: node validate-plan.mjs <plan.alcedoplan>");
   process.exit(2);
 }
 var plan;
@@ -1864,10 +1864,10 @@ try {
   process.exit(1);
 }
 if ((0, import_validate_schema.default)(plan)) {
-  console.log(`${file} is a valid LiftLog plan.`);
+  console.log(`${file} is a valid Alcedo plan.`);
   process.exit(0);
 }
-console.error(`${file} is not a valid LiftLog plan:
+console.error(`${file} is not a valid Alcedo plan:
 `);
 for (const error of import_validate_schema.default.errors) {
   const path = error.instancePath || "/";

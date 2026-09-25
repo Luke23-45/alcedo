@@ -18,7 +18,7 @@ always the fallback layer under the active locale. Missing files, keys, or field
 
 ## Adding / updating a locale
 
-Translations are managed in Weblate at https://translate.liftlog.online
+Translations live in `app/src/i18n/` — add new locales there
 
 When adding a new locale, ensure to add the loader to the `localeLoaders` function in the `exercise-catalog.ts`
 

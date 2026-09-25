@@ -1,8 +1,8 @@
 package expo.modules.workoutworker.handlers
 
 
-import com.limajuice.liftlog.WorkoutMessage
-import com.limajuice.liftlog.WorkoutStartedEvent
+import com.powergym.alcedo.WorkoutMessage
+import com.powergym.alcedo.WorkoutStartedEvent
 import expo.modules.workoutworker.utils.WorkoutNotificationManager
 import kotlin.time.ExperimentalTime
 

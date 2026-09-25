@@ -1,10 +1,10 @@
 # Introduction
 
-This deploys a backend to your own personal AWS account that can be used to store backups of your LiftLog data. While you do not need to be an experienced programmer or AWS expert to do this, this is certainly for the more technically minded. I ( https://github.com/cannontrodder ) have contributed this reference implementation to LiftLog and if I see any questions in issues, I will try to help but this implementation is provided as-is and neither I nor the maintainer of LiftLog can be held responsible for any costs or issues that arise from using it.
+This deploys a backend to your own personal AWS account that can be used to store backups of your Alcedo data. While you do not need to be an experienced programmer or AWS expert to do this, this is certainly for the more technically minded. I ( https://github.com/cannontrodder ) have contributed this reference implementation to LiftLog and if I see any questions in issues, I will try to help but this implementation is provided as-is and neither I nor the maintainer of LiftLog can be held responsible for any costs or issues that arise from using it.
 
 # The server
 
-This deploys a serverless lambda, written in Node.js which will accept files uploaded from LiftLog and store those files into an S3 bucket. The lambda is hosted behind AWS API Gateway which allows us to implement TLS that apps calling backend require for security. The files will be stored in the S3 bucket organised by date and by default will never expire. You are able to set an expiry length in days if you wish, and that will prevent the bucket continuously growing in size. With respect to that, backups are rather small, measuring in the low kilobytes, so you can store a lot of them before you need to worry about the cost of storage.
+This deploys a serverless lambda, written in Node.js which will accept files uploaded from Alcedo and store those files into an S3 bucket. The lambda is hosted behind AWS API Gateway which allows us to implement TLS that apps calling backend require for security. The files will be stored in the S3 bucket organised by date and by default will never expire. You are able to set an expiry length in days if you wish, and that will prevent the bucket continuously growing in size. With respect to that, backups are rather small, measuring in the low kilobytes, so you can store a lot of them before you need to worry about the cost of storage.
 
 # Costs
 
@@ -22,7 +22,7 @@ The below guide is for Apple Mac users (and possibly Linux users). The command l
 
 You will need your own [AWS account](https://aws.amazon.com/free/).
 
-- From the IAM service, Create an IAM User Group called `liftlog-deploy` - do not attach any permissions to it yet.
+- From the IAM service, Create an IAM User Group called `alcedo-deploy` - do not attach any permissions to it yet.
 - Edit it and go to the `Permissions` tab, click `Add Permissions` -> `Attach Policies` and then add the following managed policies:
 
 ```
@@ -32,20 +32,20 @@ AWSLambda_FullAccess
 IAMFullAccess
 ```
 
-- Create a user `liftlog-deploy` and add it to the `liftlog-deploy` group.
+- Create a user `alcedo-deploy` and add it to the `alcedo-deploy` group.
 - Select the user and then go to `Security credentials` and generate an access key. Choose `other` when AWS wants your use case. Feel free to use one of the alternate methods if you prefer, but explaining the set up for those is out of scope for this document.
-- Tag it `liftlog-deploy` to make it easier to identify later.
+- Tag it `alcedo-deploy` to make it easier to identify later.
 - Copy the access key and secret key to a safe place. You will not be able to see the secret key again. Store it in your .aws/config file locally:
 
 ```bash
-[profile liftlog-aws-profile]
+[profile alcedo-aws-profile]
 aws_access_key_id = <access key>
 aws_secret_access_key = <secret key>
 ```
 
 - If you do not have this file already; you should create it. It lives in your user folder. On Windows, this is usually C:\Users\<username>\.aws\config. On Linux, it is ~/.aws/config.
-- Make a note of the profile name, you will need it later. It is fine to leave it as `liftlog-aws-profile` if you want.
-- In AWS, go to the S3 service and create a bucket accepting all the defaults. The name must be globally unique but it can be anything you want, e.g. `YOURNAME-liftlog-state-bucket`.
+- Make a note of the profile name, you will need it later. It is fine to leave it as `alcedo-aws-profile` if you want.
+- In AWS, go to the S3 service and create a bucket accepting all the defaults. The name must be globally unique but it can be anything you want, e.g. `YOURNAME-alcedo-state-bucket`.
 - Make a note of this bucket name for later, this is your terraform 'state bucket'.
 
 Recap:
@@ -62,7 +62,7 @@ These programs make it easy to install the exact version of node and terraform t
 
 ## Build the node app
 
-- Change directory into `LiftLog/examples/remote-backup/reference-server-implementation/aws-lambda-s3-deployable/src`
+- Change directory into `alcedo/examples/remote-backup/reference-server-implementation/aws-lambda-s3-deployable/src`
 - Install the correct version of node and then build the app:
 
 ```bash
@@ -77,13 +77,13 @@ npm run package
 - The tests exercise the Lambda request and S3 upload behavior locally without
   writing to AWS.
 - There will now be a deterministic `lambda.zip` file in the
-  `LiftLog/examples/remote-backup/reference-server-implementation/aws-lambda-s3-deployable/terraform`
+  `alcedo/examples/remote-backup/reference-server-implementation/aws-lambda-s3-deployable/terraform`
   folder. This is the file that will be uploaded to AWS to run the backup
   server.
 
 ## Configure terraform
 
-Before you use terraform to deploy the infrastructure, you need add some settings to files in the `LiftLog/examples/remote-backup/reference-server-implementation/aws-lambda-s3-deployable/terraform` folder:
+Before you use terraform to deploy the infrastructure, you need add some settings to files in the `alcedo/examples/remote-backup/reference-server-implementation/aws-lambda-s3-deployable/terraform` folder:
 
 In `backend.tfvars`, configure:
 
@@ -97,18 +97,18 @@ This is the name of the state bucket you created earlier. This bucket keeps trac
 
 - 'profile'
 
-This must match the name of the AWS profile you created in the `.aws/config file`. The default is `liftlog-aws-profile` and you probably won't need to change it.
+This must match the name of the AWS profile you created in the `.aws/config file`. The default is `alcedo-aws-profile` and you probably won't need to change it.
 
 In `terraform.tfvars` you must also configure:
 
 - `region` and `profile` to match the above values but there is an additional setting.
-- `liftlog_backup_bucket_name` - this is the actual bucket where your backups will go. This needs to be a globally unique name so call it what you want, perhaps `YOURNAME-liftlog-backups`. Terraform will create this bucket for you in the next steps.
+- `alcedo_backup_bucket_name` - this is the actual bucket where your backups will go. This needs to be a globally unique name so call it what you want, perhaps `YOURNAME-alcedo-backups`. Terraform will create this bucket for you in the next steps.
 
 There is also an optional `delete_after_days` variable. Uncomment this to set an expiry on your backups in days. **With versioning enabled, S3 will expire the current backup after that many days and then remove the noncurrent version after the same period again, so the object can remain recoverable and billable for longer than the raw number suggests.** I personally set it to be 365 days, if I don't go to the gym for that long, I probably won't be going back!
 
 ## Run terraform to deploy the node app
 
-- Change directory into `LiftLog/examples/remote-backup/reference-server-implementation/aws-lambda-s3-deployable/terraform`
+- Change directory into `alcedo/examples/remote-backup/reference-server-implementation/aws-lambda-s3-deployable/terraform`
 - Run `tfenv install`
 - Run `tfenv use`
 - Run `terraform init -backend-config=backend.tfvars`
@@ -121,9 +121,9 @@ There is also an optional `delete_after_days` variable. Uncomment this to set an
   backups are readable
 - The URL of the lambda and the API key will have been written to `output.txt` in the root of the project.
 
-## Configuring LiftLog to use the remote backup
+## Configuring Alcedo to use the remote backup
 
-Save the file `output.txt` somewhere safe. Open it and note the url and api key. Add these to the remote backup configuration in LiftLog and when you click 'Test', it should work.
+Save the file `output.txt` somewhere safe. Open it and note the url and api key. Add these to the remote backup configuration in Alcedo and when you click 'Test', it should work.
 
 To access your backup, log into the AWS Console, navigate to S3, find your bucket and your files will be organised into folders by date. Object versioning is enabled so accidental overwrites and deletes can be recovered from S3.
 

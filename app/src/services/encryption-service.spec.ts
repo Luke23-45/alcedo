@@ -80,7 +80,7 @@ describe('EncryptionService', () => {
 
   describe('signRsa256PssAndEncryptAesCbcAsync / decryptAesCbcAndVerifyRsa256PssAsync', () => {
     it('round-trips arbitrary data', async () => {
-      const plaintext = new TextEncoder().encode('hello liftlog');
+      const plaintext = new TextEncoder().encode('hello alcedo');
       const encrypted = await svc.signRsa256PssAndEncryptAesCbcAsync(plaintext, aesKey, rsaKeyPair.privateKey);
       const decrypted = await svc.decryptAesCbcAndVerifyRsa256PssAsync(encrypted, aesKey, rsaKeyPair.publicKey);
       expect(Array.from(decrypted)).toEqual(Array.from(plaintext));

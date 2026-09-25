@@ -1,6 +1,6 @@
 package expo.modules.workoutworker.handlers
 
-import com.limajuice.liftlog.WorkoutMessage
+import com.powergym.alcedo.WorkoutMessage
 
 /**
  * Interface for handling specific workout event types.

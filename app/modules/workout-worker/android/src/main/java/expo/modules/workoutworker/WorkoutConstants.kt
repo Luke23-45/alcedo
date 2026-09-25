@@ -4,13 +4,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
-import com.limajuice.liftlog.WorkoutMessage
+import com.powergym.alcedo.WorkoutMessage
 import expo.modules.workoutworker.utils.Json
 
 object WorkoutConstants {
     const val BUNDLE_EXTRA_MESSAGE_KEY = "expo.modules.workoutworker.MESSAGE"
 
-    const val SESSION_PAGE_URI = "liftlog://session"
+    const val SESSION_PAGE_URI = "alcedo://session"
 
     // Fired when the user swipes away the promoted Live Update; re-promoting after this would make
     // Android revoke our promotion permission, so we downgrade to a plain ongoing notification.

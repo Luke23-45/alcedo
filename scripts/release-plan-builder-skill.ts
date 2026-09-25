@@ -8,7 +8,7 @@ import { tmpdir } from "os";
 import { join } from "path";
 
 const SKILL_TAG = "plan-builder-skill";
-const SKILL_PATH = "plugins/liftlog-plan-builder/skills/create-liftlog-plan";
+const SKILL_PATH = "plugins/alcedo-plan-builder/skills/create-alcedo-plan";
 
 $.verbose = false;
 // Every path below is repo-relative, but the script is run from `scripts/`.
@@ -71,7 +71,7 @@ if (currentSha) {
 
 // Built from the tagged commit rather than the working tree, so an unpushed or
 // half-finished local change can never end up in what users install.
-const workDir = mkdtempSync(join(tmpdir(), "liftlog-skill-"));
+const workDir = mkdtempSync(join(tmpdir(), "alcedo-skill-"));
 try {
   await $`git archive ${sha} ${SKILL_PATH} | tar -x -C ${workDir}`;
   const skillDir = join(workDir, SKILL_PATH);
@@ -96,10 +96,10 @@ try {
   await $`git push --force origin ${`refs/tags/${SKILL_TAG}`}`;
   console.log(`  ✓ Moved ${SKILL_TAG} to ${sha.slice(0, 9)} - /plugin install now serves it`);
 
-  const skillsDir = join(workDir, "plugins/liftlog-plan-builder/skills");
-  await $({ cwd: skillsDir })`zip -r create-liftlog-plan.zip create-liftlog-plan/`;
-  await $`gh release upload ${SKILL_TAG} ${join(skillsDir, "create-liftlog-plan.zip")} --clobber`;
-  console.log("  ✓ Uploaded create-liftlog-plan.zip - the claude.ai download now serves it");
+  const skillsDir = join(workDir, "plugins/alcedo-plan-builder/skills");
+  await $({ cwd: skillsDir })`zip -r create-alcedo-plan.zip create-alcedo-plan/`;
+  await $`gh release upload ${SKILL_TAG} ${join(skillsDir, "create-alcedo-plan.zip")} --clobber`;
+  console.log("  ✓ Uploaded create-alcedo-plan.zip - the claude.ai download now serves it");
 } finally {
   rmSync(workDir, { recursive: true, force: true });
 }
