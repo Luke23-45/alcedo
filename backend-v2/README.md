@@ -1,6 +1,9 @@
 # Alcedo Backend v2
 
-NestJS 11 + TypeScript + MongoDB (Mongoose) modular monolith. Migration target for the
+NestJS 11 + TypeScript modular monolith with **two production-grade persistence
+backends — MongoDB (Mongoose) and PostgreSQL (Prisma)**. Exactly one backend is
+active per deployment, selected by `DB_PROVIDER`; both implement the same
+repository contracts (see "Database providers" below). Migration target for the
 legacy .NET backend in `~/workspace/alcedo/backend` (which this project does not touch).
 
 Identity is **Google-only OAuth**, keyed by the stable Google `sub` claim — never by email.
@@ -12,7 +15,7 @@ webhook** tied to the same Google account. There is no Stripe integration, by de
 ```
 src/
 ├── main.ts                  # bootstrap: global prefix /api, validation, filters, helmet, CORS
-├── app.module.ts            # module wiring + startup MongoDB probe
+├── app.module.ts            # module wiring + startup database probe (either provider)
 ├── config/                  # strict env validation (env.validation.ts), LiteLLM yaml template
 ├── common/                  # request-id middleware, logging, AllExceptionsFilter,
 │                            #   JwtAuthGuard (global), cursor pagination helpers,
@@ -71,7 +74,7 @@ Global prefix: `/api`. Webhook routes are public; everything else needs a Bearer
 | DELETE | `/api/ai/conversations/:id` | Delete conversation + its messages (204) |
 | POST | `/api/ai/conversations/:id/messages` | Send a message, get the coach reply (30/min) |
 | POST | `/api/ai/conversations/:id/messages/stream` | SSE stream of the reply (20/min, premium-gated) |
-| GET | `/api/healthz` | Liveness + MongoDB + heap checks |
+| GET | `/api/healthz` | Liveness + database (active provider) + heap checks |
 
 Default rate limit: 120 requests / 60s per IP. Webhook routes skip throttling (bursty
 provider delivery); auth login/refresh and AI message routes have tighter per-route limits.
@@ -235,7 +238,9 @@ All required in production; validated at startup with clear errors.
 | -------- | -------- | ------- | ------- |
 | `NODE_ENV` | no | `development` | `production` enables strict behaviors |
 | `PORT` | no | `3000` | HTTP port |
-| `MONGODB_URI` | **yes** | — | MongoDB connection string |
+| `DB_PROVIDER` | no | `mongodb` | `mongodb` or `postgres` — the persistence backend for this deployment |
+| `MONGODB_URI` | **yes, when `DB_PROVIDER=mongodb`** | — | MongoDB connection string |
+| `DATABASE_URL` | **yes, when `DB_PROVIDER=postgres`** | — | PostgreSQL connection string, e.g. `postgresql://alcedo:alcedo@localhost:5432/alcedo` |
 | `JWT_ACCESS_SECRET` | **yes** | — | ≥32 chars; signs access JWTs |
 | `JWT_ACCESS_TTL_SECONDS` | no | `900` | Access token lifetime |
 | `JWT_REFRESH_TTL_DAYS` | no | `30` | Refresh token lifetime |
@@ -260,8 +265,35 @@ All required in production; validated at startup with clear errors.
 | `WEB_CHECKOUT_SECRET` | **yes** | — | ≥16 chars; HMAC key for web-checkout webhook |
 | `TOMBSTONE_RETENTION_DAYS` | no | `90` | Hard-purge age for soft-deleted docs |
 
-Startup probes MongoDB with six exponential-backoff attempts before listening; the
-process exits loudly if it cannot connect.
+Startup probes the active database with six exponential-backoff attempts before
+listening; the process exits loudly if it cannot connect.
+
+## Database providers
+
+One provider is active per deployment — never dual-write, never mixed. The
+twelve repository contracts in `src/*/repositories/*-repository.interface.ts`
+are implemented twice: `mongo-*.repository.ts` (Mongoose) and
+`prisma-*.repository.ts` (Prisma + PostgreSQL). `PersistenceModule` binds
+exactly one implementation per token based on `DB_PROVIDER`.
+
+Behavioral parity is enforced by contract tests in `test/parity/`, which run
+the same suites against a real MongoDB (in-memory server) and a real
+PostgreSQL:
+
+```bash
+npm run test:parity
+```
+
+PostgreSQL schema is managed with Prisma Migrate (`prisma/schema.prisma` →
+`prisma/migrations/`). From a clean database:
+
+```bash
+# point DATABASE_URL at the target database, then:
+npx prisma migrate deploy
+```
+
+The compose file runs both databases for local development (`mongo` on 27017,
+`postgres` on 5432); pick one per backend instance via `DB_PROVIDER`.
 
 ## What is deliberately not in v1
 
@@ -280,9 +312,11 @@ npm install
 cp .env.example .env   # fill in secrets
 npm run start:dev
 npm run typecheck      # tsc --noEmit
-npx jest               # 12 suites
+npx jest               # unit suites
+npm run test:parity    # repository parity: real MongoDB + real PostgreSQL
 npm run lint           # oxlint, 0 warnings
 npm run build
 ```
 
-Docker: `docker-compose.yml` runs MongoDB for local development.
+Docker: `docker-compose.yml` runs MongoDB and PostgreSQL for local development
+(one provider active per backend instance via `DB_PROVIDER`).

@@ -1,20 +1,16 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { EntitlementService } from './entitlement.service';
-import { MongoUserRepository } from './repositories/mongo-user.repository';
-import { UserRepository } from './repositories/user-repository.interface';
-import { User, UserSchema } from './schemas/user.schema';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
+/**
+ * Repository bindings live in the global PersistenceModule now — this module
+ * only wires its services and controller. The UserRepository token resolves
+ * to the MongoDB or PostgreSQL implementation per DB_PROVIDER.
+ */
 @Module({
   controllers: [UsersController],
-  exports: [UsersService, EntitlementService, UserRepository],
-  imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
-  providers: [
-    UsersService,
-    EntitlementService,
-    { provide: UserRepository, useClass: MongoUserRepository },
-  ],
+  exports: [UsersService, EntitlementService],
+  providers: [UsersService, EntitlementService],
 })
 export class UsersModule {}

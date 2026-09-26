@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { SiteConfig, SiteConfigSchema } from './site-config.schema';
 import { SiteConfigService } from './site-config.service';
+
+// The SiteConfigRepository binding is owned by the global
+// PersistenceModule — this module injects the token directly.
 
 @Module({
   exports: [SiteConfigService],
-  imports: [MongooseModule.forFeature([{ name: SiteConfig.name, schema: SiteConfigSchema }])],
   providers: [SiteConfigService],
 })
 export class SiteConfigModule {}

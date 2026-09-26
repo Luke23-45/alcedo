@@ -1,78 +1,136 @@
-import { Model } from 'mongoose';
 import { EntitlementService } from './entitlement.service';
-import { UserDocument } from './schemas/user.schema';
+import type { PremiumSource } from './schemas/user.schema';
+import type { UserRecord, UserRepository } from './repositories/user-repository.interface';
 
-interface StoredDoc {
-  googleSub: string;
-  premium: {
-    status: 'none' | 'active' | 'expired';
-    source?: 'revenuecat' | 'web' | 'manual';
-    expiresAt?: Date | null;
-    updatedAt: Date;
+/** In-memory UserRepository fake honoring the contract semantics. */
+function makeRepository(seed: UserRecord[] = []) {
+  const store = new Map<string, UserRecord>();
+  for (const record of seed) store.set(record.googleSub, record);
+
+  const repo: UserRepository = {
+    count: () => Promise.resolve(store.size),
+    countAdmins: () =>
+      Promise.resolve([...store.values()].filter((r) => r.isAdmin).length),
+    expireEntitlement: (googleSub: string, source: PremiumSource) => {
+      const record = store.get(googleSub);
+      // Source guard is atomic in the real implementations — a mismatched
+      // source must not revoke another provider's grant.
+      if (!record || record.premium.source !== source || record.premium.status !== 'active') {
+        return Promise.resolve(null);
+      }
+      record.premium.status = 'expired';
+      record.premium.updatedAt = new Date();
+      return Promise.resolve(record);
+    },
+    findByGoogleSub: (googleSub: string) => Promise.resolve(store.get(googleSub) ?? null),
+    findByStripeCustomerId: () => Promise.resolve(null),
+    create: (input: { googleSub: string; email?: string; name?: string; picture?: string }) => {
+      const now = new Date();
+      const record: UserRecord = {
+        createdAt: now,
+        email: input.email,
+        googleSub: input.googleSub,
+        id: `user-${input.googleSub}`,
+        isAdmin: false,
+        name: input.name,
+        picture: input.picture,
+        premium: { expiresAt: null, source: undefined, status: 'none', updatedAt: now },
+        units: 'metric',
+        updatedAt: now,
+      };
+      store.set(input.googleSub, record);
+      return Promise.resolve(record);
+    },
+    updateProfile: (
+      googleSub: string,
+      patch: { name?: string; picture?: string; units?: 'metric' | 'imperial' },
+    ) => {
+      const record = store.get(googleSub);
+      if (!record) return Promise.resolve(null);
+      if (patch.name !== undefined) record.name = patch.name;
+      if (patch.picture !== undefined) record.picture = patch.picture;
+      if (patch.units !== undefined) record.units = patch.units;
+      record.updatedAt = new Date();
+      return Promise.resolve(record);
+    },
+    updateEntitlement: (
+      googleSub: string,
+      entitlement: { status: 'active' | 'expired' | 'none'; source: PremiumSource; expiresAt?: Date },
+    ) => {
+      const record = store.get(googleSub);
+      if (!record) return Promise.resolve(null);
+      const now = new Date();
+      record.premium = {
+        expiresAt: entitlement.expiresAt ?? null,
+        source: entitlement.source,
+        status: entitlement.status,
+        updatedAt: now,
+      };
+      record.updatedAt = now;
+      return Promise.resolve(record);
+    },
+    grantEntitlement: (googleSub: string, source: PremiumSource, expiresAt: Date | null) => {
+      const now = new Date();
+      const record = store.get(googleSub) ?? {
+        createdAt: now,
+        email: undefined,
+        googleSub,
+        id: `user-${googleSub}`,
+        isAdmin: false,
+        name: undefined,
+        picture: undefined,
+        premium: { expiresAt: null, source: undefined, status: 'none', updatedAt: now },
+        units: 'metric' as const,
+        updatedAt: now,
+      };
+      record.premium = { expiresAt, source, status: 'active', updatedAt: now };
+      record.updatedAt = now;
+      store.set(googleSub, record);
+      return Promise.resolve(record);
+    },
+    isAdmin: (googleSub: string) => Promise.resolve(store.get(googleSub)?.isAdmin ?? false),
+    linkStripeCustomer: (googleSub: string, ids: { customerId?: string | null; subscriptionId?: string | null }) => {
+      const record = store.get(googleSub);
+      if (!record) return Promise.resolve(null);
+      if (ids.customerId) record.stripeCustomerId = ids.customerId;
+      if (ids.subscriptionId) record.stripeSubscriptionId = ids.subscriptionId;
+      return Promise.resolve(record);
+    },
+    listRecent: (limit: number, offset = 0) =>
+      Promise.resolve(
+        [...store.values()]
+          .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+          .slice(offset, offset + limit),
+      ),
+    setAdmin: (googleSub: string, isAdmin: boolean) => {
+      const record = store.get(googleSub);
+      if (!record) return Promise.resolve(null);
+      record.isAdmin = isAdmin;
+      return Promise.resolve(record);
+    },
   };
-}
-
-function makeService(seed: StoredDoc[] = []) {
-  const store = new Map<string, StoredDoc>();
-  for (const doc of seed) store.set(doc.googleSub, doc);
-
-  const model = {
-    findOne: jest.fn((query: { googleSub: string }) => ({
-      select: jest.fn().mockReturnThis(),
-      lean: jest.fn().mockReturnThis(),
-      exec: jest.fn().mockResolvedValue(store.get(query.googleSub) ?? null),
-    })),
-    findOneAndUpdate: jest.fn(
-      (
-        filter: { googleSub: string } & Record<string, unknown>,
-        update: { $set: Record<string, unknown> },
-        options?: { upsert?: boolean },
-      ) => ({
-        exec: jest.fn().mockImplementation(async () => {
-          let doc = store.get(filter.googleSub);
-          if (!doc && options?.upsert) {
-            doc = {
-              googleSub: filter.googleSub,
-              premium: { status: 'none', updatedAt: new Date() },
-            };
-            store.set(filter.googleSub, doc);
-          }
-          if (doc) {
-            // Honor dotted filter conditions (e.g. expire's
-            // 'premium.source'/'premium.status' guard): a non-matching
-            // filter updates nothing, like Mongo.
-            for (const [key, value] of Object.entries(filter)) {
-              if (key === 'googleSub') continue;
-              const actual = key.startsWith('premium.')
-                ? (doc.premium as Record<string, unknown>)[key.slice('premium.'.length)]
-                : (doc as unknown as Record<string, unknown>)[key];
-              if (actual !== value) return doc;
-            }
-            for (const [key, value] of Object.entries(update.$set)) {
-              if (key === 'premium') {
-                doc.premium = value as StoredDoc['premium'];
-              } else if (key.startsWith('premium.')) {
-                (doc.premium as Record<string, unknown>)[key.slice('premium.'.length)] = value;
-              }
-            }
-          }
-          return doc ?? null;
-        }),
-      }),
-    ),
-  };
-  const service = new EntitlementService(model as unknown as Model<UserDocument>);
-  return { model, service, store };
+  return { repo, store };
 }
 
 function stored(
   googleSub: string,
-  premium: Partial<StoredDoc['premium']> & { status: StoredDoc['premium']['status'] },
-): StoredDoc {
+  premium: Partial<UserRecord['premium']> & { status: UserRecord['premium']['status'] },
+): UserRecord {
+  const now = new Date();
   return {
+    createdAt: now,
     googleSub,
-    premium: { updatedAt: new Date(), ...premium },
+    id: `user-${googleSub}`,
+    isAdmin: false,
+    premium: { expiresAt: null, source: undefined, updatedAt: now, ...premium },
+    units: 'metric',
+    updatedAt: now,
   };
+}
+
+function makeService(seed: UserRecord[] = []) {
+  const { repo, store } = makeRepository(seed);
+  return { repo, service: new EntitlementService(repo), store };
 }
 
 describe('EntitlementService state machine', () => {
@@ -172,17 +230,12 @@ describe('EntitlementService state machine', () => {
     expect(await service.isPremiumActive('ghost')).toBe(false);
   });
 
-  it('grant upserts: a missing user document is created', async () => {
-    const { model, service, store } = makeService();
+  it('grant upserts: a missing user record is created', async () => {
+    const { service, store } = makeService();
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
     await service.grant('brand-new', 'web', expiresAt);
 
-    expect(model.findOneAndUpdate).toHaveBeenCalledWith(
-      { googleSub: 'brand-new' },
-      expect.objectContaining({ $set: expect.anything() }),
-      expect.objectContaining({ upsert: true }),
-    );
     expect(store.get('brand-new')!.premium).toMatchObject({
       expiresAt,
       source: 'web',
@@ -197,5 +250,25 @@ describe('EntitlementService state machine', () => {
     await service.expire('ghost', 'revenuecat');
 
     expect(store.has('ghost')).toBe(false);
+  });
+
+  it('linkStripeCustomer links both IDs when provided', async () => {
+    const { repo, service, store } = makeService([stored('u1', { status: 'none' })]);
+    const link = jest.spyOn(repo, 'linkStripeCustomer');
+
+    await service.linkStripeCustomer('u1', 'cus_123', 'sub_456');
+
+    expect(link).toHaveBeenCalledWith('u1', { customerId: 'cus_123', subscriptionId: 'sub_456' });
+    expect(store.get('u1')!.stripeCustomerId).toBe('cus_123');
+    expect(store.get('u1')!.stripeSubscriptionId).toBe('sub_456');
+  });
+
+  it('linkStripeCustomer with both IDs null does not touch the store', async () => {
+    const { repo, service } = makeService([stored('u1', { status: 'none' })]);
+    const link = jest.spyOn(repo, 'linkStripeCustomer');
+
+    await service.linkStripeCustomer('u1', null, null);
+
+    expect(link).not.toHaveBeenCalled();
   });
 });

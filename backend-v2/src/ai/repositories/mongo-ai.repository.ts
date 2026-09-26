@@ -138,6 +138,7 @@ export class MongoAiUsageRepository extends AiUsageRepository {
       costUsd: input.costUsd ?? null,
       messageId: input.messageId,
       promptTokens: input.promptTokens,
+      skillNames: input.skillNames,
       userId: input.userId,
     });
   }

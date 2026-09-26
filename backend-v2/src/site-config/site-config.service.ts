@@ -1,9 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { SiteConfigRepository } from './repositories/site-config-repository.interface';
 import { decryptSecret, encryptSecret, maskSecret } from './secret-crypto';
-import { SiteConfig, SiteConfigDocument } from './site-config.schema';
 
 export interface ConfigEntry {
   key: string;
@@ -30,13 +28,13 @@ export class SiteConfigService {
   private readonly logger = new Logger(SiteConfigService.name);
 
   constructor(
-    @InjectModel(SiteConfig.name) private readonly model: Model<SiteConfigDocument>,
+    private readonly store: SiteConfigRepository,
     private readonly config: ConfigService,
   ) {}
 
   /** Reads a config value, falling back to `defaultValue` when unset. */
   async get(key: string, defaultValue: string | null = null): Promise<string | null> {
-    const doc = await this.model.findOne({ key }).lean().exec();
+    const doc = await this.store.findByKey(key);
     if (!doc) return defaultValue;
     if (doc.secret) {
       const encryptionKey = this.config.get<string>('CONFIG_ENCRYPTION_KEY');
@@ -65,14 +63,12 @@ export class SiteConfigService {
       }
       stored = encryptSecret(value, encryptionKey);
     }
-    await this.model
-      .findOneAndUpdate({ key }, { $set: { secret, value: stored } }, { upsert: true, new: true })
-      .exec();
+    await this.store.upsert(key, stored, secret);
   }
 
   /** All config entries for the admin panel. Secrets are masked. */
   async list(): Promise<ConfigEntry[]> {
-    const docs = await this.model.find().lean().exec();
+    const docs = await this.store.findAll();
     const entries: ConfigEntry[] = [];
     for (const doc of docs) {
       let display = doc.value;

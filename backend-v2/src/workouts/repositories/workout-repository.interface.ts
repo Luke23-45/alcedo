@@ -18,7 +18,12 @@ export interface WorkoutData {
 }
 
 export interface WorkoutRecord {
-  /** Mongo `_id` as hex — internal cursor tiebreaker only. */
+  /**
+   * Internal cursor tiebreaker only, opaque to clients: the Mongo `_id` hex
+   * on MongoDB, the decimal row id on PostgreSQL. Never compared
+   * lexicographically across providers — repositories order by the native
+   * column type.
+   */
   id: string;
   /** Client-generated UUID — the stable identity clients sync on. */
   clientId: string;
@@ -44,7 +49,8 @@ export abstract class WorkoutRepository {
   /**
    * Atomically applies a mutation only if the stored version still equals
    * baseVersion (and sets version = baseVersion + 1). On mismatch returns
-   * `conflict` with the current record, or null when the doc does not exist.
+   * `conflict` with a null record — the caller re-reads (findByClientId) to
+   * distinguish a version conflict from a missing row.
    */
   abstract applyIfVersionMatches(
     googleSub: string,
@@ -90,4 +96,9 @@ export abstract class SyncIdempotencyStore {
   abstract claim(key: string, googleSub: string): Promise<boolean>;
   abstract find(key: string): Promise<IdempotencyOutcome | null>;
   abstract save(key: string, googleSub: string, outcome: IdempotencyOutcome): Promise<void>;
+  /**
+   * Deletes claims created before `cutoff` — mirrors the Mongo TTL on
+   * `createdAt` (30 days). Returns the removed count.
+   */
+  abstract purgeExpired(cutoff: Date): Promise<number>;
 }

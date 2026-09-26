@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 import { SiteConfigModule } from '../site-config/site-config.module';
 import { UsersModule } from '../users/users.module';
 import { AiConfigService } from './ai-config.service';
@@ -18,20 +17,10 @@ import { QuotaService } from './quota.service';
 import { ALL_SKILLS } from './skills/skill-definitions';
 import { SkillRegistry } from './skills/skill-registry.service';
 import { SKILL_DEFINITIONS } from './skills/skill.interface';
-import {
-  AiUsageRepository,
-  ConversationRepository,
-  MessageRepository,
-} from './repositories/ai-repository.interface';
-import {
-  MongoAiUsageRepository,
-  MongoConversationRepository,
-  MongoMessageRepository,
-} from './repositories/mongo-ai.repository';
-import { AiDailyUsage, AiDailyUsageSchema } from './schemas/ai-daily-usage.schema';
-import { AiUsage, AiUsageSchema } from './schemas/ai-usage.schema';
-import { Conversation, ConversationSchema } from './schemas/conversation.schema';
-import { Message, MessageSchema } from './schemas/message.schema';
+
+// Repository bindings (ConversationRepository, MessageRepository,
+// AiUsageRepository, AiDailyUsageRepository) are owned by the global
+// PersistenceModule — this module injects the tokens directly.
 
 @Module({
   controllers: [ConversationsController],
@@ -40,12 +29,6 @@ import { Message, MessageSchema } from './schemas/message.schema';
     // stream gating — owned by the users module, never reimplemented here.
     UsersModule,
     SiteConfigModule,
-    MongooseModule.forFeature([
-      { name: Conversation.name, schema: ConversationSchema },
-      { name: Message.name, schema: MessageSchema },
-      { name: AiUsage.name, schema: AiUsageSchema },
-      { name: AiDailyUsage.name, schema: AiDailyUsageSchema },
-    ]),
   ],
   providers: [
     ConversationsService,
@@ -56,9 +39,6 @@ import { Message, MessageSchema } from './schemas/message.schema';
     SkillRegistry,
     AiConfigService,
     { provide: SKILL_DEFINITIONS, useValue: ALL_SKILLS },
-    { provide: ConversationRepository, useClass: MongoConversationRepository },
-    { provide: MessageRepository, useClass: MongoMessageRepository },
-    { provide: AiUsageRepository, useClass: MongoAiUsageRepository },
     { provide: TopicGuard, useClass: KeywordTopicGuard },
     { provide: MemoryService, useClass: Mem0MemoryService },
     {

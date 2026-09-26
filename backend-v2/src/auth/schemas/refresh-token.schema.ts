@@ -27,6 +27,9 @@ export class RefreshToken {
 
   @Prop({ required: false })
   replacedByHash?: string;
+
+  /** Managed by `timestamps: true`; declared for typed access. */
+  createdAt!: Date;
 }
 
 export type RefreshTokenDocument = RefreshToken & Document;

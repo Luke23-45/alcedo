@@ -1,13 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import {
   EntitlementService,
   EntitlementSource,
   EntitlementStatusValue,
 } from '../users/entitlement.service';
-import { WebhookEvent, WebhookEventDocument } from './schemas/webhook-event.schema';
+import {
+  WebhookClaimResult,
+  WebhookEventRepository,
+  WebhookProvider,
+} from './repositories/webhook-event-repository.interface';
 import { StripeService } from './stripe.service';
+
+export { WebhookProvider };
 
 /** Subset of the RevenueCat v1 webhook event we act on. */
 export interface RevenueCatEvent {
@@ -27,8 +31,6 @@ export interface WebCheckoutPayload {
   expiresAt: string | null;
 }
 
-export type WebhookProvider = 'revenuecat' | 'web' | 'stripe';
-
 /**
  * Premium pipeline: both purchase paths (RevenueCat native purchases and the
  * website checkout webhook) converge here, keyed by the Google `sub`. The app
@@ -42,18 +44,13 @@ export class PaymentsService {
   constructor(
     private readonly entitlements: EntitlementService,
     private readonly stripeService: StripeService,
-    @InjectModel(WebhookEvent.name) private readonly events: Model<WebhookEventDocument>,
+    private readonly events: WebhookEventRepository,
   ) {}
 
   /**
-   * Inserts the webhook's audit record before any processing. The unique
-   * `eventId` index makes this atomic: a redelivery racing the original fails
-   * the insert with a duplicate-key error instead of applying twice.
-   *
-   * - `'claimed'` — this call won the race and must process the event.
-   * - `'duplicate-processed'` — the event was already applied; ack only.
-   * - `'duplicate-inflight'` — another request is processing it right now;
-   *   ack without re-applying (its outcome decides the retry, not ours).
+   * Inserts the webhook's audit record before any processing. The repository
+   * claims the event atomically via the unique `eventId`: a redelivery
+   * racing the original is classified instead of applying twice.
    */
   async claimEvent(
     eventId: string,
@@ -61,39 +58,19 @@ export class PaymentsService {
     type: string,
     googleSub: string,
     payload: Record<string, unknown>,
-  ): Promise<'claimed' | 'duplicate-processed' | 'duplicate-inflight'> {
-    try {
-      await this.events.create({
-        eventId,
-        googleSub,
-        payload,
-        provider,
-        receivedAt: new Date(),
-        status: 'claimed',
-        type,
-      });
-    } catch (error) {
-      if (error instanceof Error && (error as { code?: number }).code === 11000) {
-        const existing = await this.events
-          .findOne({ eventId })
-          .select('status')
-          .lean()
-          .exec();
-        if (existing?.status === 'processed') {
-          this.logger.log(`Duplicate ${provider} webhook ${eventId}; already applied; acking.`);
-          return 'duplicate-processed';
-        }
-        this.logger.log(`Duplicate ${provider} webhook ${eventId}; inflight elsewhere; acking.`);
-        return 'duplicate-inflight';
-      }
-      throw error;
+  ): Promise<WebhookClaimResult> {
+    const result = await this.events.claim({ eventId, googleSub, payload, provider, type });
+    if (result === 'duplicate-processed') {
+      this.logger.log(`Duplicate ${provider} webhook ${eventId}; already applied; acking.`);
+    } else if (result === 'duplicate-inflight') {
+      this.logger.log(`Duplicate ${provider} webhook ${eventId}; inflight elsewhere; acking.`);
     }
-    return 'claimed';
+    return result;
   }
 
   /** Marks a claimed event as applied. Idempotent. */
   async markEventProcessed(eventId: string): Promise<void> {
-    await this.events.updateOne({ eventId }, { $set: { status: 'processed' } }).exec();
+    await this.events.markProcessed(eventId);
   }
 
   /**
@@ -102,7 +79,7 @@ export class PaymentsService {
    * reprocessed event never double-applies.
    */
   async releaseEventClaim(eventId: string): Promise<void> {
-    await this.events.deleteOne({ eventId, status: 'claimed' }).exec();
+    await this.events.releaseClaim(eventId);
   }
 
   /** Applies a verified RevenueCat webhook event to the matching Google account. */

@@ -1,0 +1,197 @@
+// Prisma schema for the Alcedo backend-v2 PostgreSQL persistence option.
+//
+// Selected with DB_PROVIDER=postgres. Mirrors the MongoDB document model
+// field-for-field so both backends satisfy the same repository contracts.
+// Behavioral parity is enforced by the contract tests in test/parity/.
+//
+// Conventions:
+// - Tables and columns are snake_case (@@map/@map); Prisma models/fields are
+//   PascalCase/camelCase as usual.
+// - Timestamps are timestamptz, always UTC — same instant semantics as the
+//   BSON dates stored by MongoDB.
+// - IDs that serve as cursor tiebreakers (workouts, posts, follows) are
+//   bigserial; the repositories expose them as strings and order by
+//   (timestamp, id) exactly like the Mongo implementations.
+// - Entities whose IDs are client-visible UUIDs (conversations, messages,
+//   refresh-token families) keep app-generated text primary keys.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   String    @id @default(uuid()) @db.Text
+  googleSub            String    @unique @map("google_sub") @db.Text
+  email                String?   @db.Text
+  name                 String?   @db.Text
+  picture              String?   @db.Text
+  units                String    @default("metric") @map("units") @db.Text
+  premiumStatus        String    @default("none") @map("premium_status") @db.Text
+  premiumSource        String?   @map("premium_source") @db.Text
+  premiumExpiresAt     DateTime? @map("premium_expires_at") @db.Timestamptz
+  premiumUpdatedAt     DateTime  @default(now()) @map("premium_updated_at") @db.Timestamptz
+  stripeCustomerId     String?   @map("stripe_customer_id") @db.Text
+  stripeSubscriptionId String?   @map("stripe_subscription_id") @db.Text
+  isAdmin              Boolean   @default(false) @map("is_admin")
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("users")
+}
+
+model RefreshToken {
+  tokenHash      String    @id @map("token_hash") @db.Text
+  googleSub      String    @map("google_sub") @db.Text
+  familyId       String    @map("family_id") @db.Text
+  issuedAt       DateTime  @default(now()) @map("issued_at") @db.Timestamptz
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz
+  revokedAt      DateTime? @map("revoked_at") @db.Timestamptz
+  replacedByHash String?   @map("replaced_by_hash") @db.Text
+  userAgent      String?   @map("user_agent") @db.Text
+  ip             String?   @db.Text
+
+  @@index([googleSub], map: "refresh_tokens_google_sub_idx")
+  @@index([familyId], map: "refresh_tokens_family_id_idx")
+  @@index([expiresAt], map: "refresh_tokens_expires_at_idx")
+  @@map("refresh_tokens")
+}
+
+model WebhookEvent {
+  eventId    String   @id @map("event_id") @db.Text
+  provider   String   @db.Text
+  type       String   @db.Text
+  googleSub  String   @map("google_sub") @db.Text
+  receivedAt DateTime @map("received_at") @db.Timestamptz
+  status     String   @default("claimed") @db.Text
+  payload    Json     @db.JsonB
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([googleSub], map: "webhook_events_google_sub_idx")
+  @@index([status], map: "webhook_events_status_idx")
+  @@map("webhook_events")
+}
+
+model SiteConfig {
+  key       String   @id @db.Text
+  value     String   @db.Text
+  secret    Boolean  @map("is_secret")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("site_config")
+}
+
+model Workout {
+  id             BigInt    @id @default(autoincrement())
+  clientId       String    @map("client_id") @db.Text
+  userId         String    @map("user_id") @db.Text
+  name           String    @db.Text
+  date           DateTime  @db.Timestamptz
+  exercises      Json      @db.JsonB
+  version        Int       @default(0)
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz
+  serverUpdatedAt DateTime @default(now()) @map("server_updated_at") @db.Timestamptz
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([userId, clientId], map: "workouts_user_client_uidx")
+  @@index([userId, serverUpdatedAt, id], map: "workouts_user_cursor_idx")
+  @@index([userId, deletedAt], map: "workouts_user_deleted_idx")
+  @@map("workouts")
+}
+
+model SyncIdempotencyRecord {
+  idempotencyKey String    @id @map("idempotency_key") @db.Text
+  userId         String    @map("user_id") @db.Text
+  status         String?   @db.Text
+  entityId       String?   @map("entity_id") @db.Text
+  serverVersion  Int?      @map("server_version")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([userId], map: "sync_idempotency_user_idx")
+  @@map("sync_idempotency")
+}
+
+model Post {
+  id        BigInt    @id @default(autoincrement())
+  authorId  String    @map("author_id") @db.Text
+  text      String    @db.Text
+  mediaUrls String[]  @map("media_urls") @db.Text
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([authorId, createdAt(sort: Desc), id(sort: Desc)], map: "posts_author_cursor_idx")
+  @@map("posts")
+}
+
+model Follow {
+  id         BigInt   @id @default(autoincrement())
+  followerId String   @map("follower_id") @db.Text
+  followeeId String   @map("followee_id") @db.Text
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@unique([followerId, followeeId], map: "follows_edge_uidx")
+  @@index([followeeId, createdAt], map: "follows_followee_idx")
+  @@map("follows")
+}
+
+model Conversation {
+  id           String   @id @db.Text
+  userId       String   @map("user_id") @db.Text
+  title        String?  @db.Text
+  messageCount Int      @default(0) @map("message_count")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([userId, updatedAt(sort: Desc)], map: "conversations_user_updated_idx")
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @db.Text
+  conversationId String   @map("conversation_id") @db.Text
+  userId         String   @map("user_id") @db.Text
+  role           String   @db.Text
+  content        String   @db.Text
+  usage          Json?    @db.JsonB
+  flagged        Boolean  @default(false)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([conversationId, createdAt], map: "messages_conversation_idx")
+  @@index([userId], map: "messages_user_idx")
+  @@map("messages")
+}
+
+model AiUsage {
+  id               String   @id @default(uuid()) @db.Text
+  userId           String   @map("user_id") @db.Text
+  conversationId   String   @map("conversation_id") @db.Text
+  messageId        String   @map("message_id") @db.Text
+  promptTokens     Int?     @map("prompt_tokens")
+  completionTokens Int?     @map("completion_tokens")
+  costUsd          Float?   @map("cost_usd")
+  skillNames       String[] @map("skill_names") @db.Text
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([userId, createdAt(sort: Desc)], map: "ai_usage_user_created_idx")
+  @@map("ai_usage")
+}
+
+model AiDailyUsage {
+  userId    String   @map("user_id") @db.Text
+  date      String   @db.Text
+  count     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@id([userId, date], map: "ai_daily_usage_pkey")
+  @@map("ai_daily_usage")
+}

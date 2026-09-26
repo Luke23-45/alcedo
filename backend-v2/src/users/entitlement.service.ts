@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema';
+import { UserRepository } from './repositories/user-repository.interface';
+import type { PremiumSource } from './schemas/user.schema';
 
 export type EntitlementStatusValue = 'none' | 'active' | 'expired';
 export type EntitlementSource = 'revenuecat' | 'web' | 'stripe' | 'manual';
@@ -14,20 +13,21 @@ export interface EntitlementStatus {
 
 /**
  * Single owner of the user's premium entitlement state machine.
- * Persisted in the `premium` subdocument on the user record (kept under its
- * historic field name so stored documents and the billing pipeline keep working).
+ * Persists through the UserRepository so it works identically on MongoDB and
+ * PostgreSQL — the premium fields keep their historic names on both backends
+ * so stored data and the billing pipeline keep working.
  */
 @Injectable()
 export class EntitlementService {
-  constructor(@InjectModel(User.name) private readonly model: Model<UserDocument>) {}
+  constructor(private readonly users: UserRepository) {}
 
   async getStatus(googleSub: string): Promise<EntitlementStatus> {
-    const user = await this.model.findOne({ googleSub }).select('premium').lean().exec();
+    const user = await this.users.findByGoogleSub(googleSub);
     const premium = user?.premium;
     return {
       expiresAt: premium?.expiresAt ?? null,
-      source: premium?.source ?? null,
-      status: premium?.status ?? 'none',
+      source: (premium?.source as EntitlementSource | undefined) ?? null,
+      status: (premium?.status as EntitlementStatusValue | undefined) ?? 'none',
     };
   }
 
@@ -44,42 +44,16 @@ export class EntitlementService {
     source: EntitlementSource,
     expiresAt: Date | null,
   ): Promise<void> {
-    await this.model
-      .findOneAndUpdate(
-        { googleSub },
-        {
-          $set: {
-            premium: { expiresAt, source, status: 'active', updatedAt: new Date() },
-          },
-        },
-        { new: true, setDefaultsOnInsert: true, upsert: true },
-      )
-      .exec();
+    await this.users.grantEntitlement(googleSub, source as PremiumSource, expiresAt);
   }
 
-  /**
-   * Sets the entitlement to 'expired'. The source is kept (it records which
-   * pipeline last touched the entitlement — audit trail) and expiresAt is
-   * left untouched; only status and updatedAt change.
-   */
   /**
    * Expires premium, but only when the currently recorded source matches the
    * caller. A Stripe cancellation must never revoke a RevenueCat grant (or
    * vice versa) — each provider only revokes its own entitlements.
    */
   async expire(googleSub: string, source: EntitlementSource): Promise<void> {
-    await this.model
-      .findOneAndUpdate(
-        { googleSub, 'premium.source': source, 'premium.status': 'active' },
-        {
-          $set: {
-            'premium.status': 'expired',
-            'premium.updatedAt': new Date(),
-          },
-        },
-        { new: true },
-      )
-      .exec();
+    await this.users.expireEntitlement(googleSub, source as PremiumSource);
   }
 
   /** Links Stripe customer/subscription IDs to the user for the billing portal. */
@@ -88,10 +62,7 @@ export class EntitlementService {
     customerId: string | null,
     subscriptionId: string | null,
   ): Promise<void> {
-    const set: Record<string, string> = {};
-    if (customerId) set['stripeCustomerId'] = customerId;
-    if (subscriptionId) set['stripeSubscriptionId'] = subscriptionId;
-    if (Object.keys(set).length === 0) return;
-    await this.model.findOneAndUpdate({ googleSub }, { $set: set }, { new: true }).exec();
+    if (!customerId && !subscriptionId) return;
+    await this.users.linkStripeCustomer(googleSub, { customerId, subscriptionId });
   }
 }

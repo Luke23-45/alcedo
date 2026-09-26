@@ -10,7 +10,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   IsBoolean,
   IsIn,
@@ -26,11 +25,10 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { Model } from 'mongoose';
 import { Type } from 'class-transformer';
 import { SiteConfigService } from '../site-config/site-config.service';
 import { CurrentUserSub } from '../common/decorators/current-user.decorator';
-import { User, UserDocument } from '../users/schemas/user.schema';
+import { UserRepository } from '../users/repositories/user-repository.interface';
 import { AdminGuard } from './admin.guard';
 
 /** Allowlist of config keys editable from the admin panel. */
@@ -154,7 +152,7 @@ export class AdminController {
 
   constructor(
     private readonly siteConfig: SiteConfigService,
-    @InjectModel(User.name) private readonly users: Model<UserDocument>,
+    private readonly users: UserRepository,
   ) {}
 
   /** All editable config entries. Secret values are masked. */
@@ -186,30 +184,23 @@ export class AdminController {
   async listUsers(@Query() query: UsersQuery) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 20;
-    const [total, docs] = await Promise.all([
-      this.users.countDocuments().exec(),
-      this.users
-        .find()
-        .select('googleSub email name isAdmin premium createdAt')
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean()
-        .exec(),
+    const [total, users] = await Promise.all([
+      this.users.count(),
+      this.users.listRecent(limit, (page - 1) * limit),
     ]);
     return {
       page,
       limit,
       total,
-      users: docs.map((u) => ({
+      users: users.map((u) => ({
         googleSub: u.googleSub,
         email: u.email ?? null,
         name: u.name ?? null,
-        isAdmin: u.isAdmin ?? false,
+        isAdmin: u.isAdmin,
         premium: {
-          status: u.premium?.status ?? 'none',
-          source: u.premium?.source ?? null,
-          expiresAt: u.premium?.expiresAt ? new Date(u.premium.expiresAt).toISOString() : null,
+          status: u.premium.status,
+          source: u.premium.source ?? null,
+          expiresAt: u.premium.expiresAt ? new Date(u.premium.expiresAt).toISOString() : null,
         },
         createdAt: u.createdAt ? new Date(u.createdAt).toISOString() : null,
       })),
@@ -226,12 +217,12 @@ export class AdminController {
     @Param('googleSub') googleSub: string,
     @Body() body: SetAdminBody,
   ) {
-    const target = await this.users.findOne({ googleSub }).select('isAdmin').lean().exec();
+    const target = await this.users.findByGoogleSub(googleSub);
     if (!target) {
       throw new NotFoundException({ code: 'ADMIN_USER_NOT_FOUND', message: 'User not found.' });
     }
     if (!body.isAdmin && target.isAdmin) {
-      const adminCount = await this.users.countDocuments({ isAdmin: true }).exec();
+      const adminCount = await this.users.countAdmins();
       if (adminCount <= 1) {
         throw new ConflictException({
           code: 'ADMIN_LAST_ADMIN',
@@ -239,7 +230,7 @@ export class AdminController {
         });
       }
     }
-    await this.users.findOneAndUpdate({ googleSub }, { $set: { isAdmin: body.isAdmin } }).exec();
+    await this.users.setAdmin(googleSub, body.isAdmin);
     this.logger.log(
       `Admin ${actorSub} set isAdmin=${body.isAdmin} for user ${googleSub}.`,
     );

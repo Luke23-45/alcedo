@@ -3,22 +3,17 @@ import { ConfigService } from '@nestjs/config';
 import { BillingController } from './billing.controller';
 import { PaymentsService } from './payments.service';
 import { StripeService } from './stripe.service';
+import type { UserRecord, UserRepository } from '../users/repositories/user-repository.interface';
 
 function makeController(opts: { premium?: boolean; stripeCustomerId?: string | null }) {
-  const findOne = jest.fn().mockReturnValue({
-    exec: jest
-      .fn()
-      .mockResolvedValue(
-        opts.stripeCustomerId === undefined
-          ? { email: 'alex@example.com', stripeCustomerId: 'cus_1' }
-          : opts.stripeCustomerId
-            ? { stripeCustomerId: opts.stripeCustomerId }
-            : null,
-      ),
-    lean: jest.fn().mockReturnThis(),
-    select: jest.fn().mockReturnThis(),
-  });
-  const users = { findOne } as never;
+  const findByGoogleSub = jest.fn().mockResolvedValue(
+    opts.stripeCustomerId === undefined
+      ? ({ email: 'alex@example.com', googleSub: 'google-sub-9', stripeCustomerId: 'cus_1' } as UserRecord)
+      : opts.stripeCustomerId
+        ? ({ googleSub: 'google-sub-9', stripeCustomerId: opts.stripeCustomerId } as UserRecord)
+        : null,
+  );
+  const users = { findByGoogleSub } as unknown as UserRepository;
   const paymentsService = {
     hasActiveSubscription: jest.fn().mockResolvedValue(opts.premium ?? false),
   } as unknown as PaymentsService;

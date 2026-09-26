@@ -1,17 +1,15 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from '../users/schemas/user.schema';
+import { UserRepository } from '../users/repositories/user-repository.interface';
 
 /**
  * Admin guard. The global JwtAuthGuard already verified the access token and
  * attached `{ googleSub }` to the request; this checks the `isAdmin` flag on
- * the user document. Admin is bootstrapped from ADMIN_EMAILS on login
+ * the user record. Admin is bootstrapped from ADMIN_EMAILS on login
  * (verified emails only).
  */
 @Injectable()
 export class AdminGuard implements CanActivate {
-  constructor(@InjectModel(User.name) private readonly users: Model<UserDocument>) {}
+  constructor(private readonly users: UserRepository) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<{ user?: { googleSub?: string } }>();
@@ -19,8 +17,7 @@ export class AdminGuard implements CanActivate {
     if (!googleSub) {
       throw new ForbiddenException({ code: 'ADMIN_UNAUTHORIZED', message: 'Not signed in.' });
     }
-    const user = await this.users.findOne({ googleSub }).select('isAdmin').lean().exec();
-    if (!user?.isAdmin) {
+    if (!(await this.users.isAdmin(googleSub))) {
       throw new ForbiddenException({ code: 'ADMIN_FORBIDDEN', message: 'Admin access required.' });
     }
     return true;

@@ -127,12 +127,12 @@ class FakeWorkoutRepo extends WorkoutRepository {
 }
 
 class FakeIdempotencyStore extends SyncIdempotencyStore {
-  readonly claimed = new Set<string>();
+  readonly claimed = new Map<string, Date>();
   readonly outcomes = new Map<string, IdempotencyOutcome>();
 
   async claim(key: string): Promise<boolean> {
     if (this.claimed.has(key)) return false;
-    this.claimed.add(key);
+    this.claimed.set(key, new Date());
     return true;
   }
 
@@ -142,6 +142,18 @@ class FakeIdempotencyStore extends SyncIdempotencyStore {
 
   async save(key: string, _sub: string, outcome: IdempotencyOutcome): Promise<void> {
     this.outcomes.set(key, outcome);
+  }
+
+  async purgeExpired(cutoff: Date): Promise<number> {
+    let removed = 0;
+    for (const [key, claimedAt] of this.claimed) {
+      if (claimedAt < cutoff) {
+        this.claimed.delete(key);
+        this.outcomes.delete(key);
+        removed++;
+      }
+    }
+    return removed;
   }
 }
 

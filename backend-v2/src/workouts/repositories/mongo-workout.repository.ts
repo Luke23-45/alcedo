@@ -6,8 +6,11 @@ import {
   Workout,
   WorkoutDocument,
   WorkoutExercise,
-  WorkoutSet,
 } from '../schemas/workout.schema';
+import {
+  isDuplicateKeyError,
+  normalizeExercises,
+} from './workout-record.util';
 import {
   ApplyStatus,
   CursorPoint,
@@ -18,36 +21,14 @@ import {
   WorkoutRepository,
 } from './workout-repository.interface';
 
-export function isDuplicateKeyError(error: unknown): boolean {
-  return (
-    error instanceof Error && (error as { code?: unknown }).code === 11000
-  );
-}
-
-function toPlainSet(s: WorkoutSet): WorkoutSet {
-  const out: WorkoutSet = {};
-  if (typeof s.reps === 'number') out.reps = s.reps;
-  if (typeof s.weight === 'number') out.weight = s.weight;
-  if (typeof s.unit === 'string') out.unit = s.unit;
-  if (typeof s.rpe === 'number') out.rpe = s.rpe;
-  return out;
-}
-
-function toPlainExercise(e: WorkoutExercise): WorkoutExercise {
-  const out: WorkoutExercise = {
-    exerciseId: e.exerciseId,
-    sets: (e.sets ?? []).map(toPlainSet),
-  };
-  if (typeof e.notes === 'string') out.notes = e.notes;
-  return out;
-}
+export { isDuplicateKeyError };
 
 function toRecord(doc: WorkoutDocument): WorkoutRecord {
   return {
     clientId: doc.clientId,
     date: doc.date,
     deletedAt: doc.deletedAt ?? null,
-    exercises: (doc.exercises ?? []).map(toPlainExercise),
+    exercises: normalizeExercises(doc.exercises),
     id: doc._id.toHexString(),
     name: doc.name,
     serverUpdatedAt: doc.serverUpdatedAt,
@@ -271,5 +252,10 @@ export class MongoSyncIdempotencyStore extends SyncIdempotencyStore {
         { upsert: true },
       )
       .exec();
+  }
+
+  async purgeExpired(cutoff: Date): Promise<number> {
+    const res = await this.model.deleteMany({ createdAt: { $lt: cutoff } }).exec();
+    return res.deletedCount ?? 0;
   }
 }

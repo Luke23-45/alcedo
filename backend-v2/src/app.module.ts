@@ -1,3 +1,6 @@
+// Must be the first import: loads .env files and validates the environment
+// (including DB_PROVIDER) before any module decorator is evaluated.
+import './config/bootstrap-env';
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
@@ -7,7 +10,7 @@ import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { AppConfigModule } from './config/app-config.module';
-import { DatabaseModule } from './database/database.module';
+import { PersistenceModule } from './database/persistence.module';
 import { FeaturesModule } from './features/features.module';
 import { HealthModule } from './health/health.module';
 import { PaymentsModule } from './payments/payments.module';
@@ -30,7 +33,9 @@ import { WorkoutsModule } from './workouts/workouts.module';
         },
       ],
     }),
-    DatabaseModule,
+    // Owns every repository binding and selects the MongoDB or PostgreSQL
+    // implementation per DB_PROVIDER. Replaces the old DatabaseModule import.
+    PersistenceModule.forRoot(),
     CommonModule,
     HealthModule,
     FeaturesModule,

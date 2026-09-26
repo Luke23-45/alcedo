@@ -1,11 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
-import { HealthCheck, HealthCheckService, MemoryHealthIndicator, MongooseHealthIndicator } from '@nestjs/terminus';
+import { HealthCheck, HealthCheckService, MemoryHealthIndicator } from '@nestjs/terminus';
+import { DatabaseHealthIndicator } from '../database/database-health.indicator';
 
 @Controller('healthz')
 export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
-    private readonly mongoose: MongooseHealthIndicator,
+    private readonly database: DatabaseHealthIndicator,
     private readonly memory: MemoryHealthIndicator,
   ) {}
 
@@ -13,7 +14,8 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.mongoose.pingCheck('database'),
+      // Pings whichever database backend DB_PROVIDER selected.
+      () => this.database.isHealthy('database'),
       // Fail the check if the heap is close to 1.5 GB — the orchestrator restarts us.
       () => this.memory.checkHeap('memory_heap', 1.5 * 1024 * 1024 * 1024),
     ]);

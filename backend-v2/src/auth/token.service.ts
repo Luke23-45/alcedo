@@ -1,10 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { createHash, randomBytes, randomUUID } from 'crypto';
-import { Model } from 'mongoose';
-import { RefreshToken, RefreshTokenDocument } from './schemas/refresh-token.schema';
+import {
+  RefreshTokenRecord,
+  RefreshTokenRepository,
+} from './repositories/refresh-token-repository.interface';
 
 export interface TokenPair {
   accessToken: string;
@@ -32,7 +33,7 @@ export class TokenService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
-    @InjectModel(RefreshToken.name) private readonly model: Model<RefreshTokenDocument>,
+    private readonly tokens: RefreshTokenRepository,
   ) {}
 
   private accessTtlSeconds(): number {
@@ -46,16 +47,16 @@ export class TokenService {
 
   /**
    * Rotating refresh: the presented token is revoked and a new pair in the
-   * same family is issued. The revocation is an atomic findOneAndUpdate, so
-   * two concurrent refreshes with the same token cannot both succeed — the
-   * loser mints nothing usable. Presenting an already-rotated token is
-   * treated as theft (whole family revoked) unless it falls inside the
-   * benign-retry grace window.
+   * same family is issued. The revocation is an atomic claim, so two
+   * concurrent refreshes with the same token cannot both succeed — the loser
+   * mints nothing usable. Presenting an already-rotated token is treated as
+   * theft (whole family revoked) unless it falls inside the benign-retry
+   * grace window.
    */
   async refresh(refreshToken: string): Promise<TokenPair> {
     const hash = sha256(refreshToken);
     const now = new Date();
-    const record = await this.model.findOne({ tokenHash: hash }).exec();
+    const record = await this.tokens.findByHash(hash);
     if (!record) {
       throw new UnauthorizedException({
         code: 'AUTH_REFRESH_INVALID',
@@ -75,21 +76,13 @@ export class TokenService {
     // Mint the replacement first so its hash can be recorded in the same
     // atomic claim below. If the claim loses, the minted record is revoked
     // immediately — its plaintext never left this scope, so it is unusable.
-    const pair = await this.issueTokenPairInFamily(record.googleSub, record.tokenFamilyId);
-    const claimed = await this.model
-      .findOneAndUpdate(
-        { expiresAt: { $gt: now }, revokedAt: { $exists: false }, tokenHash: hash },
-        { $set: { replacedByHash: sha256(pair.refreshToken), revokedAt: now } },
-        { new: true },
-      )
-      .exec();
+    const pair = await this.issueTokenPairInFamily(record.googleSub, record.familyId);
+    const claimed = await this.tokens.claimRotation(hash, now, sha256(pair.refreshToken));
     if (!claimed) {
       // Lost a race (concurrent refresh) or the token expired mid-flight.
       // Revoke the minted replacement so it can never be used.
-      await this.model
-        .updateOne({ tokenHash: sha256(pair.refreshToken) }, { $set: { revokedAt: now } })
-        .exec();
-      const current = await this.model.findOne({ tokenHash: hash }).exec();
+      await this.tokens.revokeByHash(sha256(pair.refreshToken), now);
+      const current = await this.tokens.findByHash(hash);
       if (current?.revokedAt && current?.replacedByHash) {
         await this.handleReuse(current, now);
       }
@@ -107,17 +100,12 @@ export class TokenService {
    * whole family is revoked (suspected theft). Always throws.
    */
   private async handleReuse(
-    record: { revokedAt?: Date; tokenFamilyId: string },
+    record: Pick<RefreshTokenRecord, 'familyId' | 'revokedAt'>,
     now: Date,
   ): Promise<never> {
     const rotatedMsAgo = now.getTime() - (record.revokedAt?.getTime() ?? 0);
     if (rotatedMsAgo > REUSE_GRACE_MS) {
-      await this.model
-        .updateMany(
-          { tokenFamilyId: record.tokenFamilyId, revokedAt: { $exists: false } },
-          { $set: { revokedAt: now } },
-        )
-        .exec();
+      await this.tokens.revokeFamily(record.familyId, now);
     }
     throw new UnauthorizedException({
       code: 'AUTH_REFRESH_REUSED',
@@ -127,21 +115,11 @@ export class TokenService {
 
   /** Revokes one refresh token. Unknown tokens are a silent no-op (no leakage). */
   async revoke(refreshToken: string): Promise<void> {
-    await this.model
-      .updateOne(
-        { tokenHash: sha256(refreshToken), revokedAt: { $exists: false } },
-        { $set: { revokedAt: new Date() } },
-      )
-      .exec();
+    await this.tokens.revokeByHash(sha256(refreshToken), new Date());
   }
 
   async revokeAllForUser(googleSub: string): Promise<void> {
-    await this.model
-      .updateMany(
-        { googleSub, revokedAt: { $exists: false } },
-        { $set: { revokedAt: new Date() } },
-      )
-      .exec();
+    await this.tokens.revokeAllForUser(googleSub, new Date());
   }
 
   private async issueTokenPairInFamily(googleSub: string, familyId: string): Promise<TokenPair> {
@@ -153,10 +131,10 @@ export class TokenService {
     // 256-bit cryptographically random; only the sha256 hash touches the DB.
     const refreshToken = randomBytes(32).toString('hex');
     const days = this.config.get<number>('JWT_REFRESH_TTL_DAYS', 30);
-    await this.model.create({
+    await this.tokens.create({
       expiresAt: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+      familyId,
       googleSub,
-      tokenFamilyId: familyId,
       tokenHash: sha256(refreshToken),
     });
     return { accessToken, expiresIn, refreshToken };

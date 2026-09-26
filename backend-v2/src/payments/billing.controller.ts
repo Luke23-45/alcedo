@@ -1,11 +1,9 @@
 import { Body, ConflictException, Controller, Get, Post } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectModel } from '@nestjs/mongoose';
 import { Throttle } from '@nestjs/throttler';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Model } from 'mongoose';
 import { CurrentUserSub } from '../common/decorators/current-user.decorator';
-import { User, UserDocument } from '../users/schemas/user.schema';
+import { UserRepository } from '../users/repositories/user-repository.interface';
 import { PaymentsService } from './payments.service';
 import { StripeService } from './stripe.service';
 
@@ -26,7 +24,7 @@ export class BillingController {
     private readonly paymentsService: PaymentsService,
     private readonly stripeService: StripeService,
     private readonly config: ConfigService,
-    @InjectModel(User.name) private readonly users: Model<UserDocument>,
+    private readonly users: UserRepository,
   ) {}
 
   /**
@@ -77,11 +75,7 @@ export class BillingController {
   }
 
   private async doCheckout(googleSub: string, priceId: string): Promise<{ url: string }> {
-    const user = await this.users
-      .findOne({ googleSub })
-      .select('email stripeCustomerId')
-      .lean()
-      .exec();
+    const user = await this.users.findByGoogleSub(googleSub);
     if (await this.paymentsService.hasActiveSubscription(googleSub)) {
       throw new ConflictException({
         code: 'BILLING_ALREADY_PREMIUM',
@@ -104,7 +98,7 @@ export class BillingController {
   @Post('portal')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async portal(@CurrentUserSub() googleSub: string) {
-    const user = await this.users.findOne({ googleSub }).select('stripeCustomerId').lean().exec();
+    const user = await this.users.findByGoogleSub(googleSub);
     if (!user?.stripeCustomerId) {
       return { url: null as string | null };
     }

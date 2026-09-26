@@ -1,4 +1,4 @@
-/** Opaque page position: last row's sort keys (timestamp + _id). */
+/** Opaque page position: last row's sort keys (timestamp + provider row id). */
 export interface FollowCursor {
   t: Date;
   id: string;

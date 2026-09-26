@@ -1,29 +1,28 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { validate } from 'class-validator';
 import { AdminController, SetAdminBody, UpdateConfigBody } from './admin.controller';
+import type { UserRecord, UserRepository } from '../users/repositories/user-repository.interface';
 
 function makeController(opts: {
   user: { isAdmin: boolean } | null;
   adminCount?: number;
   storedConfig?: Array<{ key: string; secret: boolean; updatedAt: string; value: string }>;
 }) {
-  const findOne = jest.fn().mockReturnValue({
-    exec: jest.fn().mockResolvedValue(opts.user),
-    select: jest.fn().mockReturnThis(),
-    lean: jest.fn().mockReturnThis(),
-  });
-  const countDocuments = jest.fn().mockReturnValue({
-    exec: jest.fn().mockResolvedValue(opts.adminCount ?? 2),
-  });
-  const findOneAndUpdate = jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({}) });
-  const users = { countDocuments, findOne, findOneAndUpdate } as never;
+  const findByGoogleSub = jest
+    .fn()
+    .mockResolvedValue(opts.user ? ({ ...opts.user, googleSub: 'google-sub-9' } as UserRecord) : null);
+  const countAdmins = jest.fn().mockResolvedValue(opts.adminCount ?? 2);
+  const setAdmin = jest.fn().mockResolvedValue(undefined);
+  const count = jest.fn().mockResolvedValue(1);
+  const listRecent = jest.fn().mockResolvedValue([]);
+  const users = { findByGoogleSub, countAdmins, setAdmin, count, listRecent } as unknown as UserRepository;
   const siteConfig = {
     get: jest.fn(),
     list: jest.fn().mockResolvedValue(opts.storedConfig ?? []),
     set: jest.fn(),
   } as never;
   const controller = new AdminController(siteConfig as never, users);
-  return { controller, findOneAndUpdate, siteConfig };
+  return { controller, setAdmin, siteConfig };
 }
 
 function validUpdate(overrides: Partial<UpdateConfigBody> = {}): UpdateConfigBody {
@@ -37,16 +36,13 @@ function validUpdate(overrides: Partial<UpdateConfigBody> = {}): UpdateConfigBod
 describe('AdminController', () => {
   describe('PUT /admin/users/:googleSub/admin', () => {
     it('grants admin to an existing user', async () => {
-      const { controller, findOneAndUpdate } = makeController({ user: { isAdmin: false } });
+      const { controller, setAdmin } = makeController({ user: { isAdmin: false } });
       const body = new SetAdminBody();
       body.isAdmin = true;
 
       await controller.setAdmin('actor-sub', 'google-sub-9', body);
 
-      expect(findOneAndUpdate).toHaveBeenCalledWith(
-        { googleSub: 'google-sub-9' },
-        { $set: { isAdmin: true } },
-      );
+      expect(setAdmin).toHaveBeenCalledWith('google-sub-9', true);
     });
 
     it('throws 404 when the user does not exist', async () => {
@@ -60,7 +56,7 @@ describe('AdminController', () => {
     });
 
     it('throws 409 when revoking the last remaining admin', async () => {
-      const { controller, findOneAndUpdate } = makeController({
+      const { controller, setAdmin } = makeController({
         adminCount: 1,
         user: { isAdmin: true },
       });
@@ -70,11 +66,11 @@ describe('AdminController', () => {
       await expect(controller.setAdmin('actor-sub', 'google-sub-9', body)).rejects.toThrow(
         ConflictException,
       );
-      expect(findOneAndUpdate).not.toHaveBeenCalled();
+      expect(setAdmin).not.toHaveBeenCalled();
     });
 
     it('allows revoking when other admins remain', async () => {
-      const { controller, findOneAndUpdate } = makeController({
+      const { controller, setAdmin } = makeController({
         adminCount: 3,
         user: { isAdmin: true },
       });
@@ -83,10 +79,7 @@ describe('AdminController', () => {
 
       await controller.setAdmin('actor-sub', 'google-sub-9', body);
 
-      expect(findOneAndUpdate).toHaveBeenCalledWith(
-        { googleSub: 'google-sub-9' },
-        { $set: { isAdmin: false } },
-      );
+      expect(setAdmin).toHaveBeenCalledWith('google-sub-9', false);
     });
 
     it('rejects a non-boolean isAdmin via DTO validation', async () => {

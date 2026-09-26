@@ -1,5 +1,9 @@
 import { EntitlementService } from '../users/entitlement.service';
 import { PaymentsService, RevenueCatEvent } from './payments.service';
+import {
+  WebhookClaimResult,
+  WebhookEventRepository,
+} from './repositories/webhook-event-repository.interface';
 import { StripeService } from './stripe.service';
 
 function mockStripeService(): jest.Mocked<StripeService> {
@@ -22,24 +26,12 @@ function mockEntitlements(): {
   return { entitlements };
 }
 
-function mockEventsModel(
-  createImpl: jest.Mock = jest.fn().mockResolvedValue({}),
-  findOneResult: unknown = null,
-) {
+function mockEventsRepository(claimImpl: jest.Mock = jest.fn().mockResolvedValue('claimed')) {
   return {
-    create: createImpl,
-    deleteOne: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({}) }),
-    findOne: jest.fn().mockReturnValue({
-      exec: jest.fn().mockResolvedValue(findOneResult),
-      lean: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-    }),
-    updateOne: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue({}) }),
-  } as never;
-}
-
-function duplicateKeyError(): Error {
-  return Object.assign(new Error('E11000 duplicate key error'), { code: 11000 });
+    claim: claimImpl,
+    markProcessed: jest.fn().mockResolvedValue(undefined),
+    releaseClaim: jest.fn().mockResolvedValue(undefined),
+  } as unknown as jest.Mocked<WebhookEventRepository>;
 }
 
 function rcEvent(overrides: Partial<RevenueCatEvent>): RevenueCatEvent {
@@ -53,90 +45,54 @@ function rcEvent(overrides: Partial<RevenueCatEvent>): RevenueCatEvent {
 
 describe('PaymentsService', () => {
   describe('claimEvent', () => {
-    it('inserts the event as claimed and returns claimed on first sight', async () => {
-      const create = jest.fn().mockResolvedValue({});
-      const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel(create));
+    it.each(['claimed', 'duplicate-processed', 'duplicate-inflight'] as WebhookClaimResult[])(
+      'passes the claim through to the repository and returns %s',
+      async (result) => {
+        const claim = jest.fn().mockResolvedValue(result);
+        const { entitlements } = mockEntitlements();
+        const service = new PaymentsService(
+          entitlements,
+          mockStripeService(),
+          mockEventsRepository(claim),
+        );
 
-      await expect(
-        service.claimEvent('evt-1', 'revenuecat', 'RENEWAL', 'google-sub-9', { id: 'evt-1' }),
-      ).resolves.toBe('claimed');
-      expect(create).toHaveBeenCalledWith(
-        expect.objectContaining({
+        await expect(
+          service.claimEvent('evt-1', 'revenuecat', 'RENEWAL', 'google-sub-9', { id: 'evt-1' }),
+        ).resolves.toBe(result);
+        expect(claim).toHaveBeenCalledWith({
           eventId: 'evt-1',
           googleSub: 'google-sub-9',
+          payload: { id: 'evt-1' },
           provider: 'revenuecat',
-          status: 'claimed',
           type: 'RENEWAL',
-        }),
-      );
-    });
+        });
+      },
+    );
 
-    it('returns duplicate-processed when the existing record was already applied', async () => {
-      const create = jest.fn().mockRejectedValue(duplicateKeyError());
+    it('markEventProcessed delegates to the repository', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(
-        entitlements,
-        mockStripeService(),
-        mockEventsModel(create, { status: 'processed' }),
-      );
-
-      await expect(
-        service.claimEvent('evt-dup', 'web', 'purchase', 'google-sub-7', {}),
-      ).resolves.toBe('duplicate-processed');
-    });
-
-    it('returns duplicate-inflight when the existing record is still being processed', async () => {
-      const create = jest.fn().mockRejectedValue(duplicateKeyError());
-      const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(
-        entitlements,
-        mockStripeService(),
-        mockEventsModel(create, { status: 'claimed' }),
-      );
-
-      await expect(
-        service.claimEvent('evt-race', 'stripe', 'checkout.session.completed', 'google-sub-9', {}),
-      ).resolves.toBe('duplicate-inflight');
-    });
-
-    it('rethrows non-duplicate insert errors', async () => {
-      const create = jest.fn().mockRejectedValue(new Error('db down'));
-      const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel(create));
-
-      await expect(
-        service.claimEvent('evt-x', 'web', 'purchase', 'google-sub-7', {}),
-      ).rejects.toThrow('db down');
-    });
-
-    it('markEventProcessed flips the claim to processed', async () => {
-      const { entitlements } = mockEntitlements();
-      const model = mockEventsModel() as unknown as { updateOne: jest.Mock };
-      const service = new PaymentsService(entitlements, mockStripeService(), model as never);
+      const events = mockEventsRepository();
+      const service = new PaymentsService(entitlements, mockStripeService(), events);
 
       await service.markEventProcessed('evt-1');
 
-      expect(model.updateOne).toHaveBeenCalledWith(
-        { eventId: 'evt-1' },
-        { $set: { status: 'processed' } },
-      );
+      expect(events.markProcessed).toHaveBeenCalledWith('evt-1');
     });
 
-    it('releaseEventClaim deletes only a still-claimed record', async () => {
+    it('releaseEventClaim delegates to the repository', async () => {
       const { entitlements } = mockEntitlements();
-      const model = mockEventsModel() as unknown as { deleteOne: jest.Mock };
-      const service = new PaymentsService(entitlements, mockStripeService(), model as never);
+      const events = mockEventsRepository();
+      const service = new PaymentsService(entitlements, mockStripeService(), events);
 
       await service.releaseEventClaim('evt-1');
 
-      expect(model.deleteOne).toHaveBeenCalledWith({ eventId: 'evt-1', status: 'claimed' });
+      expect(events.releaseClaim).toHaveBeenCalledWith('evt-1');
     });
 
     it('hasActiveSubscription delegates to the entitlement service', async () => {
       const { entitlements } = mockEntitlements();
       entitlements.isPremiumActive.mockResolvedValue(true);
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await expect(service.hasActiveSubscription('google-sub-9')).resolves.toBe(true);
       expect(entitlements.isPremiumActive).toHaveBeenCalledWith('google-sub-9');
@@ -146,7 +102,7 @@ describe('PaymentsService', () => {
   describe('applyRevenueCatEvent', () => {
     it('grants premium on RENEWAL with an expiry date', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
       const expirationMs = Date.now() + 30 * 24 * 60 * 60 * 1000;
 
       await service.applyRevenueCatEvent(
@@ -163,7 +119,7 @@ describe('PaymentsService', () => {
 
     it('grants with a null expiry on INITIAL_PURCHASE when no expiration is given', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyRevenueCatEvent(
         rcEvent({ entitlement_ids: ['premium'], type: 'INITIAL_PURCHASE' }),
@@ -175,7 +131,7 @@ describe('PaymentsService', () => {
 
     it('processes anyway with a warning when entitlement_ids is absent', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyRevenueCatEvent(rcEvent({ entitlement_ids: undefined }), 'premium');
 
@@ -184,7 +140,7 @@ describe('PaymentsService', () => {
 
     it('ignores events for other entitlements', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyRevenueCatEvent(
         rcEvent({ entitlement_ids: ['some_other_pack'] }),
@@ -197,7 +153,7 @@ describe('PaymentsService', () => {
 
     it('expires premium on EXPIRATION', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyRevenueCatEvent(
         rcEvent({ entitlement_ids: ['premium'], type: 'EXPIRATION' }),
@@ -210,7 +166,7 @@ describe('PaymentsService', () => {
 
     it('keeps access on CANCELLATION (no expire)', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyRevenueCatEvent(
         rcEvent({ entitlement_ids: ['premium'], type: 'CANCELLATION' }),
@@ -223,7 +179,7 @@ describe('PaymentsService', () => {
 
     it('keeps access on BILLING_ISSUE', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyRevenueCatEvent(
         rcEvent({ entitlement_ids: ['premium'], type: 'BILLING_ISSUE' }),
@@ -236,7 +192,7 @@ describe('PaymentsService', () => {
 
     it('logs and ignores unknown event types', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyRevenueCatEvent(
         rcEvent({ entitlement_ids: ['premium'], type: 'SOME_FUTURE_EVENT' }),
@@ -251,7 +207,7 @@ describe('PaymentsService', () => {
   describe('applyWebCheckoutEvent', () => {
     it('grants premium with source web and the expiry', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
       const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
 
       await service.applyWebCheckoutEvent({
@@ -270,7 +226,7 @@ describe('PaymentsService', () => {
 
     it('grants with a null expiry for a lifetime plan', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyWebCheckoutEvent({
         eventId: 'web-2',
@@ -292,7 +248,7 @@ describe('PaymentsService', () => {
         source: 'revenuecat',
         status: 'active',
       });
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await expect(service.billingStatus('google-sub-9')).resolves.toEqual({
         expiresAt: '2027-01-01T00:00:00.000Z',
@@ -312,7 +268,7 @@ describe('PaymentsService', () => {
       const { entitlements } = mockEntitlements();
       const stripe = mockStripeService();
       stripe.getSubscriptionPeriodEnd.mockResolvedValue(new Date('2027-02-01T00:00:00.000Z'));
-      const service = new PaymentsService(entitlements, stripe, mockEventsModel());
+      const service = new PaymentsService(entitlements, stripe, mockEventsRepository());
 
       await service.applyStripeEvent(
         stripeEvent('checkout.session.completed', {
@@ -333,7 +289,7 @@ describe('PaymentsService', () => {
 
     it('keeps access on customer.subscription.updated with status past_due', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyStripeEvent(
         stripeEvent('customer.subscription.updated', {
@@ -353,7 +309,7 @@ describe('PaymentsService', () => {
 
     it('expires on customer.subscription.updated with status canceled', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyStripeEvent(
         stripeEvent('customer.subscription.updated', {
@@ -370,7 +326,7 @@ describe('PaymentsService', () => {
       const { entitlements } = mockEntitlements();
       const stripe = mockStripeService();
       stripe.resolveSubscriptionGoogleSub.mockResolvedValue('google-sub-9');
-      const service = new PaymentsService(entitlements, stripe, mockEventsModel());
+      const service = new PaymentsService(entitlements, stripe, mockEventsRepository());
 
       await service.applyStripeEvent(
         stripeEvent('invoice.payment_failed', { subscription: 'sub_1' }),
@@ -384,7 +340,7 @@ describe('PaymentsService', () => {
 
     it('ignores an event whose googleSub cannot be resolved', async () => {
       const { entitlements } = mockEntitlements();
-      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsModel());
+      const service = new PaymentsService(entitlements, mockStripeService(), mockEventsRepository());
 
       await service.applyStripeEvent(
         stripeEvent('invoice.payment_failed', { subscription: 'sub_unknown' }),

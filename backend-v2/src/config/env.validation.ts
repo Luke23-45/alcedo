@@ -1,15 +1,21 @@
 import { Transform } from 'class-transformer';
 import {
   IsBoolean,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   Min,
   MinLength,
+  ValidateIf,
   validateSync,
 } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
+
+/** Database backends the server can persist to. One per deployment. */
+export const DB_PROVIDERS = ['mongodb', 'postgres'] as const;
+export type DbProvider = (typeof DB_PROVIDERS)[number];
 
 function toBoolean(value: unknown): boolean {
   if (typeof value === 'boolean') return value;
@@ -29,9 +35,35 @@ export class EnvironmentVariables {
   @Transform(({ value }) => Number(value ?? 3000))
   PORT = 3000;
 
+  /**
+   * Selects the persistence backend for this deployment. 'mongodb' keeps the
+   * existing Mongoose behavior; 'postgres' uses Prisma against PostgreSQL.
+   * Both backends implement the same repository contracts, so switching is a
+   * config-only change — never dual-write, never mixed.
+   */
+  @IsIn(DB_PROVIDERS)
+  @IsOptional()
+  @Transform(({ value }) => value ?? 'mongodb')
+  DB_PROVIDER: DbProvider = 'mongodb';
+
+  /**
+   * MongoDB connection string. Required only when DB_PROVIDER=mongodb;
+   * ignored (and not required) when DB_PROVIDER=postgres.
+   */
+  @ValidateIf((o) => (o as EnvironmentVariables).DB_PROVIDER === 'mongodb')
   @IsString()
   @IsNotEmpty()
-  MONGODB_URI!: string;
+  MONGODB_URI?: string;
+
+  /**
+   * PostgreSQL connection string, e.g.
+   * `postgresql://user:pass@localhost:5432/alcedo`. Required only when
+   * DB_PROVIDER=postgres; ignored (and not required) when DB_PROVIDER=mongodb.
+   */
+  @ValidateIf((o) => (o as EnvironmentVariables).DB_PROVIDER === 'postgres')
+  @IsString()
+  @IsNotEmpty()
+  DATABASE_URL?: string;
 
   @IsString()
   @IsNotEmpty()
