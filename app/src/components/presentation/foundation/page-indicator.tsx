@@ -1,11 +1,24 @@
 import { spacing } from '@/hooks/useAppTheme';
-import { Animated, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import Reanimated, { interpolate, SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 
 export interface PageIndicatorProps {
   count: number;
-  progress: Animated.AnimatedInterpolation<number> | Animated.Value;
+  /** UI-thread scroll progress in page units (0 = first page). */
+  progress: SharedValue<number>;
   color: string;
   style?: StyleProp<ViewStyle>;
+}
+
+function IndicatorDot({ index, progress, color }: { index: number; progress: SharedValue<number>; color: string }) {
+  const animatedStyle = useAnimatedStyle(() => {
+    const inputRange = [index - 1, index, index + 1];
+    return {
+      opacity: interpolate(progress.value, inputRange, [0.3, 0.9, 0.3], 'clamp'),
+      width: interpolate(progress.value, inputRange, [spacing[2], spacing[6], spacing[2]], 'clamp'),
+    };
+  });
+  return <Reanimated.View style={[styles.dot, { backgroundColor: color }, animatedStyle]} />;
 }
 
 export function PageIndicator({ count, progress, color, style }: PageIndicatorProps) {
@@ -14,26 +27,9 @@ export function PageIndicator({ count, progress, color, style }: PageIndicatorPr
   }
   return (
     <View style={[styles.container, style]}>
-      {Array.from({ length: count }).map((_, index) => {
-        const inputRange = [index - 1, index, index + 1];
-        return (
-          <Animated.View
-            key={index}
-            style={[
-              styles.dot,
-              {
-                backgroundColor: color,
-                opacity: progress.interpolate({ inputRange, outputRange: [0.3, 0.9, 0.3], extrapolate: 'clamp' }),
-                width: progress.interpolate({
-                  inputRange,
-                  outputRange: [spacing[2], spacing[6], spacing[2]],
-                  extrapolate: 'clamp',
-                }),
-              },
-            ]}
-          />
-        );
-      })}
+      {Array.from({ length: count }).map((_, index) => (
+        <IndicatorDot key={index} index={index} progress={progress} color={color} />
+      ))}
     </View>
   );
 }

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'expo-router';
@@ -64,10 +64,10 @@ interface PostRowProps {
   caption: string | null;
   bookmarked: boolean;
   shareText: string;
-  onToggleBookmark: () => void;
-  onHide: () => void;
-  onComment: () => void;
-  onShare: () => void;
+  onToggleBookmark: (postId: string) => void;
+  onHide: (postId: string) => void;
+  onComment: (postId: string) => void;
+  onShare: (title: string, value: string) => void;
 }
 
 /**
@@ -84,7 +84,13 @@ interface PostRowProps {
  *   drops cheers for events whose author isn't followed, which would
  *   visibly un-fill the heart ~1s after tapping your own post).
  */
-function TimelinePostRow({
+/**
+ * One timeline card. Memoized: the parent passes stable props (stable post
+ * objects from the memoized posts array, stable callbacks), so rows skip
+ * re-render when the timeline re-renders for unrelated reasons (e.g. pull-to-
+ * refresh spinner, content-height updates).
+ */
+const TimelinePostRow = memo(function TimelinePostRow({
   post,
   kudosOverride,
   onToggleKudosOverride,
@@ -114,10 +120,10 @@ function TimelinePostRow({
     bookmarked,
     shareText,
     onToggleKudos: handleToggleKudos,
-    onToggleBookmark,
-    onHide,
-    onComment,
-    onShare,
+    onToggleBookmark: () => onToggleBookmark(post.id),
+    onHide: () => onHide(post.id),
+    onComment: () => onComment(post.id),
+    onShare: () => onShare(post.person.name, shareText),
   };
   return post.kind === 'milestone' ? (
     <MilestoneCard post={post} {...common} />
@@ -126,7 +132,7 @@ function TimelinePostRow({
   ) : (
     <MediaCard post={post} {...common} />
   );
-}
+});
 
 /**
  * Screen 1 — Feed Timeline.
@@ -262,6 +268,46 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
     dispatch(fetchFeedItems({ fromUserAction: true }));
   };
 
+  // Stable row callbacks: bookmarks.toggle / hidden.add are useCallback-stable;
+  // these two close over stable router/dispatch only.
+  const handleComment = useCallback((postId: string) => router.push(`item/${postId}`), [router]);
+  const handleShare = useCallback(
+    (title: string, value: string) => dispatch(shareString({ title, value })),
+    [dispatch],
+  );
+
+  const renderItem = useCallback(
+    ({ item: post }: { item: TimelinePost }) => {
+      const caption = post.id === 'alex' ? (draftCaption ?? null) : post.caption;
+      const shareText =
+        caption != null
+          ? `${post.person.name} on Alcedo: ${caption}`
+          : post.kind === 'workout'
+            ? `${post.person.name} on Alcedo: ${post.poster.heroValue} ${post.poster.heroUnit} · ${post.poster.workoutName}`
+            : post.kind === 'milestone'
+              ? `${post.person.name} on Alcedo: ${post.milestone.value} ${post.milestone.unit.toLowerCase()} milestone`
+              : post.kind === 'photo'
+                ? `${post.person.name} on Alcedo: shared a photo`
+                : `${post.person.name} on Alcedo: shared a video`;
+      const isAlexPost = post.id === 'alex';
+      return (
+        <TimelinePostRow
+          post={post}
+          kudosOverride={isAlexPost ? alexKudos : undefined}
+          onToggleKudosOverride={isAlexPost ? ownPostKudos.toggleKudos : undefined}
+          caption={caption}
+          bookmarked={bookmarks.has(post.id)}
+          shareText={shareText}
+          onToggleBookmark={bookmarks.toggle}
+          onHide={hidden.add}
+          onComment={handleComment}
+          onShare={handleShare}
+        />
+      );
+    },
+    [draftCaption, alexKudos, ownPostKudos.toggleKudos, bookmarks, hidden, handleComment, handleShare],
+  );
+
   const activeFilter = TIMELINE_FILTERS.find((f) => f.id === filter)!;
 
   return (
@@ -270,34 +316,7 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
       <FlatList
         data={posts}
         keyExtractor={(post) => post.id}
-        renderItem={({ item: post }) => {
-          const caption = post.id === 'alex' ? (draftCaption ?? null) : post.caption;
-          const shareText =
-            caption != null
-              ? `${post.person.name} on Alcedo: ${caption}`
-              : post.kind === 'workout'
-                ? `${post.person.name} on Alcedo: ${post.poster.heroValue} ${post.poster.heroUnit} · ${post.poster.workoutName}`
-                : post.kind === 'milestone'
-                  ? `${post.person.name} on Alcedo: ${post.milestone.value} ${post.milestone.unit.toLowerCase()} milestone`
-                  : post.kind === 'photo'
-                    ? `${post.person.name} on Alcedo: shared a photo`
-                    : `${post.person.name} on Alcedo: shared a video`;
-          const isAlexPost = post.id === 'alex';
-          return (
-            <TimelinePostRow
-              post={post}
-              kudosOverride={isAlexPost ? alexKudos : undefined}
-              onToggleKudosOverride={isAlexPost ? ownPostKudos.toggleKudos : undefined}
-              caption={caption}
-              bookmarked={bookmarks.has(post.id)}
-              shareText={shareText}
-              onToggleBookmark={() => bookmarks.toggle(post.id)}
-              onHide={() => hidden.add(post.id)}
-              onComment={() => router.push(`item/${post.id}`)}
-              onShare={() => dispatch(shareString({ title: post.person.name, value: shareText }))}
-            />
-          );
-        }}
+        renderItem={renderItem}
         ItemSeparatorComponent={TimelineSeparator}
         ListHeaderComponent={
           <S.HeaderWrap>

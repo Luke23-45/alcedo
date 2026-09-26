@@ -1,4 +1,5 @@
 import { Instant } from '@js-joda/core';
+import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { ReceivedReaction } from '@/models/feed-models';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
@@ -56,22 +57,27 @@ export function useOwnPostKudos(sessionId: string | undefined): {
   const receivedByEvent = useAppSelector(selectReceivedReactionsByEvent);
   const storedKudos = useAppSelectorWithArg(selectPostKudos, 'alex');
 
-  const received = sessionId ? (receivedByEvent.get(sessionId) ?? []) : [];
-  const kudos =
-    sessionId !== undefined
-      ? {
-          total: received.reduce((sum, r) => sum + r.count, 0) + (storedKudos?.kudoed ? 1 : 0),
-          faces: received
-            .map((r) => personById(r.fromUserId))
-            .filter((p): p is FeedPerson => p !== undefined)
-            .slice(0, 3),
-          kudoed: storedKudos?.kudoed ?? false,
-        }
-      : undefined;
+  // Stable identities: the timeline passes kudos/toggleKudos into memoized
+  // rows — fresh objects per render would defeat that memoization.
+  const kudos = useMemo(() => {
+    if (sessionId === undefined) return undefined;
+    const received = receivedByEvent.get(sessionId) ?? [];
+    return {
+      total: received.reduce((sum, r) => sum + r.count, 0) + (storedKudos?.kudoed ? 1 : 0),
+      faces: received
+        .map((r) => personById(r.fromUserId))
+        .filter((p): p is FeedPerson => p !== undefined)
+        .slice(0, 3),
+      kudoed: storedKudos?.kudoed ?? false,
+    };
+  }, [sessionId, receivedByEvent, storedKudos]);
 
-  return {
-    kudos,
-    toggleKudos: () => dispatch(togglePostKudos('alex')),
-    needsKudosSeed: sessionId !== undefined && received.length === 0,
-  };
+  const toggleKudos = useCallback(() => dispatch(togglePostKudos('alex')), [dispatch]);
+
+  const needsKudosSeed = sessionId !== undefined && (receivedByEvent.get(sessionId) ?? []).length === 0;
+
+  return useMemo(
+    () => ({ kudos, toggleKudos, needsKudosSeed }),
+    [kudos, toggleKudos, needsKudosSeed],
+  );
 }

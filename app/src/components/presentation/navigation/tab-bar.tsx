@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
-import { useEffect, useRef } from 'react';
-import { Animated } from 'react-native';
+import Reanimated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useReducedMotion } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -34,33 +34,30 @@ export interface AppTabBarProps extends BottomTabBarProps {
  * 120ms — no scaling, no positional movement, so the glyph never drifts.
  * Under reduced motion the swap is instant; the selected state is identical
  * either way.
+ *
+ * UI-thread crossfade: the progress is derived directly from `selected` via
+ * Reanimated — no useEffect round-trip before the animation begins.
  */
 function TabGlyph({ name, selected, color }: { name: TabIconName; selected: boolean; color: string }) {
   const reduceMotion = useReducedMotion();
-  const progress = useRef(new Animated.Value(selected ? 1 : 0)).current;
+  const progress = useSharedValue(selected ? 1 : 0);
 
-  useEffect(() => {
-    if (reduceMotion) {
-      progress.setValue(selected ? 1 : 0);
-      return;
-    }
-    const animation = Animated.timing(progress, {
-      toValue: selected ? 1 : 0,
-      duration: 120,
-      useNativeDriver: true,
-    });
-    animation.start();
-    return () => animation.stop();
-  }, [selected, reduceMotion, progress]);
+  // Sync the UI-thread value when selection changes (no animation delay).
+  if (reduceMotion) {
+    progress.value = selected ? 1 : 0;
+  } else {
+    progress.value = withTiming(selected ? 1 : 0, { duration: 120 });
+  }
 
-  const outlineOpacity = progress.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+  const outlineStyle = useAnimatedStyle(() => ({ opacity: 1 - progress.value }));
+  const filledStyle = useAnimatedStyle(() => ({ opacity: progress.value }));
 
   return (
     <>
-      <S.IconLayer style={{ opacity: outlineOpacity }} pointerEvents="none">
+      <S.IconLayer style={outlineStyle} pointerEvents="none">
         <TabIcon name={name} selected={false} color={color} />
       </S.IconLayer>
-      <S.IconLayer style={{ opacity: progress }} pointerEvents="none">
+      <S.IconLayer style={filledStyle} pointerEvents="none">
         <TabIcon name={name} selected color={color} />
       </S.IconLayer>
     </>
@@ -99,10 +96,17 @@ export function AppTabBar({ state, descriptors, navigation, hiddenRouteNames, ba
             route,
             isFocused,
           );
+          // Haptic on tab switch: Apple's tab bar confirms every switch.
+          const handlePress = () => {
+            if (!isFocused) {
+              void Haptics.selectionAsync();
+            }
+            onPress();
+          };
           return (
             <S.TabButton
               key={route.key}
-              onPress={onPress}
+              onPress={handlePress}
               onLongPress={onLongPress}
               accessibilityRole="tab"
               accessibilityState={{ selected: isFocused }}

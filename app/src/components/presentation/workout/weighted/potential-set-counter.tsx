@@ -4,8 +4,11 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { Text as PaperText, Chip } from 'react-native-paper';
 import { Animated, Keyboard, View } from 'react-native';
+import Reanimated, { runOnUI } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import WeightDialog from '@/components/presentation/foundation/editors/weight-dialog';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { usePressScale } from '@/hooks/usePressScale';
 import FocusRing from '@/components/presentation/foundation/focus-ring';
 import { T, useTranslate } from '@tolgee/react';
 import Holdable from '@/components/presentation/foundation/holdable';
@@ -125,6 +128,14 @@ function CurrentSetDot() {
 export default function PotentialSetCounter(props: PotentialSetCounterProps) {
   const theme = useAppTheme();
   const { t } = useTranslate();
+  // Apple press physics on the set-logging check — the most-tapped control in
+  // the app. Scale runs on the UI thread; haptic confirms the log.
+  const { pressIn, pressOut, animatedStyle } = usePressScale(props.isReadonly);
+  const handleCheckTap = () => {
+    if (props.isReadonly) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    props.onTap();
+  };
   const [isWeightDialogOpen, setIsWeightDialogOpen] = useState(false);
   const [isRepsDialogOpen, setIsRepsDialogOpen] = useState(false);
   const maxReps = props.repsTarget.max;
@@ -189,21 +200,25 @@ export default function PotentialSetCounter(props: PotentialSetCounterProps) {
         )}
         {prevText === undefined && <View style={{ flex: 1 }} />}
         <CheckPressable
-          onPress={props.isReadonly ? undefined : props.onTap}
+          onPress={props.isReadonly ? undefined : handleCheckTap}
+          onPressIn={() => runOnUI(pressIn)()}
+          onPressOut={() => runOnUI(pressOut)()}
           disabled={props.isReadonly}
           hitSlop={11}
           accessibilityRole="checkbox"
           accessibilityState={{ checked: done }}
           accessibilityLabel={t('exercise.set_number.label', { number: props.index + 1 })}
         >
-          {state === 'current' ? (
-            <View style={{ width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
+          <Reanimated.View style={animatedStyle}>
+            {state === 'current' ? (
+              <View style={{ width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
+                <CheckMark state={state} />
+                <CurrentSetDot />
+              </View>
+            ) : (
               <CheckMark state={state} />
-              <CurrentSetDot />
-            </View>
-          ) : (
-            <CheckMark state={state} />
-          )}
+            )}
+          </Reanimated.View>
         </CheckPressable>
       </SetRow>
         <WeightDialog

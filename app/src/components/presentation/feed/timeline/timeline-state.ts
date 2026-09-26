@@ -1,5 +1,5 @@
 import type { KeyValueStore } from '@/services/key-value-store';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const HIDDEN_POSTS_KEY = 'feed.timeline.hidden.v1';
 const BOOKMARKS_KEY = 'feed.timeline.bookmarks.v1';
@@ -65,7 +65,9 @@ function useStringSet(
 
   const has = useCallback((id: string) => set.has(id), [set]);
 
-  return { set, add, toggle, has };
+  // Stable identity: consumers memoize against this object (e.g. the timeline's
+  // posts array). A fresh literal per render would defeat every downstream useMemo.
+  return useMemo(() => ({ set, add, toggle, has }), [set, add, toggle, has]);
 }
 
 /**

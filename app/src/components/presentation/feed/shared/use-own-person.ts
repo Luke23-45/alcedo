@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useAppSelector } from '@/store';
 import { selectFeedIdentityRemote } from '@/store/feed';
 import { buildOwnPerson } from './own-person';
@@ -11,5 +12,6 @@ export function useOwnPerson(): FeedPerson {
       .unwrapOr(''),
   );
   const username = useAppSelector((state) => state.settings.profileUsername);
-  return buildOwnPerson({ name: identityName, username });
+  // Stable identity: the timeline memoizes its posts array against this object.
+  return useMemo(() => buildOwnPerson({ name: identityName, username }), [identityName, username]);
 }

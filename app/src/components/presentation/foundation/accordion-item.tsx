@@ -1,5 +1,7 @@
-import React, { useCallback, useEffect, useRef } from 'react';
-import { View, LayoutChangeEvent, StyleSheet, Animated, Easing } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
+import Reanimated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useAppReducedMotion } from '@/hooks/useMotionSettings';
 
 type AccordionItemProps = {
   isExpanded: boolean;
@@ -11,6 +13,9 @@ type AccordionItemProps = {
   style?: object;
 };
 
+// Apple's standard deceleration curve.
+const APPLE_EASE = Easing.bezier(0.16, 0.84, 0.24, 1);
+
 export function AccordionItem({
   isExpanded,
   startsExpanded,
@@ -20,47 +25,70 @@ export function AccordionItem({
   style,
   unexpandedHeight = 0,
 }: AccordionItemProps) {
-  const animatedHeight = useRef(new Animated.Value(unexpandedHeight)).current;
+  const reduceMotion = useAppReducedMotion();
+  // UI-thread height: Reanimated drives layout props on the UI thread, so the
+  // expand/collapse no longer drops frames to JS layout work.
+  const height = useSharedValue(unexpandedHeight);
   const measuredHeightRef = useRef(unexpandedHeight);
   const settledHeightRef = useRef(unexpandedHeight);
+  const onToggledRef = useRef(onToggled);
+  onToggledRef.current = onToggled;
 
-  const animate = useCallback(() => {
-    const targetHeight = isExpanded ? measuredHeightRef.current : unexpandedHeight;
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: height.value,
+    overflow: 'hidden' as const,
+  }));
+
+  // Stable JS callback for the UI-thread completion handler.
+  const handleToggled = useRef((expanded: boolean) => {
+    onToggledRef.current?.(expanded);
+  });
+
+  const animateTo = (expanded: boolean) => {
+    const targetHeight = expanded ? measuredHeightRef.current : unexpandedHeight;
     if (settledHeightRef.current === targetHeight) {
-      onToggled?.(isExpanded);
+      onToggledRef.current?.(expanded);
       return;
     }
     settledHeightRef.current = targetHeight;
-    Animated.timing(animatedHeight, {
-      toValue: targetHeight,
-      duration,
-      easing: Easing.cubic,
-      useNativeDriver: false,
-    }).start(({ finished }) => {
-      if (finished && onToggled) {
-        onToggled(isExpanded);
-      }
+    if (reduceMotion) {
+      height.value = targetHeight;
+      onToggledRef.current?.(expanded);
+      return;
+    }
+    const onComplete = handleToggled.current;
+    height.value = withTiming(targetHeight, { duration, easing: APPLE_EASE }, (finished) => {
+      if (finished) runOnJS(onComplete)(expanded);
     });
-  }, [isExpanded, duration, onToggled, animatedHeight, unexpandedHeight]);
+  };
+  // Keep a ref to the latest animateTo for the layout handler (avoids stale closures).
+  const animateToRef = useRef(animateTo);
+  animateToRef.current = animateTo;
 
-  useEffect(() => animate(), [animate]);
+  useEffect(() => {
+    animateToRef.current(isExpanded);
+  }, [isExpanded, duration, unexpandedHeight, reduceMotion]);
 
   const onLayoutContent = (e: LayoutChangeEvent) => {
-    const height = e.nativeEvent.layout.height;
-    measuredHeightRef.current = height;
-    if (isExpanded && startsExpanded) {
-      animatedHeight.setValue(height);
-      settledHeightRef.current = height;
+    const measured = e.nativeEvent.layout.height;
+    const prevMeasured = measuredHeightRef.current;
+    measuredHeightRef.current = measured;
+    if (isExpanded && startsExpanded && prevMeasured === unexpandedHeight) {
+      // First measurement while starting expanded: snap, don't animate.
+      height.value = measured;
+      settledHeightRef.current = measured;
+      return;
     }
-    animate();
+    // Content height changed (e.g. dynamic children): re-settle.
+    animateToRef.current(isExpanded);
   };
 
   return (
-    <Animated.View style={[{ height: animatedHeight, overflow: 'hidden' }, style]}>
+    <Reanimated.View style={[animatedStyle, style]}>
       <View style={styles.content} onLayout={onLayoutContent}>
         {children}
       </View>
-    </Animated.View>
+    </Reanimated.View>
   );
 }
 

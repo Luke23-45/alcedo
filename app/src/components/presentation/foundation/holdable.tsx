@@ -3,9 +3,11 @@ import {
   triggerClickHaptic,
   triggerSlowRiseHaptic,
 } from '~/modules/native-lib/src/ReactNativeHapticsModule';
-import { ReactNode, useRef } from 'react';
-import { Animated, Easing, ViewStyle } from 'react-native';
+import { ReactNode } from 'react';
+import { ViewStyle } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Reanimated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useAppReducedMotion } from '@/hooks/useMotionSettings';
 
 export type HoldableProps = {
   children: ReactNode;
@@ -16,44 +18,46 @@ export type HoldableProps = {
 };
 
 export default function Holdable({ children, onLongPress, duration = 500, style, disabled }: HoldableProps) {
-  const holdingScale = useRef(new Animated.Value(1)).current;
+  const reduceMotion = useAppReducedMotion();
+  // UI-thread scale: the press-and-hold growth starts the instant the finger
+  // lands, with no JS round-trip. Only the long-press callback hops to JS.
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   const handleLongPress = () => {
     onLongPress();
     triggerClickHaptic();
   };
 
-  const enterHold = () => {
-    Animated.timing(holdingScale, {
-      toValue: 1.1,
-      duration,
-      easing: Easing.bezier(0.21, 0.95, 0.67, 0.28),
-      useNativeDriver: true,
-    }).start();
-    triggerSlowRiseHaptic();
-  };
-
-  const exitHold = (triggered: boolean) => {
-    Animated.timing(holdingScale, {
-      toValue: 1,
-      duration,
-      useNativeDriver: true,
-    }).start();
-    if (!triggered) cancelHaptic();
-  };
-
   const gesture = disabled
     ? Gesture.Manual()
     : Gesture.LongPress()
         .minDuration(duration)
-        .runOnJS(true)
-        .onBegin(enterHold)
-        .onFinalize((_, triggered) => exitHold(triggered))
-        .onStart(handleLongPress);
+        .onBegin(() => {
+          'worklet';
+          if (!reduceMotion) {
+            scale.value = withTiming(1.1, { duration, easing: Easing.bezier(0.16, 0.84, 0.24, 1) });
+          }
+          runOnJS(triggerSlowRiseHaptic)();
+        })
+        .onFinalize((_, triggered) => {
+          'worklet';
+          if (!reduceMotion) {
+            scale.value = withTiming(1, { duration: 200 });
+          }
+          if (!triggered) runOnJS(cancelHaptic)();
+        })
+        .onStart(() => {
+          'worklet';
+          runOnJS(handleLongPress)();
+        });
 
   return (
     <GestureDetector gesture={gesture}>
-      <Animated.View style={[style, { transform: [{ scale: holdingScale }] }]}>{children}</Animated.View>
+      <Reanimated.View style={[style, animatedStyle]}>{children}</Reanimated.View>
     </GestureDetector>
   );
 }

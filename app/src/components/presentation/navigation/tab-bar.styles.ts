@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Animated, Pressable, StyleSheet, Text as RNText, View } from 'react-native';
+import { Pressable, StyleSheet, Text as RNText, View } from 'react-native';
+import Reanimated from 'react-native-reanimated';
 import { useAppTheme } from '@/hooks/useAppTheme';
 
 /**
@@ -39,7 +40,7 @@ export function IconSlot({ children, style, ...rest }: { children?: React.ReactN
 
 /** Absolute glyph layer for the selected-state cross-fade; opacity is animated. */
 export function IconLayer({ children, style, ...rest }: any) {
-  return React.createElement(Animated.View, { style: [{ position: 'absolute', left: 0, top: 0 } as any, style as any], ...rest }, children);
+  return React.createElement(Reanimated.View, { style: [{ position: 'absolute', left: 0, top: 0 } as any, style as any], ...rest }, children);
 }
 
 export function Badge({ children, style, ...rest }: { children?: React.ReactNode; style?: any }) {

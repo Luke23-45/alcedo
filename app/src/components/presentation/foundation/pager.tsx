@@ -1,7 +1,6 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { Children, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { Children, ReactNode, useEffect, useRef, useState } from 'react';
 import {
-  Animated,
   LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -11,6 +10,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import Reanimated, { useAnimatedScrollHandler, useDerivedValue, useSharedValue } from 'react-native-reanimated';
 import { PageIndicator } from './page-indicator';
 
 export interface PagerProps {
@@ -38,7 +38,8 @@ export function Pager({
 }: PagerProps) {
   const theme = useAppTheme();
   const [pageWidth, setPageWidth] = useState(0);
-  const scrollX = useRef(new Animated.Value(0)).current;
+  // UI-thread scroll offset: the indicator dots track the finger with no JS round-trip.
+  const scrollX = useSharedValue(0);
   const scrollRef = useRef<ScrollView>(null);
   const pages = Children.toArray(children);
 
@@ -48,7 +49,13 @@ export function Pager({
     }
   }, [page, pageWidth]);
 
-  const progress = useMemo(() => Animated.divide(scrollX, pageWidth || 1), [scrollX, pageWidth]);
+  const progressWidth = useSharedValue(1);
+  if (pageWidth > 0) progressWidth.value = pageWidth;
+  const progress = useDerivedValue(() => scrollX.value / progressWidth.value);
+
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollX.value = event.contentOffset.x;
+  });
 
   const onLayout = (e: LayoutChangeEvent) => setPageWidth(e.nativeEvent.layout.width);
   const settleTo = (offsetX: number) => {
@@ -64,13 +71,13 @@ export function Pager({
 
   return (
     <View style={[fill && styles.fill, style]}>
-      <Animated.ScrollView
+      <Reanimated.ScrollView
         ref={scrollRef}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         scrollEnabled={scrollEnabled && pages.length > 1}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
+        onScroll={scrollHandler}
         onScrollEndDrag={onScrollEndDrag}
         onMomentumScrollEnd={onMomentumScrollEnd}
         scrollEventThrottle={16}
@@ -83,7 +90,7 @@ export function Pager({
               {child}
             </View>
           ))}
-      </Animated.ScrollView>
+      </Reanimated.ScrollView>
 
       {showIndicator && (
         <PageIndicator
