@@ -31,8 +31,10 @@ export function applyProgramEffects(addEffect: AddEffectFn) {
     initializeProgramStateSlice,
     async (
       _,
-      { getState, cancelActiveListeners, dispatch, extra: { keyValueStore, logger, db }, throwIfCancelled },
+      { getState, cancelActiveListeners, dispatch, onFail, extra: { keyValueStore, logger, db }, throwIfCancelled },
     ) => {
+      // A hydration failure must never strand the app on the loading screen.
+      onFail(() => dispatch(setIsHydrated(true)));
       const start = performance.now();
       cancelActiveListeners();
 

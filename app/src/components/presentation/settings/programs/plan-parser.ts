@@ -36,6 +36,11 @@ export interface ParsedPlan {
 const DAY_HEADER = /^\s*day\s*(\d+)\s*(?:[·•\-–—:]\s*(.+?))?\s*$/i;
 const EXERCISE_LINE = /^\s*(.+?)\s+(\d+)\s*[x×]\s*(\d+|amrap)\b\s*(?:(\d+)\s*s(?:ec(?:ond)?s?)?)?\s*$/i;
 
+/** Pasted numbers are untrusted: clamp them so a "999999999x10" line can't OOM the plan builder. */
+function clampInt(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, Math.floor(value)));
+}
+
 /**
  * Matches a pasted exercise name against the exercise library:
  * 1. exact normalized match,
@@ -110,9 +115,9 @@ export function parsePlanText(text: string, descriptors: Record<string, Exercise
         name: descriptor?.name ?? rawName,
         matched: descriptor !== undefined,
         renamed: descriptor !== undefined && descriptor.name.toLowerCase() !== rawName.toLowerCase(),
-        sets: Number(exerciseMatch[2]),
-        reps: exerciseMatch[3]!.toLowerCase() === 'amrap' ? 'amrap' : Number(exerciseMatch[3]),
-        restSeconds: exerciseMatch[4] ? Number(exerciseMatch[4]) : undefined,
+        sets: clampInt(Number(exerciseMatch[2]), 1, 100),
+        reps: exerciseMatch[3]!.toLowerCase() === 'amrap' ? 'amrap' : clampInt(Number(exerciseMatch[3]), 1, 10000),
+        restSeconds: exerciseMatch[4] ? clampInt(Number(exerciseMatch[4]), 0, 3600) : undefined,
       });
     }
   }

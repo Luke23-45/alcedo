@@ -126,6 +126,13 @@ export function addFollowingEffects(addEffect: AddEffectFn) {
     const identity = identityRemote.data;
     const feedUser = action.payload.feedUser;
 
+    if (feedUser.type === 'FollowerFeedUser') {
+      // Removing a follower revokes their follow secret — it is not an
+      // unfollow, and the dedicated flow retries the revocation.
+      dispatch(revokeFollowSecretAndRemoveFollower({ userId: feedUser.id, fromUserAction: true }));
+      return;
+    }
+
     dispatch(removeFollowedUser(feedUser.id));
 
     if (feedUser.type === 'PendingFeedUser') {

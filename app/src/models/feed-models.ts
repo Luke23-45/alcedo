@@ -57,7 +57,7 @@ export const FEED_EVENT_RETENTION_SECONDS = FEED_EVENT_RETENTION_DAYS * 24 * 60 
 // ---------------------------------------------------------------------------
 
 export class FollowerFeedUser {
-  readonly type = 'PendingFeedUser' as const;
+  readonly type = 'FollowerFeedUser' as const;
 
   constructor(
     readonly id: string,

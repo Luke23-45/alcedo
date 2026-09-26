@@ -326,4 +326,110 @@ describe('aiPlanFromJSON', () => {
       }
     });
   });
+
+  describe('hostile model values', () => {
+    // Bypass contextual typing: the whole point is feeding values the schema
+    // would never produce, so the literal is cast at the boundary.
+    function hostileExercise(exercise: unknown) {
+      return firstExercise({
+        version: 3,
+        name: 'PPL',
+        blueprint: {
+          sessions: [{ exercises: [exercise] }],
+        },
+      } as DeepPartial<AnyVersionAiPlanJSON>);
+    }
+
+    it('coerces a wrong-typed enum axis to the default instead of casting', () => {
+      const exercise = hostileExercise({
+        type: 'WeightedExerciseBlueprint',
+        name: 'Squat',
+        progression: [{ axis: 'sideways', step: '2.5', scope: { type: 'allSets' }, trigger: 'allSetsMetTarget' }],
+      }) as WeightedExerciseBlueprint;
+
+      expect(exercise.progression[0]!.axis).toBe('load');
+    });
+
+    it('coerces a non-numeric step string to the default', () => {
+      const exercise = hostileExercise({
+        type: 'WeightedExerciseBlueprint',
+        name: 'Squat',
+        progression: [{ axis: 'load', step: 'lots', scope: { type: 'allSets' }, trigger: 'allSetsMetTarget' }],
+      }) as WeightedExerciseBlueprint;
+
+      expect(exercise.progression[0]!.step.toString()).toBe('2.5');
+    });
+
+    it('coerces a bad scope pick to all', () => {
+      const exercise = hostileExercise({
+        type: 'WeightedExerciseBlueprint',
+        name: 'Squat',
+        progression: [
+          { axis: 'reps', step: '1', scope: { type: 'lowestSets', pick: 'everywhere' }, trigger: 'allSetsMetTarget' },
+        ],
+      }) as WeightedExerciseBlueprint;
+
+      const scope = exercise.progression[0]!.scope;
+      expect(scope.type).toBe('lowestSets');
+      if (scope.type === 'lowestSets') {
+        expect(scope.pick).toBe('all');
+      }
+    });
+
+    it('coerces a bad resistance value to the empty-exercise default', () => {
+      const exercise = hostileExercise({
+        type: 'WeightedExerciseBlueprint',
+        name: 'Squat',
+        resistance: 'telekinetic',
+      }) as WeightedExerciseBlueprint;
+
+      expect(['none', 'external', 'bodyweight']).toContain(exercise.resistance);
+    });
+
+    it('coerces a truthy non-boolean superset flag to the default', () => {
+      const exercise = hostileExercise({
+        type: 'WeightedExerciseBlueprint',
+        name: 'Squat',
+        supersetWithNext: 'yes',
+      }) as WeightedExerciseBlueprint;
+
+      expect(exercise.supersetWithNext).toBe(false);
+    });
+
+    it('coerces a bad distance unit to kilometre', () => {
+      const exercise = hostileExercise({
+        type: 'CardioExerciseBlueprint',
+        name: 'Run',
+        sets: [{ target: { type: 'distance', value: { value: '5', unit: 'furlongs' } } }],
+      }) as CardioExerciseBlueprint;
+
+      const target = exercise.sets[0]!.target;
+      if (target.type === 'distance') {
+        expect(target.value.unit).toBe('kilometre');
+      } else {
+        expect.unreachable('expected a distance target');
+      }
+    });
+
+    it('coerces a malformed duration string to the default', () => {
+      const exercise = hostileExercise({
+        type: 'WeightedExerciseBlueprint',
+        name: 'Squat',
+        restBetweenSets: { minRest: 'soon', maxRest: 'later', failureRest: 'PT5M' },
+      }) as WeightedExerciseBlueprint;
+
+      expect(exercise.restBetweenSets.minRest.toString()).not.toBe('soon');
+      expect(exercise.restBetweenSets.failureRest.toString()).toBe('PT5M');
+    });
+
+    it('coerces non-boolean cardio track flags to the defaults', () => {
+      const exercise = hostileExercise({
+        type: 'CardioExerciseBlueprint',
+        name: 'Run',
+        sets: [{ target: { type: 'time', value: 'PT30M' }, trackDistance: 1 }],
+      }) as CardioExerciseBlueprint;
+
+      expect(typeof exercise.sets[0]!.trackDistance).toBe('boolean');
+    });
+  });
 });

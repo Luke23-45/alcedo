@@ -71,6 +71,32 @@ import { sessionUserEventMigrations } from '@/models/storage/versions/migrations
 import { setBackendAssignment, switchFeedBackend } from '@/store/backends';
 
 export function applyFeedEffects(addEffect: AddEffectFn) {
+  // Clearing the Redux feed state must also wipe the persisted tables, or the old
+  // account's data rehydrates under the new identity on the next launch.
+  addEffect(clearFeedState, async (_, { extra: { db, logger } }) => {
+    try {
+      const tables = [
+        feedIdentitySchema,
+        feedFollowedUsersSchema,
+        feedPendingUsersSchema,
+        feedItemsSchema,
+        feedFollowerUsersSchema,
+        feedFollowRequestsSchema,
+        feedReactionsSchema,
+        feedSentReactionsSchema,
+        feedRevokedFollowSecretsSchema,
+        feedUnpublishedSessionsSchema,
+      ];
+      await db.transaction(async (tx) => {
+        for (const table of tables) {
+          await tx.delete(table);
+        }
+      });
+    } catch (e) {
+      logger.error('Failed to clear persisted feed state', e);
+    }
+  });
+
   addEffect(
     initializeFeedStateSlice,
     async (_, { cancelActiveListeners, getState, dispatch, extra: { db, logger, encryptionService } }) => {
@@ -190,7 +216,9 @@ export function applyFeedEffects(addEffect: AddEffectFn) {
         logger.info(`Feed state initialized in ${elapsedMilliseconds}ms`);
       } catch (e) {
         logger.error('Failed to initialize feed state', e);
-        throw e;
+        // Never leave the feed permanently unhydrated: finalize so the UI can
+        // render (and offer retry) instead of staying dead until app restart.
+        dispatch(setIsHydrated(true));
       }
     },
   );
@@ -253,6 +281,16 @@ export function applyFeedEffects(addEffect: AddEffectFn) {
           },
         ]);
         await tx.delete(feedFollowedUsersSchema).where(eq(feedFollowedUsersSchema.id, action.payload.id));
+      } else if (action.payload.type === 'FollowerFeedUser') {
+        // Followers have their own table — they must never land in the
+        // followed table, which the feed reader decrypts with a shared key
+        // followers do not have.
+        await upsert(tx, feedFollowerUsersSchema, [
+          {
+            id: action.payload.id,
+            payload: action.payload.toJSON(),
+          },
+        ]);
       } else {
         await tx.delete(feedPendingUsersSchema).where(eq(feedPendingUsersSchema.id, action.payload.id));
         await upsert(tx, feedFollowedUsersSchema, [

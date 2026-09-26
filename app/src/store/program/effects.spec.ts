@@ -423,6 +423,33 @@ describe('program reducer', () => {
       store.dispatch(deleteSavedPlan({ programId: 'ghost' }));
       expect(store.getState().program.savedPrograms).toEqual(before);
     });
+
+    it('moves activePlanId to a remaining plan when the active plan is deleted', () => {
+      const store = createProgramStore();
+      store.dispatch(savePlan({ programId: 'plan-a', programBlueprint: makeProgram() }));
+      store.dispatch(savePlan({ programId: 'plan-b', programBlueprint: makeProgram() }));
+      store.dispatch(setActivePlan({ activePlanId: 'plan-a' }));
+      store.dispatch(deleteSavedPlan({ programId: 'plan-a' }));
+      expect(store.getState().program.activePlanId).toBe('plan-b');
+    });
+
+    it('resets activePlanId to the initial nil id when the last plan is deleted', () => {
+      const store = createProgramStore();
+      store.dispatch(savePlan({ programId: 'only-plan', programBlueprint: makeProgram() }));
+      store.dispatch(setActivePlan({ activePlanId: 'only-plan' }));
+      store.dispatch(deleteSavedPlan({ programId: 'only-plan' }));
+      expect(store.getState().program.activePlanId).toBe('00000000-0000-0000-0000-000000000000');
+      expect(store.getState().program.savedPrograms).toEqual({});
+    });
+
+    it('leaves activePlanId alone when a non-active plan is deleted', () => {
+      const store = createProgramStore();
+      store.dispatch(savePlan({ programId: 'plan-a', programBlueprint: makeProgram() }));
+      store.dispatch(savePlan({ programId: 'plan-b', programBlueprint: makeProgram() }));
+      store.dispatch(setActivePlan({ activePlanId: 'plan-a' }));
+      store.dispatch(deleteSavedPlan({ programId: 'plan-b' }));
+      expect(store.getState().program.activePlanId).toBe('plan-a');
+    });
   });
 
   describe('setSavedPlanName', () => {

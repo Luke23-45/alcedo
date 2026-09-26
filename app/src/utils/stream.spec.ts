@@ -1,4 +1,4 @@
-import { streamToUint8Array, writeInChunks } from './stream';
+import { streamToUint8Array, streamToUint8ArrayWithLimit, writeInChunks, DecompressionLimitError } from './stream';
 import { gunzipSync } from 'fflate';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -83,5 +83,42 @@ describe('writeInChunks', () => {
     expect(frameSpy).not.toHaveBeenCalled();
     nowSpy.mockRestore();
     frameSpy.mockRestore();
+  });
+});
+
+/** A ReadableStream that yields the given chunks, like a decompressor would. */
+function chunkStream(chunks: Uint8Array[]): ReadableStream<Uint8Array> {
+  return new ReadableStream<Uint8Array>({
+    start(controller: ReadableStreamDefaultController<Uint8Array>) {
+      for (const chunk of chunks) {
+        controller.enqueue(chunk);
+      }
+      controller.close();
+    },
+  });
+}
+
+describe('streamToUint8ArrayWithLimit', () => {
+  it('returns the bytes when under the limit', async () => {
+    const chunks = [new Uint8Array([1, 2, 3]), new Uint8Array([4, 5])];
+    const result = await streamToUint8ArrayWithLimit(chunkStream(chunks), 16);
+    expect(result).toEqual(new Uint8Array([1, 2, 3, 4, 5]));
+  });
+
+  it('throws DecompressionLimitError instead of accumulating past the limit', async () => {
+    const chunks = [new Uint8Array(8), new Uint8Array(8), new Uint8Array(8)];
+    const failure = await streamToUint8ArrayWithLimit(chunkStream(chunks), 16).then(
+      () => undefined,
+      (e: unknown) => e,
+    );
+    expect(failure).toBeInstanceOf(DecompressionLimitError);
+    expect((failure as DecompressionLimitError).limit).toBe(16);
+  });
+
+  it('releases the reader lock even when the limit is breached', async () => {
+    const stream = chunkStream([new Uint8Array(32)]);
+    await expect(streamToUint8ArrayWithLimit(stream, 16)).rejects.toBeInstanceOf(DecompressionLimitError);
+    // Would throw "locked" if the failed read had kept the reader.
+    expect(() => stream.getReader()).not.toThrow();
   });
 });

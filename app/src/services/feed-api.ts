@@ -257,7 +257,14 @@ function stringify(value: unknown): string {
 }
 
 function uint8ArrayToBase64(value: Uint8Array): string {
-  return btoa(String.fromCharCode(...value));
+  // Chunked: spreading a large array into fromCharCode exceeds the engine's
+  // argument limit and throws RangeError on Hermes/JSC.
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < value.length; i += chunkSize) {
+    binary += String.fromCharCode(...value.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
 }
 
 function base64ToUint8Array(value: string): Uint8Array {

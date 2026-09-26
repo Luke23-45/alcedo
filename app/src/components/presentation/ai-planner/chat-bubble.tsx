@@ -13,6 +13,19 @@ import * as S from './chat-bubble.styles';
 const RADIUS = 18;
 const GROUPED_RADIUS = 6;
 
+/**
+ * The match below is exhaustive over the known message types, but a message
+ * persisted by a newer app version (or corrupted storage) can carry an
+ * unknown `type` — that must render nothing, not crash the whole chat.
+ */
+const KNOWN_MESSAGE_TYPES: ReadonlySet<string> = new Set([
+  'messageResponse',
+  'chatPlan',
+  'sharedProgram',
+  'purchasePro',
+  'updateRequired',
+]);
+
 export function ChatBubble(props: {
   message: ChatMessage;
   sameSenderBelow: boolean;
@@ -22,6 +35,10 @@ export function ChatBubble(props: {
   const { t } = useTranslate();
   const { message, sameSenderBelow, sameSenderAbove } = props;
   const isUser = message.from === 'User';
+
+  if (!KNOWN_MESSAGE_TYPES.has(message.type)) {
+    return null;
+  }
 
   return match(message)
     .with({ type: 'messageResponse' }, (message) => (

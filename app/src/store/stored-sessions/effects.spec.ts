@@ -12,9 +12,11 @@ import {
   sessionFinished,
   setActiveSessionId,
   setStoredSessions,
+  storedSessionsReducer,
   upsertExercises,
   upsertStoredSessions,
 } from '@/store/stored-sessions';
+import { combineReducers } from '@reduxjs/toolkit';
 import { addUnpublishedSessionId } from '@/store/feed';
 import { setStatsIsDirty } from '@/store/stats';
 import { createAddEffectTestBed } from '@/utils/__test__/add-effect-testbed';
@@ -64,6 +66,14 @@ describe('stored-sessions effects', () => {
 
   function bed(options: { keyValueStore?: ReturnType<typeof makeKvStore>; state?: Partial<RootState> }) {
     const testBed = createAddEffectTestBed({
+      // The active-flag staleness guard reads live state, so the real reducer
+      // must run (reducers are synchronous on dispatch in production).
+      // `settings` is a passthrough: combineReducers would otherwise drop it,
+      // and the init/migration effects read settings.isHydrated.
+      reducer: combineReducers({
+        storedSessions: storedSessionsReducer,
+        settings: (state: unknown = {}) => state,
+      }) as never,
       initialState: {
         settings: { isHydrated: true, preferredLanguage: 'en', exportToHealthAggregator: false },
         storedSessions: { sessions: {}, activeSessionId: undefined },

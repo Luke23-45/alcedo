@@ -282,6 +282,22 @@ describe('following-effects', () => {
       expect(testBed.getDispatchedAction(removeFollowedUser).payload).toBe('u1');
       expect(services.feedFollowService.unfollowUserAsync).toHaveBeenCalledWith(identity, followed);
     });
+
+    it('removes a follower through the revocation flow, not unfollow', async () => {
+      const follower = new FollowerFeedUser('u1', publicKey, 'Bob', 'the-secret');
+      const { testBed, services } = makeTestBed({ followers: { u1: follower } });
+
+      await testBed.dispatchHandled(unfollowFeedUser({ feedUser: follower }));
+
+      // Delegates to the dedicated flow (which removes the follower locally and
+      // revokes the secret with retries) instead of calling unfollow.
+      expect(testBed.getDispatchedAction(revokeFollowSecretAndRemoveFollower).payload).toEqual({
+        userId: 'u1',
+        fromUserAction: true,
+      });
+      testBed.expectNotDispatched(removeFollowedUser);
+      expect(services.feedFollowService.unfollowUserAsync).not.toHaveBeenCalled();
+    });
   });
 
   describe('acceptFollowRequest', () => {

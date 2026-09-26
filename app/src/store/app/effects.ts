@@ -2,6 +2,7 @@ import {
   copyLogs,
   initializeAppStateSlice,
   setCurrentSnackbar,
+  setInitializationError,
   setIsHydrated,
   shareString,
   showSnackbar,
@@ -16,9 +17,17 @@ import { initializeBackendsStateSlice } from '@/store/backends';
 export function applyAppEffects(addEffect: AddEffectFn) {
   addEffect(
     initializeAppStateSlice,
-    async (_, { cancelActiveListeners, dispatch, extra: { databaseMigrationService } }) => {
+    async (_, { cancelActiveListeners, dispatch, extra: { databaseMigrationService, logger } }) => {
       cancelActiveListeners();
-      await databaseMigrationService.migrate();
+      // A migration failure must never leave the app on the loading screen forever:
+      // record the error, still kick off slice initialization, and always finalize
+      // hydration so AppStateProvider can show a recovery screen.
+      try {
+        await databaseMigrationService.migrate();
+      } catch (e) {
+        logger.error('Database migration failed', e);
+        dispatch(setInitializationError(e instanceof Error ? e.message : String(e)));
+      }
       dispatch(initializeSettingsStateSlice());
       dispatch(initializeProgramStateSlice());
       dispatch(initializeBackendsStateSlice());

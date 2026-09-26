@@ -64,3 +64,48 @@ export async function streamToUint8Array(stream: ReadableStream<Uint8Array>) {
 
   return result;
 }
+
+export class DecompressionLimitError extends Error {
+  constructor(readonly limit: number) {
+    super(`Decompressed data exceeds the ${limit} byte limit`);
+    this.name = 'DecompressionLimitError';
+  }
+}
+
+/**
+ * Bounded variant of {@link streamToUint8Array}: aborts with a
+ * {@link DecompressionLimitError} instead of letting a gzip bomb exhaust
+ * device memory.
+ */
+export async function streamToUint8ArrayWithLimit(
+  stream: ReadableStream<Uint8Array>,
+  limit: number,
+): Promise<Uint8Array> {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalLength = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      totalLength += value.length;
+      if (totalLength > limit) {
+        throw new DecompressionLimitError(limit);
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const result = new Uint8Array(totalLength);
+  let position = 0;
+  for (const chunk of chunks) {
+    result.set(chunk, position);
+    position += chunk.length;
+  }
+
+  return result;
+}

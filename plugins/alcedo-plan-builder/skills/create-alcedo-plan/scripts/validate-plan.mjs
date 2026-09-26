@@ -1853,7 +1853,7 @@ var import_validate_schema = __toESM(require_validate_schema(), 1);
 import { readFileSync } from "node:fs";
 var file = process.argv[2];
 if (!file) {
-  console.error("usage: node validate-plan.mjs <plan.alcedoplan>");
+  console.error("usage: node validate-plan.mjs <plan.alcedoplan|plan.liftlogplan>");
   process.exit(2);
 }
 var plan;

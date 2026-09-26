@@ -13,7 +13,8 @@ import {
 } from '@/store/settings';
 import { upsertExercises, upsertStoredSessions } from '@/store/stored-sessions';
 import { Instant } from '@js-joda/core';
-import { streamToUint8Array, writeInChunks } from '@/utils/stream';
+import { streamToUint8ArrayWithLimit, DecompressionLimitError, writeInChunks } from '@/utils/stream';
+import { PICKED_FILE_TOO_LARGE } from '@/services/file-picker-service';
 import { sleep } from '@/utils/sleep';
 import { Session } from '@/models/session-models';
 import { ProgramBlueprint } from '@/models/blueprint-models';
@@ -59,10 +60,28 @@ import { FeedUserJSON } from '@/models/storage/versions/latest';
 import { fromExerciseDescriptorJSON, toExerciseDescriptorJSON } from '@/models/exercise-models';
 import { mapRowsSkippingCorrupt, upsert } from '@/db/helpers';
 
-export function addImportBackupEffects(addEffect: AddEffectFn) {
-  addEffect(importData, async (_, { dispatch, extra: { filePickerService, logger, tolgee } }) => {
-    const file = await filePickerService.pickFile();
+// A real workout database is megabytes; these caps only bite on corrupt or
+// hostile files (gzip bombs), never on legitimate backups. 64 MiB compressed is
+// ~1000x a typical export, and the decompressed cap stays well under what would
+// OOM-kill the app on a phone.
+const MAX_BACKUP_FILE_BYTES = 64 * 1024 * 1024;
+const MAX_DECOMPRESSED_BYTES = 256 * 1024 * 1024;
+
+export function addImportBackupEffects(addEffect: AddEffectFn) {  addEffect(importData, async (_, { dispatch, extra: { filePickerService, logger, tolgee } }) => {
+    // The size limit is enforced from the picker's reported size before the file's
+    // bytes are read into memory; the bytes.length check below is the fallback for
+    // pickers that don't report a size.
+    const file = await filePickerService.pickFile(MAX_BACKUP_FILE_BYTES);
     if (!file) {
+      return;
+    }
+    if (file === PICKED_FILE_TOO_LARGE || file.bytes.length > MAX_BACKUP_FILE_BYTES) {
+      logger.warn('Backup file exceeds the size limit', { limit: MAX_BACKUP_FILE_BYTES });
+      dispatch(
+        showSnackbar({
+          text: 'Could not import data: file is too large.',
+        }),
+      );
       return;
     }
     dispatch(
@@ -71,7 +90,21 @@ export function addImportBackupEffects(addEffect: AddEffectFn) {
       }),
     );
     await sleep(200);
-    const gunzipped = await unGzipIfZipped(file.bytes, logger);
+    let gunzipped: Uint8Array;
+    try {
+      gunzipped = await unGzipIfZipped(file.bytes, logger);
+    } catch (e) {
+      if (e instanceof DecompressionLimitError) {
+        logger.warn('Backup decompressed data exceeds the size limit', { limit: e.limit });
+        dispatch(
+          showSnackbar({
+            text: 'Could not import data: file is too large.',
+          }),
+        );
+        return;
+      }
+      throw e;
+    }
     const parsedProto = tryParseProto(gunzipped, logger);
     if (parsedProto) {
       dispatch(importDataProto({ dao: parsedProto }));
@@ -339,19 +372,44 @@ function tryParseProto(
 }
 
 async function unGzipIfZipped(bytes: Uint8Array, logger: Logger): Promise<Uint8Array> {
+  let writer: WritableStreamDefaultWriter<Uint8Array>;
+  let decompressPromise: Promise<Uint8Array>;
   try {
     const stream = new DecompressionStream('gzip');
-
-    const writer = stream.writable.getWriter();
-
-    // Start reading from the stream immediately
-    const decompressPromise = streamToUint8Array(stream.readable);
-    await writeInChunks(writer, bytes);
-    await writer.close();
-    const gunzipped = await decompressPromise;
+    writer = stream.writable.getWriter();
+    decompressPromise = streamToUint8ArrayWithLimit(stream.readable, MAX_DECOMPRESSED_BYTES);
+  } catch (e) {
+    // No decompressor on this platform (or it failed to construct): the file
+    // simply isn't treated as gzip, so fall through to the raw bytes.
+    logger.warn('Could not unzip bytes', e);
+    return bytes;
+  }
+  // Feed the decompressor in the background: if the read side breaches the size
+  // limit (or the data isn't gzip), the write side is aborted instead of
+  // pointlessly pushing the rest of a hostile file through the decompressor.
+  // The write side's own errors are swallowed — the read side's verdict below is
+  // the one that matters.
+  const writePromise = writeInChunks(writer, bytes).then(
+    () => writer.close(),
+    () => undefined,
+  );
+  try {
+    const [gunzipped] = await Promise.all([decompressPromise, writePromise]);
     return gunzipped;
   } catch (e) {
-    logger.warn('Could not unzip bytes', e);
+    // One side failed: stop the other so no stream half dangles.
+    await writer.abort().catch(() => undefined);
+    // Prefer the read side's verdict — it distinguishes "too big" from "not gzip".
+    // (Promise.all already observed the rejection, so this re-inspection is safe.)
+    const readError = await decompressPromise.then(
+      () => undefined,
+      (readFailure: unknown) => readFailure,
+    );
+    const failure = readError ?? e;
+    if (failure instanceof DecompressionLimitError) {
+      throw failure;
+    }
+    logger.warn('Could not unzip bytes', failure);
     return bytes;
   }
 }

@@ -40,9 +40,10 @@ export default function HistoryEditPage() {
     },
   });
 
-  const save = () => {
-    const hasDiff = finishWorkout();
+  const save = async () => {
     finished.current = true;
+    // Awaited: navigating before the finish is durable risks resurrecting the workout on restart.
+    const hasDiff = await finishWorkout();
     dismissTo('/history');
     if (hasDiff) {
       push('/diff-save');

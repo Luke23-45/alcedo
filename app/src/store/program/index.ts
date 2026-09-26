@@ -122,6 +122,14 @@ const programSlice = createSlice({
     deleteSavedPlan(state, action: PayloadAction<{ programId: string }>) {
       const { [action.payload.programId]: _, ...remainingPrograms } = state.savedPrograms;
       state.savedPrograms = remainingPrograms;
+      // Deleting the active plan must not leave a dangling activePlanId —
+      // selectActiveProgram asserts non-null and the home screen dereferences it.
+      if (state.activePlanId === action.payload.programId) {
+        const remainingIds = Object.keys(remainingPrograms);
+        // With no plans left, fall back to the initial nil id: that is exactly the
+        // "no plans yet" state consumers already handle (see initialState).
+        state.activePlanId = remainingIds.length > 0 ? remainingIds[0]! : initialState.activePlanId;
+      }
     },
 
     setSavedPlanName(state, action: PayloadAction<{ programId: string; name: string }>) {

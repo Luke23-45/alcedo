@@ -290,4 +290,24 @@ describe('import-backup-effects', () => {
 
     testBed.expectNotDispatched(beginFeedImport);
   });
+
+  it('rejects an oversized file before reading it, without starting an import', async () => {
+    const testBed = createAddEffectTestBed({
+      services: {
+        filePickerService: {
+          pickFile: vi.fn().mockResolvedValue('too-large'),
+        },
+        tolgee: { t: (s: string) => s },
+      },
+    });
+    addImportBackupEffects(testBed.addEffect);
+
+    await testBed.dispatchHandled(importData());
+
+    expect(snackbarText(testBed.getDispatchedAction(showSnackbar).payload)).toBe(
+      'Could not import data: file is too large.',
+    );
+    testBed.expectNotDispatched(importDataProto);
+    testBed.expectNotDispatched(importDataSql);
+  });
 });

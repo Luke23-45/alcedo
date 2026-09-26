@@ -70,7 +70,7 @@ export class DatabaseImportService implements DatabaseImporter {
       await importBackends(this.db, this.preferenceService);
     }
     if (!dataMigrationsRun.includes(migrateBackendKindToAlcedoDataMigration)) {
-      await migrateBackendKindToAlcedo(this.db);
+      await migrateBackendKindToAlcedo(this.db, this.keyValueStore);
     }
     if (!dataMigrationsRun.includes(migrateAiPlannerToV2DataMigration)) {
       await migrateAiPlannerToV2(this.db);

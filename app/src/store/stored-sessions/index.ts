@@ -387,3 +387,5 @@ export function getSessionReferenceTime(session: Session): OffsetDateTime {
     session.lastExercise?.latestTime ?? session.date.atStartOfDay().atZone(ZoneId.systemDefault()).toOffsetDateTime()
   );
 }
+
+export { awaitSessionFinished } from './effects';

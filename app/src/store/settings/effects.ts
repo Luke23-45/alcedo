@@ -33,9 +33,11 @@ import { initializeStoredSessionsStateSlice } from "@/store/stored-sessions";
 import { builtInBackendId } from "@/models/backend";
 
 // Read every generically-hydrated key, then dispatch its setter.
+// One failing key must not block every other setting from hydrating.
 async function hydrateGenericPreferences(
   preferenceService: { getPreference: <K extends PrefKey>(key: K) => Promise<PrefValue<K>> },
   dispatch: (action: unknown) => void,
+  onKeyError: (key: string, error: unknown) => void,
 ) {
   const keys = preferenceKeys.filter(
     (key) =>
@@ -43,8 +45,12 @@ async function hydrateGenericPreferences(
   );
   await Promise.all(
     keys.map(async (key) => {
-      const value = await preferenceService.getPreference(key);
-      dispatch(buildPreferenceAction(key, value));
+      try {
+        const value = await preferenceService.getPreference(key);
+        dispatch(buildPreferenceAction(key, value));
+      } catch (e) {
+        onKeyError(key, e);
+      }
     }),
   );
 }
@@ -52,11 +58,15 @@ async function hydrateGenericPreferences(
 export function applySettingsEffects(addEffect: AddEffectFn) {
   addEffect(
     initializeSettingsStateSlice,
-    async (_, { cancelActiveListeners, dispatch, extra: { preferenceService, logger } }) => {
+    async (_, { cancelActiveListeners, dispatch, onFail, extra: { preferenceService, logger } }) => {
       const start = performance.now();
       cancelActiveListeners();
+      // A hydration failure must never strand the app on the loading screen.
+      onFail(() => dispatch(setIsHydrated(true)));
 
-      await hydrateGenericPreferences(preferenceService, dispatch);
+      await hydrateGenericPreferences(preferenceService, dispatch, (key, e) =>
+        logger.error(`Failed to hydrate preference ${key}`, e),
+      );
 
       // Bespoke hydration: sync read, composite keys, and composed values.
       dispatch(setPreferredLanguage(preferenceService.getPreferredLanguage()));
@@ -83,14 +93,21 @@ export function applySettingsEffects(addEffect: AddEffectFn) {
       dispatch(setProToken(proToken));
 
       if (!__DEV__) {
-        if (Platform.OS === "ios") {
-          Purchases.configure({
-            apiKey: process.env.EXPO_PUBLIC_REVENUECAT_APPLE_API_KEY!,
-          });
-        } else if (Platform.OS === "android") {
-          Purchases.configure({
-            apiKey: process.env.EXPO_PUBLIC_REVENUECAT_GOOGLE_API_KEY!,
-          });
+        // A missing or failing RevenueCat configuration must never brick startup hydration.
+        // process.env entries are untyped here — quarantine the any at the boundary.
+        const rawRevenueCatKey: unknown =
+          Platform.OS === "ios"
+            ? process.env.EXPO_PUBLIC_REVENUECAT_APPLE_API_KEY
+            : process.env.EXPO_PUBLIC_REVENUECAT_GOOGLE_API_KEY;
+        const revenueCatKey = typeof rawRevenueCatKey === "string" && rawRevenueCatKey.length > 0 ? rawRevenueCatKey : undefined;
+        if (revenueCatKey) {
+          try {
+            Purchases.configure({ apiKey: revenueCatKey });
+          } catch (err) {
+            logger.error("Failed to configure RevenueCat", err);
+          }
+        } else {
+          logger.warn("RevenueCat API key is not set; purchases are disabled", {});
         }
       }
       // migrate pro token to a revenuecat

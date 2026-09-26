@@ -12,6 +12,15 @@ export const dedupeBuiltInExercisesDataMigration = 'DEDUPE_BUILTIN_EXERCISES';
 const addedBuiltInExerciseIdsStorageKey = 'AddedBuiltInExerciseIdList';
 const hiddenBuiltInExerciseIdsStorageKey = 'HiddenBuiltInExerciseIdList';
 
+function isExerciseDescriptorLike(value: unknown): value is ExerciseDescriptor {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as ExerciseDescriptor).name === 'string' &&
+    Array.isArray((value as ExerciseDescriptor).muscles)
+  );
+}
+
 function descriptorsEqual(a: ExerciseDescriptor, b: ExerciseDescriptor): boolean {
   return (
     a.name === b.name &&
@@ -33,20 +42,42 @@ function descriptorsEqual(a: ExerciseDescriptor, b: ExerciseDescriptor): boolean
  */
 export async function dedupeBuiltInExercises(db: ExpoSQLiteDatabase, keyValueStore: KeyValueStore) {
   const canonical = await loadCanonicalBuiltInExercises();
+  if (Object.keys(canonical).length === 0) {
+    // The catalog failed to load: recording success now would silently skip the cleanup
+    // forever, so bail out and let the migration retry on the next launch.
+    return;
+  }
   const rows = await db.select().from(exercisesSchema);
   const presentIds = new Set(rows.map((r) => r.id));
 
   const idsToDelete = rows
     .filter((row) => {
-      const canonicalDescriptor = canonical[row.id];
-      return (
-        canonicalDescriptor && descriptorsEqual(exerciseDescriptorMigrations.migrate(row.payload), canonicalDescriptor)
-      );
+      try {
+        const descriptor = exerciseDescriptorMigrations.migrate(row.payload);
+        if (!isExerciseDescriptorLike(descriptor)) {
+          return false;
+        }
+        const canonicalDescriptor = canonical[row.id];
+        return !!canonicalDescriptor && descriptorsEqual(descriptor, canonicalDescriptor);
+      } catch {
+        // A malformed row must not abort the whole migration (and brick startup).
+        return false;
+      }
     })
     .map((row) => row.id);
 
-  const added = JSON.parse((await keyValueStore.getItem(addedBuiltInExerciseIdsStorageKey)) ?? '[]') as string[];
-  const hidden = added.filter((id) => canonical[id] && !presentIds.has(id));
+  let added: string[] = [];
+  try {
+    const raw = await keyValueStore.getItem(addedBuiltInExerciseIdsStorageKey);
+    const parsed: unknown = raw == null ? [] : JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.every((x) => typeof x === 'string')) {
+      added = parsed;
+    }
+  } catch {
+    added = [];
+  }
+  const deletedIds = new Set(idsToDelete);
+  const hidden = added.filter((id) => canonical[id] && !presentIds.has(id) && !deletedIds.has(id));
 
   await db.transaction(async (tx) => {
     for (const id of idsToDelete) {

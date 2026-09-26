@@ -8,6 +8,7 @@ const initialState: AppState = {
   currentSnackbar: undefined,
   exerciseSearchResult: undefined,
   recentExerciseSearchIds: [],
+  initializationError: undefined,
 };
 
 type AppState = {
@@ -16,6 +17,11 @@ type AppState = {
   exerciseSearchResult: ExerciseSearchResult | undefined;
   /** Exercise ids most recently picked from the exercise search, newest first. */
   recentExerciseSearchIds: string[];
+  /**
+   * Set when app initialization (migrations) fails. Hydration still completes so the
+   * app can show a recovery screen instead of loading forever.
+   */
+  initializationError: string | undefined;
 };
 
 // The exercise search is its own route, so it hands its result back through the store rather than a
@@ -32,6 +38,10 @@ const appSlice = createSlice({
   reducers: {
     setIsHydrated(state, action: PayloadAction<boolean>) {
       state.isHydrated = action.payload;
+    },
+
+    setInitializationError(state, action: PayloadAction<string | undefined>) {
+      state.initializationError = action.payload;
     },
 
     setCurrentSnackbar(state, action: PayloadAction<SnackbarDescriptor | undefined>) {
@@ -122,6 +132,7 @@ export const showSnackbar = createAction<SnackbarDescriptor & { duration?: numbe
 
 export const {
   setIsHydrated,
+  setInitializationError,
   setCurrentSnackbar,
   setExerciseSearchResult,
   clearExerciseSearchResult,

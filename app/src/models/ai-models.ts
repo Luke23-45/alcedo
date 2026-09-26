@@ -112,12 +112,49 @@ const emptyCardioSet = emptyCardioExercise.sets[0]!;
 const defaultIncreaseAmount = '2.5' as BigNumberJSON;
 const defaultRepsTarget = emptyWeightedExercise.plannedSets[0]?.reps ?? { min: 10, max: 10 };
 
+/**
+ * The model sometimes emits the wrong JSON type for a text field (a number,
+ * an object). `?? ''` only guards null/undefined — a non-string would reach
+ * React Text and red-screen. Coerce to the default instead.
+ */
+function text(value: unknown, fallback: string): string {
+  return typeof value === 'string' ? value : fallback;
+}
+
+/** Same idea for numeric fields: non-finite values become the default. */
+function num(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+/** Durations must be ISO-8601 strings like 'PT30M'; anything else is the default. */
+function duration(value: unknown, fallback: DurationJSON): DurationJSON {
+  return typeof value === 'string' && ISO_DURATION.test(value) ? (value as DurationJSON) : fallback;
+}
+
+const ISO_DURATION = /^P(?!$)(\d+Y)?(\d+M)?(\d+W)?(\d+D)?(T(?!$)(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$/;
+const BIG_NUMBER_STRING = /^[+-]?(\d+(\.\d+)?|\.\d+)([eE][+-]?\d+)?$/;
+
+/** BigNumber fields are decimal strings; anything else becomes the default. */
+function bigNum(value: unknown, fallback: BigNumberJSON): BigNumberJSON {
+  return typeof value === 'string' && BIG_NUMBER_STRING.test(value) ? (value as BigNumberJSON) : fallback;
+}
+
+/** Enum-typed fields: an unexpected value becomes the default, never a cast lie. */
+function oneOf<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
+  return typeof value === 'string' && (allowed as readonly string[]).includes(value) ? (value as T) : fallback;
+}
+
+/** Boolean fields: truthy garbage like "yes" must not become true. */
+function bool(value: unknown, fallback: boolean): boolean {
+  return typeof value === 'boolean' ? value : fallback;
+}
+
 function fillRest(partial: DeepPartial<RestJSON> = {}): RestJSON {
   const { restBetweenSets } = emptyWeightedExercise;
   return {
-    minRest: partial.minRest ?? restBetweenSets.minRest,
-    maxRest: partial.maxRest ?? restBetweenSets.maxRest,
-    failureRest: partial.failureRest ?? restBetweenSets.failureRest,
+    minRest: duration(partial.minRest, restBetweenSets.minRest),
+    maxRest: duration(partial.maxRest, restBetweenSets.maxRest),
+    failureRest: duration(partial.failureRest, restBetweenSets.failureRest),
   };
 }
 
@@ -127,13 +164,18 @@ function fillRest(partial: DeepPartial<RestJSON> = {}): RestJSON {
  */
 function fillProgression(partial: DeepPartial<ProgressionRuleJSON>[] | undefined): ProgressionRuleJSON[] {
   return (partial ?? []).map((rule) => ({
-    axis: rule?.axis ?? 'load',
-    step: rule?.step ?? defaultIncreaseAmount,
+    axis: oneOf(rule?.axis, ['reps', 'load'] as const, 'load'),
+    step: bigNum(rule?.step, defaultIncreaseAmount),
     scope:
-      rule?.scope?.type === 'lowestSets' ? { type: 'lowestSets', pick: rule.scope.pick ?? 'all' } : { type: 'allSets' },
-    ...(rule?.ceiling === undefined ? {} : { ceiling: rule.ceiling }),
-    ...(rule?.onCeiling === undefined ? {} : { onCeiling: rule.onCeiling }),
-    trigger: rule?.trigger ?? 'allSetsMetTarget',
+      rule?.scope?.type === 'lowestSets'
+        ? {
+            type: 'lowestSets',
+            pick: oneOf(rule.scope.pick, ['first', 'middle', 'last', 'all'] as const, 'all'),
+          }
+        : { type: 'allSets' },
+    ...(rule?.ceiling === undefined ? {} : { ceiling: bigNum(rule.ceiling, defaultIncreaseAmount) }),
+    ...(rule?.onCeiling === 'reset' ? { onCeiling: 'reset' as const } : {}),
+    trigger: oneOf(rule?.trigger, ['allSetsMetTarget'] as const, 'allSetsMetTarget'),
   }));
 }
 
@@ -147,8 +189,8 @@ function fillPlannedSets(partial: DeepPartial<PlannedSetJSON>[] | undefined): Pl
   }
   return partial.map((set) => ({
     reps: {
-      min: set?.reps?.min ?? set?.reps?.max ?? defaultRepsTarget.min,
-      max: set?.reps?.max ?? set?.reps?.min ?? defaultRepsTarget.max,
+      min: num(set?.reps?.min ?? set?.reps?.max, defaultRepsTarget.min),
+      max: num(set?.reps?.max ?? set?.reps?.min, defaultRepsTarget.max),
     },
   }));
 }
@@ -156,14 +198,14 @@ function fillPlannedSets(partial: DeepPartial<PlannedSetJSON>[] | undefined): Pl
 function fillWeightedExercise(partial: DeepPartial<WeightedExerciseBlueprintJSON> = {}): WeightedExerciseBlueprintJSON {
   return {
     type: 'WeightedExerciseBlueprint',
-    name: partial.name ?? emptyWeightedExercise.name,
+    name: text(partial.name, emptyWeightedExercise.name),
     plannedSets: fillPlannedSets(partial.plannedSets),
     restBetweenSets: fillRest(partial.restBetweenSets),
-    supersetWithNext: partial.supersetWithNext ?? emptyWeightedExercise.supersetWithNext,
-    notes: partial.notes ?? emptyWeightedExercise.notes,
-    link: partial.link ?? emptyWeightedExercise.link,
+    supersetWithNext: bool(partial.supersetWithNext, emptyWeightedExercise.supersetWithNext),
+    notes: text(partial.notes, emptyWeightedExercise.notes),
+    link: text(partial.link, emptyWeightedExercise.link),
     progression: fillProgression(partial.progression),
-    resistance: partial.resistance ?? emptyWeightedExercise.resistance,
+    resistance: oneOf(partial.resistance, ['none', 'external', 'bodyweight'] as const, emptyWeightedExercise.resistance),
   };
 }
 
@@ -173,14 +215,14 @@ function fillCardioTarget(partial: DeepPartial<CardioTargetJSON> = {}): CardioTa
       return {
         type: 'distance',
         value: {
-          value: partial.value?.value ?? ('0' as BigNumberJSON),
-          unit: partial.value?.unit ?? 'kilometre',
+          value: bigNum(partial.value?.value, '0' as BigNumberJSON),
+          unit: oneOf(partial.value?.unit, ['metre', 'yard', 'mile', 'kilometre'] as const, 'kilometre'),
         },
       };
     case 'time':
       return {
         type: 'time',
-        value: partial.value ?? ('PT30M' as DurationJSON),
+        value: duration(partial.value, 'PT30M' as DurationJSON),
       };
     default:
       return emptyCardioSet.target;
@@ -190,12 +232,12 @@ function fillCardioTarget(partial: DeepPartial<CardioTargetJSON> = {}): CardioTa
 function fillCardioSet(partial: DeepPartial<CardioExerciseSetBlueprintJSON> = {}): CardioExerciseSetBlueprintJSON {
   return {
     target: fillCardioTarget(partial.target),
-    trackDuration: partial.trackDuration ?? emptyCardioSet.trackDuration,
-    trackDistance: partial.trackDistance ?? emptyCardioSet.trackDistance,
-    trackResistance: partial.trackResistance ?? emptyCardioSet.trackResistance,
-    trackIncline: partial.trackIncline ?? emptyCardioSet.trackIncline,
-    trackWeight: partial.trackWeight ?? emptyCardioSet.trackWeight,
-    trackSteps: partial.trackSteps ?? emptyCardioSet.trackSteps,
+    trackDuration: bool(partial.trackDuration, emptyCardioSet.trackDuration),
+    trackDistance: bool(partial.trackDistance, emptyCardioSet.trackDistance),
+    trackResistance: bool(partial.trackResistance, emptyCardioSet.trackResistance),
+    trackIncline: bool(partial.trackIncline, emptyCardioSet.trackIncline),
+    trackWeight: bool(partial.trackWeight, emptyCardioSet.trackWeight),
+    trackSteps: bool(partial.trackSteps, emptyCardioSet.trackSteps),
   };
 }
 
@@ -203,10 +245,10 @@ function fillCardioExercise(partial: DeepPartial<CardioExerciseBlueprintJSON> = 
   const sets = (partial.sets ?? []).map(fillCardioSet);
   return {
     type: 'CardioExerciseBlueprint',
-    name: partial.name ?? emptyCardioExercise.name,
+    name: text(partial.name, emptyCardioExercise.name),
     sets: sets.length ? sets : [fillCardioSet()],
-    notes: partial.notes ?? emptyCardioExercise.notes,
-    link: partial.link ?? emptyCardioExercise.link,
+    notes: text(partial.notes, emptyCardioExercise.notes),
+    link: text(partial.link, emptyCardioExercise.link),
   };
 }
 
@@ -220,16 +262,16 @@ function fillExercise(partial: DeepPartial<ExerciseBlueprintJSON> = {}): Exercis
 function fillSession(partial: DeepPartial<SessionBlueprintJSON> = {}): SessionBlueprintJSON {
   return {
     version: 6,
-    name: partial.name ?? emptySessionBlueprint.name,
+    name: text(partial.name, emptySessionBlueprint.name),
     exercises: (partial.exercises ?? []).map(fillExercise),
-    notes: partial.notes ?? emptySessionBlueprint.notes,
+    notes: text(partial.notes, emptySessionBlueprint.notes),
   };
 }
 
 function fillBlueprint(partial: DeepPartial<ProgramBlueprintJSON> = {}): ProgramBlueprintJSON {
   return {
     version: 3,
-    name: partial.name ?? '',
+    name: text(partial.name, ''),
     sessions: (partial.sessions ?? []).map(fillSession),
     lastEdited: toLocalDateJSON(LocalDate.now()),
   };
@@ -249,8 +291,8 @@ export function aiPlanFromJSON(partialJson: DeepPartial<AnyVersionAiPlanJSON>): 
     partialJson.version === 3
       ? {
           version: 3,
-          name: partialJson.name ?? '',
-          description: partialJson.description ?? '',
+          name: text(partialJson.name, ''),
+          description: text(partialJson.description, ''),
           // The any-version plan type no longer couples the outer version to the embedded
           // blueprint's, so `version === 3` can't narrow it - but a v3 wire plan is latest-shaped.
           blueprint: fillBlueprint(partialJson.blueprint as DeepPartial<ProgramBlueprintJSON>),

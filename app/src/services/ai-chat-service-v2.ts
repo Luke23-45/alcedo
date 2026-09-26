@@ -57,9 +57,20 @@ export class AiChatServiceV2 {
   }
 
   async *sendMessage(message: string): AsyncIterableIterator<AiChatResponseV2> {
+    // A new message supersedes any in-flight stream: abort it before starting,
+    // so two generators can never drive the chat at once.
+    void this.stopInProgress();
+    // Created up front (not after the conversation POST) so Stop also works
+    // while the conversation is being created.
+    const aborter = new AbortController();
+    this.streamAborter = aborter;
     try {
-      yield* this.streamFromServer(message);
+      yield* this.streamFromServer(message, aborter);
     } catch (e) {
+      // The user stopped generation — end quietly, not with an error bubble.
+      if (aborter.signal.aborted) {
+        return;
+      }
       if (e instanceof AuthError && (e.code === 'session-expired' || e.code === 'network')) {
         // A greeting the coach can't answer gets the deterministic local
         // script; anything else gets the honest one-liner.
@@ -83,6 +94,10 @@ export class AiChatServiceV2 {
         return;
       }
       yield { type: 'messageResponse', message: FALLBACK_MESSAGE };
+    } finally {
+      if (this.streamAborter === aborter) {
+        this.streamAborter = undefined;
+      }
     }
   }
 
@@ -98,10 +113,27 @@ export class AiChatServiceV2 {
     this.conversationId = undefined;
   }
 
-  private async *streamFromServer(message: string, retried = false): AsyncIterableIterator<AiChatResponseV2> {
-    const conversationId = await this.ensureConversation();
-    const aborter = new AbortController();
-    this.streamAborter = aborter;
+  private async *streamFromServer(
+    message: string,
+    aborter: AbortController,
+    retried = false,
+  ): AsyncIterableIterator<AiChatResponseV2> {
+    // An error bubble must never destroy the partial reply already on screen:
+    // when text is already streaming, the error opens a new bubble instead of
+    // replacing the in-flight one.
+    const errorBubble = (text: string, errorMessage: string): AiChatResponseV2 =>
+      text
+        ? { type: 'messageResponse', message: errorMessage, appendAsNew: true }
+        : { type: 'messageResponse', message: errorMessage };
+    let conversationId: string;
+    try {
+      conversationId = await this.ensureConversation(aborter.signal);
+    } catch (e) {
+      if (aborter.signal.aborted) {
+        return;
+      }
+      throw e;
+    }
     let response: Response;
     try {
       response = await authenticatedFetch(`/ai/conversations/${conversationId}/messages/stream`, {
@@ -116,30 +148,27 @@ export class AiChatServiceV2 {
         signal: aborter.signal,
       });
     } catch (e) {
-      if (this.streamAborter === aborter) {
-        this.streamAborter = undefined;
+      if (aborter.signal.aborted) {
+        return;
       }
       throw e;
     }
     if (!response.ok) {
-      if (this.streamAborter === aborter) {
-        this.streamAborter = undefined;
-      }
       const error = await toCoachHttpError(response);
       if (error.status === 404 && error.code === 'AI_CONVERSATION_NOT_FOUND' && !retried) {
         // The conversation died server-side (or belongs to another signed-in
         // user) — start fresh once and replay the message.
         this.conversationId = undefined;
-        yield* this.streamFromServer(message, true);
+        yield* this.streamFromServer(message, aborter, true);
         return;
       }
       throw error;
     }
+    // Declared outside the try so the catch can report the partial reply.
+    let text = '';
     try {
-      let text = '';
       let sawEvent = false;
-      for await (const event of readSseEvents(response)) {
-        sawEvent = true;
+      for await (const event of readSseEvents(response)) {        sawEvent = true;
         if (event.event === 'token') {
           const rawDelta = (event.data as { delta?: unknown }).delta;
           const delta = typeof rawDelta === 'string' ? rawDelta : '';
@@ -168,10 +197,10 @@ export class AiChatServiceV2 {
             typeof event.data === 'object' && event.data !== null
               ? (event.data as { message?: unknown }).message
               : undefined;
-          yield {
-            type: 'messageResponse',
-            message: typeof serverMessage === 'string' && serverMessage ? serverMessage : FALLBACK_MESSAGE,
-          };
+          yield errorBubble(
+            text,
+            typeof serverMessage === 'string' && serverMessage ? serverMessage : FALLBACK_MESSAGE,
+          );
           return;
         } else if (event.event === 'done') {
           return;
@@ -181,20 +210,19 @@ export class AiChatServiceV2 {
       if (!sawEvent) {
         yield { type: 'messageResponse', message: 'The coach went quiet. Try again in a moment.' };
       }
-    } catch (e) {
+    } catch {
       // The user stopped generation — end quietly, not with an error bubble.
       if (aborter.signal.aborted) {
         return;
       }
-      throw e;
-    } finally {
-      if (this.streamAborter === aborter) {
-        this.streamAborter = undefined;
-      }
+      // A network failure mid-stream keeps the partial reply and reports the
+      // failure in a new bubble instead of replacing what already streamed.
+      yield errorBubble(text, FALLBACK_MESSAGE);
+      return;
     }
   }
 
-  private async ensureConversation(): Promise<string> {
+  private async ensureConversation(signal: AbortSignal): Promise<string> {
     if (this.conversationId) {
       return this.conversationId;
     }
@@ -202,6 +230,7 @@ export class AiChatServiceV2 {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: '{}',
+      signal,
     });
     if (!response.ok) {
       throw await toCoachHttpError(response);

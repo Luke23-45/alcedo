@@ -41,13 +41,14 @@ export default function PostWorkoutPage() {
       />
       <PostWorkoutScreen
         sessionId={session.id}
-        onDone={() => {
+        onDone={async () => {
           if (!openedAfterFinishingWorkout) {
             // Live sources never finish the workout from here — back navigation only.
             dismissTo('/(tabs)/(session)');
             return;
           }
-          const hasDiff = finishWorkout();
+          // Awaited: navigating before the finish is durable risks resurrecting the workout on restart.
+          const hasDiff = await finishWorkout();
           dismissTo('/');
           if (hasDiff) {
             push('/diff-save');

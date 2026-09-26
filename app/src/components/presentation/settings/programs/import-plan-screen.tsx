@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 import { Platform, Pressable, TextInput } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
@@ -42,6 +42,9 @@ function formatSets(exercise: ParsedExercise, secondSuffix: string): string {
   return `${exercise.sets} × ${reps}${rest}`;
 }
 
+/** Pasted plan text is capped: parsing is linear, but the recognized list is not virtualized. */
+const MAX_PLAN_TEXT_LENGTH = 100_000;
+
 function RecognizedRowView({ exercise }: { exercise: ParsedExercise }) {
   const { t } = useTranslate();
   const note = exercise.matched
@@ -75,25 +78,40 @@ export function ImportPlanScreen() {
   const theme = useAppTheme();
   const descriptors = useAppSelector(selectExercises);
   const [text, setText] = useState('');
+  const [importError, setImportError] = useState<string | undefined>(undefined);
 
-  const plan = parsePlanText(text, descriptors);
+  // Parsing runs on the deferred text so typing stays responsive even for
+  // very long pastes; the input itself is capped below.
+  const deferredText = useDeferredValue(text);
+  const plan = parsePlanText(deferredText, descriptors);
   // An untouched paste box is zero lines, not one.
   const lineCount = text.length === 0 ? 0 : text.split(/\r?\n/).length;
   const hasExercises = plan.total > 0;
   const allRecognized = hasExercises && plan.recognized === plan.total;
+  // The deferred parse lags the input while typing; don't offer the import
+  // button until the preview matches what's in the box.
+  const previewStale = deferredText !== text;
 
   const paste = async () => {
     const clipped = await getStringAsync();
     if (clipped) {
-      setText(clipped);
+      setText(clipped.slice(0, MAX_PLAN_TEXT_LENGTH));
     }
   };
 
   const importPlan = () => {
-    if (!hasExercises) {
+    if (!hasExercises || previewStale) {
       return;
     }
-    dispatch(setPendingImport({ programBlueprint: parsedPlanToBlueprint(plan) }));
+    try {
+      dispatch(setPendingImport({ programBlueprint: parsedPlanToBlueprint(plan) }));
+    } catch (e) {
+      setImportError(
+        t(settingsKey('settings.programs.import.parse_failed'), 'This text could not be turned into a plan.'),
+      );
+      return;
+    }
+    setImportError(undefined);
     push('/settings/import-plan-info');
   };
 
@@ -111,8 +129,9 @@ export function ImportPlanScreen() {
           <PasteBox>
             <TextInput
               value={text}
-              onChangeText={setText}
+              onChangeText={(next) => setText(next.slice(0, MAX_PLAN_TEXT_LENGTH))}
               multiline
+              maxLength={MAX_PLAN_TEXT_LENGTH}
               placeholder={t(settingsKey('settings.programs.import.placeholder'))}
               placeholderTextColor={theme.isDark ? '#6C6C70' : '#AEAEB2'}
               style={{
@@ -180,13 +199,18 @@ export function ImportPlanScreen() {
               </RecognizedList>
             </>
           ) : undefined}
+          {importError ? (
+            <StatusRow>
+              <StatusText $ok={false}>{importError}</StatusText>
+            </StatusRow>
+          ) : undefined}
           <Pressable
             onPress={importPlan}
-            disabled={!hasExercises}
+            disabled={!hasExercises || previewStale}
             accessibilityRole="button"
             accessibilityLabel={t(settingsKey('settings.programs.import.submit'))}
-            accessibilityState={{ disabled: !hasExercises }}
-            style={{ opacity: hasExercises ? 1 : 0.5 }}
+            accessibilityState={{ disabled: !hasExercises || previewStale }}
+            style={{ opacity: hasExercises && !previewStale ? 1 : 0.5 }}
           >
             <SubmitButton>
               <HomeGradient

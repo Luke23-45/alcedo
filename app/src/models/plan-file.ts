@@ -57,5 +57,11 @@ export function parseProgramBlueprintFile(bytes: Uint8Array): ParsedPlanFile {
     return { ok: false, failure: 'notAPlan', error: validation.error };
   }
 
-  return { ok: true, blueprint: ProgramBlueprint.fromJSON(validation.value) };
+  // The schema is weaker than the domain invariants (e.g. empty cardio set lists,
+  // unparseable durations), so construction itself can still throw.
+  try {
+    return { ok: true, blueprint: ProgramBlueprint.fromJSON(validation.value) };
+  } catch (e) {
+    return { ok: false, failure: 'notAPlan', error: `The file is not a valid workout plan: ${String(e)}` };
+  }
 }

@@ -29,7 +29,7 @@ export default function FeedIndexPage() {
           title: t('feed.feed.title'),
           headerRight: () => (
             <Pressable
-              onPress={() => router.push('../share')}
+              onPress={() => router.push('/feed/share')}
               accessibilityRole="button"
               accessibilityLabel={t('feed.timeline.nav.compose.a11y', 'Compose')}
               hitSlop={5}

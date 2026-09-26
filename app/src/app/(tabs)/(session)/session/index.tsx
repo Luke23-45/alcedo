@@ -19,7 +19,7 @@ export default function Index() {
   const { t } = useTranslate();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const save = (force = false) => {
+  const save = async (force = false) => {
     if (!session) {
       return;
     }
@@ -32,7 +32,8 @@ export default function Index() {
       push(`/session/post-workout?sessionId=${encodeURIComponent(session.id)}&source=finished`);
       return;
     }
-    const hasDiff = finishWorkout();
+    // Awaited: navigating before the finish is durable risks resurrecting the workout on restart.
+    const hasDiff = await finishWorkout();
     dismissTo('/');
     if (hasDiff) {
       push('/diff-save');

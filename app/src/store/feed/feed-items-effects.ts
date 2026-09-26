@@ -111,7 +111,9 @@ export function addFeedItemEffects(addEffect: AddEffectFn) {
             if (!originalUser) {
               return undefined;
             }
-            if (originalUser.type === 'PendingFeedUser') {
+            // Pending users and followers carry no shared AES key, so there is
+            // nothing to decrypt — keep them as they are.
+            if (originalUser.type === 'PendingFeedUser' || originalUser.type === 'FollowerFeedUser') {
               return originalUser;
             }
 
@@ -120,8 +122,17 @@ export function addFeedItemEffects(addEffect: AddEffectFn) {
         )
       )
         .filter((user) => user !== null && user !== undefined)
-        .concat(Object.values(originalFollowedUsers).filter((user) => user.type === 'PendingFeedUser'))
-        .filter((user) => user.type === 'PendingFeedUser' || !invalidFollowSecrets.has(user.followSecret || ''));
+        .concat(
+          Object.values(originalFollowedUsers).filter(
+            (user) => user.type === 'PendingFeedUser' || user.type === 'FollowerFeedUser',
+          ),
+        )
+        .filter(
+          (user) =>
+            user.type === 'PendingFeedUser' ||
+            user.type === 'FollowerFeedUser' ||
+            !invalidFollowSecrets.has(user.followSecret || ''),
+        );
 
       newUsers.forEach((user) => dispatch(putFollowedUser(user)));
 
@@ -348,7 +359,8 @@ async function toFeedItemAsync(
   encryptionService: EncryptionService,
 ): Promise<FeedUserEvent | null> {
   const user = users.find((u) => u.id === userEvent.userId);
-  if (!user || user.type === 'PendingFeedUser') {
+  // Only mutually-followed users share the AES key needed to decrypt events.
+  if (!user || user.type !== 'FollowedFeedUser') {
     return null;
   }
 

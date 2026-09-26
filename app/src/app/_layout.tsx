@@ -18,6 +18,7 @@ import { StatusBar } from 'expo-status-bar';
 import { requireOptionalNativeModule } from 'expo';
 import * as SplashScreen from 'expo-splash-screen';
 import { LaunchProvider } from '@/components/smart/launch-provider';
+import { RootErrorBoundary } from '@/components/smart/root-error-boundary';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -49,7 +50,9 @@ export default function RootLayout() {
                   <LaunchProvider>
                     <PlanImportGate />
                     <AutoPauseOnLock />
-                    <Layout />
+                    <RootErrorBoundary name="root">
+                      <Layout />
+                    </RootErrorBoundary>
                   </LaunchProvider>
                 </SnackbarProvider>
               </AppStateProvider>

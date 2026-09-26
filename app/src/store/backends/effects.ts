@@ -16,8 +16,10 @@ import { AddEffectFn } from '@/store/store';
 import { eq } from 'drizzle-orm';
 
 export function applyBackendsEffects(addEffect: AddEffectFn) {
-  addEffect(initializeBackendsStateSlice, async (_, { cancelActiveListeners, dispatch, extra: { db, logger } }) => {
+  addEffect(initializeBackendsStateSlice, async (_, { cancelActiveListeners, dispatch, onFail, extra: { db, logger } }) => {
     cancelActiveListeners();
+    // A hydration failure must never strand dependent UI on a loading state.
+    onFail(() => dispatch(setBackendsHydrated(true)));
     await logger.time('initializeBackends', async () => {
       const [backendRows, headerRows, assignmentRows] = await Promise.all([
         db.select().from(backendsSchema),
