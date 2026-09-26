@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, RefreshControl } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'expo-router';
@@ -143,6 +143,13 @@ function TimelinePostRow({
  * - Delete (own) / Report (others) hide the post, persisted across restarts.
  * - Comments navigate to the post-detail route (Screen 2): item/<post id>.
  */
+
+// Stable separator: an inline `() => <S.Separator />` creates a new component
+// type per render, unmounting/remounting every separator.
+function TimelineSeparator() {
+  return <S.Separator />;
+}
+
 export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }) {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -153,6 +160,7 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
 
   const [filter, setFilter] = useState<TimelineFilter>('all');
   const [contentHeight, setContentHeight] = useState(2400);
+  const contentHeightRef = useRef(contentHeight);
   const isFetching = useAppSelector((x) => x.feed.isFetching);
 
   const sessions = useAppSelector(selectSessions);
@@ -179,33 +187,41 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
   // profile username), not the contract's fictional "Alex Rivera".
   const ownPerson = useOwnPerson();
 
-  const defaultPosts = buildDefaultPosts(Date.now());
+  // Sample catalog is stable for the screen's lifetime: rebuilding it per
+  // render would hand FlatList a new data identity every time and re-render
+  // every row. Relative-time labels refresh on remount.
+  const defaultPosts = useMemo(() => buildDefaultPosts(Date.now()), []);
 
-  const ownPost: TimelineWorkoutPost | undefined =
-    latest && composerData
-      ? {
-          kind: 'workout',
-          id: 'alex',
-          person: ownPerson,
-          isOwn: true,
-          badge: 'you',
-          audience: 'friends',
-          postedAt: getSessionReferenceTime(latest).toInstant().toEpochMilli(),
-          caption: draftCaption ?? null,
-          poster: {
-            kicker: composerData.kicker,
-            heroValue: composerData.volumeLabel,
-            heroUnit: composerData.volumeUnit,
-            workoutName: `${composerData.name} · ${composerData.kindLabel}`,
-            duration: composerData.durationLabel,
-            sets: composerData.setsLabel,
-            prPills: composerData.prPills,
-          },
-          kudos: { faceIds: ['mia', 'jon', 'sofia'], total: 6 },
-          comments: 3,
-          inChallenge: true,
-        }
-      : undefined;
+  // ownPost is a fresh object per render; memoize so the posts array below
+  // keeps a stable identity unless its real inputs change.
+  const ownPost: TimelineWorkoutPost | undefined = useMemo(
+    () =>
+      latest && composerData
+        ? {
+            kind: 'workout',
+            id: 'alex',
+            person: ownPerson,
+            isOwn: true,
+            badge: 'you',
+            audience: 'friends',
+            postedAt: getSessionReferenceTime(latest).toInstant().toEpochMilli(),
+            caption: draftCaption ?? null,
+            poster: {
+              kicker: composerData.kicker,
+              heroValue: composerData.volumeLabel,
+              heroUnit: composerData.volumeUnit,
+              workoutName: `${composerData.name} · ${composerData.kindLabel}`,
+              duration: composerData.durationLabel,
+              sets: composerData.setsLabel,
+              prPills: composerData.prPills,
+            },
+            kudos: { faceIds: ['mia', 'jon', 'sofia'], total: 6 },
+            comments: 3,
+            inChallenge: true,
+          }
+        : undefined,
+    [latest, composerData, ownPerson, draftCaption],
+  );
 
   // Seed kudos (and Alex's comment thread) before first paint so seeded values
   // never flash through an empty state. Idempotent per post id.
@@ -228,15 +244,18 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
     }
   }, [dispatch, ownPostedAt, needsAlexKudosSeed, sessionId]);
 
-  const isVisible = (p: TimelinePost) => !hidden.has(p.id) && postMatchesFilter(p, filter);
-  // The default catalog is the fallback: fictional sample posts, never mixed
-  // into genuine remote state. The footer counts samples only — Alex's own
-  // card is the real user, not a sample.
-  const availableSamples = defaultPosts.filter((p) => !hidden.has(p.id));
-  const visibleSamples = availableSamples.filter((p) => postMatchesFilter(p, filter));
-  const posts = [ownPost, ...visibleSamples]
-    .filter((p): p is TimelinePost => p !== undefined && isVisible(p))
-    .sort((a, b) => b.postedAt - a.postedAt);
+  // Stable data identity for FlatList: without this, every parent re-render
+  // (filter tap, isFetching toggle, content-height update) rebuilds the array
+  // and re-renders every visible row.
+  const { posts, visibleSampleCount, availableSampleCount } = useMemo(() => {
+    const isVisible = (p: TimelinePost) => !hidden.has(p.id) && postMatchesFilter(p, filter);
+    const availableSamples = defaultPosts.filter((p) => !hidden.has(p.id));
+    const visibleSamples = availableSamples.filter((p) => postMatchesFilter(p, filter));
+    const posts = [ownPost, ...visibleSamples]
+      .filter((p): p is TimelinePost => p !== undefined && isVisible(p))
+      .sort((a, b) => b.postedAt - a.postedAt);
+    return { posts, visibleSampleCount: visibleSamples.length, availableSampleCount: availableSamples.length };
+  }, [ownPost, defaultPosts, hidden, filter]);
 
   const refresh = () => {
     dispatch(fetchInboxItems({ fromUserAction: true }));
@@ -279,7 +298,7 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
             />
           );
         }}
-        ItemSeparatorComponent={() => <S.Separator />}
+        ItemSeparatorComponent={TimelineSeparator}
         ListHeaderComponent={
           <S.HeaderWrap>
             <ChallengeBanner />
@@ -295,8 +314,8 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
           </S.EmptyWrap>
         }
         ListFooterComponent={
-          visibleSamples.length > 0 ? (
-            <FeedFooter shown={visibleSamples.length} total={availableSamples.length} onLoadEarlier={refresh} />
+          visibleSampleCount > 0 ? (
+            <FeedFooter shown={visibleSampleCount} total={availableSampleCount} onLoadEarlier={refresh} />
           ) : null
         }
         refreshControl={
@@ -307,7 +326,16 @@ export function FeedTimeline({ keyValueStore }: { keyValueStore: KeyValueStore }
           />
         }
         onScroll={handleScroll}
-        onContentSizeChange={(_, height) => setContentHeight(Math.max(height, 2400))}
+        scrollEventThrottle={16}
+        onContentSizeChange={(_, height) => {
+          // Guard against the feedback loop: content size changes as rows mount
+          // during scroll, and each setState re-renders. Only update on a real change.
+          const next = Math.max(height, 2400);
+          if (Math.abs(next - contentHeightRef.current) > 1) {
+            contentHeightRef.current = next;
+            setContentHeight(next);
+          }
+        }}
         contentContainerStyle={{ paddingBottom: 8 }}
       />
     </S.Screen>

@@ -154,11 +154,20 @@ export function ExercisePickerList({
 
   // Precomputed section-header offsets for scrubber jumps + active tracking.
   const headerOffsets: number[] = [];
+  // Precomputed per-row layout for getItemLayout: SectionList's flat index
+  // counts each section header as one row followed by its items.
+  const itemLayouts: { length: number; offset: number }[] = [];
   {
     let y = listHeaderHeight;
     sections.forEach((section, index) => {
       headerOffsets.push(y);
-      y += headerHeightFor(sections, index) + section.data.length * ROW_H;
+      const headerH = headerHeightFor(sections, index);
+      itemLayouts.push({ length: headerH, offset: y });
+      y += headerH;
+      for (let i = 0; i < section.data.length; i++) {
+        itemLayouts.push({ length: ROW_H, offset: y });
+        y += ROW_H;
+      }
     });
   }
 
@@ -248,6 +257,12 @@ export function ExercisePickerList({
         contentContainerStyle={{ paddingLeft: 16, paddingRight: 41, paddingBottom: 56 }}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
+        // All heights are deterministic constants, so layout is exact — this
+        // makes scrollToLocation and fast scroll skip measurement passes.
+        getItemLayout={(_, index) => {
+          const layout = itemLayouts[index] ?? { length: ROW_H, offset: 0 };
+          return { ...layout, index };
+        }}
         onScroll={onScroll}
         stickySectionHeadersEnabled={false}
         keyboardShouldPersistTaps="handled"

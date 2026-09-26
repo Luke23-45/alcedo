@@ -28,7 +28,7 @@ import { addNotificationEffects } from "@/store/settings/notification-effects";
 import Purchases from "react-native-purchases";
 import { I18nManager, Platform } from "react-native";
 import { detectLanguageFromDateLocale } from "@/utils/language-detector";
-import { supportedLanguages } from "@/services/tolgee";
+import { ensureLocaleLoaded, supportedLanguages } from "@/services/tolgee";
 import { initializeStoredSessionsStateSlice } from "@/store/stored-sessions";
 import { builtInBackendId } from "@/models/backend";
 
@@ -71,6 +71,12 @@ export function applySettingsEffects(addEffect: AddEffectFn) {
       // Bespoke hydration: sync read, composite keys, and composed values.
       dispatch(setPreferredLanguage(preferenceService.getPreferredLanguage()));
 
+      // Kick off stored-sessions init NOW, in parallel with the remaining
+      // settings work below (backup status, pro token). Its only settings
+      // dependencies are the generic preferences and preferredLanguage, both
+      // set above — it must not wait for the network/KV tail.
+      dispatch(initializeStoredSessionsStateSlice());
+
       const [lastSuccessfulRemoteBackupHash, lastBackupTime, lastBackupBackendId] =
         await Promise.all([
           preferenceService.getLastSuccessfulRemoteBackupHash(),
@@ -110,19 +116,25 @@ export function applySettingsEffects(addEffect: AddEffectFn) {
           logger.warn("RevenueCat API key is not set; purchases are disabled", {});
         }
       }
-      // migrate pro token to a revenuecat
-      if (proToken && !proToken.startsWith("$RCAnonymousID")) {
-        try {
-          const customerInfo = await Purchases.getCustomerInfo();
-          await Purchases.syncPurchases();
-          dispatch(setProToken(customerInfo.originalAppUserId));
-          await preferenceService.setProToken(customerInfo.originalAppUserId);
-        } catch (err) {
-          logger.error("Failed to migrate user", err);
-        }
-      }
       dispatch(setIsHydrated(true));
-      dispatch(initializeStoredSessionsStateSlice());
+      // initializeStoredSessionsStateSlice is dispatched earlier (right after
+      // the generic preferences + language) so its DB reads run in parallel
+      // with the backup-status/pro-token tail above.
+      // Deferred past hydration: these are network round-trips (100ms–2s+)
+      // that only matter for pro/paywall features. Blocking TTI on them is
+      // pure launch latency. Fire-and-forget; failures are logged, never fatal.
+      if (proToken && !proToken.startsWith("$RCAnonymousID")) {
+        void (async () => {
+          try {
+            const customerInfo = await Purchases.getCustomerInfo();
+            await Purchases.syncPurchases();
+            dispatch(setProToken(customerInfo.originalAppUserId));
+            await preferenceService.setProToken(customerInfo.originalAppUserId);
+          } catch (err) {
+            logger.error("Failed to migrate user", err);
+          }
+        })();
+      }
       const end = performance.now();
       logger.log(`initializeSettingsStateSlice effect took ${(end - start).toFixed(2)}ms`);
     },
@@ -159,6 +171,9 @@ export function applySettingsEffects(addEffect: AddEffectFn) {
         detectLanguageFromDateLocale(supportedLanguages.map((x) => x.code)) ??
         "en";
       const languageSettings = supportedLanguages.find((x) => x.code === languageCode);
+      // Load the locale's translations before switching so there's no flash
+      // of untranslated keys.
+      await ensureLocaleLoaded(tolgee, languageCode);
       await tolgee.changeLanguage(languageCode);
       I18nManager.forceRTL(!!languageSettings?.isRTL);
     },

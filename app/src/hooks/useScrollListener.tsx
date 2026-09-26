@@ -62,6 +62,7 @@ export const useScroll = (invertedScroll?: boolean): ScrollContextValues => {
   const ctx = useContext(ScrollContext);
   const [scrollHandlerLastFired, setScrollHandlerLastFired] = useState<boolean | undefined>(undefined);
   const lastOffset = useRef(0);
+  const lastScrollingDown = useRef(false);
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = event.nativeEvent.contentOffset.y;
     const contentHeight = event.nativeEvent.contentSize.height;
@@ -69,7 +70,13 @@ export const useScroll = (invertedScroll?: boolean): ScrollContextValues => {
     const scrollHeight = contentHeight - layoutHeight;
 
     // Clamp so that an overscroll bounce past the top doesn't read as scrolling down on the way back.
-    ctx.setScrollingDown(offsetY > Math.max(lastOffset.current, 0));
+    // Only propagate when the direction actually changes — this fires per
+    // scroll frame, and an unconditional context setState per frame is wasted work.
+    const scrollingDown = offsetY > Math.max(lastOffset.current, 0);
+    if (scrollingDown !== lastScrollingDown.current) {
+      lastScrollingDown.current = scrollingDown;
+      ctx.setScrollingDown(scrollingDown);
+    }
     lastOffset.current = offsetY;
 
     const isScrolled = invertedScroll ? offsetY < scrollHeight : offsetY > 0;

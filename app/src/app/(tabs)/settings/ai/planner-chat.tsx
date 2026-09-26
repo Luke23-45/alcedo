@@ -1,7 +1,7 @@
 import { useTranslate } from '@tolgee/react';
 import { Stack } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { Alert, Dimensions, FlatList, I18nManager, Platform, View } from 'react-native';
+import { Alert, Dimensions, FlatList, I18nManager, NativeScrollEvent, NativeSyntheticEvent, Platform, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller';
 import { useDispatch } from 'react-redux';
@@ -79,6 +79,13 @@ export default function AiPlannerChat() {
   const [restGap, setRestGap] = useState(0);
   const composerRef = useRef<View>(null);
   const listRef = useRef<FlatList>(null);
+  // Inverted list: offset 0 is the newest message. Track whether the user has
+  // scrolled up to read history, so streaming updates don't yank them back.
+  const userScrolledAway = useRef(false);
+  const handleChatScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    handleScroll(event);
+    userScrolledAway.current = event.nativeEvent.contentOffset.y > 120;
+  };
   const onComposerLayout = useCallback(() => {
     composerRef.current?.measureInWindow((_x, y, _width, height) => {
       // measureInWindow gives the composer's outer bottom; the input sits above it by the
@@ -156,11 +163,18 @@ export default function AiPlannerChat() {
           <FlatList<ChatMessage>
             ref={listRef}
             style={{ flex: 1 }}
-            onScroll={handleScroll}
+            onScroll={handleChatScroll}
+            scrollEventThrottle={16}
             keyboardDismissMode="interactive"
             automaticallyAdjustContentInsets={false}
             contentInsetAdjustmentBehavior="never"
-            onContentSizeChange={() => listRef.current?.scrollToOffset({ offset: 0, animated: false })}
+            onContentSizeChange={() => {
+              // Follow new messages only when the user is already at the
+              // newest; never yank them away from history they're reading.
+              if (!userScrolledAway.current) {
+                listRef.current?.scrollToOffset({ offset: 0, animated: false });
+              }
+            }}
             data={messages}
             inverted
             contentContainerStyle={{

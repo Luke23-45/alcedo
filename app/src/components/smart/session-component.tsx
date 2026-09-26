@@ -1,7 +1,7 @@
 import { showSnackbar } from '@/store/app';
 import { Card, Icon, Text } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import { Fragment } from 'react';
+import { Fragment, useCallback } from 'react';
 import { View } from 'react-native';
 import EmptyInfo from '@/components/presentation/foundation/empty-info';
 import { useAppTheme } from '@/hooks/useAppTheme';
@@ -146,6 +146,11 @@ export default function SessionComponent(props: {
 }) {
   const { session, isActiveWorkout } = props;
   const theme = useAppTheme();
+  // Stable across renders: the active-workout clock reads "now" and depends on
+  // no session state, so this closure never changes identity when sets are
+  // logged — keeping every exercise card memoized. (The inactive branch below
+  // captures session, but history sessions are static.)
+  const activeTimeProvider = useCallback(() => OffsetDateTime.now(), []);
   const { t } = useTranslate();
   const { push } = useRouter();
   const restTimersEnabled = useAppSelector((x) => x.settings.restTimersEnabled);
@@ -224,11 +229,12 @@ export default function SessionComponent(props: {
     return match(item)
       .with(P.instanceOf(RecordedWeightedExercise), (item) => (
         <WeightedExercise
-          timeProvider={() =>
+          timeProvider={
             isActiveWorkout
-              ? OffsetDateTime.now()
-              : (session.lastExercise?.latestTime ??
-                session.date.atTime(LocalTime.now()).atZone(ZoneId.systemDefault()).toOffsetDateTime())
+              ? activeTimeProvider
+              : () =>
+                  session.lastExercise?.latestTime ??
+                  session.date.atTime(LocalTime.now()).atZone(ZoneId.systemDefault()).toOffsetDateTime()
           }
           resetSetTimer={() => updateSession((s) => withRestTimerAt(s, s.lastExercise?.latestTime))}
           recordedExercise={item}

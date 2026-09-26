@@ -183,9 +183,10 @@ export function applyStoredSessionsEffects(addEffect: AddEffectFn) {
       cancelActiveListeners();
       // A hydration failure must never strand the app on the loading screen.
       onFail(() => dispatch(setIsHydrated(true)));
-      if (!getState().settings.isHydrated) {
-        throw new Error('Settings must be hydrated before stored sessions');
-      }
+      // Invariant: the settings effect dispatches this action only after its
+      // essential hydration (generic preferences + preferredLanguage). Full
+      // settings.isHydrated is NOT required — the backup-status/pro-token
+      // tail runs in parallel with this effect's DB reads.
       await logger.time('initializeStoredSessions', async () => {
         // The two table reads are independent, so they run concurrently
         // instead of two sequential round-trips.
