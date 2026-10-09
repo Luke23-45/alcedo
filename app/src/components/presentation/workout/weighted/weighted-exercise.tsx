@@ -21,6 +21,7 @@ interface WeightedExerciseProps {
   resetSetTimer: () => void;
   onEditExercise: (() => void) | undefined;
   onRemoveExercise: () => void;
+  onPressExercise?: () => void;
 }
 
 export default function WeightedExercise(props: WeightedExerciseProps) {
@@ -46,6 +47,7 @@ export default function WeightedExercise(props: WeightedExerciseProps) {
       variant={props.variant}
       // The reference draws the Add Set row on completed exercises only.
       onAddSet={!props.isReadonly && recordedExercise.isComplete ? () => updateExercise((ex) => ex.withAddedSet()) : undefined}
+      onPressExercise={props.onPressExercise}
     >
       <View>
         {recordedExercise.potentialSets.map((set, index) => (

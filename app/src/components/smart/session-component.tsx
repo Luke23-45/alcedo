@@ -1,9 +1,9 @@
 import { showSnackbar } from '@/store/app';
+import { Rest } from '@/models/blueprint-models';
 import { Card, Icon, Text } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import { Fragment, useCallback } from 'react';
-import { Pressable, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import { useCallback } from 'react';
+import { View } from 'react-native';
 import EmptyInfo from '@/components/presentation/foundation/empty-info';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { T, useTranslate } from '@tolgee/react';
@@ -23,9 +23,9 @@ import RestTimer from '@/components/presentation/workout/rest-timer';
 import { ReactNode } from 'react';
 import FullHeightScrollView from '@/components/layout/full-height-scroll-view';
 import { getSessionExerciseEditorHref } from '@/components/smart/session-exercise-editor';
+import { getSessionExerciseHref } from '@/components/smart/session-exercise';
 import { LocalTime, OffsetDateTime, ZoneId } from '@js-joda/core';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { selectRecentlyCompletedExercises } from '@/store/stored-sessions';
 import { PageActions } from '@/components/presentation/foundation/page-actions';
@@ -39,130 +39,15 @@ import { formatDuration } from '@/utils/format-date';
 import { localeFormatBigNumber } from '@/utils/locale-bignumber';
 import { useAddExercise } from '@/hooks/useAddExercise';
 import SessionMoreMenuComponent from '@/components/smart/session-more-menu-component';
-import { HomeScreenBackground } from '@/components/presentation/home/shared/home-auras';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
-import { SessionNav } from '@/components/presentation/workout/session/session-nav/session-nav';
-import { ElapsedCard } from '@/components/presentation/workout/session/elapsed-card/elapsed-card';
-import { StatStrip } from '@/components/presentation/workout/session/stat-strip/stat-strip';
-import {
-  computeSessionStats,
-  sessionHasLoggedSet,
-  sessionStartedExerciseCount,
-} from '@/components/presentation/workout/session/session-stats';
-import { ExercisesHeader } from '@/components/presentation/workout/session/exercises-header/exercises-header';
-import { EmptySession } from '@/components/presentation/workout/session/empty-session/empty-session';
-import { SessionFooter } from '@/components/presentation/workout/session/session-footer/session-footer';
-import { SessionAuras } from '@/components/presentation/workout/session/session-auras/session-auras';
-import { useElapsedSeconds } from '@/components/presentation/workout/session/use-elapsed-seconds';
+import { SessionList } from '@/components/presentation/workout/session/session-list';
 
-function withRestTimerAt(session: Session, time: OffsetDateTime | undefined) {
+function withRestTimerAt(session: Session, time: OffsetDateTime | undefined, exerciseIndex?: number) {
   return session.with({
-    restTimer: time ? new RestTimerModel(time) : undefined,
+    restTimer: time ? new RestTimerModel(time, undefined, exerciseIndex) : undefined,
   });
 }
 
-function ActiveSessionView(props: {
-  session: Session;
-  addExercise: () => void;
-  renderItem: (item: RecordedExercise, index: number) => ReactNode;
-  notesComponent: ReactNode;
-  timer: ReactNode;
-  canFinish: boolean;
-  onFinishWorkout: () => void;
-  menu: ReactNode;
-}) {
-  const { session } = props;
-  const { back } = useRouter();
-  const { t } = useTranslate();
-  const theme = useAppTheme();
-  const insets = useSafeAreaInsets();
-  const elapsed = useElapsedSeconds(session);
-  const isEmpty = session.recordedExercises.length === 0;
-  const stats = computeSessionStats(session);
-
-  return (
-    <FullHeightScrollView
-      screenBackground={
-        <>
-          <HomeScreenBackground />
-          <SessionAuras />
-        </>
-      }
-      // Direct children: nav(0), elapsed(1), strip(2), body(3), notes(4),
-      // footer(5). Nulls only occur at 4+, so the strip index is stable.
-      // Nothing is pinned: the finish flow scrolls with the content.
-      stickyHeaderIndices={[2]}
-    >
-      <View style={{ paddingTop: insets.top }}>
-        <SessionNav title={session.blueprint.name} onBack={back} menu={props.menu} />
-      </View>
-      <View style={{ marginTop: 6 }}>
-        <ElapsedCard seconds={elapsed} />
-      </View>
-      {/* Sticky wrapper stays transparent so the ambient background never
-          seams; paddingTop docks the parked strip below the status bar and
-          doubles as the elapsed-to-strip section gap (insets.top). */}
-      <View style={{ paddingTop: insets.top }}>
-        <StatStrip stats={stats} dimmed={isEmpty} />
-      </View>
-      {isEmpty ? (
-        <EmptySession onAddExercise={props.addExercise} />
-      ) : (
-        <View>
-          <ExercisesHeader done={sessionStartedExerciseCount(session)} total={session.recordedExercises.length} />
-          <View style={{ gap: 12 }}>
-            {session.recordedExercises.map((item, index) => (
-              // Exercises can be removed mid-list (which shifts positions), so the key
-              // carries the movement identity — set rows below stay index-keyed: sets are
-              // append-only with in-place cycling, never reordered or removed here.
-              <Fragment key={`${item.movementKey()}-${index}`}>{props.renderItem(item, index)}</Fragment>
-            ))}
-          </View>
-          {/* In-flow add: the empty state has its own button, but once an
-              exercise exists the only add path was the ⋯ menu. This row keeps
-              adding a second, third, … exercise discoverable. */}
-          <Pressable
-            onPress={props.addExercise}
-            accessibilityRole="button"
-            accessibilityLabel={t('exercise.add.title')}
-            testID="session-add-exercise"
-            hitSlop={{ top: 6, bottom: 6 }}
-            style={{
-              marginHorizontal: theme.layout.screenPadding,
-              marginTop: theme.space.md,
-              minHeight: 48,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              borderRadius: theme.radius.md,
-              borderWidth: 1,
-              borderStyle: 'dashed',
-              borderColor: theme.color.border.hairline,
-            }}
-          >
-            <Svg width={12} height={12} viewBox="-6 -6 12 12">
-              <Path
-                d="M-6 0 H6 M0 -6 V6"
-                stroke={theme.color.interactive.tint}
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                fill="none"
-              />
-            </Svg>
-            <SurfaceText>{t('exercise.add.title')}</SurfaceText>
-          </Pressable>
-        </View>
-      )}
-      {props.notesComponent}
-      <SessionFooter
-        timer={props.timer}
-        canFinish={props.canFinish}
-        onFinish={props.onFinishWorkout}
-      />
-    </FullHeightScrollView>
-  );
-}
 
 export default function SessionComponent(props: {
   session: Session;
@@ -177,6 +62,8 @@ export default function SessionComponent(props: {
   openPostWorkoutSummary?: () => void;
   /** Active session only: runs the finish flow (confirmation included) from the sticky footer. */
   onFinishWorkout?: () => void;
+  /** When set, focuses on a single exercise and drops session-wide chrome. */
+  focusExerciseIndex?: number;
 }) {
   const { session, isActiveWorkout } = props;
   const theme = useAppTheme();
@@ -220,7 +107,7 @@ export default function SessionComponent(props: {
       const before = s.cardioSetAt(exerciseIndex, setIndex);
       const updated = s.withCardioSet(exerciseIndex, setIndex, update, now);
       return updated.cardioSetAt(exerciseIndex, setIndex)?.earnsRest(before)
-        ? withRestTimerAt(updated, updated.lastExercise?.latestTime)
+        ? withRestTimerAt(updated, updated.lastExercise?.latestTime, exerciseIndex)
         : updated;
     });
   };
@@ -260,6 +147,11 @@ export default function SessionComponent(props: {
     ) : null;
 
   const renderItem = (variant: 'active' | 'classic') => (item: RecordedExercise, index: number) => {
+    const navigateToDetail =
+      isActiveWorkout && props.focusExerciseIndex === undefined
+        ? () => push(getSessionExerciseHref(session.id, index))
+        : undefined;
+
     return match(item)
       .with(P.instanceOf(RecordedWeightedExercise), (item) => (
         <WeightedExercise
@@ -270,7 +162,7 @@ export default function SessionComponent(props: {
                   session.lastExercise?.latestTime ??
                   session.date.atTime(LocalTime.now()).atZone(ZoneId.systemDefault()).toOffsetDateTime()
           }
-          resetSetTimer={() => updateSession((s) => withRestTimerAt(s, s.lastExercise?.latestTime))}
+          resetSetTimer={() => updateSession((s) => withRestTimerAt(s, s.lastExercise?.latestTime, index))}
           recordedExercise={item}
           toStartNext={session.nextExercise === item}
           updateExercise={(update) =>
@@ -285,6 +177,7 @@ export default function SessionComponent(props: {
           previousRecordedExercises={recentlyCompletedExercises(item.movementKey()) as RecordedWeightedExercise[]}
           variant={variant}
           index={index + 1}
+          onPressExercise={navigateToDetail}
         />
       ))
       .with(P.instanceOf(RecordedCardioExercise), (item) => (
@@ -305,28 +198,36 @@ export default function SessionComponent(props: {
           previousRecordedExercises={recentlyCompletedExercises(item.movementKey()) as RecordedCardioExercise[]}
           variant={variant}
           index={index + 1}
+          onPressExercise={navigateToDetail}
         />
       ))
       .exhaustive();
   };
 
-  const lastExercise = session.lastExercise;
-  const lastRecordedSet = lastExercise instanceof RecordedWeightedExercise ? lastExercise?.lastRecordedSet : undefined;
+  const timerExercise =
+    session.restTimer?.exerciseIndex !== undefined
+      ? session.recordedExercises[session.restTimer.exerciseIndex]
+      : session.lastExercise;
+  const timerLastSet =
+    timerExercise instanceof RecordedWeightedExercise ? timerExercise.lastRecordedSet : undefined;
+  const isWarmUp = timerLastSet?.set?.type === 'warmUp';
   const nextExercise = session.nextExercise;
 
   // A weighted exercise rests per exercise; cardio rests per set, and may not rest at all.
-  const restBetweenSets = match(lastExercise)
-    .with(P.instanceOf(RecordedWeightedExercise), (exercise) => exercise.blueprint.restBetweenSets)
+  const restBetweenSets = match(timerExercise)
+    .with(P.instanceOf(RecordedWeightedExercise), (exercise) =>
+      isWarmUp ? Rest.short : exercise.blueprint.restBetweenSets,
+    )
     .with(P.instanceOf(RecordedCardioExercise), (exercise) => exercise.lastCompletedSet?.blueprint.restBetweenSets)
     .otherwise(() => undefined);
 
   const showRestTimer = restTimersEnabled && isActiveWorkout && nextExercise && restBetweenSets && session.restTimer;
   // Only a weighted set can be failed - cardio has no rep count to fall short of.
   const lastSetFailed =
-    lastRecordedSet?.set &&
-    lastExercise instanceof RecordedWeightedExercise &&
-    lastRecordedSet.set.repsCompleted <
-      lastExercise.repsTargetForSet(lastExercise.potentialSets.indexOf(lastRecordedSet)).min;
+    timerLastSet?.set &&
+    timerExercise instanceof RecordedWeightedExercise &&
+    timerLastSet.set.repsCompleted <
+      timerExercise.repsTargetForSet(timerExercise.potentialSets.indexOf(timerLastSet)).min;
   // Complete-state "Log Set": mirror tapping the check on the next unlogged set of the next exercise.
   const nextWeightedExercise = nextExercise instanceof RecordedWeightedExercise ? nextExercise : undefined;
   const nextWeightedIndex = nextWeightedExercise ? session.recordedExercises.indexOf(nextWeightedExercise) : -1;
@@ -342,7 +243,11 @@ export default function SessionComponent(props: {
           if (setIndex < 0) {
             return s;
           }
-          return withRestTimerAt(s.withExercise(nextWeightedIndex, exercise.withCycledRepCount(setIndex, now)), now);
+          return withRestTimerAt(
+            s.withExercise(nextWeightedIndex, exercise.withCycledRepCount(setIndex, now)),
+            now,
+            nextWeightedIndex,
+          );
         });
       }
     : undefined;
@@ -402,15 +307,12 @@ export default function SessionComponent(props: {
 
   if (isActiveWorkout) {
     return (
-      <ActiveSessionView
+      <SessionList
         session={session}
-        addExercise={addExercise}
-        renderItem={renderItem('active')}
-        notesComponent={notesComponent}
-        timer={timer}
-        canFinish={sessionHasLoggedSet(session)}
+        onAddExercise={addExercise}
         onFinishWorkout={props.onFinishWorkout ?? (() => {})}
         menu={<SessionMoreMenuComponent session={session} isActiveWorkout />}
+        notesComponent={notesComponent}
       />
     );
   }

@@ -1,3 +1,4 @@
+import { Rest } from '@/models/blueprint-models';
 import { RecordedCardioExercise, RecordedExercise, RecordedWeightedExercise, Session } from '@/models/session-models';
 import { toDurationJSON, toInstantJson } from '@/models/storage/versions/latest';
 import { CardioTimerInfo, CurrentExerciseDetails, RestTimerInfo } from '@/models/workout-worker-messages';
@@ -17,7 +18,7 @@ export function workoutUpdatedEvent(session: Session, restTimersEnabled: boolean
 
 export function getCardioTimerInfo(session: Session): CardioTimerInfo | undefined {
   const running = session.runningCardioSet;
-  if (!running) {
+  if (!running || session.workoutPhase === 'paused') {
     return undefined;
   }
 
@@ -42,13 +43,19 @@ export function getCurrentExerciseDetails(session: Session): CurrentExerciseDeta
 }
 
 export function getTimerInfo(session: Session): RestTimerInfo | undefined {
-  const lastExercise = session.lastExercise;
+  if (!session.restTimer || session.restTimer.isPaused || session.workoutPhase === 'paused') {
+    return undefined;
+  }
+  const timerExercise =
+    session.restTimer.exerciseIndex !== undefined
+      ? session.recordedExercises[session.restTimer.exerciseIndex]
+      : session.lastExercise;
   const nextExercise = session.nextExercise;
-  if (!session.restTimer || session.restTimer.isPaused || !lastExercise || !nextExercise) {
+  if (!timerExercise || !nextExercise) {
     return undefined;
   }
 
-  const rest = getRestWindow(lastExercise);
+  const rest = getRestWindow(timerExercise);
   if (!rest || rest.partialRest.equals(Duration.ZERO)) {
     return;
   }
@@ -60,23 +67,25 @@ export function getTimerInfo(session: Session): RestTimerInfo | undefined {
 }
 
 /** Cardio rests per set and has nothing to fail; a weighted exercise rests per exercise. */
-function getRestWindow(lastExercise: RecordedExercise) {
-  if (lastExercise instanceof RecordedCardioExercise) {
-    const rest = lastExercise.lastCompletedSet?.blueprint.restBetweenSets;
+function getRestWindow(exercise: RecordedExercise) {
+  if (exercise instanceof RecordedCardioExercise) {
+    const rest = exercise.lastCompletedSet?.blueprint.restBetweenSets;
     return rest && { partialRest: rest.minRest, fullRest: rest.maxRest };
   }
-  if (!(lastExercise instanceof RecordedWeightedExercise)) {
+  if (!(exercise instanceof RecordedWeightedExercise)) {
     return undefined;
   }
 
-  const { minRest, maxRest, failureRest } = lastExercise.blueprint.restBetweenSets;
-
-  const lastSet = lastExercise.lastRecordedSet;
+  const lastSet = exercise.lastRecordedSet;
   if (!lastSet?.set) {
     return { partialRest: Duration.ZERO, fullRest: Duration.ZERO };
   }
 
-  const targetMin = lastExercise.repsTargetForSet(lastExercise.potentialSets.indexOf(lastSet)).min;
+  const isWarmUp = lastSet.set.type === 'warmUp';
+  const restConfig = isWarmUp ? Rest.short : exercise.blueprint.restBetweenSets;
+  const { minRest, maxRest, failureRest } = restConfig;
+
+  const targetMin = exercise.repsTargetForSet(exercise.potentialSets.indexOf(lastSet)).min;
   return lastSet.set.repsCompleted >= targetMin
     ? { partialRest: minRest, fullRest: maxRest }
     : { partialRest: failureRest, fullRest: failureRest };

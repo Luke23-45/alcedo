@@ -64,6 +64,17 @@ export const whatsNewEntries: WhatsNewEntry[] = [
     // The mode is a real choice now: hide once the user picks Automatic or Manual.
     condition: (state) => state.settings.backupMode === 'off',
   },
+  {
+    id: 5,
+    icon: 'settings',
+    titleKey: 'whats_new.rpe_tracking.title',
+    bodyKey: 'whats_new.rpe_tracking.body',
+    cta: {
+      labelKey: 'whats_new.rpe_tracking.cta',
+      route: '/settings/display' as Href,
+    },
+    condition: (state) => !state.settings.rpeTracking,
+  },
 ];
 
 export const latestWhatsNewId = whatsNewEntries.reduce((max, entry) => Math.max(max, entry.id), 0);

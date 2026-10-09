@@ -1,14 +1,20 @@
 import { Pressable, View } from 'react-native';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useTranslate } from '@tolgee/react';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { ExerciseDescriptor } from '@/models/exercise-models';
+import { recordRecentExerciseSearch } from '@/store/app';
+import { updateExercise } from '@/store/stored-sessions';
+import { translateExerciseMeta } from '@/utils/exercise-meta';
+import { uuid } from '@/utils/uuid';
 import {
   Card,
   FocusFieldInner,
   FocusGlow,
   Hairline,
   MagnifierGlyph,
+  PlusGlyph,
   ResultTile,
   ResultTileLetter,
   SegmentedControl,
@@ -17,10 +23,18 @@ import {
   XGlyph,
   tileAccent,
 } from '../editor-primitives';
-import { ExerciseKind } from '../exercise-editor-logic';
+import { ExerciseKind, filterCatalog } from '../exercise-editor-logic';
 import { AddExerciseTab, CustomExerciseTab } from './custom-exercise-tab';
 import {
   AddSearchPad,
+  CategoryBadge,
+  CategoryBadgeText,
+  Chip,
+  ChipRow,
+  ChipScroll,
+  ChipText,
+  CreateCustomAction,
+  CreateCustomActionText,
   IdentityPad,
   NameText,
   ResultName,
@@ -36,6 +50,7 @@ import {
 } from './identity-card.styles';
 
 export interface SearchResultItem {
+  id?: string;
   name: string;
   subtitle?: string;
   /** Built-in catalog category ('cardio', 'strength', …); '' for custom exercises. */
@@ -153,6 +168,13 @@ function SearchResults({
                 </ResultName>
                 {result.subtitle ? <ResultSubtitle numberOfLines={1}>{result.subtitle}</ResultSubtitle> : null}
               </ResultTextColumn>
+              {result.category ? (
+                <CategoryBadge $isCardio={result.category === 'cardio'}>
+                  <CategoryBadgeText $isCardio={result.category === 'cardio'}>
+                    {result.category === 'cardio' ? 'Cardio' : 'Weighted'}
+                  </CategoryBadgeText>
+                </CategoryBadge>
+              ) : null}
             </ResultRow>
           </View>
         );
@@ -184,21 +206,80 @@ function SearchResults({
 /**
  * Add mode before a name is picked: Library and Custom tabs over a shared
  * search state. The library tab keeps the focused-search card plus the
- * results card; the custom tab owns the name field, the type picker, and
- * the explicit Create action. Tab and custom-form inputs live here so
- * switching tabs never wipes either side.
+ * results card with muscle filter chips; the custom tab owns the name field,
+ * the type picker, categorization, and the explicit Create action.
  */
 export function AddSearchCards(
   props: SearchSectionProps & {
     catalog: Record<string, ExerciseDescriptor>;
-    onCreateCustom: (name: string, kind: ExerciseKind) => void;
+    onCreateCustom: (name: string, kind: ExerciseKind, descriptor?: ExerciseDescriptor) => void;
   },
 ) {
-  const { query, results, catalog, onCreateCustom } = props;
+  const { query, catalog, onCreateCustom, onSelectResult } = props;
   const { t } = useTranslate();
+  const dispatch = useDispatch();
   const [tab, setTab] = useState<AddExerciseTab>('library');
   const [customName, setCustomName] = useState('');
   const [customKind, setCustomKind] = useState<ExerciseKind>('weighted');
+  const [selectedMuscleFilter, setSelectedMuscleFilter] = useState<string | null>(null);
+
+  const handleTabChange = (nextTab: AddExerciseTab) => {
+    if (nextTab === 'custom' && customName.trim() === '' && query.trim() !== '') {
+      setCustomName(query.trim());
+    }
+    setTab(nextTab);
+  };
+
+  const FILTER_MUSCLES = [
+    'chest',
+    'back',
+    'shoulders',
+    'biceps',
+    'triceps',
+    'quadriceps',
+    'hamstrings',
+    'glutes',
+    'abs',
+  ];
+
+  const libraryItems: SearchResultItem[] = useMemo(() => {
+    const matched = filterCatalog(catalog, {
+      query,
+      muscles: selectedMuscleFilter ? [selectedMuscleFilter] : [],
+      limit: 40,
+    });
+    return matched.map(({ id, descriptor }) => {
+      const firstMuscle = descriptor.muscles[0];
+      const parts = [
+        descriptor.equipment ? translateExerciseMeta(t, 'equipment', descriptor.equipment) : undefined,
+        firstMuscle ? translateExerciseMeta(t, 'muscle', firstMuscle) : undefined,
+      ].filter((part): part is string => !!part);
+      return {
+        id,
+        name: descriptor.name,
+        subtitle: parts.length > 0 ? parts.join(' · ') : undefined,
+        category: descriptor.category,
+        library: {
+          equipment: descriptor.equipment,
+          muscles: [...descriptor.muscles],
+          instructions: descriptor.instructions,
+        },
+      };
+    });
+  }, [catalog, query, selectedMuscleFilter, t]);
+
+  const handleCreateCustom = (descriptor: ExerciseDescriptor) => {
+    const id = uuid();
+    dispatch(updateExercise({ id, exercise: descriptor }));
+    onCreateCustom(descriptor.name, customKind, descriptor);
+  };
+
+  const handleSelectResult = (item: SearchResultItem) => {
+    if (item.id) {
+      dispatch(recordRecentExerciseSearch(item.id));
+    }
+    onSelectResult(item);
+  };
 
   return (
     <View>
@@ -209,7 +290,7 @@ export function AddSearchCards(
             { value: 'custom', label: t('exercise.editor.add_tab.custom', 'Custom') },
           ]}
           value={tab}
-          onChange={setTab}
+          onChange={handleTabChange}
           accessibilityLabel={t('exercise.editor.add_tab.label', 'Add exercise source')}
         />
       </TabPad>
@@ -218,24 +299,69 @@ export function AddSearchCards(
           <Card radius={20}>
             <AddSearchPad>
               <SearchFieldControl {...props} compact />
-              <SearchHintRow query={query} results={results} />
-              <SearchHint>
-                {t(
-                  'exercise.editor.search.pick_guidance',
-                  'Pick from the library — Done unlocks once the exercise has a name.',
-                )}
-              </SearchHint>
+              <ChipScroll horizontal showsHorizontalScrollIndicator={false}>
+                <ChipRow>
+                  <Chip
+                    $active={selectedMuscleFilter === null}
+                    onPress={() => setSelectedMuscleFilter(null)}
+                    accessibilityRole="button"
+                  >
+                    <ChipText $active={selectedMuscleFilter === null}>{t('generic.all', 'All')}</ChipText>
+                  </Chip>
+                  {FILTER_MUSCLES.map((muscle) => {
+                    const active = selectedMuscleFilter === muscle;
+                    return (
+                      <Chip
+                        key={muscle}
+                        $active={active}
+                        onPress={() => setSelectedMuscleFilter(active ? null : muscle)}
+                        accessibilityRole="button"
+                      >
+                        <ChipText $active={active}>{translateExerciseMeta(t, 'muscle', muscle)}</ChipText>
+                      </Chip>
+                    );
+                  })}
+                </ChipRow>
+              </ChipScroll>
+              {query.trim().length > 0 && libraryItems.length === 0 ? (
+                <View>
+                  <SearchHint>
+                    {t('exercise.editor.search.no_results', 'No exercises match “{query}”.', {
+                      query: query.trim(),
+                    })}
+                  </SearchHint>
+                  <CreateCustomAction
+                    onPress={() => {
+                      setCustomName(query.trim());
+                      setTab('custom');
+                    }}
+                    accessibilityRole="button"
+                    accessibilityLabel={t(
+                      'exercise.editor.custom.create_named',
+                      'Create “{name}” as custom exercise',
+                      { name: query.trim() },
+                    )}
+                  >
+                    <PlusGlyph />
+                    <CreateCustomActionText>
+                      {t('exercise.editor.custom.create_named', 'Create “{name}” as custom exercise', {
+                        name: query.trim(),
+                      })}
+                    </CreateCustomActionText>
+                  </CreateCustomAction>
+                </View>
+              ) : null}
             </AddSearchPad>
           </Card>
-          {results.length > 0 ? (
+          {libraryItems.length > 0 ? (
             <View>
               <SearchSection>
                 <Card radius={20}>
                   <SearchResults
-                    results={results}
+                    results={libraryItems}
                     query={query}
                     allowCustom={false}
-                    onSelectResult={props.onSelectResult}
+                    onSelectResult={handleSelectResult}
                   />
                 </Card>
               </SearchSection>
@@ -249,7 +375,7 @@ export function AddSearchCards(
           kind={customKind}
           onKindChange={setCustomKind}
           catalog={catalog}
-          onCreate={() => onCreateCustom(customName.trim(), customKind)}
+          onCreate={handleCreateCustom}
           onUseLibrary={(name) => {
             props.onQueryChange(name);
             setTab('library');

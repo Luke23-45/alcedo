@@ -145,7 +145,7 @@ export function calculateStats(
       const exerciseStats = exerciseStatsMap.get(key)!;
       // Max weight lifted for this exercise in this session
       const maxWeight = ex.potentialSets
-        .filter((ps) => ps.set)
+        .filter((ps) => ps.set && ps.set.type !== 'warmUp')
         .map((ps) => ex.effectiveWeight(ps, session.bodyweight))
         .reduce((a, b) => (a === null ? b : a.isGreaterThan(b) ? a : b), null as null | Weight);
       if (!maxWeight) {
@@ -154,7 +154,7 @@ export function calculateStats(
 
       // Max 1RM for this exercise in this session
       const max1RM = ex.potentialSets
-        .filter((ps) => ps.set)
+        .filter((ps) => ps.set && ps.set.type !== 'warmUp')
         .filter((ps) => ps.set!.repsCompleted)
         .map((ps) => calculateOneRepMax(ps, ex.effectiveWeight(ps, session.bodyweight)))
         .reduce((a, b) => (a === null ? b : a.isGreaterThan(b) ? a : b), null as null | Weight);
@@ -163,7 +163,7 @@ export function calculateStats(
       }
 
       for (const set of ex.potentialSets) {
-        if (!set.set) {
+        if (!set.set || set.set.type === 'warmUp') {
           continue;
         }
         exerciseStats.repsStatistics.breakdown[set.set.repsCompleted] ??= {
@@ -185,7 +185,9 @@ export function calculateStats(
       });
       exerciseStats.maxRepsStatistics.push({
         dateTime: lastSet.set!.completionDateTime,
-        value: ex.potentialSets.reduce((most, ps) => Math.max(most, ps.set?.repsCompleted ?? 0), 0),
+        value: ex.potentialSets
+          .filter((ps) => ps.set?.type !== 'warmUp')
+          .reduce((most, ps) => Math.max(most, ps.set?.repsCompleted ?? 0), 0),
       });
       exerciseStats.max1RMStatistics.push({
         dateTime: lastSet.set!.completionDateTime,
@@ -194,7 +196,7 @@ export function calculateStats(
       exerciseStats.totalVolumeStatistics.push({
         dateTime: lastSet.set!.completionDateTime,
         value: ex.potentialSets
-          .filter((x) => x.set)
+          .filter((x) => x.set && x.set.type !== 'warmUp')
           .reduce(
             (accum, set) =>
               ex.effectiveWeight(set, session.bodyweight).multipliedBy(set.set!.repsCompleted).plus(accum),

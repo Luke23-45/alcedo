@@ -4,7 +4,7 @@
   "properties": {
     "version": {
       "type": "number",
-      "const": 8
+      "const": 9
     },
     "id": {
       "type": "string"
@@ -35,6 +35,15 @@
     },
     "bodyweight": {
       "$ref": "./Weight.json"
+    },
+    "startedAt": {
+      "$ref": "./OffsetDateTime.json"
+    },
+    "pausedAt": {
+      "$ref": "./OffsetDateTime.json"
+    },
+    "pausedTotalMs": {
+      "type": "number"
     }
   },
   "required": [

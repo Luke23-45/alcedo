@@ -9,12 +9,15 @@ import type {
 import type { WeightJSON } from '@/models/storage/versions/libs/weight';
 
 export interface SessionJSON {
-  version: 8;
+  version: 9;
   id: string;
   blueprint: { name: string; notes: string };
   recordedExercises: RecordedExerciseJSON[];
   date: LocalDateJSON;
   bodyweight: WeightJSON | undefined;
+  startedAt?: OffsetDateTimeJSON | undefined;
+  pausedAt?: OffsetDateTimeJSON | undefined;
+  pausedTotalMs?: number | undefined;
 }
 
 /**
@@ -63,4 +66,6 @@ export interface RecordedSetJSON {
    */
   repsCompleted: number;
   completionDateTime: OffsetDateTimeJSON;
+  type?: 'warmUp' | 'working' | 'failure' | 'drop' | undefined;
+  rpe?: number | undefined;
 }

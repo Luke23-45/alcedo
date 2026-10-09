@@ -3,6 +3,7 @@ import {
   PotentialSet,
   RecordedSet,
   RecordedWeightedExercise,
+  SetType,
   WeightAppliesTo,
 } from '@/models/session-models/recorded-weighted-exercise';
 import { RecordedCardioExercise, RecordedCardioExerciseSet } from '@/models/session-models/recorded-cardio-exercise';
@@ -18,6 +19,7 @@ export {
   RecordedCardioExerciseSet,
   RecordedExercise,
   RecordedSet,
+  SetType,
   EmptySession,
   fromRecordedExerciseJSON,
   WeightAppliesTo,

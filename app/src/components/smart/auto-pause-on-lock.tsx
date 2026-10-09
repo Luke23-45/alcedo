@@ -28,18 +28,29 @@ export function AutoPauseOnLock() {
       const state = store.getState();
       const sessionId = state.storedSessions.activeSessionId;
       const session = sessionId ? state.storedSessions.sessions[sessionId] : undefined;
-      const restTimer = session?.restTimer;
-      if (!session || !restTimer || restTimer.isPaused) {
+      if (!session) {
         return;
       }
       const now = OffsetDateTime.now();
+      const shouldPauseWorkout = session.workoutPhase === 'running';
+      const shouldPauseRest = !!session.restTimer && !session.restTimer.isPaused;
+      if (!shouldPauseWorkout && !shouldPauseRest) {
+        return;
+      }
+
       dispatch(
         updateStoredSession({
           sessionId: session.id,
-          update: (current) =>
-            current.restTimer && !current.restTimer.isPaused
-              ? current.with({ restTimer: current.restTimer.pause(now) })
-              : current,
+          update: (current) => {
+            let updated = current;
+            if (shouldPauseWorkout && updated.workoutPhase === 'running') {
+              updated = updated.withPaused(now);
+            }
+            if (shouldPauseRest && updated.restTimer && !updated.restTimer.isPaused) {
+              updated = updated.with({ restTimer: updated.restTimer.pause(now) });
+            }
+            return updated;
+          },
         }),
       );
     };

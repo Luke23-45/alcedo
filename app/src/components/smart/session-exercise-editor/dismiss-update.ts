@@ -2,16 +2,20 @@ import { ExerciseBlueprint } from '@/models/blueprint-models';
 import { Session } from '@/models/session-models';
 
 /**
- * What dismissing the exercise editor should persist. Add mode: backing out
- * keeps the placeholder exercise with its defaults — the workout editor names
- * this behavior explicitly, so the editor must not silently drop the exercise.
- * Only an actual draft is committed to the store.
+ * What dismissing the exercise editor should persist.
+ * In add mode (isNew): if the user backs out without picking/naming an exercise
+ * (draft is undefined or name is blank), cleanly remove the temporary placeholder
+ * so no ghost exercise is left in the session.
  */
 export function exerciseEditorDismissUpdate(
   exerciseIndex: number,
   draft: ExerciseBlueprint | undefined,
   useImperialUnits: boolean,
+  isNew?: boolean,
 ): ((s: Session) => Session) | undefined {
+  if (isNew && (!draft || draft.name.trim() === '')) {
+    return (s) => (s.recordedExercises[exerciseIndex] ? s.withRemovedExercise(exerciseIndex) : s);
+  }
   if (!draft) {
     return undefined;
   }

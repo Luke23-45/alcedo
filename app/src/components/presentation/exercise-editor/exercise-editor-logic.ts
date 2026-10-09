@@ -449,3 +449,48 @@ export function searchResultSubtitle(descriptor: ExerciseDescriptor): { equipmen
     muscle: descriptor.muscles[0],
   };
 }
+
+export interface FilterCatalogOptions {
+  query?: string;
+  muscles?: string[];
+  equipment?: string[];
+  limit?: number;
+}
+
+export function filterCatalog(
+  catalog: Record<string, ExerciseDescriptor>,
+  options: FilterCatalogOptions = {},
+): { id: string; descriptor: ExerciseDescriptor }[] {
+  const trimmed = (options.query ?? '').trim();
+  const muscles = (options.muscles ?? []).map((m) => m.toLowerCase());
+  const equipment = (options.equipment ?? []).map((e) => e.toLowerCase());
+  const limit = options.limit ?? 50;
+
+  const entries = Object.entries(catalog).map(([id, descriptor]) => {
+    const score = trimmed ? fuzzyMatchScore(trimmed, descriptor.name) : 0;
+    return { id, descriptor, score };
+  });
+
+  return entries
+    .filter(({ descriptor, score }) => {
+      if (trimmed && score === null) {
+        return false;
+      }
+      if (muscles.length > 0 && !descriptor.muscles.some((m) => muscles.includes(m.toLowerCase()))) {
+        return false;
+      }
+      if (equipment.length > 0 && (!descriptor.equipment || !equipment.includes(descriptor.equipment.toLowerCase()))) {
+        return false;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (trimmed) {
+        const diff = (b.score ?? 0) - (a.score ?? 0);
+        if (diff !== 0) return diff;
+      }
+      return a.descriptor.name.localeCompare(b.descriptor.name);
+    })
+    .slice(0, limit)
+    .map(({ id, descriptor }) => ({ id, descriptor }));
+}

@@ -2,6 +2,7 @@ import { match, P } from 'ts-pattern';
 import { RecordedCardioExercise } from '@/models/session-models/recorded-cardio-exercise';
 import { RecordedWeightedExercise } from '@/models/session-models/recorded-weighted-exercise';
 import { Session } from '@/models/session-models/session';
+import { shortFormatWeightUnit, Weight } from '@/models/weight';
 import { localeFormatBigNumber } from '@/utils/locale-bignumber';
 
 export interface SessionStats {
@@ -10,6 +11,16 @@ export interface SessionStats {
   volume: string;
   reps: string;
   avgBpm: string | undefined;
+}
+
+export interface SessionTotals {
+  setsCompleted: number;
+  setsTotal: number;
+  setsRemaining: number;
+  volume: string;
+  bestSingleSet: string | undefined;
+  reps: string;
+  avgRepsPerSet: string | undefined;
 }
 
 /**
@@ -70,3 +81,59 @@ export function sessionStartedExerciseCount(session: Session): number {
       .otherwise(() => false),
   ).length;
 }
+
+/**
+ * Computes the 2×2 totals grid metrics for the session list view:
+ * TIME · SETS · VOLUME KG · REPS, along with their respective micro-details.
+ */
+export function computeSessionTotals(session: Session): SessionTotals {
+  let setsCompleted = 0;
+  let setsTotal = 0;
+  let reps = 0;
+  let bestWeight: Weight | undefined = undefined;
+  let bestReps = 0;
+
+  for (const exercise of session.recordedExercises) {
+    if (exercise instanceof RecordedWeightedExercise) {
+      for (const potentialSet of exercise.potentialSets) {
+        setsTotal += 1;
+        if (potentialSet.set) {
+          setsCompleted += 1;
+          reps += potentialSet.set.repsCompleted;
+          if (
+            potentialSet.set.type !== 'warmUp' &&
+            (!bestWeight || potentialSet.weight.convertTo('kilograms').isGreaterThan(bestWeight.convertTo('kilograms')))
+          ) {
+            bestWeight = potentialSet.weight;
+            bestReps = potentialSet.set.repsCompleted;
+          }
+        }
+      }
+    } else if (exercise instanceof RecordedCardioExercise) {
+      for (const set of exercise.sets) {
+        setsTotal += 1;
+        if (set.isCompletelyFilled) {
+          setsCompleted += 1;
+        }
+      }
+    }
+  }
+
+  const volumeKg = session.totalWeightLifted.convertTo('kilograms');
+  const bestSingleSet = bestWeight
+    ? `· ${localeFormatBigNumber(bestWeight.value.decimalPlaces(bestWeight.value.isInteger() ? 0 : 1))} ${shortFormatWeightUnit(bestWeight.unit)} × ${bestReps}`
+    : undefined;
+
+  const avgRepsPerSet = setsCompleted > 0 ? `· ${Math.round(reps / setsCompleted)} avg/set` : undefined;
+
+  return {
+    setsCompleted,
+    setsTotal,
+    setsRemaining: Math.max(0, setsTotal - setsCompleted),
+    volume: localeFormatBigNumber(volumeKg.value.decimalPlaces(0)),
+    bestSingleSet,
+    reps: String(reps),
+    avgRepsPerSet,
+  };
+}
+

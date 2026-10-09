@@ -96,6 +96,25 @@ export function sessionPalette(isDark: boolean) {
       edge: 'rgba(255,255,255,0.22)',
       label: '#FFFFFF',
     },
+    totals: {
+      label: isDark ? '#86868B' : '#8E8E93',
+      value: isDark ? '#FFFFFF' : '#1C1C1E',
+      sub: isDark ? '#86868B' : '#8E8E93',
+      dimValue: isDark ? '#48484A' : '#AEAEB2',
+      dimSub: isDark ? '#6C6C70' : '#AEAEB2',
+      ruleTrack: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+      ruleCompleteFrom: '#7BE000',
+      ruleCompleteTo: '#D6FF52',
+      ruleProgressFrom: '#FF0A47',
+      ruleProgressTo: '#FF7A96',
+    },
+    row: {
+      nextChipBg: isDark ? 'rgba(255,45,85,0.16)' : 'rgba(255,45,85,0.12)',
+      nextChipText: isDark ? '#FF6A88' : '#D70015',
+      nextRail: isDark ? '#FF375F' : '#FF2D55',
+      supersetGlyph: isDark ? '#8E8E93' : '#8E8E93',
+      chevron: '#8E8E93',
+    },
   };
 }
 

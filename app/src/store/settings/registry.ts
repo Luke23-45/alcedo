@@ -218,6 +218,7 @@ export const preferenceRegistry = {
   notesExpandedByDefault: pref({ default: true, codec: boolCodec }),
   keepScreenAwakeDuringWorkout: pref({ default: true, codec: boolCodec }),
   showPostWorkoutSummary: pref({ default: false, codec: boolCodec }),
+  rpeTracking: pref({ default: false, codec: boolCodec }),
   trueBlackDarkTheme: pref({ default: false, codec: boolCodec }),
   tipToShow: pref({ default: 1, codec: intCodec }),
   lastSeenWhatsNewId: pref({ default: 0, codec: intCodec }),

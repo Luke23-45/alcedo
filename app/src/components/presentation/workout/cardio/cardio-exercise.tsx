@@ -43,6 +43,7 @@ interface CardioExerciseProps {
   onStartTimer: (setIndex: number) => void;
   onEditExercise: (() => void) | undefined;
   onRemoveExercise: () => void;
+  onPressExercise?: () => void;
 }
 
 export function CardioExercise(props: CardioExerciseProps) {
@@ -63,6 +64,7 @@ export function CardioExercise(props: CardioExerciseProps) {
       variant={props.variant}
       // The reference draws the Add Set row on completed exercises only.
       onAddSet={!props.isReadonly && recordedExercise.isComplete ? () => updateExercise((ex) => ex.withAddedSet()) : undefined}
+      onPressExercise={props.onPressExercise}
     >
       <View style={{ gap: theme.space.base }}>
         {recordedExercise.sets.map((set, setIndex) => (

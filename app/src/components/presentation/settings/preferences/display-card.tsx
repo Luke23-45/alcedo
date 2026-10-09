@@ -5,6 +5,7 @@ import { useAppSelector } from '@/store';
 import {
   setKeepScreenAwakeDuringWorkout,
   setNotesExpandedByDefault,
+  setRpeTracking,
   setShowBodyweight,
   setShowFeed,
   setShowPostWorkoutSummary,
@@ -30,7 +31,7 @@ export function DisplayCard() {
   const chevron = useChevronColor();
 
   const rows: {
-    id: 'bodyweight' | 'feed' | 'summary' | 'notes' | 'awake';
+    id: 'bodyweight' | 'feed' | 'summary' | 'notes' | 'awake' | 'rpe';
     label: string;
     subtitle: string;
     value: boolean;
@@ -42,6 +43,13 @@ export function DisplayCard() {
       subtitle: t('settings.show_bodyweight.subtitle'),
       value: settings.showBodyweight,
       onChange: (v) => dispatch(setShowBodyweight(v)),
+    },
+    {
+      id: 'rpe',
+      label: t('settings.rpe_tracking.label', 'RPE Effort Tracking'),
+      subtitle: t('settings.rpe_tracking.subtitle', 'Record Rate of Perceived Exertion (6–10) per set'),
+      value: settings.rpeTracking,
+      onChange: (v) => dispatch(setRpeTracking(v)),
     },
     {
       id: 'feed',

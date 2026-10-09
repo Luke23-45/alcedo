@@ -66,7 +66,7 @@ export function SessionExerciseEditor(props: { sessionId: string; index: number;
   };
 
   useOnDismiss(() => {
-    const update = exerciseEditorDismissUpdate(exerciseIndex, draftRef.current, useImperialUnits);
+    const update = exerciseEditorDismissUpdate(exerciseIndex, draftRef.current, useImperialUnits, isNew);
     if (update) {
       dispatch(
         updateStoredSession({

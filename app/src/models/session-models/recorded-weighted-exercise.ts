@@ -222,10 +222,12 @@ export class RecordedWeightedExercise {
   }
 
   totalWeightLiftedWith(bodyweight: Weight | undefined): Weight {
-    return this.potentialSets.reduce(
-      (accum, set) => accum.plus(this.effectiveWeight(set, bodyweight).multipliedBy(set.set?.repsCompleted ?? 0)),
-      Weight.NIL,
-    );
+    return this.potentialSets
+      .filter((set) => set.set?.type !== 'warmUp')
+      .reduce(
+        (accum, set) => accum.plus(this.effectiveWeight(set, bodyweight).multipliedBy(set.set?.repsCompleted ?? 0)),
+        Weight.NIL,
+      );
   }
 
   get isStarted() {
@@ -278,19 +280,33 @@ export class RecordedWeightedExercise {
   }
 }
 
+export type SetType = 'warmUp' | 'working' | 'failure' | 'drop';
+
 export class RecordedSet {
   constructor(
     readonly repsCompleted: number,
     readonly completionDateTime: OffsetDateTime,
+    readonly type: SetType = 'working',
+    readonly rpe?: number | undefined,
   ) {}
 
   /** Build a recorded set from named fields. See {@link PotentialSet.of}. */
-  static of(init: { repsCompleted: number; completionDateTime: OffsetDateTime }): RecordedSet {
-    return new RecordedSet(init.repsCompleted, init.completionDateTime);
+  static of(init: {
+    repsCompleted: number;
+    completionDateTime: OffsetDateTime;
+    type?: SetType;
+    rpe?: number | undefined;
+  }): RecordedSet {
+    return new RecordedSet(init.repsCompleted, init.completionDateTime, init.type ?? 'working', init.rpe);
   }
 
   static fromJSON(json: RecordedSetJSON): RecordedSet {
-    return new RecordedSet(json.repsCompleted, fromOffsetDateTimeJSON(json.completionDateTime));
+    return new RecordedSet(
+      json.repsCompleted,
+      fromOffsetDateTimeJSON(json.completionDateTime),
+      json.type ?? 'working',
+      json.rpe,
+    );
   }
 
   equals(other: RecordedSet | undefined): boolean {
@@ -300,20 +316,37 @@ export class RecordedSet {
     if (other === this) {
       return true;
     }
-    return this.repsCompleted === other.repsCompleted && this.completionDateTime.equals(other.completionDateTime);
+    return (
+      this.repsCompleted === other.repsCompleted &&
+      this.completionDateTime.equals(other.completionDateTime) &&
+      this.type === other.type &&
+      this.rpe === other.rpe
+    );
   }
 
   with(other: Partial<RecordedSet>): RecordedSet {
     return new RecordedSet(
       'repsCompleted' in other ? other.repsCompleted! : this.repsCompleted,
       'completionDateTime' in other ? other.completionDateTime! : this.completionDateTime,
+      'type' in other ? other.type! : this.type,
+      'rpe' in other ? other.rpe : this.rpe,
     );
+  }
+
+  withType(type: SetType): RecordedSet {
+    return this.with({ type });
+  }
+
+  withRpe(rpe: number | undefined): RecordedSet {
+    return this.with({ rpe });
   }
 
   toJSON(): RecordedSetJSON {
     return {
       repsCompleted: this.repsCompleted,
       completionDateTime: toOffsetDateTimeJSON(this.completionDateTime),
+      type: this.type,
+      rpe: this.rpe,
     };
   }
 }

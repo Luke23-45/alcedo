@@ -7,6 +7,18 @@
     },
     "completionDateTime": {
       "$ref": "./OffsetDateTime.json"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "warmUp",
+        "working",
+        "failure",
+        "drop"
+      ]
+    },
+    "rpe": {
+      "type": "number"
     }
   },
   "required": [

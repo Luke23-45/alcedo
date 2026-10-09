@@ -2,11 +2,12 @@ import {
   CardioExerciseBlueprint,
   ExerciseBlueprint,
   repsTargetsEqual,
+  Rest,
   SessionBlueprint,
   WeightedExerciseBlueprint,
 } from '@/models/blueprint-models';
 import { TemporalComparer } from '@/models/comparers';
-import { SessionJSON, fromLocalDateJSON, toLocalDateJSON } from '@/models/storage/versions/latest';
+import { SessionJSON, fromLocalDateJSON, toLocalDateJSON, fromOffsetDateTimeJSON, toOffsetDateTimeJSON } from '@/models/storage/versions/latest';
 import { Weight, WeightUnit } from '@/models/weight';
 import { indexed } from '@/utils/enumerable';
 import { Duration, LocalDate, OffsetDateTime } from '@js-joda/core';
@@ -33,8 +34,54 @@ export class Session {
     readonly date: LocalDate,
     readonly bodyweight: Weight | undefined,
     readonly restTimer: RestTimer | undefined,
+    readonly startedAt?: OffsetDateTime | undefined,
+    readonly pausedAt?: OffsetDateTime | undefined,
+    readonly pausedTotalMs?: number | undefined,
   ) {}
+
+  get workoutPhase(): 'idle' | 'running' | 'paused' {
+    if (!this.startedAt) return 'idle';
+    if (this.pausedAt) return 'paused';
+    return 'running';
+  }
+
+  elapsedMsAt(now: OffsetDateTime): number {
+    if (!this.startedAt) {
+      return 0;
+    }
+    const totalPassed = Duration.between(this.startedAt, now).toMillis();
+    const currentPause = this.pausedAt ? Duration.between(this.pausedAt, now).toMillis() : 0;
+    return Math.max(0, totalPassed - (this.pausedTotalMs ?? 0) - currentPause);
+  }
+
+  withStartedAt(now: OffsetDateTime): Session {
+    if (this.startedAt) return this;
+    return this.with({ startedAt: now, pausedAt: undefined, pausedTotalMs: 0 });
+  }
+
+  withPaused(now: OffsetDateTime): Session {
+    if (!this.startedAt || this.pausedAt) return this;
+    return this.with({ pausedAt: now });
+  }
+
+  withResumed(now: OffsetDateTime): Session {
+    if (!this.startedAt || !this.pausedAt) return this;
+    const pauseDurationMs = Duration.between(this.pausedAt, now).toMillis();
+    return this.with({
+      pausedAt: undefined,
+      pausedTotalMs: (this.pausedTotalMs ?? 0) + Math.max(0, pauseDurationMs),
+    });
+  }
+
   get duration(): Duration | undefined {
+    // When startedAt is set, duration is derived from the persisted workout clock.
+    // If startedAt is absent (legacy sessions persisted prior to v9), fall back to
+    // Duration.between(firstExercise.earliestTime, lastExercise.latestTime) so historical
+    // logs remain valid and byte-identical.
+    if (this.startedAt) {
+      const end = this.pausedAt ?? this.lastExercise?.latestTime ?? OffsetDateTime.now();
+      return Duration.ofMillis(this.elapsedMsAt(end));
+    }
     return this.lastExercise?.latestTime && this.firstExercise?.earliestTime
       ? Duration.between(this.firstExercise.earliestTime, this.lastExercise.latestTime)
       : undefined;
@@ -52,6 +99,9 @@ export class Session {
       fromLocalDateJSON(json.date),
       json.bodyweight ? Weight.fromJSON(json.bodyweight) : undefined,
       undefined,
+      json.startedAt ? fromOffsetDateTimeJSON(json.startedAt) : undefined,
+      json.pausedAt ? fromOffsetDateTimeJSON(json.pausedAt) : undefined,
+      json.pausedTotalMs,
     );
   }
 
@@ -103,11 +153,22 @@ export class Session {
       return false;
     }
 
+    const sameStartedAt =
+      (!this.startedAt && !other.startedAt) ||
+      (!!this.startedAt && !!other.startedAt && this.startedAt.isEqual(other.startedAt));
+    const samePausedAt =
+      (!this.pausedAt && !other.pausedAt) ||
+      (!!this.pausedAt && !!other.pausedAt && this.pausedAt.isEqual(other.pausedAt));
+    const samePausedTotalMs = this.pausedTotalMs === other.pausedTotalMs;
+
     return (
       this.id === other.id &&
       this.date.equals(other.date) &&
       equal(this.bodyweight, other.bodyweight) &&
       this.blueprint.equals(other.blueprint) &&
+      sameStartedAt &&
+      samePausedAt &&
+      samePausedTotalMs &&
       this.recordedExercises.length === other.recordedExercises.length &&
       this.recordedExercises.every((exercise, index) => exercise.equals(other.recordedExercises[index]))
     );
@@ -121,6 +182,9 @@ export class Session {
       'date' in other ? (other.date ?? this.date) : this.date,
       'bodyweight' in other ? other.bodyweight : this.bodyweight,
       'restTimer' in other ? other.restTimer : this.restTimer,
+      'startedAt' in other ? other.startedAt : this.startedAt,
+      'pausedAt' in other ? other.pausedAt : this.pausedAt,
+      'pausedTotalMs' in other ? other.pausedTotalMs : this.pausedTotalMs,
     );
   }
 
@@ -320,12 +384,15 @@ export class Session {
 
   toJSON(): SessionJSON {
     return {
-      version: 8,
+      version: 9,
       blueprint: this.blueprint.toJSON(),
       bodyweight: this.bodyweight?.toJSON(),
       date: toLocalDateJSON(this.date),
       id: this.id,
       recordedExercises: this.recordedExercises.map((x) => x.toJSON()),
+      startedAt: this.startedAt ? toOffsetDateTimeJSON(this.startedAt) : undefined,
+      pausedAt: this.pausedAt ? toOffsetDateTimeJSON(this.pausedAt) : undefined,
+      pausedTotalMs: this.pausedTotalMs,
     };
   }
 
@@ -496,11 +563,15 @@ export class Session {
     if (!this.restTimer || this.restTimer.isPaused) {
       return undefined;
     }
-    const exercise = this.lastExercise;
+    const exercise =
+      this.restTimer.exerciseIndex !== undefined
+        ? this.recordedExercises[this.restTimer.exerciseIndex]
+        : this.lastExercise;
     if (this.nextExercise && exercise && exercise.latestTime && exercise instanceof RecordedWeightedExercise) {
-      const { minRest, failureRest } = exercise.blueprint.restBetweenSets;
-
       const lastSet = exercise.lastRecordedSet;
+      const isWarmUp = lastSet?.set?.type === 'warmUp';
+      const { minRest, failureRest } = isWarmUp ? Rest.short : exercise.blueprint.restBetweenSets;
+
       const targetMin = lastSet?.set
         ? exercise.repsTargetForSet(exercise.potentialSets.indexOf(lastSet)).min
         : undefined;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useTranslate } from '@tolgee/react';
 import {
   CardioExerciseBlueprint,
@@ -8,6 +9,7 @@ import {
 } from '@/models/blueprint-models';
 import { ExerciseDescriptor } from '@/models/exercise-models';
 import { Weight } from '@/models/weight';
+import { recordRecentExerciseSearch } from '@/store/app';
 import { translateExerciseMeta } from '@/utils/exercise-meta';
 import { BackChevronGlyph, MicroLabel, SegmentedControl } from '../editor-primitives';
 import { AddSearchCards, IdentityCard, SearchResultItem } from '../identity-card/identity-card';
@@ -111,6 +113,8 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
     };
   });
 
+  const dispatch = useDispatch();
+
   const selectExercise = (item: SearchResultItem) => {
     // Library pick semantics: with reset enabled the draft becomes the
     // library exercise outright (name, kind, snapshot, fresh 1 x 8 / empty
@@ -119,6 +123,9 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
     // never destroyed by a rename. Either way the snapshot follows the
     // pick: a library exercise carries its detail, a custom name carries
     // none (and clears a stale one).
+    if (item.id) {
+      dispatch(recordRecentExerciseSearch(item.id));
+    }
     const library =
       item.category && item.library
         ? { category: item.category, ...item.library }
@@ -181,17 +188,25 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
 
   // Custom-tab Create: the Custom tab only exists on the blank add state, so
   // this is always a fresh exercise — same constructors as a library reset,
-  // minus the snapshot a catalog pick would carry. The reset flag is still
-  // honored for coherence: without it this degrades to a rename.
-  const createCustomExercise = (name: string, kind: ExerciseKind) => {
+  // plus the snapshot a created descriptor carries.
+  const createCustomExercise = (name: string, kind: ExerciseKind, descriptor?: ExerciseDescriptor) => {
+    const library = descriptor
+      ? {
+          category: descriptor.category,
+          equipment: descriptor.equipment,
+          muscles: [...descriptor.muscles],
+          instructions: descriptor.instructions,
+        }
+      : undefined;
+
     if (props.resetOnLibraryPick) {
       onExerciseChange(
         kind === 'cardio'
-          ? CardioExerciseBlueprint.empty().with({ name })
-          : libraryBlueprintFor({ name, category: '', library: undefined }),
+          ? CardioExerciseBlueprint.empty().with({ name, library })
+          : libraryBlueprintFor({ name, category: descriptor?.category ?? '', library }),
       );
     } else {
-      onExerciseChange(exercise.with({ name }));
+      onExerciseChange(exercise.with({ name, library }));
     }
   };
 

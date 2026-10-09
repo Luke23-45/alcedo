@@ -159,6 +159,7 @@ export const {
   setKeepScreenAwakeDuringWorkout,
   setExportToHealthAggregator,
   setShowPostWorkoutSummary,
+  setRpeTracking,
   setTrueBlackDarkTheme,
   setThemeMode,
   setRingGoalMove,

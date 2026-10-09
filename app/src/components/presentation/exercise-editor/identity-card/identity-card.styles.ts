@@ -1,4 +1,4 @@
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
 import { TextInput as RNTextInput } from 'react-native';
 import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';
@@ -179,4 +179,117 @@ export const CreateLabel = styled.Text`
   font-weight: 600;
   letter-spacing: -0.2px;
   color: #ffffff;
+`;
+
+/** Filter chips row */
+export const ChipScroll = styled.ScrollView`
+  margin-top: 8px;
+  margin-bottom: 4px;
+`;
+
+export const ChipRow = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding-horizontal: 2px;
+`;
+
+export const Chip = styled.Pressable<{ $active: boolean }>`
+  height: 28px;
+  border-radius: 14px;
+  padding-horizontal: 12px;
+  justify-content: center;
+  align-items: center;
+  ${({ theme, $active }) =>
+    $active
+      ? css`
+          background-color: ${theme.color.interactive.tint};
+        `
+      : css`
+          background-color: ${theme.isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'};
+          border-width: 0.8px;
+          border-color: ${theme.isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'};
+        `}
+`;
+
+export const ChipText = styled.Text<{ $active: boolean }>`
+  font-family: ${({ theme }) => typeHelper(theme, 'caption1').fontFamily};
+  font-size: 11.5px;
+  line-height: 15px;
+  font-weight: ${({ $active }) => ($active ? '600' : '500')};
+  letter-spacing: -0.15px;
+  color: ${({ theme, $active }) =>
+    $active ? '#ffffff' : theme.isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(0, 0, 0, 0.7)'};
+`;
+
+export const CategoryBadge = styled.View<{ $isCardio?: boolean }>`
+  padding-horizontal: 6px;
+  padding-vertical: 2px;
+  border-radius: 6px;
+  background-color: ${({ $isCardio }) => ($isCardio ? 'rgba(0, 217, 233, 0.14)' : 'rgba(255, 106, 61, 0.14)')};
+`;
+
+export const CategoryBadgeText = styled.Text<{ $isCardio?: boolean }>`
+  font-family: ${({ theme }) => typeHelper(theme, 'caption2').fontFamily};
+  font-size: 9.5px;
+  line-height: 12px;
+  font-weight: 600;
+  color: ${({ $isCardio }) => ($isCardio ? '#00D9E9' : '#FF6A3D')};
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+`;
+
+export const CreateCustomAction = styled.Pressable`
+  min-height: 48px;
+  border-radius: 14px;
+  border-width: 1px;
+  border-style: dashed;
+  border-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)')};
+  background-color: ${({ theme }) => (theme.isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.03)')};
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-horizontal: 14px;
+  margin-top: 10px;
+  gap: 8px;
+`;
+
+export const CreateCustomActionText = styled.Text`
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
+  font-size: 13px;
+  line-height: 17px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: ${({ theme }) => theme.color.interactive.tint};
+`;
+
+export const SectionMiniHeader = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-horizontal: 4px;
+  margin-top: 10px;
+  margin-bottom: 4px;
+`;
+
+export const SectionMiniLabel = styled.Text`
+  font-family: ${({ theme }) => typeHelper(theme, 'caption2').fontFamily};
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: ${({ theme }) => editorPalette(theme.isDark).text.caption};
+`;
+
+export const SectionMiniAction = styled.Pressable`
+  padding: 4px;
+`;
+
+export const SectionMiniActionText = styled.Text`
+  font-family: ${({ theme }) => typeHelper(theme, 'caption2').fontFamily};
+  font-size: 10.5px;
+  line-height: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => editorPalette(theme.isDark).text.caption};
 `;

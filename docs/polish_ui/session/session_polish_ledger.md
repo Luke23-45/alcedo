@@ -1,11 +1,12 @@
 # Session (workout flow) polish ledger (source of truth)
 
-Status: **implemented 2026-09-23 — all code patches applied; device pass (320/430, large text, DE,
-native stop buttons, landscape timer) still required before closing the acceptance bar.** Open items
-needing a device: W12c (native stop-button 44pt/labels), W11e-landscape + rest-timer landscape verify.
-No verification runs yet by user request (`typecheck`/`lint`/`vitest` skipped) — run them plus the
-session suites (`session-simulation.spec`, `rest-timer-state.spec`, `session-restore.spec`) before the
-device pass.
+> **Important update (2026-10-09):** The active workout flow has been refactored into a two-page
+> architecture: **Session List** (`session/index.tsx`) and **Workout Detail** (`session/exercise.tsx`).
+> The active architecture, state machine, and screen specifications are tracked in
+> [`docs/redesignwork/workout-split_ledger.md`](../../redesignwork/workout-split_ledger.md) and
+> [`docs/redesignwork/README.md`](../../redesignwork/README.md).
+
+Status: **superseded for active workout flow by `docs/redesignwork/`** (SX01–SX10 baseline preserved).
 Scope: the **active** workout flow in render order — route `app/src/app/(tabs)/(session)/session/index.tsx`
 through `components/smart/session-component.tsx` (`ActiveSessionView`) and every section it renders —
 for **dark + light** and **iOS + Android**. Sections 4–7 of `docs/new_design/workout-flow-dark.md`

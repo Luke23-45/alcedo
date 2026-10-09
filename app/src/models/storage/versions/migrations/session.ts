@@ -9,6 +9,9 @@ import { SessionJSON as InitialSessionJSON } from '@/models/storage/versions/ini
 import { SessionJSON } from '@/models/storage/versions/latest/session';
 import { omit } from '@/utils/omit';
 
+import { addWorkoutClock } from '@/models/storage/versions/migrations/steps/add-workout-clock';
+import { addSetEffort } from '@/models/storage/versions/migrations/steps/add-set-effort';
+
 export const sessionMigrations = createMigrations<InitialSessionJSON>()
   .add((session) => ({
     ...session,
@@ -84,5 +87,10 @@ export const sessionMigrations = createMigrations<InitialSessionJSON>()
     // The library snapshot is optional: pre-snapshot blueprints pass through
     // untouched and render without the meta line, exactly like customs.
     recordedExercises: session.recordedExercises.map((ex) => ({ ...ex })),
+  }))
+  .add((session) => ({
+    ...addWorkoutClock(session),
+    version: 9,
+    recordedExercises: addSetEffort(session.recordedExercises as any),
   }))
   .build<SessionJSON>();

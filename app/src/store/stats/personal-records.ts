@@ -28,7 +28,7 @@ function bestOneRepMax(session: Session): Map<MovementKey, PersonalRecord> {
     const key = exercise.movementKey();
 
     for (const potentialSet of exercise.potentialSets) {
-      if (!potentialSet.set?.repsCompleted) {
+      if (!potentialSet.set?.repsCompleted || potentialSet.set.type === 'warmUp') {
         continue;
       }
       const oneRepMax = calculateOneRepMax(potentialSet, exercise.effectiveWeight(potentialSet, session.bodyweight));

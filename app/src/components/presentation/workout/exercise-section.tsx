@@ -54,6 +54,8 @@ interface ExerciseSectionProps<T extends RecordedExercise> {
   index?: number;
   /** When provided (and not readonly), the active card shows an "Add Set" row. */
   onAddSet?: () => void;
+  /** When provided, tapping the exercise header navigates to its detail page. */
+  onPressExercise?: () => void;
 
   children: ReactNode;
 
@@ -289,20 +291,49 @@ export default function ExerciseSection<T extends RecordedExercise>(props: Exerc
         <HomeCard radius={24} pad={0}>
           <CardTop>
             <CardHeader>
-              {props.index !== undefined && (
-                <IndexTile>
-                  <IndexNumber>{props.index}</IndexNumber>
-                </IndexTile>
-              )}
-              <ExerciseName $done={statusChip.done} numberOfLines={1} ellipsizeMode="tail" testID="weighted-exercise-title">
-                {recordedExercise.blueprint.name}
-              </ExerciseName>
-              {statusChip.text !== '' && (
-                <ChipPill $done={statusChip.done}>
-                  <ChipText $done={statusChip.done} numberOfLines={1}>
-                    {statusChip.text}
-                  </ChipText>
-                </ChipPill>
+              {props.onPressExercise ? (
+                <Pressable
+                  onPress={props.onPressExercise}
+                  accessibilityRole="button"
+                  accessibilityLabel={recordedExercise.blueprint.name}
+                  testID="exercise-header-navigate"
+                  hitSlop={{ top: 8, bottom: 8 }}
+                  style={{ flex: 1, minHeight: 22, flexDirection: 'row', alignItems: 'center' }}
+                >
+                  {props.index !== undefined && (
+                    <IndexTile>
+                      <IndexNumber>{props.index}</IndexNumber>
+                    </IndexTile>
+                  )}
+                  <ExerciseName $done={statusChip.done} numberOfLines={1} ellipsizeMode="tail" testID="weighted-exercise-title">
+                    {recordedExercise.blueprint.name}
+                  </ExerciseName>
+                  {statusChip.text !== '' && (
+                    <ChipPill $done={statusChip.done}>
+                      <ChipText $done={statusChip.done} numberOfLines={1}>
+                        {statusChip.text}
+                      </ChipText>
+                    </ChipPill>
+                  )}
+                </Pressable>
+              ) : (
+                <>
+                  {props.index !== undefined && (
+                    <IndexTile>
+                      <IndexNumber>{props.index}</IndexNumber>
+                    </IndexTile>
+                  )}
+                  <ExerciseName $done={statusChip.done} numberOfLines={1} ellipsizeMode="tail" testID="weighted-exercise-title">
+                    {recordedExercise.blueprint.name}
+                  </ExerciseName>
+                  {statusChip.text !== '' && (
+                    <ChipPill $done={statusChip.done}>
+                      <ChipText $done={statusChip.done} numberOfLines={1}>
+                        {statusChip.text}
+                      </ChipText>
+                    </ChipPill>
+                  )}
+                </>
               )}
               {!props.isReadonly && (
                 <Menu trigger={(open) => <HeaderMenuTrigger onPress={open} />} items={menuItems} />
