@@ -10,6 +10,12 @@ doc is added, removed, renamed, or repurposed, update this index in the same cha
 - [new_design/page-verification.md](new_design/page-verification.md) — page-by-page flow simulation protocol: inventory, state matrix, trace, simulate, patch, verify, record; status table and per-page log for all 20 pages.
 - [new_design/offline-first-plan.md](new_design/offline-first-plan.md) — offline-first architecture plan: SQLite hardening, privacy-first backup modes (Off/Automatic/Manual).
 
+## Redesign work (redesignwork/)
+
+- [redesignwork/README.md](redesignwork/README.md) — workout split plan: research (Hevy/Stronglifts/Tempo/HKWorkoutSession), decisions D1–D13, model v9 (persisted clock, set type, RPE), the focus state machine, and full screen specs for the session list and the workout detail page.
+- [redesignwork/workout-split_ledger.md](redesignwork/workout-split_ledger.md) — workout split ledger (source of truth): P1 hard copy, P2 model v9, P3 state machine, P4 detail redesign, P5 list redesign, P6 cross-cutting + patch order.
+- [redesignwork/phase-1-agent-prompt.md](redesignwork/phase-1-agent-prompt.md) — self-contained implementation prompt for Phase 1 (hard copy of the workout detail page): verified APIs, the one architectural call, per-item instructions, hard constraints, definition of done.
+
 ## Design specs (new_design/)
 
 - [new_design/home_page_screen1.svg](new_design/home_page_screen1.svg) — Home page reference mockup (dark).

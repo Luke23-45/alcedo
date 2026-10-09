@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { useTranslate } from '@tolgee/react';
-import { CardioExerciseSetBlueprint, ExerciseBlueprint, WeightedExerciseBlueprint } from '@/models/blueprint-models';
+import {
+  CardioExerciseBlueprint,
+  CardioExerciseSetBlueprint,
+  ExerciseBlueprint,
+  WeightedExerciseBlueprint,
+} from '@/models/blueprint-models';
 import { ExerciseDescriptor } from '@/models/exercise-models';
 import { Weight } from '@/models/weight';
 import { translateExerciseMeta } from '@/utils/exercise-meta';
@@ -174,6 +179,22 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
     onSearchFocusChange: setSearchFocused,
   };
 
+  // Custom-tab Create: the Custom tab only exists on the blank add state, so
+  // this is always a fresh exercise — same constructors as a library reset,
+  // minus the snapshot a catalog pick would carry. The reset flag is still
+  // honored for coherence: without it this degrades to a rename.
+  const createCustomExercise = (name: string, kind: ExerciseKind) => {
+    if (props.resetOnLibraryPick) {
+      onExerciseChange(
+        kind === 'cardio'
+          ? CardioExerciseBlueprint.empty().with({ name })
+          : libraryBlueprintFor({ name, category: '', library: undefined }),
+      );
+    } else {
+      onExerciseChange(exercise.with({ name }));
+    }
+  };
+
   return (
     <ScreenRoot>
       <NavRow>
@@ -209,7 +230,7 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
       <MicroLabel>{t('exercise.editor.section.exercise', 'Exercise').toLocaleUpperCase()}</MicroLabel>
       <LabelGap />
       {showAddSearch ? (
-        <AddSearchCards {...searchSectionProps} />
+        <AddSearchCards {...searchSectionProps} catalog={props.catalog} onCreateCustom={createCustomExercise} />
       ) : (
         <IdentityCard
           name={exercise.name}

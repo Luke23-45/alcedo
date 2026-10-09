@@ -1,7 +1,8 @@
 import { Pressable, View } from 'react-native';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { useTranslate } from '@tolgee/react';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { ExerciseDescriptor } from '@/models/exercise-models';
 import {
   Card,
   FocusFieldInner,
@@ -10,11 +11,14 @@ import {
   MagnifierGlyph,
   ResultTile,
   ResultTileLetter,
+  SegmentedControl,
   SwapGlyph,
   WellField,
   XGlyph,
   tileAccent,
 } from '../editor-primitives';
+import { ExerciseKind } from '../exercise-editor-logic';
+import { AddExerciseTab, CustomExerciseTab } from './custom-exercise-tab';
 import {
   AddSearchPad,
   IdentityPad,
@@ -28,6 +32,7 @@ import {
   SearchInput,
   SearchPad,
   SearchSection,
+  TabPad,
 } from './identity-card.styles';
 
 export interface SearchResultItem {
@@ -118,8 +123,9 @@ function SearchHintRow({ query, results }: { query: string; results: SearchResul
 function SearchResults({
   results,
   query,
+  allowCustom,
   onSelectResult,
-}: Pick<SearchSectionProps, 'results' | 'onSelectResult'> & { query: string }) {
+}: Pick<SearchSectionProps, 'results' | 'onSelectResult'> & { query: string; allowCustom: boolean }) {
   const { t } = useTranslate();
   // The escape hatch: a typed name that matches nothing is still a valid
   // exercise. Without this row a custom name (or an empty catalog) strands
@@ -151,7 +157,7 @@ function SearchResults({
           </View>
         );
       })}
-      {customName.length > 0 ? (
+      {allowCustom && customName.length > 0 ? (
         <View>
           {results.length > 0 ? <Hairline /> : null}
           <ResultRow
@@ -176,35 +182,80 @@ function SearchResults({
 }
 
 /**
- * Add mode before a name is picked: the reference gives the focused search
- * its own card and the results a second card — no name well, no type picker.
+ * Add mode before a name is picked: Library and Custom tabs over a shared
+ * search state. The library tab keeps the focused-search card plus the
+ * results card; the custom tab owns the name field, the type picker, and
+ * the explicit Create action. Tab and custom-form inputs live here so
+ * switching tabs never wipes either side.
  */
-export function AddSearchCards(props: SearchSectionProps) {
-  const { query, results } = props;
+export function AddSearchCards(
+  props: SearchSectionProps & {
+    catalog: Record<string, ExerciseDescriptor>;
+    onCreateCustom: (name: string, kind: ExerciseKind) => void;
+  },
+) {
+  const { query, results, catalog, onCreateCustom } = props;
   const { t } = useTranslate();
+  const [tab, setTab] = useState<AddExerciseTab>('library');
+  const [customName, setCustomName] = useState('');
+  const [customKind, setCustomKind] = useState<ExerciseKind>('weighted');
+
   return (
     <View>
-      <Card radius={20}>
-        <AddSearchPad>
-          <SearchFieldControl {...props} compact />
-          <SearchHintRow query={query} results={results} />
-          <SearchHint>
-            {t(
-              'exercise.editor.search.pick_guidance',
-              'Pick from the library or use your own name — Done unlocks once the exercise has a name.',
-            )}
-          </SearchHint>
-        </AddSearchPad>
-      </Card>
-      {results.length > 0 || query.trim().length > 0 ? (
-        <View>
-          <SearchSection>
-            <Card radius={20}>
-              <SearchResults results={results} query={query} onSelectResult={props.onSelectResult} />
-            </Card>
-          </SearchSection>
-        </View>
-      ) : null}
+      <TabPad>
+        <SegmentedControl<AddExerciseTab>
+          options={[
+            { value: 'library', label: t('exercise.editor.add_tab.library', 'Library') },
+            { value: 'custom', label: t('exercise.editor.add_tab.custom', 'Custom') },
+          ]}
+          value={tab}
+          onChange={setTab}
+          accessibilityLabel={t('exercise.editor.add_tab.label', 'Add exercise source')}
+        />
+      </TabPad>
+      {tab === 'library' ? (
+        <>
+          <Card radius={20}>
+            <AddSearchPad>
+              <SearchFieldControl {...props} compact />
+              <SearchHintRow query={query} results={results} />
+              <SearchHint>
+                {t(
+                  'exercise.editor.search.pick_guidance',
+                  'Pick from the library — Done unlocks once the exercise has a name.',
+                )}
+              </SearchHint>
+            </AddSearchPad>
+          </Card>
+          {results.length > 0 ? (
+            <View>
+              <SearchSection>
+                <Card radius={20}>
+                  <SearchResults
+                    results={results}
+                    query={query}
+                    allowCustom={false}
+                    onSelectResult={props.onSelectResult}
+                  />
+                </Card>
+              </SearchSection>
+            </View>
+          ) : null}
+        </>
+      ) : (
+        <CustomExerciseTab
+          name={customName}
+          onNameChange={setCustomName}
+          kind={customKind}
+          onKindChange={setCustomKind}
+          catalog={catalog}
+          onCreate={() => onCreateCustom(customName.trim(), customKind)}
+          onUseLibrary={(name) => {
+            props.onQueryChange(name);
+            setTab('library');
+          }}
+        />
+      )}
     </View>
   );
 }
@@ -251,7 +302,12 @@ export function IdentityCard({
             <SearchFieldControl {...search} />
             <SearchHintRow query={search.query} results={search.results} />
           </SearchPad>
-          <SearchResults results={search.results} query={search.query} onSelectResult={search.onSelectResult} />
+          <SearchResults
+            results={search.results}
+            query={search.query}
+            allowCustom
+            onSelectResult={search.onSelectResult}
+          />
         </SearchSection>
       ) : null}
     </Card>
