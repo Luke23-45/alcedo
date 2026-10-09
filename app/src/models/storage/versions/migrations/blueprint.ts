@@ -4,6 +4,7 @@ import {
 } from '@/models/storage/versions/initial';
 import { ProgramBlueprintJSON, SessionBlueprintJSON } from '@/models/storage/versions/latest/blueprint';
 import { createMigrations } from './migrator';
+import { addLibraryInfo } from '@/models/storage/versions/migrations/steps/add-library-info';
 import { addProgressiveOverloadToExercise } from '@/models/storage/versions/migrations/steps/add-progressive-overload';
 import { repsPerSetToRepsConfig } from '@/models/storage/versions/migrations/steps/reps-per-set-to-reps-config';
 import { addUsesBodyweight } from '@/models/storage/versions/migrations/steps/add-uses-bodyweight';
@@ -40,6 +41,12 @@ export const sessionBlueprintMigrations = createMigrations<InitialSessionBluepri
   .add((value) => ({
     version: 6 as const,
     exercises: value.exercises.map((x) => (x.type === 'WeightedExerciseBlueprint' ? progressiveOverloadToRules(x) : x)),
+    name: value.name,
+    notes: value.notes,
+  }))
+  .add((value) => ({
+    version: 7 as const,
+    exercises: value.exercises.map((x) => addLibraryInfo(x)),
     name: value.name,
     notes: value.notes,
   }))

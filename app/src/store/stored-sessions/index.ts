@@ -126,6 +126,10 @@ const storedSessionsSlice = createSlice({
         delete state.latestExercises[key];
       });
 
+      // The earliest session feeds the stats range: a deleted earliest must
+      // not haunt it. Clearing forces the rebuild below to re-derive it from
+      // the survivors (or leave it undefined when none remain).
+      state.earliestSession = undefined;
       Object.values(state.sessions).forEach((session) => {
         updateDerivatives(state, session as Session);
       });

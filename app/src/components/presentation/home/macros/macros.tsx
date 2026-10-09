@@ -7,7 +7,6 @@ import { formatGrouped } from '../shared/home-format';
 import { HomeCard } from '../shared/home-card';
 import { HomeGradient } from '../shared/home-gradient';
 import { HomeText } from '../shared/home-text';
-import { SampleBadge } from '../shared/sample-badge';
 import * as S from './macros.styles';
 
 /**
@@ -115,7 +114,7 @@ export function MacrosSection() {
   const ringSize = ringsW == null ? 48 : Math.max(32, Math.min(48, (ringsW - 24) / 3));
 
   return (
-    <HomeCard radius={28} pad={16} style={{ minHeight: 150, width: '100%' }}>
+    <HomeCard radius={28} pad={16} style={{ minHeight: 168, width: '100%' }}>
       <S.HeaderRow>
         <HomeText
           weight={fontWeight.bold}
@@ -125,37 +124,39 @@ export function MacrosSection() {
         >
           {t('home.macros.label').toLocaleUpperCase() /* en: "MACROS" */}
         </HomeText>
-        <SampleBadge />
       </S.HeaderRow>
       <S.RingsRow onLayout={(e) => setRingsW(e.nativeEvent.layout.width)}>
         {MACROS.map((m) => (
-          <S.RingSlot key={m.key} style={{ width: ringSize, height: ringSize }}>
-            <MacroRing
-              id={`macro-${m.key}`}
-              size={ringSize}
-              gradient={dark ? m.dark : m.light}
-              track={m.track}
-              trackAlpha={m.trackAlpha}
-              pct={m.pct}
-            />
-            <S.RingCenter>
-              <HomeText
-                weight={fontWeight.bold}
-                tabular
-                tracking={-0.2}
-                style={{ fontSize: 9.5, lineHeight: 12, color: valueColor }}
-              >
-                {formatGrouped(m.grams)}
-              </HomeText>
-              <HomeText
-                weight={fontWeight.bold}
-                micro
-                tracking={0.5}
-                style={{ fontSize: 9.5, lineHeight: 12, color: letterColor }}
-              >
-                {t(m.letterKey) /* en: "P" / "C" / "F" */}
-              </HomeText>
-            </S.RingCenter>
+          <S.RingSlot key={m.key} style={{ width: ringSize }}>
+            <S.RingBox style={{ width: ringSize, height: ringSize }}>
+              <MacroRing
+                id={`macro-${m.key}`}
+                size={ringSize}
+                gradient={dark ? m.dark : m.light}
+                track={m.track}
+                trackAlpha={m.trackAlpha}
+                pct={m.pct}
+              />
+              <S.RingCenter>
+                <HomeText
+                  weight={fontWeight.bold}
+                  micro
+                  tracking={0.5}
+                  style={{ fontSize: 11, lineHeight: 13, color: letterColor }}
+                >
+                  {t(m.letterKey) /* en: "P" / "C" / "F" */}
+                </HomeText>
+              </S.RingCenter>
+            </S.RingBox>
+            <HomeText
+              weight={fontWeight.semibold}
+              tabular
+              tracking={-0.2}
+              numberOfLines={1}
+              style={{ fontSize: 12.5, lineHeight: 16, color: valueColor, marginTop: 4 }}
+            >
+              {formatGrouped(m.grams)}
+            </HomeText>
           </S.RingSlot>
         ))}
       </S.RingsRow>

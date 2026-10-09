@@ -241,6 +241,7 @@ var require_validate_schema = __commonJS({
     module.exports = validate10;
     module.exports.default = validate10;
     var schema29 = { "type": "string", "enum": ["none", "external", "bodyweight"] };
+    var schema30 = { "type": "object", "properties": { "category": { "type": "string" }, "equipment": { "type": ["string", "null"] }, "muscles": { "type": "array", "items": { "type": "string" } }, "instructions": { "type": "string" } }, "required": ["category", "equipment", "muscles", "instructions"], "description": "Snapshot of the library entry this exercise was picked from. Reference metadata only: it never participates in equality, diffing, or lineage keys. Absent for custom exercises and for history saved before snapshots existed (those render without the meta line)." };
     function validate14(data, { instancePath = "", parentData, parentDataProperty, rootData = data } = {}) {
       let vErrors = null;
       let errors = 0;
@@ -973,12 +974,120 @@ var require_validate_schema = __commonJS({
             errors++;
           }
         }
+        if (data.library !== void 0) {
+          let data11 = data.library;
+          if (data11 && typeof data11 == "object" && !Array.isArray(data11)) {
+            if (data11.category === void 0) {
+              const err19 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/required", keyword: "required", params: { missingProperty: "category" }, message: "must have required property 'category'" };
+              if (vErrors === null) {
+                vErrors = [err19];
+              } else {
+                vErrors.push(err19);
+              }
+              errors++;
+            }
+            if (data11.equipment === void 0) {
+              const err20 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/required", keyword: "required", params: { missingProperty: "equipment" }, message: "must have required property 'equipment'" };
+              if (vErrors === null) {
+                vErrors = [err20];
+              } else {
+                vErrors.push(err20);
+              }
+              errors++;
+            }
+            if (data11.muscles === void 0) {
+              const err21 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/required", keyword: "required", params: { missingProperty: "muscles" }, message: "must have required property 'muscles'" };
+              if (vErrors === null) {
+                vErrors = [err21];
+              } else {
+                vErrors.push(err21);
+              }
+              errors++;
+            }
+            if (data11.instructions === void 0) {
+              const err22 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/required", keyword: "required", params: { missingProperty: "instructions" }, message: "must have required property 'instructions'" };
+              if (vErrors === null) {
+                vErrors = [err22];
+              } else {
+                vErrors.push(err22);
+              }
+              errors++;
+            }
+            if (data11.category !== void 0) {
+              if (typeof data11.category !== "string") {
+                const err23 = { instancePath: instancePath + "/library/category", schemaPath: "#/definitions/ExerciseLibraryInfo/properties/category/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                if (vErrors === null) {
+                  vErrors = [err23];
+                } else {
+                  vErrors.push(err23);
+                }
+                errors++;
+              }
+            }
+            if (data11.equipment !== void 0) {
+              let data13 = data11.equipment;
+              if (typeof data13 !== "string" && data13 !== null) {
+                const err24 = { instancePath: instancePath + "/library/equipment", schemaPath: "#/definitions/ExerciseLibraryInfo/properties/equipment/type", keyword: "type", params: { type: schema30.properties.equipment.type }, message: "must be string,null" };
+                if (vErrors === null) {
+                  vErrors = [err24];
+                } else {
+                  vErrors.push(err24);
+                }
+                errors++;
+              }
+            }
+            if (data11.muscles !== void 0) {
+              let data14 = data11.muscles;
+              if (Array.isArray(data14)) {
+                const len2 = data14.length;
+                for (let i2 = 0; i2 < len2; i2++) {
+                  if (typeof data14[i2] !== "string") {
+                    const err25 = { instancePath: instancePath + "/library/muscles/" + i2, schemaPath: "#/definitions/ExerciseLibraryInfo/properties/muscles/items/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                    if (vErrors === null) {
+                      vErrors = [err25];
+                    } else {
+                      vErrors.push(err25);
+                    }
+                    errors++;
+                  }
+                }
+              } else {
+                const err26 = { instancePath: instancePath + "/library/muscles", schemaPath: "#/definitions/ExerciseLibraryInfo/properties/muscles/type", keyword: "type", params: { type: "array" }, message: "must be array" };
+                if (vErrors === null) {
+                  vErrors = [err26];
+                } else {
+                  vErrors.push(err26);
+                }
+                errors++;
+              }
+            }
+            if (data11.instructions !== void 0) {
+              if (typeof data11.instructions !== "string") {
+                const err27 = { instancePath: instancePath + "/library/instructions", schemaPath: "#/definitions/ExerciseLibraryInfo/properties/instructions/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                if (vErrors === null) {
+                  vErrors = [err27];
+                } else {
+                  vErrors.push(err27);
+                }
+                errors++;
+              }
+            }
+          } else {
+            const err28 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/type", keyword: "type", params: { type: "object" }, message: "must be object" };
+            if (vErrors === null) {
+              vErrors = [err28];
+            } else {
+              vErrors.push(err28);
+            }
+            errors++;
+          }
+        }
       } else {
-        const err19 = { instancePath, schemaPath: "#/type", keyword: "type", params: { type: "object" }, message: "must be object" };
+        const err29 = { instancePath, schemaPath: "#/type", keyword: "type", params: { type: "object" }, message: "must be object" };
         if (vErrors === null) {
-          vErrors = [err19];
+          vErrors = [err29];
         } else {
-          vErrors.push(err19);
+          vErrors.push(err29);
         }
         errors++;
       }
@@ -1062,7 +1171,7 @@ var require_validate_schema = __commonJS({
       validate25.errors = vErrors;
       return errors === 0;
     }
-    var schema38 = { "type": "string", "enum": ["metre", "yard", "mile", "kilometre"] };
+    var schema39 = { "type": "string", "enum": ["metre", "yard", "mile", "kilometre"] };
     function validate27(data, { instancePath = "", parentData, parentDataProperty, rootData = data } = {}) {
       let vErrors = null;
       let errors = 0;
@@ -1119,7 +1228,7 @@ var require_validate_schema = __commonJS({
             errors++;
           }
           if (!(data1 === "metre" || data1 === "yard" || data1 === "mile" || data1 === "kilometre")) {
-            const err5 = { instancePath: instancePath + "/unit", schemaPath: "#/definitions/DistanceUnit/enum", keyword: "enum", params: { allowedValues: schema38.enum }, message: "must be equal to one of the allowed values" };
+            const err5 = { instancePath: instancePath + "/unit", schemaPath: "#/definitions/DistanceUnit/enum", keyword: "enum", params: { allowedValues: schema39.enum }, message: "must be equal to one of the allowed values" };
             if (vErrors === null) {
               vErrors = [err5];
             } else {
@@ -1536,12 +1645,120 @@ var require_validate_schema = __commonJS({
             errors++;
           }
         }
+        if (data.library !== void 0) {
+          let data6 = data.library;
+          if (data6 && typeof data6 == "object" && !Array.isArray(data6)) {
+            if (data6.category === void 0) {
+              const err11 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/required", keyword: "required", params: { missingProperty: "category" }, message: "must have required property 'category'" };
+              if (vErrors === null) {
+                vErrors = [err11];
+              } else {
+                vErrors.push(err11);
+              }
+              errors++;
+            }
+            if (data6.equipment === void 0) {
+              const err12 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/required", keyword: "required", params: { missingProperty: "equipment" }, message: "must have required property 'equipment'" };
+              if (vErrors === null) {
+                vErrors = [err12];
+              } else {
+                vErrors.push(err12);
+              }
+              errors++;
+            }
+            if (data6.muscles === void 0) {
+              const err13 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/required", keyword: "required", params: { missingProperty: "muscles" }, message: "must have required property 'muscles'" };
+              if (vErrors === null) {
+                vErrors = [err13];
+              } else {
+                vErrors.push(err13);
+              }
+              errors++;
+            }
+            if (data6.instructions === void 0) {
+              const err14 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/required", keyword: "required", params: { missingProperty: "instructions" }, message: "must have required property 'instructions'" };
+              if (vErrors === null) {
+                vErrors = [err14];
+              } else {
+                vErrors.push(err14);
+              }
+              errors++;
+            }
+            if (data6.category !== void 0) {
+              if (typeof data6.category !== "string") {
+                const err15 = { instancePath: instancePath + "/library/category", schemaPath: "#/definitions/ExerciseLibraryInfo/properties/category/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                if (vErrors === null) {
+                  vErrors = [err15];
+                } else {
+                  vErrors.push(err15);
+                }
+                errors++;
+              }
+            }
+            if (data6.equipment !== void 0) {
+              let data8 = data6.equipment;
+              if (typeof data8 !== "string" && data8 !== null) {
+                const err16 = { instancePath: instancePath + "/library/equipment", schemaPath: "#/definitions/ExerciseLibraryInfo/properties/equipment/type", keyword: "type", params: { type: schema30.properties.equipment.type }, message: "must be string,null" };
+                if (vErrors === null) {
+                  vErrors = [err16];
+                } else {
+                  vErrors.push(err16);
+                }
+                errors++;
+              }
+            }
+            if (data6.muscles !== void 0) {
+              let data9 = data6.muscles;
+              if (Array.isArray(data9)) {
+                const len1 = data9.length;
+                for (let i1 = 0; i1 < len1; i1++) {
+                  if (typeof data9[i1] !== "string") {
+                    const err17 = { instancePath: instancePath + "/library/muscles/" + i1, schemaPath: "#/definitions/ExerciseLibraryInfo/properties/muscles/items/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                    if (vErrors === null) {
+                      vErrors = [err17];
+                    } else {
+                      vErrors.push(err17);
+                    }
+                    errors++;
+                  }
+                }
+              } else {
+                const err18 = { instancePath: instancePath + "/library/muscles", schemaPath: "#/definitions/ExerciseLibraryInfo/properties/muscles/type", keyword: "type", params: { type: "array" }, message: "must be array" };
+                if (vErrors === null) {
+                  vErrors = [err18];
+                } else {
+                  vErrors.push(err18);
+                }
+                errors++;
+              }
+            }
+            if (data6.instructions !== void 0) {
+              if (typeof data6.instructions !== "string") {
+                const err19 = { instancePath: instancePath + "/library/instructions", schemaPath: "#/definitions/ExerciseLibraryInfo/properties/instructions/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                if (vErrors === null) {
+                  vErrors = [err19];
+                } else {
+                  vErrors.push(err19);
+                }
+                errors++;
+              }
+            }
+          } else {
+            const err20 = { instancePath: instancePath + "/library", schemaPath: "#/definitions/ExerciseLibraryInfo/type", keyword: "type", params: { type: "object" }, message: "must be object" };
+            if (vErrors === null) {
+              vErrors = [err20];
+            } else {
+              vErrors.push(err20);
+            }
+            errors++;
+          }
+        }
       } else {
-        const err11 = { instancePath, schemaPath: "#/type", keyword: "type", params: { type: "object" }, message: "must be object" };
+        const err21 = { instancePath, schemaPath: "#/type", keyword: "type", params: { type: "object" }, message: "must be object" };
         if (vErrors === null) {
-          vErrors = [err11];
+          vErrors = [err21];
         } else {
-          vErrors.push(err11);
+          vErrors.push(err21);
         }
         errors++;
       }
@@ -1654,8 +1871,8 @@ var require_validate_schema = __commonJS({
             }
             errors++;
           }
-          if (6 !== data0) {
-            const err5 = { instancePath: instancePath + "/version", schemaPath: "#/properties/version/const", keyword: "const", params: { allowedValue: 6 }, message: "must be equal to constant" };
+          if (7 !== data0) {
+            const err5 = { instancePath: instancePath + "/version", schemaPath: "#/properties/version/const", keyword: "const", params: { allowedValue: 7 }, message: "must be equal to constant" };
             if (vErrors === null) {
               vErrors = [err5];
             } else {

@@ -43,7 +43,7 @@ export function StatStrip({ stats, dimmed }: { stats: SessionStats; dimmed?: boo
 
   return (
     <StripWrap>
-      <HomeCard radius={24} pad={0} style={{ flex: 1 }}>
+      <HomeCard radius={24} pad={0} style={{ flex: 1 }} bodyStyle={{ flex: 1 }}>
         <StripRow>
           {columns.map((col, i) => (
             <Fragment key={col.label}>

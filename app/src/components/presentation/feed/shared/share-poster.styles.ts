@@ -92,6 +92,8 @@ export const HeroUnit = styled.Text`
 
 export const WorkoutName = styled(PosterText)`
   top: 86px;
+  /* 12pt clearance so the 40pt hero's line box (≈90 bottom) never touches the name. */
+  margin-top: 12px;
   font-size: 12.5px;
   font-weight: ${({ theme }) => theme.weight.semibold};
   letter-spacing: -0.2px;
@@ -99,7 +101,7 @@ export const WorkoutName = styled(PosterText)`
 `;
 
 export const StatValue = styled(PosterText)<{ $column: number }>`
-  top: 115px;
+  top: 119px;
   left: ${({ $column }) => $column * 104}px;
   font-size: 14px;
   font-weight: ${({ theme }) => theme.weight.bold};
@@ -107,7 +109,7 @@ export const StatValue = styled(PosterText)<{ $column: number }>`
 `;
 
 export const StatLabel = styled(PosterText)<{ $column: number }>`
-  top: 134px;
+  top: 138px;
   left: ${({ $column }) => $column * 104}px;
   font-size: 7.5px;
   font-weight: ${({ theme }) => theme.weight.bold};
@@ -118,7 +120,7 @@ export const StatLabel = styled(PosterText)<{ $column: number }>`
 
 export const PillRow = styled.View`
   position: absolute;
-  top: 154px;
+  top: 158px;
   left: 0;
   right: 0;
   flex-direction: row;

@@ -9,7 +9,7 @@ import type {
 import type { WeightJSON } from '@/models/storage/versions/libs/weight';
 
 export interface SessionJSON {
-  version: 7;
+  version: 8;
   id: string;
   blueprint: { name: string; notes: string };
   recordedExercises: RecordedExerciseJSON[];

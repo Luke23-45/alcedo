@@ -13,6 +13,7 @@ export default function FullHeightScrollView({
   scrollStyle,
   avoidKeyboard,
   contentContainerStyle,
+  stickyHeaderIndices,
   safeAreaEdges = { left: 'additive', right: 'additive', top: 'off', bottom: 'off' },
   screenBackground,
 }: {
@@ -22,6 +23,8 @@ export default function FullHeightScrollView({
   avoidKeyboard?: boolean;
   scrollStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;
+  /** Direct-child indices pinned while scrolling (null children after them don't shift earlier indices). */
+  stickyHeaderIndices?: number[];
   safeAreaEdges?: Edges;
   /** Rendered absolutely behind the scroll view, covering the whole screen. */
   screenBackground?: React.ReactNode;
@@ -49,6 +52,7 @@ export default function FullHeightScrollView({
           onScroll={handleScroll}
           style={[scrollStyle]}
           contentContainerStyle={[contentContainerStyle]}
+          stickyHeaderIndices={stickyHeaderIndices}
         >
           {children}
           <View style={{ height: bottomInsetHeight }} />
@@ -61,6 +65,7 @@ export default function FullHeightScrollView({
           onScroll={handleScroll}
           style={[scrollStyle]}
           contentContainerStyle={[contentContainerStyle]}
+          stickyHeaderIndices={stickyHeaderIndices}
         >
           {children}
           <View style={{ height: bottomInsetHeight }} />

@@ -76,6 +76,17 @@ export const DividerLine = styled.View`
   background-color: ${({ theme }) => sessionPalette(theme.isDark).card.divider};
 `;
 
+/** Library snapshot line (equipment · muscles) under the header; absent without a snapshot. */
+export const ExerciseMeta = styled.Text`
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: ${({ theme }) => theme.color.content.secondary};
+  margin-bottom: 6px;
+`;
+
 export const CardBody = styled.View`
   padding-horizontal: 14px;
   padding-top: 6px;

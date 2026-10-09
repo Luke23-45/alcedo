@@ -4,7 +4,9 @@ import { type as typeHelper } from '@/styles/theme';
 import { sessionPalette } from '../session-tokens';
 
 export const StripWrap = styled.View`
-  min-height: 68px;
+  /* Definite height so the card layers below stretch by flex instead of
+     shrink-wrapping the ~40pt content (which left the body fill short). */
+  height: 68px;
   margin-horizontal: 16px;
 `;
 

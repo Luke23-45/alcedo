@@ -57,8 +57,12 @@ export default function WeightedExercise(props: WeightedExerciseProps) {
             repsTarget={recordedExercise.repsTargetForSet(index)}
             onTap={() => {
               const previousSet = set.set;
-              const newSet = recordedExercise.withCycledRepCount(index, timeProvider()).getSet(index).set;
-              updateExercise((ex) => ex.withCycledRepCount(index, timeProvider()));
+              // One clock reading for the whole tap: the transition probe and
+              // the committed set must agree, not carry timestamps milliseconds
+              // apart from two separate cycles.
+              const time = timeProvider();
+              const newSet = recordedExercise.withCycledRepCount(index, time).getSet(index).set;
+              updateExercise((ex) => ex.withCycledRepCount(index, time));
               // We only want to reset the timer when switching between unfilled and filled
               // Otherwise, keep the same time
               if (!previousSet || !newSet) {

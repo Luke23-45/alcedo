@@ -25,7 +25,6 @@ export function FeedItem({ eventId }: { eventId: string }) {
   const users = useAppSelector(selectFeedFollowing);
   const ownUserId = useAppSelector(selectOwnFeedUserId);
   const identity = useAppSelector((x) => x.feed.identity.unwrapOr(undefined));
-  const showBodyweight = useAppSelector((x) => x.settings.showBodyweight);
   const formatDate = useFormatDate();
   const { t } = useTranslate();
   const session = feedItem?.session;
@@ -56,7 +55,6 @@ export function FeedItem({ eventId }: { eventId: string }) {
       <Stack.Screen options={{ title: session.blueprint.name }} />
       <SessionComponent
         session={session}
-        showBodyweight={showBodyweight && !!session.bodyweight}
         header={
           <Card mode="contained" style={{ margin: theme.layout.screenPadding }}>
             <Card.Content>

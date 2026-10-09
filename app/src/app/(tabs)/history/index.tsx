@@ -64,8 +64,8 @@ function Aurora() {
           <Stop offset="1" stopColor="#30D158" stopOpacity={0} />
         </RadialGradient>
       </Defs>
-      <Rect x={0} y={0} width={393} height={852} fill="url(#history-aurora-amber)" />
-      <Rect x={0} y={0} width={393} height={852} fill="url(#history-aurora-green)" />
+      <Rect x={0} y={0} width="100%" height="100%" fill="url(#history-aurora-amber)" />
+      <Rect x={0} y={0} width="100%" height="100%" fill="url(#history-aurora-green)" />
     </Svg>
   );
 }

@@ -1,5 +1,3 @@
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { alcedoApiBaseUrl } from './api-consts';
 import { googleAuthConfig, isGoogleAuthConfigured } from './auth-config';
@@ -50,15 +48,60 @@ let accessTokenExpiresAt = 0;
 let refreshPromise: Promise<boolean> | null = null;
 const sessionListeners = new Set<() => void>();
 
-function ensureConfigured(): void {
-  if (configured) {
-    return;
+/**
+ * The native Google Sign-In module is optional at runtime. A build compiled
+ * before the native library was linked (or a device without Google services)
+ * must still boot — only Google sign-in itself degrades to `not-configured`.
+ *
+ * The package touches `TurboModuleRegistry.getEnforcing('RNGoogleSignin')`
+ * at module scope, so a static import would crash the whole app at startup
+ * (via `store/auth/effects` → `store/index`). The import is therefore lazy:
+ * `await import()` rejects when the native module is missing and we cache
+ * null, so every touch below is guarded.
+ */
+type GoogleSigninModule = typeof import('@react-native-google-signin/google-signin');
+type GoogleSigninApi = GoogleSigninModule['GoogleSignin'];
+
+let googleModule: GoogleSigninModule | null | undefined;
+
+async function loadGoogleModule(): Promise<GoogleSigninModule | null> {
+  if (googleModule !== undefined) {
+    return googleModule;
   }
-  GoogleSignin.configure({
-    webClientId: googleAuthConfig.webClientId,
-    iosClientId: googleAuthConfig.iosClientId,
-  });
-  configured = true;
+  try {
+    googleModule = await import('@react-native-google-signin/google-signin');
+  } catch {
+    googleModule = null;
+  }
+  return googleModule;
+}
+
+// Wire codes the native module rejects with. Compared literally so error
+// mapping never needs the native module itself.
+const GOOGLE_SIGN_IN_CANCELLED = 'SIGN_IN_CANCELLED';
+const GOOGLE_SIGN_IN_IN_PROGRESS = 'IN_PROGRESS';
+const GOOGLE_PLAY_SERVICES_NOT_AVAILABLE = 'PLAY_SERVICES_NOT_AVAILABLE';
+
+async function getConfiguredGoogle(): Promise<GoogleSigninApi | null> {
+  if (!isGoogleAuthConfigured()) {
+    return null;
+  }
+  const mod = await loadGoogleModule();
+  if (!mod) {
+    return null;
+  }
+  if (!configured) {
+    try {
+      mod.GoogleSignin.configure({
+        webClientId: googleAuthConfig.webClientId,
+        iosClientId: googleAuthConfig.iosClientId,
+      });
+    } catch {
+      return null;
+    }
+    configured = true;
+  }
+  return mod.GoogleSignin;
 }
 
 function notifySessionInvalidated(): void {
@@ -75,8 +118,73 @@ export function onSessionInvalidated(listener: () => void): () => void {
   };
 }
 
+/**
+ * Secure-store access with the same degrade-don't-crash contract as Google
+ * sign-in above: `expo-secure-store` reads its constants off the native
+ * module at import time, so a static import throws on a binary that was
+ * built before the library was linked. Every route imports this file (via
+ * the store), so that throw used to white-screen the whole app.
+ *
+ * Fallback is process memory: the session works for the app's lifetime but
+ * does not survive a restart — strictly better than a dead app, and on a
+ * healthy build the secure store is used exactly as before.
+ */
+type SecureStoreApi = typeof import('expo-secure-store');
+
+let secureStore: SecureStoreApi | null | undefined;
+const memorySessionStore = new Map<string, string>();
+
+async function loadSecureStore(): Promise<SecureStoreApi | null> {
+  if (secureStore !== undefined) {
+    return secureStore;
+  }
+  try {
+    secureStore = await import('expo-secure-store');
+  } catch {
+    secureStore = null;
+  }
+  return secureStore;
+}
+
+async function secureGet(key: string): Promise<string | null> {
+  const store = await loadSecureStore();
+  if (store) {
+    try {
+      return await store.getItemAsync(key);
+    } catch {
+      // Native store unusable at call time — fall through to memory.
+    }
+  }
+  return memorySessionStore.get(key) ?? null;
+}
+
+async function secureSet(key: string, value: string): Promise<void> {
+  const store = await loadSecureStore();
+  if (store) {
+    try {
+      await store.setItemAsync(key, value);
+      return;
+    } catch {
+      // Fall through to memory.
+    }
+  }
+  memorySessionStore.set(key, value);
+}
+
+async function secureDelete(key: string): Promise<void> {
+  const store = await loadSecureStore();
+  if (store) {
+    try {
+      await store.deleteItemAsync(key);
+    } catch {
+      // Fall through to memory.
+    }
+  }
+  memorySessionStore.delete(key);
+}
+
 async function readStoredSession(): Promise<StoredSession | null> {
-  const raw = await SecureStore.getItemAsync(SECURE_STORE_KEY);
+  const raw = await secureGet(SECURE_STORE_KEY);
   if (!raw) {
     return null;
   }
@@ -85,7 +193,7 @@ async function readStoredSession(): Promise<StoredSession | null> {
     if (typeof parsed.refreshToken !== 'string' || !parsed.refreshToken) {
       // Deterministic cleanup: a value we cannot parse is corrupt and must
       // never be presented again.
-      await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
+      await secureDelete(SECURE_STORE_KEY);
       return null;
     }
     return {
@@ -97,19 +205,19 @@ async function readStoredSession(): Promise<StoredSession | null> {
       },
     };
   } catch {
-    await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
+    await secureDelete(SECURE_STORE_KEY);
     return null;
   }
 }
 
 async function writeStoredSession(session: StoredSession): Promise<void> {
-  await SecureStore.setItemAsync(SECURE_STORE_KEY, JSON.stringify(session));
+  await secureSet(SECURE_STORE_KEY, JSON.stringify(session));
 }
 
 async function clearStoredSession(): Promise<void> {
   accessToken = null;
   accessTokenExpiresAt = 0;
-  await SecureStore.deleteItemAsync(SECURE_STORE_KEY);
+  await secureDelete(SECURE_STORE_KEY);
 }
 
 function isValidTokenPair(value: unknown): value is TokenPair {
@@ -147,13 +255,13 @@ async function postJson(path: string, body: unknown, token?: string): Promise<Re
 
 function mapGoogleSignInError(error: unknown): AuthError {
   const code = (error as { code?: string })?.code;
-  if (code === statusCodes.SIGN_IN_CANCELLED) {
+  if (code === GOOGLE_SIGN_IN_CANCELLED) {
     return new AuthError('cancelled', 'Sign-in was cancelled.');
   }
-  if (code === statusCodes.IN_PROGRESS) {
+  if (code === GOOGLE_SIGN_IN_IN_PROGRESS) {
     return new AuthError('in-progress', 'Sign-in is already in progress.');
   }
-  if (code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+  if (code === GOOGLE_PLAY_SERVICES_NOT_AVAILABLE) {
     return new AuthError('play-services-unavailable', 'Google Play services are not available.');
   }
   return new AuthError('network', error instanceof Error ? error.message : 'Google sign-in failed.');
@@ -167,10 +275,10 @@ function mapGoogleSignInError(error: unknown): AuthError {
  * in memory only and never written to disk.
  */
 export async function signInWithGoogle(): Promise<AuthProfile> {
-  if (!isGoogleAuthConfigured()) {
-    throw new AuthError('not-configured', 'Google sign-in is not configured yet.');
+  const GoogleSignin = await getConfiguredGoogle();
+  if (!GoogleSignin) {
+    throw new AuthError('not-configured', 'Google sign-in is not available on this device or build.');
   }
-  ensureConfigured();
   let idToken: string | null;
   let profile: AuthProfile;
   try {
@@ -337,10 +445,8 @@ export async function signOut(): Promise<void> {
     }
   }
   try {
-    if (isGoogleAuthConfigured()) {
-      ensureConfigured();
-      await GoogleSignin.signOut();
-    }
+    const GoogleSignin = await getConfiguredGoogle();
+    await GoogleSignin?.signOut();
   } catch {
     // Best effort: the native Google session may not exist.
   }
@@ -377,6 +483,9 @@ export function __resetAuthStateForTests(): void {
   accessTokenExpiresAt = 0;
   refreshPromise = null;
   configured = false;
+  googleModule = undefined;
+  secureStore = undefined;
+  memorySessionStore.clear();
   sessionListeners.clear();
 }
 

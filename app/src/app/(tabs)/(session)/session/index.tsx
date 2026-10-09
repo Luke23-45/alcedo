@@ -39,8 +39,6 @@ export default function Index() {
       push('/diff-save');
     }
   };
-  const showBodyweight = useAppSelector((x) => x.settings.showBodyweight);
-
   // Finishing clears the active session while this screen is still mounted for the dismiss animation.
   if (!session) {
     return null;
@@ -56,7 +54,6 @@ export default function Index() {
         session={session}
         updateSession={(update) => dispatch(updateStoredSession({ sessionId: session.id, update }))}
         isActiveWorkout
-        showBodyweight={showBodyweight}
         openPostWorkoutSummary={() =>
           push(`/session/post-workout?sessionId=${encodeURIComponent(session.id)}&source=live`)
         }

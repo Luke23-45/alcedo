@@ -40,6 +40,9 @@
     "resistance": {
       "$ref": "./Resistance.json",
       "description": "Where this movement's load comes from: the whole stored weight (`external`), what is added on top of the lifter (`bodyweight`), or nothing at all (`none`, e.g. crunches)."
+    },
+    "library": {
+      "$ref": "./ExerciseLibraryInfo.json"
     }
   },
   "required": [

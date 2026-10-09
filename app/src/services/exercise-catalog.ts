@@ -1,6 +1,15 @@
 import { ExerciseDescriptor } from '@/models/exercise-models';
 import { detectLanguageFromDateLocale } from '@/utils/language-detector';
 import { supportedLanguages } from '@/services/tolgee';
+// The base catalog and the English fallback ride in the main bundle, not in
+// lazy chunks. Data the app cannot run without must never depend on a chunk
+// fetch: after a server restart or on a flaky first launch the chunk 404s,
+// the old dynamic import rejected, the catch swallowed it into [], and the
+// whole library silently read as 0 exercises. Static imports fail loudly at
+// bundle time instead of silently at runtime. Only the non-English locale
+// overlays stay lazy — they are optional by design and fall back to English.
+import baseCatalogJson from '../../assets/exercises.json';
+import englishOverlayJson from '../../assets/exercises/en.json';
 
 // The language-neutral base catalog: the id (English name) plus the fixed-vocabulary metadata
 // (localized via Tolgee keys at display time). The translated free-text fields live in the overlays.
@@ -53,7 +62,7 @@ export function resolveCatalog(
 
 // English is the fallback overlay, always layered under the active locale. Every other supported locale
 // has an overlay too (empty until translated in Weblate); missing keys fall back to English.
-const englishLoader = () => import('../../assets/exercises/en.json');
+const englishOverlay = (englishOverlayJson ?? {}) as ExerciseTranslationMap;
 const localeLoaders: Record<string, () => Promise<{ default: ExerciseTranslationMap }>> = {
   ar: () => import('../../assets/exercises/ar.json'),
   cs: () => import('../../assets/exercises/cs.json'),
@@ -76,20 +85,17 @@ const localeLoaders: Record<string, () => Promise<{ default: ExerciseTranslation
 };
 
 async function loadBaseCatalog(): Promise<BuiltInExerciseJSON[]> {
-  try {
-    const { exercises } = await import('../../assets/exercises.json');
-    return exercises as BuiltInExerciseJSON[];
-  } catch {
-    return [];
+  const exercises = (baseCatalogJson as { exercises?: unknown }).exercises;
+  if (!Array.isArray(exercises)) {
+    // Loud, not silent: the startup effect logs this and the library screen
+    // shows the failure instead of a mysterious 0.
+    throw new Error('Base exercise catalog is missing the exercises array');
   }
+  return exercises as BuiltInExerciseJSON[];
 }
 
 async function loadEnglishOverlay(): Promise<ExerciseTranslationMap> {
-  try {
-    return (await englishLoader()).default;
-  } catch {
-    return {};
-  }
+  return englishOverlay;
 }
 
 const baseLanguage = (locale: string) => locale.toLowerCase().split('-')[0]!;

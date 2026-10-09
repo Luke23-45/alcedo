@@ -12,13 +12,12 @@ export const TileBody = styled.View`
 `;
 
 /**
- * Glyphs / chips ride top-right; the SampleBadge sits top-left. Wraps instead
- * of colliding on 320pt screens — the tile grows via its min-height.
+ * Glyphs ride top-left, aligned with the labels below. Wraps instead of
+ * colliding on 320pt screens — the tile grows via its min-height.
  */
 export const TileTop = styled.View`
   flex-direction: row;
   align-items: flex-start;
-  justify-content: space-between;
   flex-wrap: wrap;
   row-gap: 4px;
   min-height: 20px;

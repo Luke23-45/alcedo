@@ -1,4 +1,5 @@
 import { getSessionExerciseEditorHref } from '@/components/smart/session-exercise-editor';
+import { claimAddExerciseSlot } from '@/components/smart/add-exercise-guard';
 import { newExercisePlaceholder } from '@/components/presentation/exercise-editor/exercise-editor-logic';
 import { useAppSelector, useAppSelectorWithArg } from '@/store';
 import { selectSession, updateStoredSession } from '@/store/stored-sessions';
@@ -13,6 +14,9 @@ export function useAddExercise(sessionId: string | undefined) {
 
   return () => {
     if (!sessionId || !session) {
+      return;
+    }
+    if (!claimAddExerciseSlot()) {
       return;
     }
     const newIndex = session.recordedExercises.length;

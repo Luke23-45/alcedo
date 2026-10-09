@@ -18,6 +18,7 @@ import {
   addCardioSet,
   ExerciseKind,
   kindOf,
+  libraryBlueprintFor,
   removeCardioSet,
   restPresetFor,
   searchExercises,
@@ -49,6 +50,14 @@ export interface ExerciseEditorScreenProps {
   isNew: boolean;
   exercise: ExerciseBlueprint;
   onExerciseChange: (exercise: ExerciseBlueprint) => void;
+  /**
+   * When true, picking from the library replaces the whole draft with the
+   * library exercise (name, kind, fresh configuration) — manual edits are
+   * wiped. When false (default) only the name swaps and everything
+   * configured is preserved. Hosts enable it only where nothing real can
+   * be lost (add flow, or an exercise with no logged sets).
+   */
+  resetOnLibraryPick?: boolean;
   dirty: boolean;
   doneDisabled: boolean;
   onDone: () => void;
@@ -85,11 +94,35 @@ export function ExerciseEditorScreen(props: ExerciseEditorScreenProps) {
       descriptor.equipment ? translateExerciseMeta(t, 'equipment', descriptor.equipment) : undefined,
       firstMuscle ? translateExerciseMeta(t, 'muscle', firstMuscle) : undefined,
     ].filter((part): part is string => !!part);
-    return { name: descriptor.name, subtitle: parts.length > 0 ? parts.join(' · ') : undefined };
+    return {
+      name: descriptor.name,
+      subtitle: parts.length > 0 ? parts.join(' · ') : undefined,
+      category: descriptor.category,
+      library: {
+        equipment: descriptor.equipment,
+        muscles: [...descriptor.muscles],
+        instructions: descriptor.instructions,
+      },
+    };
   });
 
-  const selectExercise = (name: string) => {
-    onExerciseChange(exercise.with({ name }));
+  const selectExercise = (item: SearchResultItem) => {
+    // Library pick semantics: with reset enabled the draft becomes the
+    // library exercise outright (name, kind, snapshot, fresh 1 x 8 / empty
+    // cardio) and manual edits are wiped. Without it only the name swaps
+    // and configured sets, rest, and progression survive — logged sets are
+    // never destroyed by a rename. Either way the snapshot follows the
+    // pick: a library exercise carries its detail, a custom name carries
+    // none (and clears a stale one).
+    const library =
+      item.category && item.library
+        ? { category: item.category, ...item.library }
+        : undefined;
+    if (props.resetOnLibraryPick) {
+      onExerciseChange(libraryBlueprintFor({ name: item.name, category: item.category, library }));
+    } else {
+      onExerciseChange(exercise.with({ name: item.name, library }));
+    }
     setSearchOpen(false);
     setQuery('');
   };

@@ -222,7 +222,7 @@ export const preferenceRegistry = {
   tipToShow: pref({ default: 1, codec: intCodec }),
   lastSeenWhatsNewId: pref({ default: 0, codec: intCodec }),
   colorSchemeSeed: pref<ColorSchemeSeed>({ default: 'default', codec: colorSchemeSeedCodec }),
-  themeMode: pref<ThemeMode>({ default: 'system', codec: themeModeCodec }),
+  themeMode: pref<ThemeMode>({ default: 'dark', codec: themeModeCodec }),
   plansSortOrder: pref<PlansSortOrder>({ default: 'name', codec: plansSortOrderCodec }),
   firstDayOfWeek: pref<DayOfWeek>({ default: DayOfWeek.MONDAY, codec: dayOfWeekCodec }),
 

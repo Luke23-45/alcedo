@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslate } from '@tolgee/react';
+import { translateExerciseMeta } from '@/utils/exercise-meta';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { CardioExerciseBlueprint, WeightedExerciseBlueprint } from '@/models/blueprint-models';
 import { Card, LinkGlyph, SubHead } from '../editor-primitives';
@@ -7,6 +8,9 @@ import { clampNotes, isValidHttpUrl, linkGlyphColor, NOTES_MAX_LENGTH } from '..
 import {
   DetailPad,
   FieldInput,
+  LibraryInstructions,
+  LibraryMeta,
+  LibraryWell,
   LinkGlyphWrap,
   LinkWell,
   NotesWell,
@@ -26,9 +30,32 @@ export function DetailCard({
   const [focused, setFocused] = useState<'notes' | 'link' | null>(null);
   const linkValid = isValidHttpUrl(exercise.link);
 
+  const library = exercise.library;
+  const libraryMeta = library
+    ? [
+        library.equipment ? translateExerciseMeta(t, 'equipment', library.equipment) : undefined,
+        ...library.muscles.slice(0, 2).map((muscle) => translateExerciseMeta(t, 'muscle', muscle)),
+      ]
+        .filter((part): part is string => !!part)
+        .join(' · ')
+    : '';
+
   return (
     <Card>
       <DetailPad>
+        {library && (libraryMeta.length > 0 || library.instructions.trim().length > 0) ? (
+          <>
+            <SubHeadRow>
+              <SubHead>{t('exercise.editor.library.title', 'From the library').toLocaleUpperCase()}</SubHead>
+            </SubHeadRow>
+            <LibraryWell>
+              {libraryMeta.length > 0 ? <LibraryMeta>{libraryMeta}</LibraryMeta> : null}
+              {library.instructions.trim().length > 0 ? (
+                <LibraryInstructions>{library.instructions}</LibraryInstructions>
+              ) : null}
+            </LibraryWell>
+          </>
+        ) : null}
         <SubHeadRow>
           <SubHead>{t('plan.notes.label', 'Notes').toLocaleUpperCase()}</SubHead>
           <SubHeadCounter>

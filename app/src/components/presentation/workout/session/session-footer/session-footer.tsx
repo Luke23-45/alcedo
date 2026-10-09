@@ -1,98 +1,42 @@
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useTranslate } from '@tolgee/react';
 import type { ReactNode } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 import { HomeCard } from '../../../home/shared/home-card';
-import { sessionPalette } from '../session-tokens';
 import { BrandButton } from '../brand-button/brand-button';
 import {
-  BottomFade,
   DisabledFinish,
   FinishLabel,
   FinishPressable,
-  FooterContent,
-  FooterGradient,
-  Hairline,
   Hint,
-  IdleCardInner,
-  IdleLabel,
-  IdleSub,
-  IdleTexts,
-  RestSlot,
-  SkipPill,
-  SkipText,
+  Section,
+  TimerSlot,
 } from './session-footer.styles';
 
-/** Idle rest-timer slot: the ring, REST TIMER copy, and a dimmed Skip. */
-function IdleRestCard() {
-  const { t } = useTranslate();
-  const { isDark } = useAppTheme();
-  const c = sessionPalette(isDark).footer;
-
-  return (
-    <HomeCard radius={26} pad={0} style={{ minHeight: 88 }}>
-      <IdleCardInner>
-        <Svg width={60} height={60} viewBox="0 0 60 60">
-          <Circle cx={30} cy={30} r={26} stroke={c.ringTrack} strokeWidth={7} fill="none" />
-          <SvgText
-            x={30}
-            y={30}
-            textAnchor="middle"
-            alignmentBaseline="central"
-            fontSize={12}
-            fontWeight="700"
-            fill={c.ringDash}
-          >
-            —
-          </SvgText>
-        </Svg>
-        <IdleTexts>
-          <IdleLabel>{t('workout.session.rest_timer.label').toLocaleUpperCase()}</IdleLabel>
-          <IdleSub>{t('workout.session.rest_timer.idle.body')}</IdleSub>
-        </IdleTexts>
-        <SkipPill>
-          <SkipText>{t('rest_timer.skip')}</SkipText>
-        </SkipPill>
-      </IdleCardInner>
-    </HomeCard>
-  );
-}
-
 /**
- * Sticky session footer: the live rest-timer slot (or its idle card) above
- * the Finish Workout button. The button stays dimmed with a hint until at
- * least one set is logged — an empty session can never be finished.
+ * Session finish section: a plain in-flow section like bodyweight and notes
+ * — nothing here is pinned. The live rest-timer slot sits above the finish
+ * card, and only while a timer is running. The finish action lives in a
+ * `HomeCard` with the exact bodyweight spec (radius 22, pad 16) so the two
+ * read as siblings. The button stays dimmed with a hint until at least one
+ * set is logged — an empty session can never be finished.
  */
 export function SessionFooter({
   timer,
-  showRestSlot,
   canFinish,
   onFinish,
 }: {
   /** The live `<RestTimer/>` / `<CardioTimer/>` node when a timer is running. */
   timer?: ReactNode;
-  /** Whether the rest-timer slot (live or idle) is shown at all. */
-  showRestSlot: boolean;
   onFinish: () => void;
   canFinish: boolean;
 }) {
-  const { isDark } = useAppTheme();
+  const theme = useAppTheme();
   const { t } = useTranslate();
-  const insets = useSafeAreaInsets();
-  const c = sessionPalette(isDark);
 
   return (
-    <FooterGradient
-      colors={[c.footer.gradientFrom, c.footer.gradientTo]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-      style={{ marginBottom: -insets.bottom, paddingBottom: insets.bottom }}
-    >
-      <BottomFade pointerEvents="none" />
-      <Hairline />
-      <FooterContent>
-        {(timer || showRestSlot) && <RestSlot>{timer ?? <IdleRestCard />}</RestSlot>}
+    <Section>
+      {timer && <TimerSlot>{timer}</TimerSlot>}
+      <HomeCard radius={theme.home.radius.row} pad={theme.space.base}>
         {canFinish ? (
           <BrandButton
             label={t('workout.session.finish_workout.button')}
@@ -117,7 +61,7 @@ export function SessionFooter({
           </FinishPressable>
         )}
         {!canFinish && <Hint>{t('workout.session.finish_disabled.hint')}</Hint>}
-      </FooterContent>
-    </FooterGradient>
+      </HomeCard>
+    </Section>
   );
 }

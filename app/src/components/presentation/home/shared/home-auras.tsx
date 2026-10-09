@@ -1,13 +1,14 @@
 import Svg, { Defs, RadialGradient, Stop, Ellipse } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import { useAppTheme } from '@/hooks/useAppTheme';
 
-const AuraLayer = styled.View`
+const AuraLayer = styled.View<{ $top: number; $side: number }>`
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: ${({ $top }) => $top}px;
+  left: ${({ $side }) => $side}px;
+  right: ${({ $side }) => $side}px;
   bottom: 0;
 `;
 
@@ -15,10 +16,22 @@ const AuraLayer = styled.View`
  * Asymmetric ambient color auras behind the home content so darkness has
  * atmosphere (never unbroken pure black). Positions and opacities are measured
  * off the reference SVGs (400x2300 canvas); the layer stretches with the
- * scroll content and the SVG scales non-uniformly to match. Pointer-transparent.
+ * scroll content (taller than any viewport, so `slice` keeps every aura
+ * aspect-true) and the SVG covers it. Pointer-transparent.
+ *
+ * COUPLING: this renders inside the home scroller's padded content box
+ * (`scrollStyle` in `(tabs)/(session)/index.tsx`), so the layer bleeds back
+ * out with the exact negative of that padding — full screen edge to edge,
+ * status zone included. If the scroller padding ever changes, these offsets
+ * follow it via the same theme tokens.
  */
 export function HomeAuras() {
   const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
+  // Negative of the home scroller's own padding: the glow must reach the
+  // screen edges and the status zone, not stop at the content box.
+  const bleedSide = -theme.layout.screenPadding;
+  const bleedTop = -(insets.top + theme.space.sm);
   // Exact per-mode values extracted from the reference SVGs (gAuraA..D).
   // Positions are identical in both modes; light uses iOS-tone colors at
   // lower opacity so the pale background stays calm.
@@ -37,7 +50,7 @@ export function HomeAuras() {
       ];
 
   return (
-    <AuraLayer pointerEvents="none">
+    <AuraLayer $top={bleedTop} $side={bleedSide} pointerEvents="none">
       <Svg width="100%" height="100%" viewBox="0 0 400 2300" preserveAspectRatio="xMidYMid slice">
         <Defs>
           {auras.map((a) => (

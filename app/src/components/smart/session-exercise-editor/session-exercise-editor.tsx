@@ -86,6 +86,10 @@ export function SessionExerciseEditor(props: { sessionId: string; index: number;
 
   const current = draft ?? exercise;
   const dirty = draft !== undefined && !blueprintsEqual(draft, exercise);
+  // Library picks reset the draft only where nothing real is lost: the add
+  // flow, or an exercise with no logged sets. Once sets are logged a pick
+  // renames only — a reset there would destroy real training data.
+  const hasLoggedSets = session?.recordedExercises[exerciseIndex]?.isStarted ?? false;
   const auraMode: AuraMode = isNew ? 'add' : current ? kindOf(current) : 'weighted';
   const nextExerciseName = session?.recordedExercises[exerciseIndex + 1]?.blueprint.name;
 
@@ -111,6 +115,7 @@ export function SessionExerciseEditor(props: { sessionId: string; index: number;
           isNew={!!isNew}
           exercise={current}
           onExerciseChange={updateDraft}
+          resetOnLibraryPick={!!isNew || !hasLoggedSets}
           dirty={dirty}
           doneDisabled={!!isNew && current.name.trim() === ''}
           onDone={() => dismiss()}

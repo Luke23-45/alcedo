@@ -68,6 +68,7 @@ export function HomeCard({
   pad,
   children,
   style,
+  bodyStyle,
 }: {
   /** The screen's anchor card: 30pt radius, 20pt padding. */
   hero?: boolean;
@@ -79,12 +80,18 @@ export function HomeCard({
   pad?: number;
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  /** Extra style for the inner body layer (e.g. `flex: 1` to fill a fixed-height card). */
+  bodyStyle?: StyleProp<ViewStyle>;
 }) {
   const theme = useAppTheme();
   const r = radius ?? (hero ? theme.home.radius.hero : theme.home.radius.tile);
   return (
     <EdgeLayer $radius={r} $elev={elev} style={[{ borderCurve: 'continuous' }, style]}>
-      <BodyLayer $radius={Math.max(0, r - 1)} $pad={pad ?? (hero ? 20 : 16)} style={{ borderCurve: 'continuous' }}>
+      <BodyLayer
+        $radius={Math.max(0, r - 1)}
+        $pad={pad ?? (hero ? 20 : 16)}
+        style={[{ borderCurve: 'continuous' }, bodyStyle]}
+      >
         {children}
       </BodyLayer>
     </EdgeLayer>

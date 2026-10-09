@@ -3,6 +3,7 @@ import Menu from '@/components/presentation/foundation/menu';
 import { HomeScreenBackground } from '@/components/presentation/home/shared/home-auras';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { getSessionExerciseEditorHref } from '@/components/smart/session-exercise-editor';
+import { claimAddExerciseSlot } from '@/components/smart/add-exercise-guard';
 import { newExercisePlaceholder } from '@/components/presentation/exercise-editor/exercise-editor-logic';
 import { useAppReducedMotion } from '@/hooks/useMotionSettings';
 import { useOnDismiss } from '@/hooks/useOnDismiss';
@@ -388,6 +389,9 @@ export function SessionWorkoutEditor(props: { sessionId: string; focusNotes?: bo
   // in the plan with its defaults — the choice is named, not hidden.
   const openAddExercise = () => {
     if (!workout) {
+      return;
+    }
+    if (!claimAddExerciseSlot()) {
       return;
     }
     const newIndex = workout.recordedExercises.length;

@@ -2,6 +2,7 @@ import {
   CardioExerciseBlueprint,
   CardioExerciseSetBlueprint,
   DistanceUnit,
+  ExerciseLibraryInfo,
   ProgressionRule,
   Rest,
   WeightedExerciseBlueprint,
@@ -255,6 +256,29 @@ export function newExercisePlaceholder(): WeightedExerciseBlueprint {
 }
 
 /**
+ * What a library pick produces when the host opts into reset: a fresh
+ * blueprint of the descriptor's kind ('cardio' category → cardio, anything
+ * else → weighted) carrying the picked name plus the library snapshot, so
+ * the workout card and editor can show the exercise's detail. Weighted
+ * resets to the same 1 x 8 the add flow starts from, so a reset can never
+ * yield a set-less exercise (which would read as vacuously complete). A
+ * custom name carries no snapshot.
+ */
+export interface LibraryPick {
+  name: string;
+  category: string;
+  library: ExerciseLibraryInfo | undefined;
+}
+
+export function libraryBlueprintFor(
+  pick: LibraryPick,
+): WeightedExerciseBlueprint | CardioExerciseBlueprint {
+  return pick.category === 'cardio'
+    ? CardioExerciseBlueprint.empty().with({ name: pick.name, library: pick.library })
+    : newExercisePlaceholder().with({ name: pick.name, library: pick.library });
+}
+
+/**
  * What confirming the S4-A type switch produces: a fresh blueprint of the
  * target kind carrying only name, notes and link — the rep/target
  * configuration is genuinely reset, never silently migrated.
@@ -263,7 +287,9 @@ export function switchExerciseKind(
   exercise: WeightedExerciseBlueprint | CardioExerciseBlueprint,
   target: ExerciseKind,
 ): WeightedExerciseBlueprint | CardioExerciseBlueprint {
-  const preserved = { name: exercise.name, notes: exercise.notes, link: exercise.link };
+  // The library snapshot describes the movement, not the modality, so it
+  // survives the switch with the name — only a fresh library pick replaces it.
+  const preserved = { name: exercise.name, notes: exercise.notes, link: exercise.link, library: exercise.library };
   return target === 'cardio'
     ? CardioExerciseBlueprint.empty().with(preserved)
     : WeightedExerciseBlueprint.of(preserved);

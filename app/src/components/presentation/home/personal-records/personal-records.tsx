@@ -52,7 +52,6 @@ export function PersonalRecordsSection({ records }: { records: PersonalRecordIte
         <S.TilesRow>
           {records.map((record) => (
             <S.Tile key={record.name} style={{ borderCurve: 'continuous' }}>
-              {record.isNew ? <S.TileInner pointerEvents="none" /> : null}
               <HomeText
                 weight={fontWeight.bold}
                 micro

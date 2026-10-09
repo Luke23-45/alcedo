@@ -15,7 +15,11 @@ import IconButton from '@/components/presentation/foundation/icon-button';
 import { useRouter } from 'expo-router';
 import { getExerciseHistoryHref } from '@/components/smart/exercise-history';
 import { Updater } from '@/utils/types';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
+import { Pressable } from 'react-native';
+import { translateExerciseMeta } from '@/utils/exercise-meta';
+import { ExerciseLibraryInfo } from '@/models/blueprint-models';
+import { DotsSvgColor } from '@/components/presentation/workout/session/dots-trigger/dots-trigger.styles';
 import { HomeCard } from '@/components/presentation/home/shared/home-card';
 import { sessionPalette } from '@/components/presentation/workout/session/session-tokens';
 import {
@@ -27,6 +31,7 @@ import {
   ChipPill,
   ChipText,
   DividerLine,
+  ExerciseMeta,
   ExerciseName,
   IndexNumber,
   IndexTile,
@@ -55,6 +60,34 @@ interface ExerciseSectionProps<T extends RecordedExercise> {
   updateExercise: (update: Updater<T>) => void;
   onEditExercise: (() => void) | undefined;
   onRemoveExercise: () => void;
+}
+
+/**
+ * The library snapshot line under the header ("Barbell · Chest"): equipment
+ * plus the first two muscles, localized like the search rows. Renders nothing
+ * without a snapshot (custom exercises, pre-snapshot history) or when the
+ * snapshot carries nothing displayable. The full instructions live in the
+ * editor's Detail section, not in the workout card.
+ */
+function LibraryMetaLine({ library }: { library: ExerciseLibraryInfo | undefined }) {
+  const { t } = useTranslate();
+  if (!library) {
+    return null;
+  }
+  const text = [
+    library.equipment ? translateExerciseMeta(t, 'equipment', library.equipment) : undefined,
+    ...library.muscles.slice(0, 2).map((muscle) => translateExerciseMeta(t, 'muscle', muscle)),
+  ]
+    .filter((part): part is string => !!part)
+    .join(' · ');
+  if (!text) {
+    return null;
+  }
+  return (
+    <ExerciseMeta numberOfLines={1} ellipsizeMode="tail">
+      {text}
+    </ExerciseMeta>
+  );
 }
 
 /** The status chip text for the active card header. */
@@ -119,6 +152,33 @@ function AddSetButton({ onPress }: { onPress: () => void }) {
         />
       </Svg>
     </AddSetRow>
+  );
+}
+
+/**
+ * The active card's trailing ⋯ trigger. The header row is 22pt tall and must
+ * stay that way, so the visual is 22pt with hitSlop carrying the 44pt touch
+ * target — the same three-dot spec as the nav trigger, no layout growth, and
+ * its reach clears the first set's check below.
+ */
+function HeaderMenuTrigger({ onPress }: { onPress: () => void }) {
+  const { isDark } = useAppTheme();
+  const { t } = useTranslate();
+  return (
+    <Pressable
+      onPress={onPress}
+      testID="more-exercise-btn"
+      accessibilityRole="button"
+      accessibilityLabel={t('generic.more_options.label')}
+      hitSlop={{ top: 11, bottom: 11, left: 8, right: 6 }}
+      style={{ width: 30, height: 22, alignItems: 'center', justifyContent: 'center', marginLeft: 6 }}
+    >
+      <Svg width={24} height={8} viewBox="0 0 24 8">
+        <Circle cx={5} cy={4} r={2} fill={DotsSvgColor(isDark)} />
+        <Circle cx={12} cy={4} r={2} fill={DotsSvgColor(isDark)} />
+        <Circle cx={19} cy={4} r={2} fill={DotsSvgColor(isDark)} />
+      </Svg>
+    </Pressable>
   );
 }
 
@@ -244,10 +304,14 @@ export default function ExerciseSection<T extends RecordedExercise>(props: Exerc
                   </ChipText>
                 </ChipPill>
               )}
+              {!props.isReadonly && (
+                <Menu trigger={(open) => <HeaderMenuTrigger onPress={open} />} items={menuItems} />
+              )}
             </CardHeader>
           </CardTop>
           <DividerLine />
           <CardBody>
+            <LibraryMetaLine library={recordedExercise.blueprint.library} />
             {props.children}
             <ExerciseNotesDisplay
               exercise={props.recordedExercise}

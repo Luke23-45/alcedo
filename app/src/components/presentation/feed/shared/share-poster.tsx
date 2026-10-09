@@ -75,10 +75,10 @@ const THEMES: Record<SharePosterTheme, ThemeSpec> = {
  * Internal grid (feed slot 329×190, all values relative to the poster):
  *   kicker 8/700/ls1.2 white .72 @ top 18 (baseline 24)
  *   hero 40/700/-1.6 white + unit 15.5/600 white .72 @ top 42 (baseline 74)
- *   workout name 12.5/600/-0.2 white .88 @ top 86 (baseline 96)
- *   duration/sets values 14/700/-0.3 white @ top 115 (baseline 126), columns at +0/+104
- *   duration/sets labels 7.5/700/ls.7 white .62 @ top 134 (baseline 140)
- *   PR pills 22pt rx11, white .20 fill + white .30 0.8 stroke, 8/700/ls.6 @ top 154
+ *   workout name 12.5/600/-0.2 white .88 @ top 86 + 12 margin (baseline 108)
+ *   duration/sets values 14/700/-0.3 white @ top 119 (baseline 130), columns at +0/+104
+ *   duration/sets labels 7.5/700/ls.7 white .62 @ top 138 (baseline 144)
+ *   PR pills 22pt rx11, white .20 fill + white .30 0.8 stroke, 8/700/ls.6 @ top 158
  *   gloss white .32→0 over the top half (drawn at .4 opacity, per the spec's feed slot)
  *   edge white .22, 1pt, inset 0.5pt
  */

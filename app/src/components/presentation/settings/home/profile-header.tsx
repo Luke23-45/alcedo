@@ -60,13 +60,14 @@ export function ProfileHeader() {
   const identityName = useAppSelector((s) => s.feed.identity.map((identity) => identity.name ?? '').unwrapOr(''));
   const username = useAppSelector((s) => s.settings.profileUsername);
 
-  // No fictional fallback: before the user sets a name or username the
-  // header shows whatever real identity exists (possibly nothing yet).
+  // Before the user sets a name or username the header falls back to the
+  // generic "Profile" label so the row never renders blank.
   const { title, handle } = deriveProfileHeaderData(identityName, username);
+  const displayTitle = title || t(settingsKey('settings.home.profile_header.default_title'));
   const chevron = useChevronColor();
   // A button with no announced label is invisible to VoiceOver; the empty
   // identity state still opens the profile editor, so say what it does.
-  const accessibilityLabel = title || t(settingsKey('settings.home.profile_header.accessibility'));
+  const accessibilityLabel = displayTitle || t(settingsKey('settings.home.profile_header.accessibility'));
 
   return (
     <HeaderEdge>
@@ -83,8 +84,8 @@ export function ProfileHeader() {
             <S.AvatarInitial>{ownPersonInitial(identityName, username)}</S.AvatarInitial>
           </Avatar>
           <S.HeaderText>
-            <S.HeaderName numberOfLines={1}>{title}</S.HeaderName>
-            <S.HeaderSubtitle numberOfLines={1}>{handle}</S.HeaderSubtitle>
+            <S.HeaderName numberOfLines={1}>{displayTitle}</S.HeaderName>
+            {handle ? <S.HeaderSubtitle numberOfLines={1}>{handle}</S.HeaderSubtitle> : null}
           </S.HeaderText>
           <Icon source="chevronRight" size={18} color={chevron} />
         </S.HeaderPressable>

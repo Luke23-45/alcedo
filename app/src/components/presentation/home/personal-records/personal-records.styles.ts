@@ -34,21 +34,6 @@ export const Tile = styled(HomeGradient).attrs({ variant: 'tile' as const })`
   overflow: hidden;
 `;
 
-/**
- * Amber inner highlight for NEW records only. The card edge carries the
- * default stroke, so non-highlighted tiles render no second border.
- */
-export const TileInner = styled.View`
-  border-width: 0.8px;
-  border-radius: 19px;
-  border-color: ${alpha('#FF9F0A', 0.22)};
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-`;
-
 /** 38×15 NEW chip, amber wash. */
 export const NewChip = styled.View`
   width: 38px;

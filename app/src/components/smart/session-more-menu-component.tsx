@@ -1,6 +1,9 @@
 import { Session } from '@/models/session-models';
 import { useTranslate } from '@tolgee/react';
 import { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { deleteStoredSession } from '@/store/stored-sessions';
+import ConfirmationDialog from '@/components/presentation/foundation/confirmation-dialog';
 import { getSessionWorkoutEditorHref } from '@/components/smart/session-workout-editor';
 import { Tooltip, TooltipHandle } from 'react-native-paper';
 import PageMenu from '@/components/presentation/foundation/page-menu';
@@ -34,30 +37,59 @@ export default function SessionMoreMenuComponent(props: {
  * Edit workout. Finishing moved to the sticky footer, so it is not here.
  */
 function ActiveSessionMenu({ session, additionalItems }: { session: Session; additionalItems?: MenuItem[] }) {
-  const { push } = useRouter();
+  const { push, dismissTo } = useRouter();
   const { t } = useTranslate();
+  const dispatch = useDispatch();
   const addExercise = useAddExercise(session.id);
+  const [discardOpen, setDiscardOpen] = useState(false);
 
   return (
-    <Menu
-      testID="session-more"
-      trigger={(open) => <DotsTrigger onPress={open} testID="session-more-menu" />}
-      items={[
-        {
-          label: t('exercise.add.title'),
-          icon: 'add',
-          systemImage: 'plus',
-          onPress: addExercise,
-        },
-        {
-          label: t('workout.edit.button'),
-          icon: 'edit',
-          systemImage: 'pencil',
-          onPress: () => push(getSessionWorkoutEditorHref(session.id)),
-        },
-        ...(additionalItems ?? []),
-      ]}
-    />
+    <>
+      <Menu
+        testID="session-more"
+        trigger={(open) => <DotsTrigger onPress={open} testID="session-more-menu" />}
+        items={[
+          {
+            label: t('exercise.add.title'),
+            icon: 'add',
+            systemImage: 'plus',
+            onPress: addExercise,
+          },
+          {
+            label: t('workout.edit.button'),
+            icon: 'edit',
+            systemImage: 'pencil',
+            onPress: () => push(getSessionWorkoutEditorHref(session.id)),
+          },
+          // Backing out of the workout leaves it active forever and only
+          // starting another workout escapes it — discarding needs a real,
+          // confirmed path. The delete clears the active flag with the row,
+          // and the serialized flag writer's staleness guard cannot resurrect
+          // it, so this is crash-safe immediately.
+          {
+            label: t('workout.discard.button'),
+            icon: 'delete',
+            systemImage: 'trash',
+            onPress: () => setDiscardOpen(true),
+          },
+          ...(additionalItems ?? []),
+        ]}
+      />
+      <ConfirmationDialog
+        headline={t('workout.discard.confirm.title')}
+        textContent={t('workout.discard.confirm.body')}
+        okText={t('workout.discard.button')}
+        destructive
+        open={discardOpen}
+        onOk={() => {
+          setDiscardOpen(false);
+          dispatch(deleteStoredSession(session.id));
+          dismissTo('/');
+        }}
+        onCancel={() => setDiscardOpen(false)}
+        preventCancel={false}
+      />
+    </>
   );
 }
 

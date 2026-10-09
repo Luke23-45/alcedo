@@ -46,6 +46,38 @@ export const NotesWell = styled(Well)`
   min-height: 80px;
 `;
 
+/** Read-only library reference: same well language, no focus state. */
+export const LibraryWell = styled.View`
+  border-radius: 16px;
+  border-curve: continuous;
+  background-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.05)' : 'rgba(120,120,128,0.08)')};
+  border-width: 0.9px;
+  border-color: ${({ theme }) => (theme.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)')};
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  gap: 8px;
+`;
+
+export const LibraryMeta = styled.Text`
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: ${({ theme }) => editorPalette(theme.isDark).text.tertiary};
+`;
+
+export const LibraryInstructions = styled.Text`
+  font-family: ${({ theme }) => typeHelper(theme, 'body').fontFamily};
+  font-size: 12.5px;
+  line-height: 17px;
+  font-weight: 500;
+  color: ${({ theme }) => (theme.isDark ? '#E5E5EA' : '#1C1C1E')};
+`;
+
 export const LinkWell = styled(Well)`
   border-radius: 14px;
   min-height: 48px;

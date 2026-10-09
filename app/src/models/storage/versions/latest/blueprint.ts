@@ -11,7 +11,7 @@ export interface ProgramBlueprintJSON {
 }
 
 export interface SessionBlueprintJSON {
-  version: 6;
+  version: 7;
   name: string;
   exercises: ExerciseBlueprintJSON[];
   notes: string;
@@ -56,12 +56,26 @@ export interface CardioExerciseSetBlueprintJSON {
   restBetweenSets?: RestJSON | undefined;
 }
 
+/**
+ * Snapshot of the library entry this exercise was picked from. Reference
+ * metadata only: it never participates in equality, diffing, or lineage
+ * keys. Absent for custom exercises and for history saved before snapshots
+ * existed (those render without the meta line).
+ */
+export interface ExerciseLibraryInfoJSON {
+  category: string;
+  equipment: string | null;
+  muscles: string[];
+  instructions: string;
+}
+
 export interface CardioExerciseBlueprintJSON {
   type: 'CardioExerciseBlueprint';
   name: string;
   sets: CardioExerciseSetBlueprintJSON[];
   notes: string;
   link: string;
+  library?: ExerciseLibraryInfoJSON | undefined;
 }
 
 export interface WeightedExerciseBlueprintJSON {
@@ -88,6 +102,7 @@ export interface WeightedExerciseBlueprintJSON {
    * top of the lifter (`bodyweight`), or nothing at all (`none`, e.g. crunches).
    */
   resistance: ResistanceJSON;
+  library?: ExerciseLibraryInfoJSON | undefined;
 }
 
 export type ResistanceJSON = 'none' | 'external' | 'bodyweight';

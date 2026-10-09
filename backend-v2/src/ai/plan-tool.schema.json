@@ -58,7 +58,7 @@
       "properties": {
         "version": {
           "type": "number",
-          "const": 6
+          "const": 7
         },
         "name": {
           "type": "string"
@@ -138,6 +138,9 @@
         "resistance": {
           "$ref": "#/definitions/Resistance",
           "description": "Where this movement's load comes from: the whole stored weight (`external`), what is added on top of the lifter (`bodyweight`), or nothing at all (`none`, e.g. crunches)."
+        },
+        "library": {
+          "$ref": "#/definitions/ExerciseLibraryInfo"
         }
       },
       "required": [
@@ -318,6 +321,36 @@
         "bodyweight"
       ]
     },
+    "ExerciseLibraryInfo": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "equipment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "muscles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "instructions": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "category",
+        "equipment",
+        "muscles",
+        "instructions"
+      ],
+      "description": "Snapshot of the library entry this exercise was picked from. Reference metadata only: it never participates in equality, diffing, or lineage keys. Absent for custom exercises and for history saved before snapshots existed (those render without the meta line)."
+    },
     "CardioExerciseBlueprint": {
       "type": "object",
       "properties": {
@@ -339,6 +372,9 @@
         },
         "link": {
           "type": "string"
+        },
+        "library": {
+          "$ref": "#/definitions/ExerciseLibraryInfo"
         }
       },
       "required": [

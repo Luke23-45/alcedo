@@ -194,7 +194,7 @@ describe('real migrations', () => {
       const result = programBlueprintMigrations.migrate(initialProgramBlueprint());
       expect(result.version).toBe(3);
       expect(result.name).toBe('PPL');
-      expect(result.sessions.every((s) => s.version === 6)).toBe(true);
+      expect(result.sessions.every((s) => s.version === 7)).toBe(true);
     });
 
     it('accepts embedded session blueprints at mixed versions and brings them all to latest', () => {
@@ -209,7 +209,7 @@ describe('real migrations', () => {
       });
 
       expect(result.sessions).toHaveLength(3);
-      expect(result.sessions.every((s) => s.version === 6)).toBe(true);
+      expect(result.sessions.every((s) => s.version === 7)).toBe(true);
       // every embedded session ends up identical to migrating it directly, regardless of the version it came in at
       const expected = sessionBlueprintMigrations.migrate(initialSessionBlueprint());
       for (const session of result.sessions) {
@@ -221,7 +221,7 @@ describe('real migrations', () => {
       // the wrapper stamps its own legacy pseudo-version; the child carries its own
       const result = programBlueprintMigrations.migrate(initialProgramBlueprint());
       expect(result.version).toBe(3);
-      expect(result.sessions[0]!.version).toBe(6);
+      expect(result.sessions[0]!.version).toBe(7);
     });
 
     it('is idempotent', () => {
@@ -288,6 +288,16 @@ describe('real migrations', () => {
       const once = sessionMigrations.migrate(initialSession());
       expect(sessionMigrations.migrate(once)).toEqual(once);
     });
+
+    it('brings a pre-snapshot session to v8 without inventing a library snapshot', () => {
+      const result = sessionMigrations.migrate(initialSession());
+      expect(result.version).toBe(8);
+      const recorded = result.recordedExercises[0];
+      if (recorded?.type !== 'RecordedWeightedExercise') {
+        throw new Error('expected a recorded weighted exercise');
+      }
+      expect('library' in recorded.blueprint).toBe(false);
+    });
   });
 
   describe('aiPlanMigrations (wrapper of programBlueprint)', () => {
@@ -302,7 +312,7 @@ describe('real migrations', () => {
       expect(result.name).toBe('Strength');
       expect(result.description).toBe('get strong');
       expect(result.blueprint.version).toBe(3);
-      expect(result.blueprint.sessions.every((s) => s.version === 6)).toBe(true);
+      expect(result.blueprint.sessions.every((s) => s.version === 7)).toBe(true);
     });
   });
 
@@ -310,7 +320,7 @@ describe('real migrations', () => {
     it('sessionUserEvent brings its embedded session to latest', () => {
       const result = sessionUserEventMigrations.migrate(initialSessionUserEvent());
       expect(result.version).toBe(3);
-      expect(result.session.version).toBe(7);
+      expect(result.session.version).toBe(8);
       expect(result.session.blueprint).toEqual({ name: 'Push Day', notes: 'session notes' });
     });
 
@@ -318,7 +328,7 @@ describe('real migrations', () => {
       const shared: InitialSharedSessionJSON = { type: 'SharedSession', session: initialSession() };
       const result = sharedSessionMigrations.migrate(shared);
       expect(result.version).toBe(3);
-      expect(result.session.version).toBe(7);
+      expect(result.session.version).toBe(8);
     });
 
     it('sharedProgramBlueprint brings its embedded program to latest', () => {
@@ -329,14 +339,14 @@ describe('real migrations', () => {
       const result = sharedProgramBlueprintMigrations.migrate(shared);
       expect(result.version).toBe(3);
       expect(result.programBlueprint.version).toBe(3);
-      expect(result.programBlueprint.sessions.every((s) => s.version === 6)).toBe(true);
+      expect(result.programBlueprint.sessions.every((s) => s.version === 7)).toBe(true);
     });
 
     it('followedFeedUser brings its currentPlan to latest', () => {
       const result = followedFeedUserMigrations.migrate(initialFollowedFeedUser(initialProgramBlueprint()));
       expect(result.version).toBe(3);
       expect(result.currentPlan?.version).toBe(3);
-      expect(result.currentPlan?.sessions.every((s) => s.version === 6)).toBe(true);
+      expect(result.currentPlan?.sessions.every((s) => s.version === 7)).toBe(true);
     });
 
     it('followedFeedUser leaves an absent currentPlan absent', () => {

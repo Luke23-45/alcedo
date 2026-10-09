@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import { type } from '@/styles/theme';
 
@@ -37,7 +38,7 @@ export const ErrorOutline = styled.View`
 `;
 
 export const Hairline = styled.View`
-  height: ${({ theme }) => theme.size.hairline}px;
+  height: ${StyleSheet.hairlineWidth}px;
   background-color: ${({ theme }) => theme.color.border.hairline};
   margin-left: 16px;
 `;

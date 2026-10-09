@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Alcedo",
-    "slug": "alcedo",
+    "slug": "liftlog",
     "version": "1.0.0",
     "userInterfaceStyle": "automatic",
     "web": {
@@ -91,11 +91,17 @@
               "host": "app.alcedo.app"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         },
         {
           "action": "VIEW",
-          "category": ["DEFAULT", "BROWSABLE"],
+          "category": [
+            "DEFAULT",
+            "BROWSABLE"
+          ],
           "data": [
             {
               "scheme": "content",
@@ -125,7 +131,10 @@
         },
         {
           "action": "VIEW",
-          "category": ["DEFAULT", "BROWSABLE"],
+          "category": [
+            "DEFAULT",
+            "BROWSABLE"
+          ],
           "data": [
             {
               "scheme": "content",
@@ -162,7 +171,9 @@
     },
     "ios": {
       "bundleIdentifier": "com.powergym.alcedo",
-      "associatedDomains": ["applinks:app.alcedo.app"],
+      "associatedDomains": [
+        "applinks:app.alcedo.app"
+      ],
       "supportsTablet": true,
       "infoPlist": {
         "UIViewControllerBasedStatusBarAppearance": true,
@@ -172,16 +183,23 @@
           {
             "CFBundleTypeName": "Alcedo Plan",
             "LSHandlerRank": "Owner",
-            "LSItemContentTypes": ["com.powergym.alcedo.plan"]
+            "LSItemContentTypes": [
+              "com.powergym.alcedo.plan"
+            ]
           }
         ],
         "UTExportedTypeDeclarations": [
           {
             "UTTypeIdentifier": "com.powergym.alcedo.plan",
             "UTTypeDescription": "Alcedo Plan",
-            "UTTypeConformsTo": ["public.json"],
+            "UTTypeConformsTo": [
+              "public.json"
+            ],
             "UTTypeTagSpecification": {
-              "public.filename-extension": ["liftlogplan", "alcedoplan"]
+              "public.filename-extension": [
+                "liftlogplan",
+                "alcedoplan"
+              ]
             }
           }
         ],
@@ -222,6 +240,7 @@
     },
     "updates": {
       "url": "https://u.expo.dev/83fbb14a-2940-4b8e-894a-170eb1e23fa3"
-    }
+    },
+    "owner": "hellxhell"
   }
 }

@@ -10,7 +10,7 @@ function DumbbellIllustration() {
   const c = sessionPalette(isDark).empty;
 
   return (
-    <Svg width={144} height={144} viewBox="0 0 144 144">
+    <Svg width={112} height={112} viewBox="0 0 144 144">
       <Circle cx={72} cy={72} r={72} fill={c.outerFill} />
       <Circle cx={72} cy={72} r={72} fill="none" stroke={c.outerDash} strokeWidth={1.4} strokeDasharray="4 7" strokeLinecap="round" />
       <Circle cx={72} cy={72} r={52} fill={c.innerFill} />

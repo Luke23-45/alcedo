@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import { type as typeHelper } from '@/styles/theme';
 import { editorPalette } from '../exercise-editor-tokens';

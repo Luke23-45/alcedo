@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 import { alpha, type } from '@/styles/theme';
 
@@ -25,7 +26,7 @@ export const Pill = styled.View`
   max-height: 132px;
   border-radius: 26px;
   background-color: ${({ theme }) => theme.color.fill.tertiary};
-  border-width: ${({ theme }) => theme.size.hairline}px;
+  border-width: ${StyleSheet.hairlineWidth}px;
   border-color: ${({ theme }) => theme.color.border.hairline};
   justify-content: center;
   padding-horizontal: 18px;
@@ -80,7 +81,7 @@ export const OutOfDateBanner = styled.View`
   border-radius: 14px;
   padding: 12px 14px;
   background-color: ${({ theme }) => theme.color.status.warning.surface};
-  border-width: ${({ theme }) => theme.size.hairline}px;
+  border-width: ${StyleSheet.hairlineWidth}px;
   border-color: ${({ theme }) => theme.color.status.warning.border};
 `;
 

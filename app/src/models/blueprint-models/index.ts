@@ -7,6 +7,7 @@ import {
   CardioTargetJSON,
   DistanceJSON,
   ExerciseBlueprintJSON,
+  ExerciseLibraryInfoJSON,
   ProgramBlueprintJSON,
   ProgressionRuleJSON,
   RestJSON,
@@ -139,7 +140,7 @@ export class SessionBlueprint {
 
   toJSON(): SessionBlueprintJSON {
     return {
-      version: 6,
+      version: 7,
       name: this.name,
       exercises: this.exercises.map((exercise) => exercise.toJSON()),
       notes: this.notes,
@@ -312,6 +313,37 @@ export class CardioExerciseSetBlueprint {
   }
 }
 
+/**
+ * Snapshot of the library entry an exercise was picked from (equipment,
+ * muscles, instructions, category). Reference metadata: it rides along for
+ * display, never participates in equality, plan diffs, or lineage keys, and
+ * is absent for custom exercises and pre-snapshot history.
+ */
+export interface ExerciseLibraryInfo {
+  category: string;
+  equipment: string | null;
+  muscles: string[];
+  instructions: string;
+}
+
+export function exerciseLibraryInfoFromJSON(json: ExerciseLibraryInfoJSON): ExerciseLibraryInfo {
+  return {
+    category: json.category,
+    equipment: json.equipment,
+    muscles: [...json.muscles],
+    instructions: json.instructions,
+  };
+}
+
+export function exerciseLibraryInfoToJSON(value: ExerciseLibraryInfo): ExerciseLibraryInfoJSON {
+  return {
+    category: value.category,
+    equipment: value.equipment,
+    muscles: [...value.muscles],
+    instructions: value.instructions,
+  };
+}
+
 export class CardioExerciseBlueprint {
   readonly type = 'CardioExerciseBlueprint';
   constructor(
@@ -319,6 +351,7 @@ export class CardioExerciseBlueprint {
     readonly sets: CardioExerciseSetBlueprint[],
     readonly notes: string,
     readonly link: string,
+    readonly library?: ExerciseLibraryInfo,
   ) {
     if (!sets.length) {
       throw new Error('Must have at least one set in cardio exercise');
@@ -335,6 +368,7 @@ export class CardioExerciseBlueprint {
       json.sets.map((x) => CardioExerciseSetBlueprint.fromJSON(x)),
       json.notes,
       json.link,
+      json.library ? exerciseLibraryInfoFromJSON(json.library) : undefined,
     );
   }
 
@@ -358,6 +392,8 @@ export class CardioExerciseBlueprint {
     if ('type' in other && other.type !== this.type) {
       return false;
     }
+    // The library snapshot is display metadata, not identity: a refreshed
+    // library text must never flag a plan diff or dirty a draft.
     return (
       this.name === other.name &&
       this.sets.length === other.sets.length &&
@@ -374,6 +410,7 @@ export class CardioExerciseBlueprint {
       sets: this.sets.map((x) => x.toJSON()),
       notes: this.notes,
       link: this.link,
+      library: this.library ? exerciseLibraryInfoToJSON(this.library) : undefined,
     };
   }
 
@@ -383,6 +420,7 @@ export class CardioExerciseBlueprint {
       other.sets ?? this.sets,
       other.notes ?? this.notes,
       other.link ?? this.link,
+      'library' in other ? other.library : this.library,
     );
   }
 }
@@ -764,6 +802,7 @@ export interface WeightedExerciseBlueprintInit {
   notes?: string;
   link?: string;
   resistance?: Resistance;
+  library?: ExerciseLibraryInfo | undefined;
   /** Authoring shorthand for `plannedSets`, projected through {@link plannedSetsOf}. */
   sets?: number;
   repsConfig?: RepsConfig;
@@ -781,9 +820,10 @@ export class WeightedExerciseBlueprint {
     readonly notes: string,
     readonly link: string,
     readonly resistance: Resistance = 'external',
+    readonly library?: ExerciseLibraryInfo,
   ) {}
 
-  /** Build a blueprint from named fields; preferred over the constructor's eight positional arguments. */
+  /** Build a blueprint from named fields; preferred over the constructor's positional arguments. */
   static of(init: WeightedExerciseBlueprintInit = {}): WeightedExerciseBlueprint {
     return new WeightedExerciseBlueprint(
       init.name ?? '',
@@ -794,6 +834,7 @@ export class WeightedExerciseBlueprint {
       init.notes ?? '',
       init.link ?? '',
       init.resistance ?? 'external',
+      init.library,
     );
   }
 
@@ -811,6 +852,7 @@ export class WeightedExerciseBlueprint {
       json.notes,
       json.link,
       json.resistance,
+      json.library ? exerciseLibraryInfoFromJSON(json.library) : undefined,
     );
   }
 
@@ -873,6 +915,8 @@ export class WeightedExerciseBlueprint {
       return false;
     }
 
+    // The library snapshot is display metadata, not identity: a refreshed
+    // library text must never flag a plan diff or dirty a draft.
     return (
       this.name === other.name &&
       plannedSetsEqual(this.plannedSets, other.plannedSets) &&
@@ -898,6 +942,7 @@ export class WeightedExerciseBlueprint {
       notes: this.notes,
       link: this.link,
       resistance: this.resistance,
+      library: this.library ? exerciseLibraryInfoToJSON(this.library) : undefined,
     };
   }
 
@@ -914,6 +959,7 @@ export class WeightedExerciseBlueprint {
       other.notes ?? this.notes,
       other.link ?? this.link,
       other.resistance ?? this.resistance,
+      'library' in other ? other.library : this.library,
     );
   }
 }

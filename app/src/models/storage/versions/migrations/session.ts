@@ -78,4 +78,11 @@ export const sessionMigrations = createMigrations<InitialSessionJSON>()
           },
     ),
   }))
+  .add((session) => ({
+    ...session,
+    version: 8,
+    // The library snapshot is optional: pre-snapshot blueprints pass through
+    // untouched and render without the meta line, exactly like customs.
+    recordedExercises: session.recordedExercises.map((ex) => ({ ...ex })),
+  }))
   .build<SessionJSON>();

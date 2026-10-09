@@ -17,6 +17,11 @@ export const RingsRow = styled.View`
 export const RingSlot = styled.View`
   flex: 1;
   align-items: center;
+`;
+
+/** Fixed square so the absolute center always lands mid-ring. */
+export const RingBox = styled.View`
+  align-items: center;
   justify-content: center;
 `;
 

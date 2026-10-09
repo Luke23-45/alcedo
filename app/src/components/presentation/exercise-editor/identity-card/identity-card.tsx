@@ -33,13 +33,21 @@ import {
 export interface SearchResultItem {
   name: string;
   subtitle?: string;
+  /** Built-in catalog category ('cardio', 'strength', …); '' for custom exercises. */
+  category: string;
+  /** Full descriptor detail; absent for the custom-name row (nothing to snapshot). */
+  library?: {
+    equipment: string | null;
+    muscles: string[];
+    instructions: string;
+  };
 }
 
 export interface SearchSectionProps {
   query: string;
   onQueryChange: (query: string) => void;
   results: SearchResultItem[];
-  onSelectResult: (name: string) => void;
+  onSelectResult: (item: SearchResultItem) => void;
   searchFocused: boolean;
   onSearchFocusChange: (focused: boolean) => void;
 }
@@ -107,7 +115,17 @@ function SearchHintRow({ query, results }: { query: string; results: SearchResul
   return null;
 }
 
-function SearchResults({ results, onSelectResult }: Pick<SearchSectionProps, 'results' | 'onSelectResult'>) {
+function SearchResults({
+  results,
+  query,
+  onSelectResult,
+}: Pick<SearchSectionProps, 'results' | 'onSelectResult'> & { query: string }) {
+  const { t } = useTranslate();
+  // The escape hatch: a typed name that matches nothing is still a valid
+  // exercise. Without this row a custom name (or an empty catalog) strands
+  // the add flow with Done disabled and no way forward.
+  const customName = query.trim();
+  const customAccent = tileAccent(results.length);
   return (
     <View>
       {results.map((result, index) => {
@@ -116,7 +134,7 @@ function SearchResults({ results, onSelectResult }: Pick<SearchSectionProps, 're
           <View key={`${result.name}::${index}`}>
             {index > 0 ? <Hairline /> : null}
             <ResultRow
-              onPress={() => onSelectResult(result.name)}
+              onPress={() => onSelectResult(result)}
               accessibilityRole="button"
               accessibilityLabel={result.name}
             >
@@ -133,6 +151,25 @@ function SearchResults({ results, onSelectResult }: Pick<SearchSectionProps, 're
           </View>
         );
       })}
+      {customName.length > 0 ? (
+        <View>
+          {results.length > 0 ? <Hairline /> : null}
+          <ResultRow
+            onPress={() => onSelectResult({ name: customName, category: '' })}
+            accessibilityRole="button"
+            accessibilityLabel={t('exercise.editor.search.use_name', 'Use “{name}”', { name: customName })}
+          >
+            <ResultTile $bg={customAccent.bg}>
+              <ResultTileLetter $fg={customAccent.fg}>+</ResultTileLetter>
+            </ResultTile>
+            <ResultTextColumn>
+              <ResultName numberOfLines={1} ellipsizeMode="tail">
+                {t('exercise.editor.search.use_name', 'Use “{name}”', { name: customName })}
+              </ResultName>
+            </ResultTextColumn>
+          </ResultRow>
+        </View>
+      ) : null}
       <ResultsBottomPad />
     </View>
   );
@@ -144,19 +181,26 @@ function SearchResults({ results, onSelectResult }: Pick<SearchSectionProps, 're
  */
 export function AddSearchCards(props: SearchSectionProps) {
   const { query, results } = props;
+  const { t } = useTranslate();
   return (
     <View>
       <Card radius={20}>
         <AddSearchPad>
           <SearchFieldControl {...props} compact />
           <SearchHintRow query={query} results={results} />
+          <SearchHint>
+            {t(
+              'exercise.editor.search.pick_guidance',
+              'Pick from the library or use your own name — Done unlocks once the exercise has a name.',
+            )}
+          </SearchHint>
         </AddSearchPad>
       </Card>
-      {results.length > 0 ? (
+      {results.length > 0 || query.trim().length > 0 ? (
         <View>
           <SearchSection>
             <Card radius={20}>
-              <SearchResults results={results} onSelectResult={props.onSelectResult} />
+              <SearchResults results={results} query={query} onSelectResult={props.onSelectResult} />
             </Card>
           </SearchSection>
         </View>
@@ -207,7 +251,7 @@ export function IdentityCard({
             <SearchFieldControl {...search} />
             <SearchHintRow query={search.query} results={search.results} />
           </SearchPad>
-          <SearchResults results={search.results} onSelectResult={search.onSelectResult} />
+          <SearchResults results={search.results} query={search.query} onSelectResult={search.onSelectResult} />
         </SearchSection>
       ) : null}
     </Card>

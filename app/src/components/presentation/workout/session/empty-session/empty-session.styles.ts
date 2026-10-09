@@ -4,8 +4,10 @@ import { sessionPalette } from '../session-tokens';
 
 export const EmptyWrap = styled.View`
   align-items: center;
-  padding-top: 46px;
+  padding-top: 32px;
   padding-horizontal: 16px;
+  /* The block owns its trailing rhythm: button-to-bodyweight was 0pt. */
+  padding-bottom: 24px;
 `;
 
 export const Title = styled.Text`
@@ -17,7 +19,7 @@ export const Title = styled.Text`
   letter-spacing: -0.4px;
   text-align: center;
   color: ${({ theme }) => sessionPalette(theme.isDark).empty.title};
-  margin-top: 34px;
+  margin-top: 24px;
 `;
 
 export const Body = styled.Text`

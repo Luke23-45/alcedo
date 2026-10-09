@@ -7,6 +7,7 @@ import { DetectLanguage, detectLanguageOrPreferred } from '@/utils/language-dete
 import en from '../i18n/en.json';
 
 import { FormatSimple, TolgeeCore as Tolgee, type TolgeeInstance, type TreeTranslationsData } from '@tolgee/core';
+import { FormatIcu } from '@tolgee/format-icu';
 import { PreferenceService } from '@/services/preference-service';
 
 export const supportedLanguages = [
@@ -78,6 +79,7 @@ export const getTolgee = (preferenceService: PreferenceService) => {
     supportedLanguages.map((x) => x.code),
   );
   const tolgee = Tolgee()
+    .use(FormatIcu())
     .use(FormatSimple())
     .use(DetectLanguage(preferenceService))
     .init({
